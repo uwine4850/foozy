@@ -7,13 +7,10 @@ import (
 )
 
 type IRouter interface {
-	Get(pattern string, fn func(w http.ResponseWriter, r *http.Request))
-	Post(pattern string, fn func(w http.ResponseWriter, r *http.Request))
+	Get(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager IManager))
+	Post(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager IManager))
 	GetMux() *http.ServeMux
 	SetTemplateEngine(engine tmlengine.ITemplateEngine)
-	SetTemplatePath(templatePath string)
-	RenderTemplate(w http.ResponseWriter) error
-	SetContext(data map[string]interface{})
 }
 
 type Router struct {
@@ -24,18 +21,19 @@ type Router struct {
 	TemplateEngine tmlengine.ITemplateEngine
 	templatePath   string
 	context        map[string]interface{}
+	manager        IManager
 }
 
-func NewRouter() *Router {
-	return &Router{mux: *http.NewServeMux()}
+func NewRouter(manager IManager) *Router {
+	return &Router{mux: *http.NewServeMux(), manager: manager}
 }
 
-func (rt *Router) Get(pattern string, fn func(w http.ResponseWriter, r *http.Request)) {
+func (rt *Router) Get(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager IManager)) {
 	rt.pattern = pattern
 	rt.mux.Handle(pattern, rt.getHandleFunc("GET", fn))
 }
 
-func (rt *Router) Post(pattern string, fn func(w http.ResponseWriter, r *http.Request)) {
+func (rt *Router) Post(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager IManager)) {
 	rt.pattern = pattern
 	rt.mux.Handle(pattern, rt.getHandleFunc("POST", fn))
 }
@@ -44,7 +42,7 @@ func (rt *Router) GetMux() *http.ServeMux {
 	return &rt.mux
 }
 
-func (rt *Router) getHandleFunc(method string, fn func(w http.ResponseWriter, r *http.Request)) http.HandlerFunc {
+func (rt *Router) getHandleFunc(method string, fn func(w http.ResponseWriter, r *http.Request, manager IManager)) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		rt.setWR(writer, request)
 		if !rt.validateMethod(method) {
@@ -53,7 +51,7 @@ func (rt *Router) getHandleFunc(method string, fn func(w http.ResponseWriter, r 
 		if !rt.validateRootUrl() {
 			return
 		}
-		fn(writer, request)
+		fn(writer, request, rt.manager)
 	}
 }
 
@@ -81,21 +79,4 @@ func (rt *Router) setWR(w http.ResponseWriter, r *http.Request) {
 
 func (rt *Router) SetTemplateEngine(engine tmlengine.ITemplateEngine) {
 	rt.TemplateEngine = engine
-}
-
-func (rt *Router) RenderTemplate(w http.ResponseWriter) error {
-	rt.TemplateEngine.SetPath(rt.templatePath)
-	err := rt.TemplateEngine.Exec(w)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (rt *Router) SetTemplatePath(templatePath string) {
-	rt.templatePath = templatePath
-}
-
-func (rt *Router) SetContext(data map[string]interface{}) {
-	rt.TemplateEngine.SetContext(data)
 }
