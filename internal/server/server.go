@@ -1,7 +1,7 @@
 package server
 
 import (
-	"foozy/internal/router"
+	"github.com/uwine4850/foozy/internal/router"
 	"net/http"
 )
 
