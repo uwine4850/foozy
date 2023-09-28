@@ -11,11 +11,14 @@ type IManager interface {
 	RenderTemplate(w http.ResponseWriter) error
 	SetTemplatePath(templatePath string)
 	SetContext(data map[string]interface{})
+	SetSlugParams(params map[string]string)
+	GetSlugParams(key string) (string, bool)
 }
 
 type Manager struct {
 	TemplateEngine tmlengine.ITemplateEngine
 	templatePath   string
+	slugParams     map[string]string
 }
 
 func NewManager() *Manager {
@@ -50,4 +53,15 @@ func (m *Manager) SetTemplatePath(templatePath string) {
 // SetContext Setting variables for html template.
 func (m *Manager) SetContext(data map[string]interface{}) {
 	m.TemplateEngine.SetContext(data)
+}
+
+// SetSlugParams sets the slug parameters.
+func (m *Manager) SetSlugParams(params map[string]string) {
+	m.slugParams = params
+}
+
+// GetSlugParams returns the parameter by key. If the key is not found returns false.
+func (m *Manager) GetSlugParams(key string) (string, bool) {
+	res, ok := m.slugParams[key]
+	return res, ok
 }
