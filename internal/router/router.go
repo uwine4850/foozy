@@ -48,19 +48,8 @@ func (rt *Router) getHandleFunc(method string, fn func(w http.ResponseWriter, r 
 		if !rt.validateMethod(method) {
 			return
 		}
-		if !rt.validateRootUrl() {
-			return
-		}
 		fn(writer, request, rt.manager)
 	}
-}
-
-func (rt *Router) validateRootUrl() bool {
-	if rt.pattern == "/" && rt.request.URL.Path != "/" {
-		http.NotFound(rt.writer, rt.request)
-		return false
-	}
-	return true
 }
 
 func (rt *Router) validateMethod(method string) bool {
@@ -79,4 +68,12 @@ func (rt *Router) setWR(w http.ResponseWriter, r *http.Request) {
 
 func (rt *Router) SetTemplateEngine(engine tmlengine.ITemplateEngine) {
 	rt.TemplateEngine = engine
+}
+
+func ValidateRootUrl(w http.ResponseWriter, r *http.Request) bool {
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return false
+	}
+	return true
 }
