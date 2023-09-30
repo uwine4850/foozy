@@ -2,6 +2,7 @@ package livereload
 
 import (
 	"fmt"
+	"github.com/uwine4850/foozy/internal/interfaces"
 	"log"
 	"os"
 	"os/exec"
@@ -12,11 +13,11 @@ import (
 type Reload struct {
 	pathToServerFile string
 	dirs             []string
-	wiretap          IWiretap
+	wiretap          interfaces.IWiretap
 	exitCh           chan os.Signal
 }
 
-func NewReload(pathToServerFile string, dirs []string, wiretap IWiretap) *Reload {
+func NewReload(pathToServerFile string, dirs []string, wiretap interfaces.IWiretap) *Reload {
 	return &Reload{pathToServerFile: pathToServerFile, dirs: dirs, wiretap: wiretap, exitCh: make(chan os.Signal, 1)}
 }
 

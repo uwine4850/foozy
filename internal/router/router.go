@@ -3,7 +3,6 @@ package router
 import (
 	"fmt"
 	"github.com/uwine4850/foozy/internal/interfaces"
-	"github.com/uwine4850/foozy/internal/tmlengine"
 	"github.com/uwine4850/foozy/internal/utils"
 	"log"
 	"net/http"
@@ -14,7 +13,7 @@ type Router struct {
 	mux            http.ServeMux
 	request        *http.Request
 	writer         http.ResponseWriter
-	TemplateEngine tmlengine.ITemplateEngine
+	TemplateEngine interfaces.ITemplateEngine
 	templatePath   string
 	context        map[string]interface{}
 	manager        interfaces.IManager
@@ -61,11 +60,18 @@ func (rt *Router) getHandleFunc(pattern string, method string, fn func(w http.Re
 				rt.manager.SetSlugParams(params)
 			}
 		}
+		// Run middlewares.
 		if rt.middleware != nil {
-			err := rt.middleware.RunPreMddl(writer, request, rt.manager)
+			// Running asynchronous middleware.
+			rt.middleware.RunAsyncMddl(writer, request, rt.manager)
+			// Running synchronous middleware.
+			err := rt.middleware.RunMddl(writer, request, rt.manager)
 			if err != nil {
 				panic(err)
 			}
+
+			// Waiting for all asynchronous middleware to complete.
+			rt.middleware.WaitAsyncMddl()
 		}
 		fn(writer, request, rt.manager)
 	}
@@ -86,7 +92,7 @@ func (rt *Router) setWR(w http.ResponseWriter, r *http.Request) {
 	rt.request = r
 }
 
-func (rt *Router) SetTemplateEngine(engine tmlengine.ITemplateEngine) {
+func (rt *Router) SetTemplateEngine(engine interfaces.ITemplateEngine) {
 	rt.TemplateEngine = engine
 }
 

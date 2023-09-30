@@ -1,22 +1,34 @@
 package router
 
 import (
+	"github.com/uwine4850/foozy/internal/interfaces"
 	"github.com/uwine4850/foozy/internal/tmlengine"
 	"github.com/uwine4850/foozy/internal/utils"
 	"net/http"
+	"sync"
 )
 
 type Manager struct {
-	TemplateEngine tmlengine.ITemplateEngine
+	TemplateEngine interfaces.ITemplateEngine
 	templatePath   string
 	slugParams     map[string]string
+	userContext    sync.Map
 }
 
 func NewManager() *Manager {
 	return &Manager{TemplateEngine: &tmlengine.TemplateEngine{}}
 }
 
-func (m *Manager) SetTemplateEngine(engine tmlengine.ITemplateEngine) {
+func (m *Manager) SetUserContext(key string, value interface{}) {
+	m.userContext.Store(key, value)
+}
+
+func (m *Manager) GetUserContext(key string) (any, bool) {
+	value, ok := m.userContext.Load(key)
+	return value, ok
+}
+
+func (m *Manager) SetTemplateEngine(engine interfaces.ITemplateEngine) {
 	m.TemplateEngine = engine
 }
 
