@@ -6,15 +6,6 @@ import (
 	"net/http"
 )
 
-type IManager interface {
-	SetTemplateEngine(engine tmlengine.ITemplateEngine)
-	RenderTemplate(w http.ResponseWriter) error
-	SetTemplatePath(templatePath string)
-	SetContext(data map[string]interface{})
-	SetSlugParams(params map[string]string)
-	GetSlugParams(key string) (string, bool)
-}
-
 type Manager struct {
 	TemplateEngine tmlengine.ITemplateEngine
 	templatePath   string

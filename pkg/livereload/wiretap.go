@@ -1,4 +1,4 @@
-package liverealod
+package livereload
 
 import (
 	"errors"
@@ -10,17 +10,6 @@ import (
 	"sync"
 	"time"
 )
-
-type IWiretap interface {
-	OnStart(fn func())
-	GetOnStartFunc() func()
-	OnTrigger(fn func(filePath string))
-	SetUserParams(key string, value interface{})
-	GetUserParams(key string) (interface{}, bool)
-	SetDirs(dirs []string)
-	Start() error
-	Stop()
-}
 
 type WiretapFiles struct {
 	dirs       []string

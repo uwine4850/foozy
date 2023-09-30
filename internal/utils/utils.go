@@ -34,3 +34,12 @@ func SplitUrlFromFirstSlug(url string) string {
 	}
 	return url[:index]
 }
+
+func SliceContains[T comparable](slice []T, item T) bool {
+	for i := 0; i < len(slice); i++ {
+		if slice[i] == item {
+			return true
+		}
+	}
+	return false
+}

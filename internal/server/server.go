@@ -2,18 +2,18 @@ package server
 
 import (
 	"fmt"
-	"github.com/uwine4850/foozy/internal/router"
+	"github.com/uwine4850/foozy/internal/interfaces"
 	"log"
 	"net/http"
 )
 
 type Server struct {
-	router router.IRouter
+	router interfaces.IRouter
 	addr   string
 	serv   *http.Server
 }
 
-func NewServer(addr string, router router.IRouter) *Server {
+func NewServer(addr string, router interfaces.IRouter) *Server {
 	s := &Server{router: router, addr: addr}
 	s.serv = &http.Server{
 		Addr:    s.addr,

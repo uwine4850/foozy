@@ -2,19 +2,13 @@ package router
 
 import (
 	"fmt"
+	"github.com/uwine4850/foozy/internal/interfaces"
 	"github.com/uwine4850/foozy/internal/tmlengine"
 	"github.com/uwine4850/foozy/internal/utils"
 	"log"
 	"net/http"
 	"strings"
 )
-
-type IRouter interface {
-	Get(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager IManager))
-	Post(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager IManager))
-	GetMux() *http.ServeMux
-	SetTemplateEngine(engine tmlengine.ITemplateEngine)
-}
 
 type Router struct {
 	mux            http.ServeMux
@@ -23,21 +17,22 @@ type Router struct {
 	TemplateEngine tmlengine.ITemplateEngine
 	templatePath   string
 	context        map[string]interface{}
-	manager        IManager
+	manager        interfaces.IManager
 	enableLog      bool
+	middleware     interfaces.IMiddleware
 }
 
-func NewRouter(manager IManager) *Router {
+func NewRouter(manager interfaces.IManager) *Router {
 	return &Router{mux: *http.NewServeMux(), manager: manager}
 }
 
 // Get Processing a GET request. Called only once.
-func (rt *Router) Get(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager IManager)) {
+func (rt *Router) Get(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) {
 	rt.mux.Handle(utils.SplitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "GET", fn))
 }
 
 // Post Processing a POST request. Called only once.
-func (rt *Router) Post(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager IManager)) {
+func (rt *Router) Post(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) {
 	rt.mux.Handle(utils.SplitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "POST", fn))
 }
 
@@ -46,7 +41,7 @@ func (rt *Router) GetMux() *http.ServeMux {
 }
 
 // getHandleFunc This method handles each http method call.
-func (rt *Router) getHandleFunc(pattern string, method string, fn func(w http.ResponseWriter, r *http.Request, manager IManager)) http.HandlerFunc {
+func (rt *Router) getHandleFunc(pattern string, method string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		rt.setWR(writer, request)
 		if !rt.validateMethod(method) {
@@ -64,6 +59,12 @@ func (rt *Router) getHandleFunc(pattern string, method string, fn func(w http.Re
 			}
 			if params != nil {
 				rt.manager.SetSlugParams(params)
+			}
+		}
+		if rt.middleware != nil {
+			err := rt.middleware.RunPreMddl(writer, request, rt.manager)
+			if err != nil {
+				panic(err)
 			}
 		}
 		fn(writer, request, rt.manager)
@@ -97,6 +98,10 @@ func (rt *Router) printLog(request *http.Request) {
 	if rt.enableLog {
 		log.Println(fmt.Sprintf("%s %s", request.Method, request.URL.Path))
 	}
+}
+
+func (rt *Router) SetMiddleware(middleware interfaces.IMiddleware) {
+	rt.middleware = middleware
 }
 
 // ValidateRootUrl Checks if the root url matches the "/" character.
