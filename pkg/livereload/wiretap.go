@@ -1,12 +1,8 @@
 package livereload
 
 import (
-	"errors"
-	"github.com/uwine4850/foozy/internal/server"
 	"os"
-	"os/exec"
 	"path/filepath"
-	"runtime"
 	"sync"
 	"time"
 )
@@ -15,24 +11,22 @@ type WiretapFiles struct {
 	dirs       []string
 	files      []string
 	onTrigger  func(filePath string)
-	StartFunc  func()
+	onStart    func()
 	UserParams sync.Map
-	Server     *server.Server
 	wg         sync.WaitGroup
-	done       chan bool
 }
 
-func NewWiretap() *WiretapFiles {
-	return &WiretapFiles{onTrigger: func(filePath string) {}, StartFunc: func() {}}
+func NewWiretap3() *WiretapFiles {
+	return &WiretapFiles{onTrigger: func(filePath string) {}, onStart: func() {}}
 }
 
 // OnStart set the function that will be executed once during the start of the listening session.
 func (f *WiretapFiles) OnStart(fn func()) {
-	f.StartFunc = fn
+	f.onStart = fn
 }
 
 func (f *WiretapFiles) GetOnStartFunc() func() {
-	return f.StartFunc
+	return f.onStart
 }
 
 // OnTrigger a function that will be executed each time the trigger is executed.
@@ -57,16 +51,17 @@ func (f *WiretapFiles) SetDirs(dirs []string) {
 
 // Start starting a wiretap.
 func (f *WiretapFiles) Start() error {
-	f.checkPlatform()
 	err := f.readDirs()
 	if err != nil {
 		return err
 	}
+
 	f.wg.Add(1)
-	go f.StartFunc()
-	for _, filePath := range f.files {
+	go f.onStart()
+
+	for i := 0; i < len(f.files); i++ {
 		f.wg.Add(1)
-		filePath := filePath
+		filePath := f.files[i]
 		go func() {
 			err := f.watchFile(filePath, &f.wg)
 			if err != nil {
@@ -74,29 +69,38 @@ func (f *WiretapFiles) Start() error {
 			}
 		}()
 	}
-	<-f.done
 	f.wg.Wait()
 	return nil
-}
-
-func (f *WiretapFiles) Stop() {
-	f.done <- true
 }
 
 // watchFile listening to an individual file.
 func (f *WiretapFiles) watchFile(filePath string, wg *sync.WaitGroup) error {
 	defer wg.Done()
 
+	lastModTime := time.Time{}
+	var init bool
+	if lastModTime.String() == "0001-01-01 00:00:00 +0000 UTC" {
+		init = true
+	}
+
 	for {
-		cmd := exec.Command("inotifywait", "-e", "modify", filePath)
-		output, err := cmd.CombinedOutput()
+		fileInfo, err := os.Stat(filePath)
 		if err != nil {
-			return errors.New(string(output))
+			return err
 		}
-
-		f.onTrigger(filePath)
-
-		time.Sleep(1 * time.Second)
+		// When the lastModTime variable is only initialized, it should be set to the correct time to modify the file.
+		// Otherwise, lastModTime and file modification time will not coincide and the event will be filled.
+		if init {
+			lastModTime = fileInfo.ModTime()
+			init = false
+			continue
+		}
+		// If the lastModTime and the current time of file modification do not coincide,
+		// it means that the file has been modified.
+		if fileInfo.ModTime() != lastModTime {
+			lastModTime = fileInfo.ModTime()
+			f.onTrigger(filePath)
+		}
 	}
 }
 
@@ -124,10 +128,4 @@ func (f *WiretapFiles) readDirs() error {
 		}
 	}
 	return nil
-}
-
-func (f *WiretapFiles) checkPlatform() {
-	if runtime.GOOS != "linux" {
-		panic("At the moment, wiretap only supports the Linux platform.")
-	}
 }

@@ -42,7 +42,6 @@ func (r *Reload) onStart() {
 			if err != nil {
 				panic(fmt.Sprintf("Error killing process: %v\n", err))
 			}
-			r.wiretap.Stop()
 		}
 	}()
 	cmd.Run()

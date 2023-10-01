@@ -8,5 +8,4 @@ type IWiretap interface {
 	GetUserParams(key string) (interface{}, bool)
 	SetDirs(dirs []string)
 	Start() error
-	Stop()
 }
