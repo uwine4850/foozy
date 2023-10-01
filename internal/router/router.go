@@ -49,8 +49,8 @@ func (rt *Router) getHandleFunc(pattern string, method string, fn func(w http.Re
 		rt.printLog(request)
 
 		// Check if the url matches its pattern with possible slug fields.
-		if request.URL.Path != "/" {
-			parseUrl := ParseSlugIndex(utils.SplitUrl(pattern))
+		parseUrl := ParseSlugIndex(utils.SplitUrl(pattern))
+		if request.URL.Path != "/" && len(parseUrl) > 0 {
 			res, params := HandleSlugUrls(parseUrl, utils.SplitUrl(pattern), utils.SplitUrl(request.URL.Path))
 			if res != request.URL.Path {
 				http.NotFound(writer, request)
