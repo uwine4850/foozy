@@ -25,6 +25,8 @@ func NewDatabase(username string, password string, host string, port string, dat
 	return &d
 }
 
+// Connect connecting to a mysql database.
+// Also, initialization of synchronous and asynchronous queries.
 func (d *Database) Connect() error {
 	connStr := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", d.username, d.password, d.host, d.port, d.database)
 	db, err := sql.Open("mysql", connStr)
@@ -43,6 +45,7 @@ func (d *Database) Connect() error {
 	return nil
 }
 
+// Close closes the connection to the database.
 func (d *Database) Close() error {
 	err := d.db.Close()
 	if err != nil {
