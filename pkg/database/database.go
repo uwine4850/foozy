@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/uwine4850/foozy/internal/interfaces"
 )
 
 type Database struct {
@@ -13,10 +14,15 @@ type Database struct {
 	port     string
 	database string
 	db       *sql.DB
+	SyncQ    interfaces.ISyncQueries
+	AsyncQ   interfaces.IAsyncQueries
 }
 
 func NewDatabase(username string, password string, host string, port string, database string) *Database {
-	return &Database{username: username, password: password, host: host, port: port, database: database}
+	d := Database{username: username, password: password, host: host, port: port, database: database}
+	d.SetSyncQueries(&SyncQueries{})
+	d.SetAsyncQueries(&AsyncQueries{})
+	return &d
 }
 
 func (d *Database) Connect() error {
@@ -31,6 +37,9 @@ func (d *Database) Connect() error {
 		return err
 	}
 	d.db = db
+
+	d.SyncQ.SetDB(db)
+	d.AsyncQ.SetSyncQueries(d.SyncQ)
 	return nil
 }
 
@@ -40,4 +49,12 @@ func (d *Database) Close() error {
 		return err
 	}
 	return nil
+}
+
+func (d *Database) SetSyncQueries(q interfaces.ISyncQueries) {
+	d.SyncQ = q
+}
+
+func (d *Database) SetAsyncQueries(q interfaces.IAsyncQueries) {
+	d.AsyncQ = q
 }
