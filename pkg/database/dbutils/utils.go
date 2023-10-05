@@ -2,7 +2,11 @@ package dbutils
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
+	"reflect"
+	"strconv"
+	"time"
 )
 
 // AsyncQueryData a structure that represents the result of executing an asynchronous database query.
@@ -81,4 +85,65 @@ func ParseEquals(equals []DbEquals, conjunction string) (string, []interface{}) 
 		}
 	}
 	return w, values
+}
+
+// ParseString processing text values from a database.
+func ParseString(value interface{}) string {
+	_uint8 := value.([]uint8)
+	return string(_uint8)
+}
+
+// ParseInt processing integer values from a database.
+// Considered, the interface format may be []uint8.
+func ParseInt(value interface{}) (int, error) {
+	_type := reflect.TypeOf(value).String()
+	var v int64
+	switch _type {
+	case "[]_uint8":
+		_uint8 := value.([]uint8)
+		parseInt, err := strconv.ParseInt(string(_uint8), 0, 64)
+		if err != nil {
+			return 0, err
+		}
+		v = parseInt
+	case "int64":
+		v = value.(int64)
+	}
+	return int(v), nil
+}
+
+// ParseDateTime parsing a date value from a database.
+// The date format must be set in the layout form.
+// For example, if the date is 2023-04-06 08:04:05, the layout will be 2006-01-02 15:04:05.
+// The time of the template should not change, only the form can change.
+func ParseDateTime(layout string, value interface{}) (time.Time, error) {
+	strValue := ParseString(value)
+	parse, err := time.Parse(layout, strValue)
+	if err != nil {
+		return parse, err
+	}
+	return parse, nil
+}
+
+// ParseFloat processing the float data type from the database.
+// It is taken into account that the interface format can be []uint8.
+func ParseFloat(value interface{}) (float64, error) {
+	if value == nil {
+		return -1, errors.New("value is nil")
+	}
+	_type := reflect.TypeOf(value).String()
+	var v float64
+	switch _type {
+	case "[]uint8":
+		_uint8 := value.([]uint8)
+		float, err := strconv.ParseFloat(string(_uint8), 64)
+		if err != nil {
+			return float, err
+		}
+		v = float
+	case "float32":
+		_v := value.(float32)
+		v = float64(_v)
+	}
+	return v, nil
 }
