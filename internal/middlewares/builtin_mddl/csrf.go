@@ -15,6 +15,7 @@ func GenerateAndSetCsrf(w http.ResponseWriter, r *http.Request, manager interfac
 			Value:    csrfToken,
 			MaxAge:   1800,
 			HttpOnly: true,
+			Secure:   true,
 		}
 		http.SetCookie(w, cookie)
 	}

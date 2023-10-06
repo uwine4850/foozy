@@ -55,3 +55,20 @@ func (f *Form) Value(key string) string {
 func (f *Form) File(key string) (multipart.File, *multipart.FileHeader, error) {
 	return f.request.FormFile(key)
 }
+
+// ValidateCsrfToken checks the validity of the csrf token. If no errors are detected, the token is valid.
+// It is desirable to use this method only after Parse() method.
+func (f *Form) ValidateCsrfToken() error {
+	csrfToken := f.Value("csrf_token")
+	if csrfToken == "" {
+		return ErrCsrfTokenNotFound{}
+	}
+	cookie, err := f.request.Cookie("csrf_token")
+	if err != nil {
+		return err
+	}
+	if cookie.Value != csrfToken {
+		return ErrCsrfTokenDoesNotMatch{}
+	}
+	return nil
+}
