@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"os"
 	"strings"
 )
@@ -42,4 +44,21 @@ func SliceContains[T comparable](slice []T, item T) bool {
 		}
 	}
 	return false
+}
+
+func GenerateCsrfToken() string {
+	tokenBytes := make([]byte, 32)
+	_, err := rand.Read(tokenBytes)
+	if err != nil {
+		panic(err)
+	}
+
+	csrfToken := base64.StdEncoding.EncodeToString(tokenBytes)
+	return csrfToken
+}
+
+func MergeMap[T1 comparable, T2 any](map1 *map[T1]T2, map2 map[T1]T2) {
+	for key, value := range map2 {
+		(*map1)[key] = value
+	}
 }

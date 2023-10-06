@@ -6,7 +6,7 @@ import (
 
 type IManager interface {
 	SetTemplateEngine(engine ITemplateEngine)
-	RenderTemplate(w http.ResponseWriter) error
+	RenderTemplate(w http.ResponseWriter, r *http.Request) error
 	SetTemplatePath(templatePath string)
 	SetContext(data map[string]interface{})
 	SetSlugParams(params map[string]string)

@@ -16,7 +16,7 @@ type Manager struct {
 }
 
 func NewManager() *Manager {
-	return &Manager{TemplateEngine: &tmlengine.TemplateEngine{}}
+	return &Manager{TemplateEngine: tmlengine.NewTemplateEngine()}
 }
 
 func (m *Manager) SetUserContext(key string, value interface{}) {
@@ -33,7 +33,7 @@ func (m *Manager) SetTemplateEngine(engine interfaces.ITemplateEngine) {
 }
 
 // RenderTemplate Rendering a template using a template engine.
-func (m *Manager) RenderTemplate(w http.ResponseWriter) error {
+func (m *Manager) RenderTemplate(w http.ResponseWriter, r *http.Request) error {
 	if m.templatePath == "" {
 		return &ErrTemplatePathNotSet{}
 	}
@@ -41,7 +41,7 @@ func (m *Manager) RenderTemplate(w http.ResponseWriter) error {
 		return &ErrTemplatePathNotExist{m.templatePath}
 	}
 	m.TemplateEngine.SetPath(m.templatePath)
-	err := m.TemplateEngine.Exec(w)
+	err := m.TemplateEngine.Exec(w, r)
 	if err != nil {
 		return err
 	}
