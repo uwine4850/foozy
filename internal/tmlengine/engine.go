@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/flosch/pongo2"
+	"github.com/uwine4850/foozy/internal/interfaces"
 	"github.com/uwine4850/foozy/internal/utils"
 	"net/http"
 )
@@ -12,10 +13,16 @@ type TemplateEngine struct {
 	path         string
 	templateFile *pongo2.Template
 	context      map[string]interface{}
+	writer       http.ResponseWriter
+	request      *http.Request
 }
 
-func NewTemplateEngine() *TemplateEngine {
-	return &TemplateEngine{context: make(map[string]interface{})}
+func NewTemplateEngine() (interfaces.ITemplateEngine, error) {
+	err := RegisterMultipleGlobalFilter(BuiltinFilters)
+	if err != nil {
+		return nil, err
+	}
+	return &TemplateEngine{context: make(map[string]interface{})}, nil
 }
 
 func (e *TemplateEngine) SetPath(path string) {
@@ -31,12 +38,12 @@ func (e *TemplateEngine) parseFile() error {
 	return nil
 }
 
-func (e *TemplateEngine) Exec(w http.ResponseWriter, r *http.Request) error {
+func (e *TemplateEngine) Exec() error {
 	err := e.parseFile()
 	if err != nil {
 		return err
 	}
-	err = e.setCsrfVariable(r)
+	err = e.setCsrfVariable(e.request)
 	if err != nil {
 		return err
 	}
@@ -44,7 +51,7 @@ func (e *TemplateEngine) Exec(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return err
 	}
-	_, err = w.Write([]byte(execute))
+	_, err = e.writer.Write([]byte(execute))
 	if err != nil {
 		return err
 	}
@@ -53,6 +60,14 @@ func (e *TemplateEngine) Exec(w http.ResponseWriter, r *http.Request) error {
 
 func (e *TemplateEngine) SetContext(data map[string]interface{}) {
 	utils.MergeMap(&e.context, data)
+}
+
+func (e *TemplateEngine) SetResponseWriter(w http.ResponseWriter) {
+	e.writer = w
+}
+
+func (e *TemplateEngine) SetRequest(r *http.Request) {
+	e.request = r
 }
 
 // setCsrfVariable sets the csrf token as a variable for the templating context.

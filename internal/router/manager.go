@@ -40,7 +40,9 @@ func (m *Manager) RenderTemplate(w http.ResponseWriter, r *http.Request) error {
 		return &ErrTemplatePathNotExist{m.templatePath}
 	}
 	m.TemplateEngine.SetPath(m.templatePath)
-	err := m.TemplateEngine.Exec(w, r)
+	m.TemplateEngine.SetResponseWriter(w)
+	m.TemplateEngine.SetRequest(r)
+	err := m.TemplateEngine.Exec()
 	if err != nil {
 		return err
 	}

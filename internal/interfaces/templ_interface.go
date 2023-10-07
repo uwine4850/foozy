@@ -4,6 +4,8 @@ import "net/http"
 
 type ITemplateEngine interface {
 	SetPath(files string)
-	Exec(w http.ResponseWriter, r *http.Request) error
+	Exec() error
 	SetContext(data map[string]interface{})
+	SetResponseWriter(w http.ResponseWriter)
+	SetRequest(r *http.Request)
 }
