@@ -2,7 +2,6 @@ package router
 
 import (
 	"github.com/uwine4850/foozy/internal/interfaces"
-	"github.com/uwine4850/foozy/internal/tmlengine"
 	"github.com/uwine4850/foozy/internal/utils"
 	"net/http"
 	"sync"
@@ -15,8 +14,8 @@ type Manager struct {
 	userContext    sync.Map
 }
 
-func NewManager() *Manager {
-	return &Manager{TemplateEngine: tmlengine.NewTemplateEngine()}
+func NewManager(engine interfaces.ITemplateEngine) *Manager {
+	return &Manager{TemplateEngine: engine}
 }
 
 func (m *Manager) SetUserContext(key string, value interface{}) {
