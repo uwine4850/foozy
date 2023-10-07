@@ -1,6 +1,7 @@
 package form
 
 import (
+	"html/template"
 	"mime/multipart"
 	"net/http"
 	"net/url"
@@ -48,7 +49,8 @@ func (f *Form) GetApplicationForm() url.Values {
 
 // Value getting a simple value of the form.
 func (f *Form) Value(key string) string {
-	return f.request.PostFormValue(key)
+	val := f.request.PostFormValue(key)
+	return template.HTMLEscapeString(val)
 }
 
 // File retrieving a file from a form. Multipart/form-data only.
