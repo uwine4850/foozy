@@ -19,6 +19,7 @@ type Router struct {
 	manager        interfaces.IManager
 	enableLog      bool
 	middleware     interfaces.IMiddleware
+	websocket      interfaces.IWebsocket
 }
 
 func NewRouter(manager interfaces.IManager) *Router {
@@ -33,6 +34,11 @@ func (rt *Router) Get(pattern string, fn func(w http.ResponseWriter, r *http.Req
 // Post Processing a POST request. Called only once.
 func (rt *Router) Post(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) {
 	rt.mux.Handle(utils.SplitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "POST", fn))
+}
+
+func (rt *Router) Ws(pattern string, ws interfaces.IWebsocket, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) {
+	rt.websocket = ws
+	rt.mux.Handle(utils.SplitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "WS", fn))
 }
 
 func (rt *Router) GetMux() *http.ServeMux {
@@ -73,12 +79,18 @@ func (rt *Router) getHandleFunc(pattern string, method string, fn func(w http.Re
 			// Waiting for all asynchronous middleware to complete.
 			rt.middleware.WaitAsyncMddl()
 		}
+		if method == "WS" {
+			rt.manager.SetWebsocket(rt.websocket)
+		}
 		fn(writer, request, rt.manager)
 	}
 }
 
 // validateMethod Check if the http method matches the expected method.
 func (rt *Router) validateMethod(method string) bool {
+	if method == "WS" {
+		return true
+	}
 	if rt.request.Method != method {
 		rt.writer.Header().Set("Allow", method)
 		http.Error(rt.writer, fmt.Sprintf("Method %s Not Allowed", rt.request.Method), 405)

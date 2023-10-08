@@ -12,6 +12,7 @@ type Manager struct {
 	templatePath   string
 	slugParams     map[string]string
 	userContext    sync.Map
+	websocket      interfaces.IWebsocket
 }
 
 func NewManager(engine interfaces.ITemplateEngine) *Manager {
@@ -68,4 +69,12 @@ func (m *Manager) SetSlugParams(params map[string]string) {
 func (m *Manager) GetSlugParams(key string) (string, bool) {
 	res, ok := m.slugParams[key]
 	return res, ok
+}
+
+func (m *Manager) GetWebSocket() interfaces.IWebsocket {
+	return m.websocket
+}
+
+func (m *Manager) SetWebsocket(websocket interfaces.IWebsocket) {
+	m.websocket = websocket
 }
