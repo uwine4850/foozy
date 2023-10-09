@@ -97,7 +97,11 @@ func (f *WiretapFiles) watchFile(filePath string, wg *sync.WaitGroup) error {
 		}
 		// If the lastModTime and the current time of file modification do not coincide,
 		// it means that the file has been modified.
-		if fileInfo.ModTime() != lastModTime {
+		// The diff variable is responsible for the time difference between the last file save and the current value.
+		// If the time is greater than 1.5 seconds and the above conditions are met, the trigger will be fired.
+		// This is to prevent the trigger from being triggered several times, because some editors save a file several times.
+		diff := fileInfo.ModTime().Sub(lastModTime)
+		if fileInfo.ModTime() != lastModTime && diff > 1500*time.Millisecond {
 			lastModTime = fileInfo.ModTime()
 			f.onTrigger(filePath)
 		}
