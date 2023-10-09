@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/uwine4850/foozy/internal/interfaces"
+	"github.com/uwine4850/foozy/pkg/interfaces"
 )
 
 type Database struct {

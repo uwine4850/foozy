@@ -2,8 +2,8 @@ package router
 
 import (
 	"fmt"
-	"github.com/uwine4850/foozy/internal/interfaces"
-	"github.com/uwine4850/foozy/internal/utils"
+	interfaces2 "github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/utils"
 	"log"
 	"net/http"
 	"strings"
@@ -13,30 +13,30 @@ type Router struct {
 	mux            http.ServeMux
 	request        *http.Request
 	writer         http.ResponseWriter
-	TemplateEngine interfaces.ITemplateEngine
+	TemplateEngine interfaces2.ITemplateEngine
 	templatePath   string
 	context        map[string]interface{}
-	manager        interfaces.IManager
+	manager        interfaces2.IManager
 	enableLog      bool
-	middleware     interfaces.IMiddleware
-	websocket      interfaces.IWebsocket
+	middleware     interfaces2.IMiddleware
+	websocket      interfaces2.IWebsocket
 }
 
-func NewRouter(manager interfaces.IManager) *Router {
+func NewRouter(manager interfaces2.IManager) *Router {
 	return &Router{mux: *http.NewServeMux(), manager: manager}
 }
 
 // Get Processing a GET request. Called only once.
-func (rt *Router) Get(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) {
+func (rt *Router) Get(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces2.IManager)) {
 	rt.mux.Handle(utils.SplitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "GET", fn))
 }
 
 // Post Processing a POST request. Called only once.
-func (rt *Router) Post(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) {
+func (rt *Router) Post(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces2.IManager)) {
 	rt.mux.Handle(utils.SplitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "POST", fn))
 }
 
-func (rt *Router) Ws(pattern string, ws interfaces.IWebsocket, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) {
+func (rt *Router) Ws(pattern string, ws interfaces2.IWebsocket, fn func(w http.ResponseWriter, r *http.Request, manager interfaces2.IManager)) {
 	rt.websocket = ws
 	rt.mux.Handle(utils.SplitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "WS", fn))
 }
@@ -46,7 +46,7 @@ func (rt *Router) GetMux() *http.ServeMux {
 }
 
 // getHandleFunc This method handles each http method call.
-func (rt *Router) getHandleFunc(pattern string, method string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) http.HandlerFunc {
+func (rt *Router) getHandleFunc(pattern string, method string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces2.IManager)) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		rt.setWR(writer, request)
 		if !rt.validateMethod(method) {
@@ -104,7 +104,7 @@ func (rt *Router) setWR(w http.ResponseWriter, r *http.Request) {
 	rt.request = r
 }
 
-func (rt *Router) SetTemplateEngine(engine interfaces.ITemplateEngine) {
+func (rt *Router) SetTemplateEngine(engine interfaces2.ITemplateEngine) {
 	rt.TemplateEngine = engine
 }
 
@@ -118,7 +118,7 @@ func (rt *Router) printLog(request *http.Request) {
 	}
 }
 
-func (rt *Router) SetMiddleware(middleware interfaces.IMiddleware) {
+func (rt *Router) SetMiddleware(middleware interfaces2.IMiddleware) {
 	rt.middleware = middleware
 }
 

@@ -1,8 +1,8 @@
 package database
 
 import (
-	"github.com/uwine4850/foozy/internal/interfaces"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
+	"github.com/uwine4850/foozy/pkg/interfaces"
 	"sync"
 )
 

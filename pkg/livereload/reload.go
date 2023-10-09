@@ -2,7 +2,7 @@ package livereload
 
 import (
 	"fmt"
-	"github.com/uwine4850/foozy/internal/interfaces"
+	"github.com/uwine4850/foozy/pkg/interfaces"
 	"log"
 	"os"
 	"os/exec"

@@ -1,21 +1,21 @@
 package router
 
 import (
-	"github.com/uwine4850/foozy/internal/interfaces"
-	"github.com/uwine4850/foozy/internal/utils"
+	interfaces2 "github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/utils"
 	"net/http"
 	"sync"
 )
 
 type Manager struct {
-	TemplateEngine interfaces.ITemplateEngine
+	TemplateEngine interfaces2.ITemplateEngine
 	templatePath   string
 	slugParams     map[string]string
 	userContext    sync.Map
-	websocket      interfaces.IWebsocket
+	websocket      interfaces2.IWebsocket
 }
 
-func NewManager(engine interfaces.ITemplateEngine) *Manager {
+func NewManager(engine interfaces2.ITemplateEngine) *Manager {
 	return &Manager{TemplateEngine: engine}
 }
 
@@ -28,7 +28,7 @@ func (m *Manager) GetUserContext(key string) (any, bool) {
 	return value, ok
 }
 
-func (m *Manager) SetTemplateEngine(engine interfaces.ITemplateEngine) {
+func (m *Manager) SetTemplateEngine(engine interfaces2.ITemplateEngine) {
 	m.TemplateEngine = engine
 }
 
@@ -71,10 +71,10 @@ func (m *Manager) GetSlugParams(key string) (string, bool) {
 	return res, ok
 }
 
-func (m *Manager) GetWebSocket() interfaces.IWebsocket {
+func (m *Manager) GetWebSocket() interfaces2.IWebsocket {
 	return m.websocket
 }
 
-func (m *Manager) SetWebsocket(websocket interfaces.IWebsocket) {
+func (m *Manager) SetWebsocket(websocket interfaces2.IWebsocket) {
 	m.websocket = websocket
 }

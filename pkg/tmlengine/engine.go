@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/flosch/pongo2"
-	"github.com/uwine4850/foozy/internal/interfaces"
-	"github.com/uwine4850/foozy/internal/utils"
+	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/utils"
 	"net/http"
 )
 
