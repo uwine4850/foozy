@@ -14,8 +14,8 @@ type Database struct {
 	port     string
 	database string
 	db       *sql.DB
-	SyncQ    interfaces.ISyncQueries
-	AsyncQ   interfaces.IAsyncQueries
+	syncQ    interfaces.ISyncQueries
+	asyncQ   interfaces.IAsyncQueries
 }
 
 func NewDatabase(username string, password string, host string, port string, database string) *Database {
@@ -40,8 +40,8 @@ func (d *Database) Connect() error {
 	}
 	d.db = db
 
-	d.SyncQ.SetDB(db)
-	d.AsyncQ.SetSyncQueries(d.SyncQ)
+	d.syncQ.SetDB(db)
+	d.asyncQ.SetSyncQueries(d.syncQ)
 	return nil
 }
 
@@ -55,9 +55,17 @@ func (d *Database) Close() error {
 }
 
 func (d *Database) SetSyncQueries(q interfaces.ISyncQueries) {
-	d.SyncQ = q
+	d.syncQ = q
 }
 
 func (d *Database) SetAsyncQueries(q interfaces.IAsyncQueries) {
-	d.AsyncQ = q
+	d.asyncQ = q
+}
+
+func (d *Database) SyncQ() interfaces.ISyncQueries {
+	return d.syncQ
+}
+
+func (d *Database) AsyncQ() interfaces.IAsyncQueries {
+	return d.asyncQ
 }

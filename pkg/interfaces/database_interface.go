@@ -10,6 +10,8 @@ type IDatabase interface {
 	Close() error
 	SetSyncQueries(q ISyncQueries)
 	SetAsyncQueries(q IAsyncQueries)
+	SyncQ() ISyncQueries
+	AsyncQ() IAsyncQueries
 }
 
 type ISyncQueries interface {
