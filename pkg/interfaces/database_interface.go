@@ -12,6 +12,7 @@ type IDatabase interface {
 	SetAsyncQueries(q IAsyncQueries)
 	SyncQ() ISyncQueries
 	AsyncQ() IAsyncQueries
+	DatabaseName() string
 }
 
 type ISyncQueries interface {

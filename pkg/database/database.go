@@ -69,3 +69,7 @@ func (d *Database) SyncQ() interfaces.ISyncQueries {
 func (d *Database) AsyncQ() interfaces.IAsyncQueries {
 	return d.asyncQ
 }
+
+func (d *Database) DatabaseName() string {
+	return d.database
+}
