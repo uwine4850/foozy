@@ -1,6 +1,7 @@
 package router
 
 import (
+	"encoding/json"
 	interfaces2 "github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/utils"
 	"net/http"
@@ -77,4 +78,18 @@ func (m *Manager) GetWebSocket() interfaces2.IWebsocket {
 
 func (m *Manager) SetWebsocket(websocket interfaces2.IWebsocket) {
 	m.websocket = websocket
+}
+
+// RenderJson displays data in json format on the page.
+func (m *Manager) RenderJson(data interface{}, w http.ResponseWriter) error {
+	marshal, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	_, err = w.Write(marshal)
+	if err != nil {
+		return err
+	}
+	return nil
 }
