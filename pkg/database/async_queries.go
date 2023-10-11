@@ -16,11 +16,11 @@ func (q *AsyncQueries) SetSyncQueries(queries interfaces.ISyncQueries) {
 	q.syncQ = queries
 }
 
-func (q *AsyncQueries) AsyncSelect(key string, rows []string, tableName string, where []dbutils.DbEquals) {
+func (q *AsyncQueries) AsyncSelect(key string, rows []string, tableName string, where []dbutils.DbEquals, limit int) {
 	q.wg.Add(1)
 	go func() {
 		defer q.wg.Done()
-		_res, err := q.syncQ.Select(rows, tableName, where)
+		_res, err := q.syncQ.Select(rows, tableName, where, limit)
 		q.setAsyncRes(key, _res, err)
 	}()
 }

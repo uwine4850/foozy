@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
+	"strconv"
 	"strings"
 )
 
@@ -36,12 +37,16 @@ func (q *SyncQueries) SetDB(db *sql.DB) {
 	q.db = db
 }
 
-func (q *SyncQueries) Select(rows []string, tableName string, where []dbutils.DbEquals) ([]map[string]interface{}, error) {
+func (q *SyncQueries) Select(rows []string, tableName string, where []dbutils.DbEquals, limit int) ([]map[string]interface{}, error) {
 	whereStr, whereValues := dbutils.ParseEquals(where, "AND")
 	if len(whereValues) > 0 {
 		whereStr = " WHERE " + whereStr
 	}
-	queryStr := fmt.Sprintf("SELECT %s FROM %s %s", strings.Join(rows, ", "), tableName, whereStr)
+	var limitStr string
+	if limit > 0 {
+		limitStr = "LIMIT " + strconv.Itoa(limit)
+	}
+	queryStr := fmt.Sprintf("SELECT %s FROM %s %s %s", strings.Join(rows, ", "), tableName, whereStr, limitStr)
 	return q.Query(queryStr, whereValues...)
 }
 

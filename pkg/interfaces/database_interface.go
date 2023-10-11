@@ -19,7 +19,7 @@ type ISyncQueries interface {
 	SetDB(db *sql.DB)
 	Query(query string, args ...any) ([]map[string]interface{}, error)
 	Insert(tableName string, params map[string]interface{}) ([]map[string]interface{}, error)
-	Select(rows []string, tableName string, where []dbutils.DbEquals) ([]map[string]interface{}, error)
+	Select(rows []string, tableName string, where []dbutils.DbEquals, limit int) ([]map[string]interface{}, error)
 	Update(tableName string, params []dbutils.DbEquals, where []dbutils.DbEquals) ([]map[string]interface{}, error)
 	Delete(tableName string, where []dbutils.DbEquals) ([]map[string]interface{}, error)
 }
@@ -28,7 +28,7 @@ type IAsyncQueries interface {
 	SetSyncQueries(queries ISyncQueries)
 	Wait()
 	LoadAsyncRes(key string) (*dbutils.AsyncQueryData, bool)
-	AsyncSelect(key string, rows []string, tableName string, where []dbutils.DbEquals)
+	AsyncSelect(key string, rows []string, tableName string, where []dbutils.DbEquals, limit int)
 	AsyncInsert(key string, tableName string, params map[string]interface{})
 	AsyncUpdate(key string, tableName string, params []dbutils.DbEquals, where []dbutils.DbEquals)
 	AsyncDelete(key string, tableName string, where []dbutils.DbEquals)
