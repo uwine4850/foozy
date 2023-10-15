@@ -7,9 +7,9 @@ Modules that the framework contains: <br>
 * database - interface for working with the mysql database.
 * interfaces - all golang interfaces used in the project.
 * livereload - a module that can be used to restart the project after updating the files.
-* middlewares - module for creating middleware.
+* [middlewares](https://github.com/uwine4850/foozy/blob/master/docs/en/middlewares.md) - module for creating middleware.
 * [router](https://github.com/uwine4850/foozy/blob/master/docs/en/router.md) is the most important module, with the help of its functionality, project routing and much more are implemented.
-* form - work with HTML forms.
+* [form](https://github.com/uwine4850/foozy/blob/master/docs/en/form.md) - work with HTML forms.
 * server - an add-on over http. Server for easier use and work with the router module.
 * tmlengine - project templating engine. The pongo2 library is used.
 * utils - general auxiliary functionality, for example, CSRF token generation.
