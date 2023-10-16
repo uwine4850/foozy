@@ -4,7 +4,7 @@ Also, modules depend on interfaces whenever possible, so most of them are open t
 
 Modules that the framework contains: <br>
 * builtin - built-in ready-made functionality, for example, authentication. It is not necessary to use.
-* database - interface for working with the mysql database.
+* [database](https://github.com/uwine4850/foozy/blob/master/docs/en/database.md) - interface for working with the mysql database.
 * interfaces - all golang interfaces used in the project.
 * livereload - a module that can be used to restart the project after updating the files.
 * [middlewares](https://github.com/uwine4850/foozy/blob/master/docs/en/middlewares.md) - module for creating middleware.
