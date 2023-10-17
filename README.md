@@ -6,7 +6,7 @@ Modules that the framework contains: <br>
 * builtin - built-in ready-made functionality, for example, authentication. It is not necessary to use.
 * [database](https://github.com/uwine4850/foozy/blob/master/docs/en/database.md) - interface for working with the mysql database.
 * interfaces - all golang interfaces used in the project.
-* livereload - a module that can be used to restart the project after updating the files.
+* [livereload](https://github.com/uwine4850/foozy/blob/master/docs/en/livereload.md) - a module that can be used to restart the project after updating the files.
 * [middlewares](https://github.com/uwine4850/foozy/blob/master/docs/en/middlewares.md) - module for creating middleware.
 * [router](https://github.com/uwine4850/foozy/blob/master/docs/en/router.md) is the most important module, with the help of its functionality, project routing and much more are implemented.
 * [form](https://github.com/uwine4850/foozy/blob/master/docs/en/form.md) - work with HTML forms.
