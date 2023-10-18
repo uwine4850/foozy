@@ -3,7 +3,7 @@ __foozy__ is a lightweight and flexible web framework. The project is based on t
 Also, modules depend on interfaces whenever possible, so most of them are open to change.
 
 Modules that the framework contains: <br>
-* builtin - built-in ready-made functionality, for example, authentication. It is not necessary to use.
+* [builtin](https://github.com/uwine4850/foozy/blob/master/docs/en/builtin.md) - built-in ready-made functionality, for example, authentication. It is not necessary to use.
 * [database](https://github.com/uwine4850/foozy/blob/master/docs/en/database.md) - interface for working with the mysql database.
 * interfaces - all golang interfaces used in the project.
 * [livereload](https://github.com/uwine4850/foozy/blob/master/docs/en/livereload.md) - a module that can be used to restart the project after updating the files.
