@@ -5,7 +5,7 @@ Also, modules depend on interfaces whenever possible, so most of them are open t
 Modules that the framework contains: <br>
 * [builtin](https://github.com/uwine4850/foozy/blob/master/docs/en/builtin.md) - built-in ready-made functionality, for example, authentication. It is not necessary to use.
 * [database](https://github.com/uwine4850/foozy/blob/master/docs/en/database.md) - interface for working with the mysql database.
-* interfaces - all golang interfaces used in the project.
+* [interfaces](https://github.com/uwine4850/foozy/blob/master/docs/en/interfaces.md) - all golang interfaces used in the project.
 * [livereload](https://github.com/uwine4850/foozy/blob/master/docs/en/livereload.md) - a module that can be used to restart the project after updating the files.
 * [middlewares](https://github.com/uwine4850/foozy/blob/master/docs/en/middlewares.md) - module for creating middleware.
 * [router](https://github.com/uwine4850/foozy/blob/master/docs/en/router.md) is the most important module, with the help of its functionality, project routing and much more are implemented.
