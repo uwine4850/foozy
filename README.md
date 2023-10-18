@@ -12,7 +12,7 @@ Modules that the framework contains: <br>
 * [form](https://github.com/uwine4850/foozy/blob/master/docs/en/form.md) - work with HTML forms.
 * [server](https://github.com/uwine4850/foozy/blob/master/docs/en/server.md) - an add-on over http. Server for easier use and work with the router module.
 * [tmlengine](https://github.com/uwine4850/foozy/blob/master/docs/en/tmlengine.md) - project templating engine. The pongo2 library is used.
-* utils - general auxiliary functionality, for example, CSRF token generation.
+* [utils](https://github.com/uwine4850/foozy/blob/master/docs/en/utils.md) - general auxiliary functionality, for example, CSRF token generation.
 ## Getting started
 
 ### Installation
