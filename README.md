@@ -11,7 +11,7 @@ Modules that the framework contains: <br>
 * [router](https://github.com/uwine4850/foozy/blob/master/docs/en/router.md) is the most important module, with the help of its functionality, project routing and much more are implemented.
 * [form](https://github.com/uwine4850/foozy/blob/master/docs/en/form.md) - work with HTML forms.
 * [server](https://github.com/uwine4850/foozy/blob/master/docs/en/server.md) - an add-on over http. Server for easier use and work with the router module.
-* tmlengine - project templating engine. The pongo2 library is used.
+* [tmlengine](https://github.com/uwine4850/foozy/blob/master/docs/en/tmlengine.md) - project templating engine. The pongo2 library is used.
 * utils - general auxiliary functionality, for example, CSRF token generation.
 ## Getting started
 
