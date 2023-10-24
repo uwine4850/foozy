@@ -89,6 +89,9 @@ func ParseEquals(equals []DbEquals, conjunction string) (string, []interface{}) 
 
 // ParseString processing text values from a database.
 func ParseString(value interface{}) string {
+	if value == nil {
+		return ""
+	}
 	_uint8 := value.([]uint8)
 	return string(_uint8)
 }
@@ -96,6 +99,9 @@ func ParseString(value interface{}) string {
 // ParseInt processing integer values from a database.
 // Considered, the interface format may be []uint8.
 func ParseInt(value interface{}) (int, error) {
+	if value == nil {
+		return -1, errors.New("value is nil")
+	}
 	_type := reflect.TypeOf(value).String()
 	var v int64
 	switch _type {
@@ -118,6 +124,9 @@ func ParseInt(value interface{}) (int, error) {
 // The time of the template should not change, only the form can change.
 func ParseDateTime(layout string, value interface{}) (time.Time, error) {
 	strValue := ParseString(value)
+	if strValue == "" {
+		return time.Now(), errors.New("value is nil")
+	}
 	parse, err := time.Parse(layout, strValue)
 	if err != nil {
 		return parse, err
