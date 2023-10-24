@@ -29,6 +29,10 @@ func (m *Manager) GetUserContext(key string) (any, bool) {
 	return value, ok
 }
 
+func (m *Manager) DelUserContext(key string) {
+	m.userContext.Delete(key)
+}
+
 func (m *Manager) SetTemplateEngine(engine interfaces2.ITemplateEngine) {
 	m.TemplateEngine = engine
 }

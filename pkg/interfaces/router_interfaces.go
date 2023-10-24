@@ -16,6 +16,7 @@ type IManager interface {
 	GetWebSocket() IWebsocket
 	SetWebsocket(websocket IWebsocket)
 	RenderJson(data interface{}, w http.ResponseWriter) error
+	DelUserContext(key string)
 }
 
 type IRouter interface {
