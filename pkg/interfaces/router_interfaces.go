@@ -20,9 +20,9 @@ type IManager interface {
 }
 
 type IRouter interface {
-	Get(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager IManager))
-	Post(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager IManager))
-	Ws(pattern string, ws IWebsocket, fn func(w http.ResponseWriter, r *http.Request, manager IManager))
+	Get(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager IManager) func())
+	Post(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager IManager) func())
+	Ws(pattern string, ws IWebsocket, fn func(w http.ResponseWriter, r *http.Request, manager IManager) func())
 	GetMux() *http.ServeMux
 	SetTemplateEngine(engine ITemplateEngine)
 	SetMiddleware(middleware IMiddleware)
