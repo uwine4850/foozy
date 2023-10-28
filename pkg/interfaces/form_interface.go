@@ -11,5 +11,6 @@ type IForm interface {
 	GetApplicationForm() url.Values
 	Value(key string) string
 	File(key string) (multipart.File, *multipart.FileHeader, error)
+	Files(key string) ([]*multipart.FileHeader, bool)
 	ValidateCsrfToken() error
 }

@@ -58,6 +58,11 @@ func (f *Form) File(key string) (multipart.File, *multipart.FileHeader, error) {
 	return f.request.FormFile(key)
 }
 
+func (f *Form) Files(key string) ([]*multipart.FileHeader, bool) {
+	fi, ok := f.multipartForm.File[key]
+	return fi, ok
+}
+
 // ValidateCsrfToken checks the validity of the csrf token. If no errors are detected, the token is valid.
 // It is desirable to use this method only after Parse() method.
 func (f *Form) ValidateCsrfToken() error {
