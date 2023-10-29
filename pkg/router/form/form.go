@@ -1,10 +1,17 @@
 package form
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
+	"github.com/uwine4850/foozy/pkg/router"
+	"github.com/uwine4850/foozy/pkg/utils"
 	"html/template"
+	"io"
 	"mime/multipart"
 	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -78,4 +85,44 @@ func (f *Form) ValidateCsrfToken() error {
 		return ErrCsrfTokenDoesNotMatch{}
 	}
 	return nil
+}
+
+func randomiseTheFileName(pathToDir string, fileName string) string {
+	outputFilepath := pathToDir + fileName
+	if utils.PathExist(pathToDir + fileName) {
+		hash := sha256.Sum256([]byte(fileName))
+		hashData := hex.EncodeToString(hash[:])
+		ext := filepath.Ext(fileName)
+		return randomiseTheFileName(pathToDir, hashData+ext)
+	}
+	return outputFilepath
+}
+
+func SaveFile(w http.ResponseWriter, file multipart.File, fileHeader *multipart.FileHeader, pathToDir string, buildPath *string) bool {
+	defer func(file multipart.File) {
+		err := file.Close()
+		if err != nil {
+			router.ServerError(w, err.Error())
+		}
+	}(file)
+
+	fp := randomiseTheFileName(pathToDir, fileHeader.Filename)
+	*buildPath = fp
+	dst, err := os.Create(fp)
+	if err != nil {
+		router.ServerError(w, err.Error())
+		return false
+	}
+	defer func(dst *os.File) {
+		err := dst.Close()
+		if err != nil {
+			router.ServerError(w, err.Error())
+		}
+	}(dst)
+	_, err = io.Copy(dst, file)
+	if err != nil {
+		router.ServerError(w, err.Error())
+		return false
+	}
+	return true
 }
