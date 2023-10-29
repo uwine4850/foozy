@@ -1,6 +1,7 @@
 package form
 
 import (
+	"github.com/uwine4850/foozy/pkg/ferrors"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"mime/multipart"
 	"reflect"
@@ -18,10 +19,10 @@ type FormFile struct {
 // []string - all other data.
 func FillStructFromForm(frm interfaces.IForm, fill interface{}) error {
 	if reflect.TypeOf(fill).Kind() != reflect.Ptr {
-		return ErrParameterNotPointer{"fill"}
+		return ferrors.ErrParameterNotPointer{Param: "fill"}
 	}
 	if reflect.TypeOf(fill).Elem().Kind() != reflect.Struct {
-		return ErrParameterNotStruct{"fill"}
+		return ferrors.ErrParameterNotStruct{Param: "fill"}
 	}
 	formMap := FrmValueToMap(frm)
 	t := reflect.TypeOf(fill).Elem()
@@ -42,7 +43,7 @@ func FillStructFromForm(frm interfaces.IForm, fill interface{}) error {
 		if reflect.DeepEqual(field.Type, reflect.TypeOf([]FormFile{})) && reflect.TypeOf(formMapItem) == reflect.TypeOf([]FormFile{}) {
 			formType, _ := formMapItem.([]FormFile)
 			if !ok {
-				return ErrFormConvertType{reflect.TypeOf(formMapItem).String(), "[]FormFile"}
+				return ferrors.ErrConvertType{Type1: reflect.TypeOf(formMapItem).String(), Type2: "[]FormFile"}
 			}
 			value.Set(reflect.ValueOf(formType))
 		}
@@ -50,7 +51,7 @@ func FillStructFromForm(frm interfaces.IForm, fill interface{}) error {
 		if field.Type.Kind() == reflect.Slice && field.Type.Elem().Kind() == reflect.String {
 			formType, ok := formMapItem.([]string)
 			if !ok {
-				return ErrFormConvertType{reflect.TypeOf(formMapItem).String(), "string"}
+				return ferrors.ErrConvertType{Type1: reflect.TypeOf(formMapItem).String(), Type2: "string"}
 			}
 			value.Set(reflect.ValueOf(formType))
 		}
