@@ -87,9 +87,10 @@ func (f *Form) ValidateCsrfToken() error {
 	return nil
 }
 
+// randomiseTheFileName If the file name already exists, randomises it and returns the new file path.
 func randomiseTheFileName(pathToDir string, fileName string) string {
-	outputFilepath := pathToDir + fileName
-	if utils.PathExist(pathToDir + fileName) {
+	outputFilepath := filepath.Join(pathToDir, fileName)
+	if utils.PathExist(outputFilepath) {
 		hash := sha256.Sum256([]byte(fileName))
 		hashData := hex.EncodeToString(hash[:])
 		ext := filepath.Ext(fileName)
@@ -98,7 +99,9 @@ func randomiseTheFileName(pathToDir string, fileName string) string {
 	return outputFilepath
 }
 
-func SaveFile(w http.ResponseWriter, file multipart.File, fileHeader *multipart.FileHeader, pathToDir string, buildPath *string) bool {
+// SaveFile Saves the file in the specified directory.
+// If the file name is already found, uses the randomiseTheFileName function to randomise the file name.
+func SaveFile(w http.ResponseWriter, file multipart.File, fileHeader *multipart.FileHeader, pathToDir string, buildPath *string) error {
 	defer func(file multipart.File) {
 		err := file.Close()
 		if err != nil {
@@ -110,8 +113,7 @@ func SaveFile(w http.ResponseWriter, file multipart.File, fileHeader *multipart.
 	*buildPath = fp
 	dst, err := os.Create(fp)
 	if err != nil {
-		router.ServerError(w, err.Error())
-		return false
+		return err
 	}
 	defer func(dst *os.File) {
 		err := dst.Close()
@@ -121,8 +123,20 @@ func SaveFile(w http.ResponseWriter, file multipart.File, fileHeader *multipart.
 	}(dst)
 	_, err = io.Copy(dst, file)
 	if err != nil {
-		router.ServerError(w, err.Error())
-		return false
+		return err
 	}
-	return true
+	return nil
+}
+
+// ReplaceFile Changes the specified file to a new file.
+func ReplaceFile(pathToFile string, w http.ResponseWriter, file multipart.File, fileHeader *multipart.FileHeader, pathToDir string, buildPath *string) error {
+	err := os.Remove(pathToFile)
+	if err != nil {
+		return err
+	}
+	err = SaveFile(w, file, fileHeader, pathToDir, buildPath)
+	if err != nil {
+		return err
+	}
+	return nil
 }
