@@ -16,23 +16,24 @@
 * *fn func(w http.ResponseWriter, r \*http.Request, manager interfaces.IManager)* — функція яка запуститься коли користувач 
 перейде на потрібну адресу. ``w http.ResponseWriter`` та ``*http.Request`` це стандартні структури golang. Про ``interfaces.IManager`` 
 детальныше написано [тут](#manager).
+* Кожен обробник повертає ``func()`` - це функція, яка виконується після завершення роботи самого обробника.
 
 __Get__
 ```
-Get(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager))
+Get(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) func()
 ```
 Метод використовується для передачі даних із сервера на веб-сторінку. Наприклад, це може бути html дані, JSON дані та інші.
 
 __Post__
 ```
-Post(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager))
+Post(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) func()
 ```
 Метод для обробки запита POST. Частіше за все використовується для роботи із формами HTML. Цей метод не має нового функціоналу 
 порівняно із методом ``Get``. Але це можна змінити за допомогою [пакету обробника форми](https://github.com/uwine4850/foozy/blob/master/docs/ua/form.md).
 
 __Ws__
 ```
-Ws(pattern string, ws interfaces2.IWebsocket, fn func(w http.ResponseWriter, r *http.Request, manager interfaces2.IManager))
+Ws(pattern string, ws interfaces2.IWebsocket, fn func(w http.ResponseWriter, r *http.Request, manager interfaces2.IManager)) func()
 ```
 Обробник запускає веб-сокет по вибраному шляху. До цього обробника можна без проблем під'єднатися з допомогою JavaScript.
 Параметр ``interfaces2.IWebsocket`` це інтерфейс структури яка реалізує взаємодію з веб-сокетом, ось стандартна реалізація
@@ -64,6 +65,7 @@ newRouter.Ws("/ws", router.NewWebsocket(router.Upgrader), func(w http.ResponseWr
 	if err != nil {
 	    panic(err)
 	}
+	return func(){}
 })
 ```
 
@@ -204,6 +206,12 @@ __RenderJson__
 RenderJson(data interface{}, w http.ResponseWriter) error
 ```
 Відображає дані у форматі JSON. Як параметр data може приймати мапу, структуру та інше.
+
+__DelUserContext__
+```
+DelUserContext(key string)
+```
+Видаляє користувацький контекст по ключу.
 
 ## Websocket
 Інтерфейс веб-сокета реалізований з допомогою бібліотеки __github.com/gorilla/websocket__. В пакеті ``router`` є глобальна 

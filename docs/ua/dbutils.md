@@ -71,3 +71,11 @@ __ParseFloat__
 ParseFloat(value interface{}) (float64, error)
 ```
 Перетворює значення із результату запиту в число з комою.
+
+__FillStructFromDb__
+```
+FillStructFromDb(dbRes map[string]interface{}, fill interface{}) error
+```
+Заповнює структуру даними з бази даних.
+Кожна змінна заповнюваної структури повинна мати тег "db", який відповідає за назву стовпця в
+базі даних, наприклад, `db: "name"`.

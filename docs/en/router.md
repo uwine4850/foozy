@@ -16,23 +16,24 @@ All handlers have standard parameters:
 * *fn func(w http.ResponseWriter, r \*http.Request, manager interfaces.IManager)* - a function that will run when the user
   goes to the desired address. ``w http.ResponseWriter`` and ``*http.Request`` are standard golang structures. About ``interfaces.IManager``
   is described in more detail [here](#manager).
+* Each handler returns ``func()`` - this is a function that is executed after the handler itself is finished.
 
 __Get__
 ```
-Get(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager))
+Get(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) func()
 ```
 The method is used to transfer data from the server to the web page. For example, it can be html data, JSON data, and others.
 
 __Post__
 ```
-Post(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager))
+Post(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) func()
 ```
 A method for processing a POST request. Most often used to work with HTML forms. This method has no new functionality
 compared to the Get method. But this can be changed with the help of the [form handler package](https://github.com/uwine4850/foozy/blob/master/docs/en/form.md).
 
 __Ws__
 ```
-Ws(pattern string, ws interfaces2.IWebsocket, fn func(w http.ResponseWriter, r *http.Request, manager interfaces2.IManager))
+Ws(pattern string, ws interfaces2.IWebsocket, fn func(w http.ResponseWriter, r *http.Request, manager interfaces2.IManager)) func()
 ```
 The handler launches a web socket on the selected path. You can easily connect to this handler using JavaScript.
 The ``interfaces2.IWebsocket`` parameter is the interface of a structure that implements interaction with a web socket, here is the standard implementation
@@ -64,6 +65,7 @@ newRouter.Ws("/ws", router.NewWebsocket(router.Upgrader), func(w http.ResponseWr
 	if err != nil {
 	    panic(err)
 	}
+	return func(){}
 })
 ```
 
@@ -205,6 +207,12 @@ __RenderJson__
 RenderJson(data interface{}, w http.ResponseWriter) error
 ```
 Displays data in JSON format. As a parameter, data can take a map, structure, etc.
+
+__DelUserContext__
+```
+DelUserContext(key string)
+```
+Deletes the user context by key.
 
 ## Websocket
 The web socket interface is implemented using the __github.com/gorilla/websocket__ library. The ``router`` package has a global

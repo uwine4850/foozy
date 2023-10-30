@@ -69,3 +69,11 @@ __ParseFloat__
 ParseFloat(value interface{}) (float64, error)
 ```
 Converts the value from the query result to a decimal number.
+
+__FillStructFromDb__
+```
+FillStructFromDb(dbRes map[string]interface{}, fill interface{}) error
+```
+Fills the structure with data from the database.
+Each variable of the filled structure must have a "db" tag, which is responsible for the name of the column in the
+the database, for example, `db: "name"`.
