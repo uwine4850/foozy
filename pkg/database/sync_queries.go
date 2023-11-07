@@ -37,17 +37,17 @@ func (q *SyncQueries) SetDB(db *sql.DB) {
 	q.db = db
 }
 
-func (q *SyncQueries) Select(rows []string, tableName string, where []dbutils.DbEquals, limit int) ([]map[string]interface{}, error) {
-	whereStr, whereValues := dbutils.ParseEquals(where, "AND")
-	if len(whereValues) > 0 {
-		whereStr = " WHERE " + whereStr
+func (q *SyncQueries) Select(rows []string, tableName string, where dbutils.WHOutput, limit int) ([]map[string]interface{}, error) {
+	var whereStr string
+	if len(where.QueryArgs) > 0 {
+		whereStr = " WHERE " + where.QueryStr
 	}
 	var limitStr string
 	if limit > 0 {
 		limitStr = "LIMIT " + strconv.Itoa(limit)
 	}
 	queryStr := fmt.Sprintf("SELECT %s FROM %s %s %s", strings.Join(rows, ", "), tableName, whereStr, limitStr)
-	return q.Query(queryStr, whereValues...)
+	return q.Query(queryStr, where.QueryArgs...)
 }
 
 func (q *SyncQueries) Insert(tableName string, params map[string]interface{}) ([]map[string]interface{}, error) {
@@ -57,39 +57,38 @@ func (q *SyncQueries) Insert(tableName string, params map[string]interface{}) ([
 	return q.Query(queryStr, vals...)
 }
 
-func (q *SyncQueries) Delete(tableName string, where []dbutils.DbEquals) ([]map[string]interface{}, error) {
-	whereStr, whereValues := dbutils.ParseEquals(where, "AND")
-	if len(whereValues) > 0 {
-		whereStr = " WHERE " + whereStr
+func (q *SyncQueries) Delete(tableName string, where dbutils.WHOutput) ([]map[string]interface{}, error) {
+	var whereStr string
+	if len(where.QueryArgs) > 0 {
+		whereStr = " WHERE " + where.QueryStr
 	}
 	queryStr := fmt.Sprintf("DELETE FROM %s %s", tableName, whereStr)
-	return q.Query(queryStr, whereValues...)
+	return q.Query(queryStr, where.QueryArgs...)
 }
 
-func (q *SyncQueries) Update(tableName string, params []dbutils.DbEquals, where []dbutils.DbEquals) ([]map[string]interface{}, error) {
+func (q *SyncQueries) Update(tableName string, params []dbutils.DbEquals, where dbutils.WHOutput) ([]map[string]interface{}, error) {
 	equalsStr, paramValues := dbutils.ParseEquals(params, ",")
-	whereStr, whereValues := dbutils.ParseEquals(where, "AND")
-	if len(whereValues) > 0 {
-		whereStr = " WHERE " + whereStr
+	var whereStr string
+	if len(where.QueryArgs) > 0 {
+		whereStr = " WHERE " + where.QueryStr
 	}
 	queryStr := fmt.Sprintf("UPDATE `%s` SET %s %s ",
 		tableName, equalsStr, whereStr)
-	args := append(paramValues, whereValues...)
+	args := append(paramValues, where.QueryArgs...)
 	return q.Query(queryStr, args...)
 }
 
 // Count returns the number of records under the condition.
 // IMPORTANT: the result is in string format.
-func (q *SyncQueries) Count(rows []string, tableName string, where []dbutils.DbEquals, limit int) ([]map[string]interface{}, error) {
-	whereStr, whereValues := dbutils.ParseEquals(where, "AND")
-	if len(whereValues) > 0 {
-		whereStr = " WHERE " + whereStr
+func (q *SyncQueries) Count(rows []string, tableName string, where dbutils.WHOutput, limit int) ([]map[string]interface{}, error) {
+	var whereStr string
+	if len(where.QueryArgs) > 0 {
+		whereStr = " WHERE " + where.QueryStr
 	}
 	var limitStr string
 	if limit > 0 {
 		limitStr = "LIMIT " + strconv.Itoa(limit)
 	}
 	queryStr := fmt.Sprintf("SELECT COUNT(%s) FROM %s %s %s", strings.Join(rows, ", "), tableName, whereStr, limitStr)
-	println(queryStr)
-	return q.Query(queryStr, whereValues...)
+	return q.Query(queryStr, where.QueryArgs...)
 }

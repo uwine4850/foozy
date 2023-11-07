@@ -22,7 +22,7 @@ func NewAuth(database interfaces.IDatabase) (*Auth, error) {
 
 // RegisterUser registers the user in the database.
 func (a *Auth) RegisterUser(username string, password string) error {
-	user, err := a.database.SyncQ().Select([]string{"username"}, a.tableName, []dbutils.DbEquals{{"username", username}}, 1)
+	user, err := a.database.SyncQ().Select([]string{"username"}, a.tableName, dbutils.WHEquals(map[string]interface{}{"username": username}, "AND"), 1)
 	if err != nil {
 		return err
 	}
@@ -79,7 +79,7 @@ func (a *Auth) ChangePassword(username string, oldPassword string, newPassword s
 	if err != nil {
 		return err
 	}
-	update, err := a.database.SyncQ().Update(a.tableName, []dbutils.DbEquals{{"password", password}}, []dbutils.DbEquals{{"username", username}})
+	update, err := a.database.SyncQ().Update(a.tableName, []dbutils.DbEquals{{"password", password}}, dbutils.WHEquals(map[string]interface{}{"username": username}, "AND"))
 	if err != nil {
 		return err
 	}
@@ -89,7 +89,7 @@ func (a *Auth) ChangePassword(username string, oldPassword string, newPassword s
 
 // UserExist checks if the user is in the database.
 func (a *Auth) UserExist(username string) (map[string]interface{}, error) {
-	user, err := a.database.SyncQ().Select([]string{"*"}, a.tableName, []dbutils.DbEquals{{"username", username}}, 1)
+	user, err := a.database.SyncQ().Select([]string{"*"}, a.tableName, dbutils.WHEquals(map[string]interface{}{"username": username}, "AND"), 1)
 	if err != nil {
 		return nil, err
 	}

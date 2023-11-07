@@ -3,6 +3,7 @@ package utils
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"fmt"
 	"os"
 	"strings"
 )
@@ -61,4 +62,16 @@ func MergeMap[T1 comparable, T2 any](map1 *map[T1]T2, map2 map[T1]T2) {
 	for key, value := range map2 {
 		(*map1)[key] = value
 	}
+}
+
+func Join[T any](elems []T, sep string) string {
+	var res string
+	for i := 0; i < len(elems); i++ {
+		if i == len(elems)-1 {
+			res += fmt.Sprintf("%v", elems[i])
+		} else {
+			res += fmt.Sprintf("%v%s ", elems[i], sep)
+		}
+	}
+	return res
 }

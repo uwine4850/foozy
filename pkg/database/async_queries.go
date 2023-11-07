@@ -16,7 +16,7 @@ func (q *AsyncQueries) SetSyncQueries(queries interfaces.ISyncQueries) {
 	q.syncQ = queries
 }
 
-func (q *AsyncQueries) AsyncSelect(key string, rows []string, tableName string, where []dbutils.DbEquals, limit int) {
+func (q *AsyncQueries) AsyncSelect(key string, rows []string, tableName string, where dbutils.WHOutput, limit int) {
 	q.wg.Add(1)
 	go func() {
 		defer q.wg.Done()
@@ -34,7 +34,7 @@ func (q *AsyncQueries) AsyncInsert(key string, tableName string, params map[stri
 	}()
 }
 
-func (q *AsyncQueries) AsyncUpdate(key string, tableName string, params []dbutils.DbEquals, where []dbutils.DbEquals) {
+func (q *AsyncQueries) AsyncUpdate(key string, tableName string, params []dbutils.DbEquals, where dbutils.WHOutput) {
 	q.wg.Add(1)
 	go func() {
 		defer q.wg.Done()
@@ -43,7 +43,7 @@ func (q *AsyncQueries) AsyncUpdate(key string, tableName string, params []dbutil
 	}()
 }
 
-func (q *AsyncQueries) AsyncDelete(key string, tableName string, where []dbutils.DbEquals) {
+func (q *AsyncQueries) AsyncDelete(key string, tableName string, where dbutils.WHOutput) {
 	q.wg.Add(1)
 	go func() {
 		defer q.wg.Done()
@@ -52,11 +52,11 @@ func (q *AsyncQueries) AsyncDelete(key string, tableName string, where []dbutils
 	}()
 }
 
-func (q *AsyncQueries) AsyncCount(key string, rows []string, tableName string, where []dbutils.DbEquals, limit int) {
+func (q *AsyncQueries) AsyncCount(key string, rows []string, tableName string, where dbutils.WHOutput, limit int) {
 	q.wg.Add(1)
 	go func() {
 		defer q.wg.Done()
-		_res, err := q.syncQ.Select(rows, tableName, where, limit)
+		_res, err := q.syncQ.Count(rows, tableName, where, limit)
 		q.setAsyncRes(key, _res, err)
 	}()
 }
