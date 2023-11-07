@@ -1,6 +1,8 @@
 package form
 
 import (
+	"errors"
+	"fmt"
 	"github.com/uwine4850/foozy/pkg/ferrors"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"mime/multipart"
@@ -29,6 +31,10 @@ func FillStructFromForm(frm interfaces.IForm, fill interface{}) error {
 	v := reflect.ValueOf(fill).Elem()
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
+		err := checkFieldType(field)
+		if err != nil {
+			return err
+		}
 		value := v.Field(i)
 		tag := field.Tag.Get("form")
 		// Skip if the tag is not a form
@@ -55,6 +61,17 @@ func FillStructFromForm(frm interfaces.IForm, fill interface{}) error {
 			}
 			value.Set(reflect.ValueOf(formType))
 		}
+	}
+	return nil
+}
+
+// checkFieldType checks if the type of field to be filled is correct.
+func checkFieldType(field reflect.StructField) error {
+	if field.Type.Kind() != reflect.Slice {
+		return errors.New(fmt.Sprintf("the %s field should be slice", field.Name))
+	}
+	if field.Type.Elem() != reflect.TypeOf("") && field.Type.Elem() != reflect.TypeOf(FormFile{}) {
+		return errors.New(fmt.Sprintf("the %s field can only be of two types: []string or []FormFile.", field.Name))
 	}
 	return nil
 }
