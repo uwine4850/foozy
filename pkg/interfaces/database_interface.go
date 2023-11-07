@@ -22,6 +22,7 @@ type ISyncQueries interface {
 	Select(rows []string, tableName string, where []dbutils.DbEquals, limit int) ([]map[string]interface{}, error)
 	Update(tableName string, params []dbutils.DbEquals, where []dbutils.DbEquals) ([]map[string]interface{}, error)
 	Delete(tableName string, where []dbutils.DbEquals) ([]map[string]interface{}, error)
+	Count(rows []string, tableName string, where []dbutils.DbEquals, limit int) ([]map[string]interface{}, error)
 }
 
 type IAsyncQueries interface {
@@ -32,4 +33,5 @@ type IAsyncQueries interface {
 	AsyncInsert(key string, tableName string, params map[string]interface{})
 	AsyncUpdate(key string, tableName string, params []dbutils.DbEquals, where []dbutils.DbEquals)
 	AsyncDelete(key string, tableName string, where []dbutils.DbEquals)
+	AsyncCount(key string, rows []string, tableName string, where []dbutils.DbEquals, limit int)
 }

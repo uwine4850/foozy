@@ -52,6 +52,15 @@ func (q *AsyncQueries) AsyncDelete(key string, tableName string, where []dbutils
 	}()
 }
 
+func (q *AsyncQueries) AsyncCount(key string, rows []string, tableName string, where []dbutils.DbEquals, limit int) {
+	q.wg.Add(1)
+	go func() {
+		defer q.wg.Done()
+		_res, err := q.syncQ.Select(rows, tableName, where, limit)
+		q.setAsyncRes(key, _res, err)
+	}()
+}
+
 // setAsyncRes sets the result of the key command execution.
 func (q *AsyncQueries) setAsyncRes(key string, _res []map[string]interface{}, err error) {
 	queryData := dbutils.AsyncQueryData{}

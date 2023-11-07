@@ -77,3 +77,19 @@ func (q *SyncQueries) Update(tableName string, params []dbutils.DbEquals, where 
 	args := append(paramValues, whereValues...)
 	return q.Query(queryStr, args...)
 }
+
+// Count returns the number of records under the condition.
+// IMPORTANT: the result is in string format.
+func (q *SyncQueries) Count(rows []string, tableName string, where []dbutils.DbEquals, limit int) ([]map[string]interface{}, error) {
+	whereStr, whereValues := dbutils.ParseEquals(where, "AND")
+	if len(whereValues) > 0 {
+		whereStr = " WHERE " + whereStr
+	}
+	var limitStr string
+	if limit > 0 {
+		limitStr = "LIMIT " + strconv.Itoa(limit)
+	}
+	queryStr := fmt.Sprintf("SELECT COUNT(%s) FROM %s %s %s", strings.Join(rows, ", "), tableName, whereStr, limitStr)
+	println(queryStr)
+	return q.Query(queryStr, whereValues...)
+}
