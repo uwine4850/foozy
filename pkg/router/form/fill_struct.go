@@ -33,15 +33,15 @@ func FillStructFromForm(frm interfaces.IForm, fill interface{}, nilIfNotExist []
 	v := reflect.ValueOf(fill).Elem()
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
-		err := checkFieldType(field)
-		if err != nil {
-			return err
-		}
 		value := v.Field(i)
 		tag := field.Tag.Get("form")
 		// Skip if the tag is not a form
 		if tag == "" {
 			continue
+		}
+		err := checkFieldType(field)
+		if err != nil {
+			return err
 		}
 		formMapItem, ok := formMap[tag]
 		if !ok {
