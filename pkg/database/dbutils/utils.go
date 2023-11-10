@@ -104,12 +104,13 @@ func ParseInt(value interface{}) (int, error) {
 	}
 	_type := reflect.TypeOf(value).String()
 	var v int64
+	fmt.Println(_type)
 	switch _type {
-	case "[]_uint8":
+	case "[]uint8":
 		_uint8 := value.([]uint8)
 		parseInt, err := strconv.ParseInt(string(_uint8), 0, 64)
 		if err != nil {
-			return 0, err
+			return -1, err
 		}
 		v = parseInt
 	case "int64":

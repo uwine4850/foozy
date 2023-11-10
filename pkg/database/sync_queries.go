@@ -39,7 +39,7 @@ func (q *SyncQueries) SetDB(db *sql.DB) {
 
 func (q *SyncQueries) Select(rows []string, tableName string, where dbutils.WHOutput, limit int) ([]map[string]interface{}, error) {
 	var whereStr string
-	if len(where.QueryArgs) > 0 {
+	if where.QueryStr != "" {
 		whereStr = " WHERE " + where.QueryStr
 	}
 	var limitStr string
@@ -59,7 +59,7 @@ func (q *SyncQueries) Insert(tableName string, params map[string]interface{}) ([
 
 func (q *SyncQueries) Delete(tableName string, where dbutils.WHOutput) ([]map[string]interface{}, error) {
 	var whereStr string
-	if len(where.QueryArgs) > 0 {
+	if where.QueryStr != "" {
 		whereStr = " WHERE " + where.QueryStr
 	}
 	queryStr := fmt.Sprintf("DELETE FROM %s %s", tableName, whereStr)
@@ -69,7 +69,7 @@ func (q *SyncQueries) Delete(tableName string, where dbutils.WHOutput) ([]map[st
 func (q *SyncQueries) Update(tableName string, params []dbutils.DbEquals, where dbutils.WHOutput) ([]map[string]interface{}, error) {
 	equalsStr, paramValues := dbutils.ParseEquals(params, ",")
 	var whereStr string
-	if len(where.QueryArgs) > 0 {
+	if where.QueryStr != "" {
 		whereStr = " WHERE " + where.QueryStr
 	}
 	queryStr := fmt.Sprintf("UPDATE `%s` SET %s %s ",
@@ -82,7 +82,7 @@ func (q *SyncQueries) Update(tableName string, params []dbutils.DbEquals, where 
 // IMPORTANT: the result is in string format.
 func (q *SyncQueries) Count(rows []string, tableName string, where dbutils.WHOutput, limit int) ([]map[string]interface{}, error) {
 	var whereStr string
-	if len(where.QueryArgs) > 0 {
+	if where.QueryStr != "" {
 		whereStr = " WHERE " + where.QueryStr
 	}
 	var limitStr string
