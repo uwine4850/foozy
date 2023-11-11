@@ -104,7 +104,6 @@ func ParseInt(value interface{}) (int, error) {
 	}
 	_type := reflect.TypeOf(value).String()
 	var v int64
-	fmt.Println(_type)
 	switch _type {
 	case "[]uint8":
 		_uint8 := value.([]uint8)

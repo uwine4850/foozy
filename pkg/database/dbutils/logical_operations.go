@@ -2,7 +2,6 @@ package dbutils
 
 import (
 	"fmt"
-	"github.com/uwine4850/foozy/pkg/utils"
 )
 
 type WHOutput struct {
@@ -50,34 +49,54 @@ func WHNotEquals(v map[string]interface{}, conjunction string) WHOutput {
 
 func WHInSlice(v map[string][]interface{}, conjunction string) WHOutput {
 	var queryStr string
+	var queryArgs []interface{}
 	i := -1
 	for name, value := range v {
 		i++
+		var values string
+		for i := 0; i < len(value); i++ {
+			queryArgs = append(queryArgs, value[i])
+			if i == len(value)-1 {
+				values += "?"
+			} else {
+				values += "?, "
+			}
+		}
 		if i == len(v)-1 {
-			queryStr += fmt.Sprintf("%s IN %s", name, "("+utils.Join(value, ",")+")")
+			queryStr += fmt.Sprintf("%s IN %s", name, "("+values+")")
 		} else {
-			queryStr += fmt.Sprintf("%s IN %s %s ", name, "("+utils.Join(value, ",")+")", conjunction)
+			queryStr += fmt.Sprintf("%s IN %s %s ", name, "("+values+")", conjunction)
 		}
 	}
 	return WHOutput{
 		QueryStr:  queryStr,
-		QueryArgs: make([]interface{}, 0),
+		QueryArgs: queryArgs,
 	}
 }
 
 func WHNotInSlice(v map[string][]interface{}, conjunction string) WHOutput {
 	var queryStr string
+	var queryArgs []interface{}
 	i := -1
 	for name, value := range v {
 		i++
+		var values string
+		for i := 0; i < len(value); i++ {
+			queryArgs = append(queryArgs, value[i])
+			if i == len(value)-1 {
+				values += "?"
+			} else {
+				values += "?, "
+			}
+		}
 		if i == len(v)-1 {
-			queryStr += fmt.Sprintf("%s NOT IN %s", name, "("+utils.Join(value, ",")+")")
+			queryStr += fmt.Sprintf("%s NOT IN %s", name, "("+values+")")
 		} else {
-			queryStr += fmt.Sprintf("%s NOT IN %s %s ", name, "("+utils.Join(value, ",")+")", conjunction)
+			queryStr += fmt.Sprintf("%s NOT IN %s %s ", name, "("+values+")", conjunction)
 		}
 	}
 	return WHOutput{
 		QueryStr:  queryStr,
-		QueryArgs: make([]interface{}, 0),
+		QueryArgs: queryArgs,
 	}
 }
