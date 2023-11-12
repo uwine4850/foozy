@@ -79,7 +79,6 @@ func (q *SyncQueries) Update(tableName string, params []dbutils.DbEquals, where 
 }
 
 // Count returns the number of records under the condition.
-// IMPORTANT: the result is in string format.
 func (q *SyncQueries) Count(rows []string, tableName string, where dbutils.WHOutput, limit int) ([]map[string]interface{}, error) {
 	var whereStr string
 	if where.QueryStr != "" {

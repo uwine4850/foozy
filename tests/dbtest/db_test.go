@@ -1,0 +1,195 @@
+package dbtest
+
+import (
+	"fmt"
+	"github.com/uwine4850/foozy/pkg/database"
+	"github.com/uwine4850/foozy/pkg/database/dbutils"
+	"os"
+	"testing"
+)
+
+var db = database.NewDatabase("root", "1111", "localhost", "3406", "foozy_test")
+
+func TestMain(m *testing.M) {
+	err := db.Connect()
+	_, err = db.SyncQ().Query("DELETE FROM dbtest")
+	if err != nil {
+		panic(err)
+	}
+	if err != nil {
+		panic(err)
+	}
+	_, err = db.SyncQ().Query("INSERT INTO `dbtest` (`col1`, `col2`, `col3`) VALUES (?, ?, ?)",
+		"test1", "2023-11-15", 111.22)
+	if err != nil {
+		panic(err)
+	}
+	_, err = db.SyncQ().Query("INSERT INTO `dbtest` (`col1`, `col2`, `col3`) VALUES (?, ?, ?)",
+		"test2", "2023-11-20", 222.11)
+	if err != nil {
+		panic(err)
+	}
+	exitCode := m.Run()
+	_, err = db.SyncQ().Query("DELETE FROM dbtest")
+	if err != nil {
+		panic(err)
+	}
+	db.Close()
+	os.Exit(exitCode)
+}
+
+func TestConnect(t *testing.T) {
+	err := db.Connect()
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestSyncQuery(t *testing.T) {
+	db.Connect()
+	query, err := db.SyncQ().Query("SELECT `col1`, `col2`, `col3` FROM `dbtest` LIMIT 1")
+	if err != nil {
+		t.Error(err)
+	}
+	s := fmt.Sprintf("%v", query)
+	if s != "[map[col1:[116 101 115 116 49] col2:[50 48 50 51 45 49 49 45 49 53] col3:[49 49 49 46 50 50]]]" {
+		t.Errorf("The row values in the database of the expected row do not match.")
+	}
+}
+
+func TestSyncSelect(t *testing.T) {
+	db.Connect()
+	res1, err := db.SyncQ().Select([]string{"col1", "col2", "col3"}, "dbtest", dbutils.WHOutput{}, 0)
+	if err != nil {
+		panic(err)
+	}
+	s := fmt.Sprintf("%v", res1)
+	if s != "[map[col1:[116 101 115 116 49] col2:[50 48 50 51 45 49 49 45 49 53] col3:[49 49 49 46 50 50]] "+
+		"map[col1:[116 101 115 116 50] col2:[50 48 50 51 45 49 49 45 50 48] col3:[50 50 50 46 49 49]]]" {
+		t.Errorf("The result of sampling all fields is not the same as expected.")
+	}
+	res2, err := db.SyncQ().Select([]string{"col1", "col2", "col3"}, "dbtest", dbutils.WHOutput{}, 1)
+	if err != nil {
+		t.Error(err)
+	}
+	s2 := fmt.Sprintf("%v", res2)
+	if s2 != "[map[col1:[116 101 115 116 49] col2:[50 48 50 51 45 49 49 45 49 53] col3:[49 49 49 46 50 50]]]" {
+		t.Errorf("The result of sampling all fields with a limit does not match the expected result.")
+	}
+}
+
+func TestSyncSelectEquals(t *testing.T) {
+	res3, err := db.SyncQ().Select([]string{"col1", "col2", "col3"}, "dbtest", dbutils.WHEquals(map[string]interface{}{
+		"col1": "test2",
+	}, "AND"), 1)
+	if err != nil {
+		t.Error(err)
+	}
+	s3 := fmt.Sprintf("%v", res3)
+	if s3 != "[map[col1:[116 101 115 116 50] col2:[50 48 50 51 45 49 49 45 50 48] col3:222.11]]" {
+		t.Errorf("The result of sampling fields c dbutils.WHEquals does not match the expected result.")
+	}
+}
+
+func TestSyncSelectNotEquals(t *testing.T) {
+	res4, err := db.SyncQ().Select([]string{"col1", "col2", "col3"}, "dbtest", dbutils.WHNotEquals(map[string]interface{}{
+		"col1": "test2",
+	}, "AND"), 1)
+	if err != nil {
+		panic(err)
+	}
+	s4 := fmt.Sprintf("%v", res4)
+	if s4 != "[map[col1:[116 101 115 116 49] col2:[50 48 50 51 45 49 49 45 49 53] col3:111.22]]" {
+		t.Errorf("The result of c dbutils.WHNotEquals field sampling does not match the expected result.")
+	}
+}
+
+func TestSyncSelectInSlice(t *testing.T) {
+	res5, err := db.SyncQ().Select([]string{"col1", "col2", "col3"}, "dbtest", dbutils.WHInSlice(map[string][]interface{}{
+		"col1": {"test1", "test2"},
+	}, "AND"), 0)
+	if err != nil {
+		panic(err)
+	}
+	s5 := fmt.Sprintf("%v", res5)
+	if s5 != "[map[col1:[116 101 115 116 49] col2:[50 48 50 51 45 49 49 45 49 53] col3:111.22] "+
+		"map[col1:[116 101 115 116 50] col2:[50 48 50 51 45 49 49 45 50 48] col3:222.11]]" {
+		t.Errorf("The result of c dbutils.WHInSlice field sampling does not match the expected result.")
+	}
+}
+
+func TestSyncSelectNotInSlice(t *testing.T) {
+	res6, err := db.SyncQ().Select([]string{"col1", "col2", "col3"}, "dbtest", dbutils.WHNotInSlice(map[string][]interface{}{
+		"col1": {"test1", "test2"},
+	}, "AND"), 0)
+	if err != nil {
+		panic(err)
+	}
+	if res6 != nil {
+		t.Errorf("The result of c dbutils.WHNotInSlice field sampling does not match the expected result.")
+	}
+}
+
+func TestSyncInsert(t *testing.T) {
+	_, err := db.SyncQ().Insert("dbtest", map[string]interface{}{"col1": "text3", "col2": "2023-10-20", "col3": 10.22})
+	if err != nil {
+		panic(err)
+	}
+	res, err := db.SyncQ().Query("SELECT * FROM dbtest WHERE col1 = 'text3'")
+	if err != nil {
+		panic(err)
+	}
+	if res == nil {
+		t.Errorf("The Insert command failed.")
+	}
+}
+
+func TestSyncCount(t *testing.T) {
+	count, err := db.SyncQ().Count([]string{"*"}, "dbtest", dbutils.WHOutput{}, 0)
+	if err != nil {
+		t.Error(err)
+	}
+	parseInt, err := dbutils.ParseInt(count[0]["COUNT(*)"])
+	if err != nil {
+		t.Error(err)
+	}
+	if parseInt < 2 {
+		t.Errorf("The result of the command is not the same as expected.")
+	}
+}
+
+func TestSyncDelete(t *testing.T) {
+	_, err := db.SyncQ().Delete("dbtest", dbutils.WHEquals(map[string]interface{}{
+		"col1": "test1",
+	}, "AND"))
+	if err != nil {
+		t.Error(err)
+	}
+	res, err := db.SyncQ().Query("SELECT * FROM dbtest WHERE col1 = 'test1'")
+	if err != nil {
+		t.Error(err)
+	}
+	if res != nil {
+		t.Errorf("The line has not been deleted.")
+	}
+}
+
+func TestSyncUpdate(t *testing.T) {
+	_, err := db.SyncQ().Update("dbtest", []dbutils.DbEquals{
+		{"col1", "upd1"},
+		{"col2", "2023-10-15"},
+		{"col3", 1.1},
+	}, dbutils.WHEquals(map[string]interface{}{"col1": "test2"}, "AND"))
+	if err != nil {
+		t.Error(err)
+	}
+	res, err := db.SyncQ().Select([]string{"*"}, "dbtest", dbutils.WHEquals(map[string]interface{}{
+		"col1": "upd1", "col2": "2023-10-15",
+	}, "AND"), 0)
+	if err != nil {
+		t.Error(err)
+	}
+	if res == nil {
+		t.Errorf("The row has not been updated.")
+	}
+}
