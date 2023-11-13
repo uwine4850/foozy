@@ -10,16 +10,8 @@ import (
 
 var db = database.NewDatabase("root", "1111", "localhost", "3406", "foozy_test")
 
-func TestMain(m *testing.M) {
-	err := db.Connect()
-	_, err = db.SyncQ().Query("DELETE FROM dbtest")
-	if err != nil {
-		panic(err)
-	}
-	if err != nil {
-		panic(err)
-	}
-	_, err = db.SyncQ().Query("INSERT INTO `dbtest` (`col1`, `col2`, `col3`) VALUES (?, ?, ?)",
+func createDbTest() {
+	_, err := db.SyncQ().Query("INSERT INTO `dbtest` (`col1`, `col2`, `col3`) VALUES (?, ?, ?)",
 		"test1", "2023-11-15", 111.22)
 	if err != nil {
 		panic(err)
@@ -29,11 +21,45 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
-	exitCode := m.Run()
-	_, err = db.SyncQ().Query("DELETE FROM dbtest")
+}
+
+func clearDbTest() {
+	_, err := db.SyncQ().Query("DELETE FROM dbtest")
 	if err != nil {
 		panic(err)
 	}
+}
+
+func createDbAsyncTest() {
+	_, err := db.SyncQ().Query("INSERT INTO `db_async_test` (`col1`, `col2`, `col3`) VALUES (?, ?, ?)",
+		"test1", "2023-11-15", 111.22)
+	if err != nil {
+		panic(err)
+	}
+	_, err = db.SyncQ().Query("INSERT INTO `db_async_test` (`col1`, `col2`, `col3`) VALUES (?, ?, ?)",
+		"test2", "2023-11-20", 222.11)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func clearDbAsyncTest() {
+	_, err := db.SyncQ().Query("DELETE FROM db_async_test")
+	if err != nil {
+		panic(err)
+	}
+}
+
+func TestMain(m *testing.M) {
+	err := db.Connect()
+	if err != nil {
+		panic(err)
+	}
+	clearDbTest()
+	createDbTest()
+	clearDbAsyncTest()
+	createDbAsyncTest()
+	exitCode := m.Run()
 	db.Close()
 	os.Exit(exitCode)
 }
