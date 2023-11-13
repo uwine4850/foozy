@@ -29,6 +29,7 @@ type IAsyncQueries interface {
 	SetSyncQueries(queries ISyncQueries)
 	Wait()
 	LoadAsyncRes(key string) (*dbutils.AsyncQueryData, bool)
+	AsyncQuery(key string, query string, args ...any)
 	AsyncSelect(key string, rows []string, tableName string, where dbutils.WHOutput, limit int)
 	AsyncInsert(key string, tableName string, params map[string]interface{})
 	AsyncUpdate(key string, tableName string, params []dbutils.DbEquals, where dbutils.WHOutput)

@@ -16,6 +16,15 @@ func (q *AsyncQueries) SetSyncQueries(queries interfaces.ISyncQueries) {
 	q.syncQ = queries
 }
 
+func (q *AsyncQueries) AsyncQuery(key string, query string, args ...any) {
+	q.wg.Add(1)
+	go func() {
+		defer q.wg.Done()
+		_res, err := q.syncQ.Query(query, args...)
+		q.setAsyncRes(key, _res, err)
+	}()
+}
+
 func (q *AsyncQueries) AsyncSelect(key string, rows []string, tableName string, where dbutils.WHOutput, limit int) {
 	q.wg.Add(1)
 	go func() {
@@ -65,7 +74,7 @@ func (q *AsyncQueries) AsyncCount(key string, rows []string, tableName string, w
 func (q *AsyncQueries) setAsyncRes(key string, _res []map[string]interface{}, err error) {
 	queryData := dbutils.AsyncQueryData{}
 	if err != nil {
-		queryData.Error = err.Error()
+		queryData.Error = err
 	}
 	queryData.Res = _res
 	q.asyncRes.Store(key, queryData)
