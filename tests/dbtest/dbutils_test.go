@@ -1,0 +1,124 @@
+package dbtest
+
+import (
+	"github.com/uwine4850/foozy/pkg/database/dbutils"
+	"github.com/uwine4850/foozy/pkg/utils"
+	"reflect"
+	"testing"
+)
+
+func TestParseString(t *testing.T) {
+	res, err := db.SyncQ().Query("SELECT * FROM dbtest")
+	if err != nil {
+		panic(err)
+	}
+	p := dbutils.ParseString(res[0]["col1"])
+	if p != "upd1" {
+		t.Errorf("The result of the method is not the same as expected.")
+	}
+}
+
+func TestParseInt(t *testing.T) {
+	res, err := db.SyncQ().Query("SELECT * FROM dbtest")
+	if err != nil {
+		panic(err)
+	}
+	parseInt, err := dbutils.ParseInt(res[0]["id"])
+	if err != nil {
+		panic(err)
+	}
+	if parseInt <= 0 {
+		t.Errorf("Error executing the dbutils.ParseInt method.")
+	}
+}
+
+func TestParseDateTime(t *testing.T) {
+	res, err := db.SyncQ().Query("SELECT * FROM dbtest")
+	if err != nil {
+		panic(err)
+	}
+	time, err := dbutils.ParseDateTime("2006-01-02", res[0]["col2"])
+	if err != nil {
+		panic(err)
+	}
+	if time.String() == "2023-10-15" {
+		t.Errorf("Error executing dbutils.ParseDateTime method.")
+	}
+}
+
+func TestParseFloat(t *testing.T) {
+	res, err := db.SyncQ().Query("SELECT * FROM dbtest")
+	if err != nil {
+		panic(err)
+	}
+	float, err := dbutils.ParseFloat(res[0]["col3"])
+	if err != nil {
+		panic(err)
+	}
+	if float != 1.1 {
+		t.Errorf("Execution error of dbutils.ParseFloat method.")
+	}
+}
+
+func TestParseEquals(t *testing.T) {
+	var equals []dbutils.DbEquals
+	equals = append(equals, dbutils.DbEquals{
+		Name:  "e1",
+		Value: 1,
+	})
+	equals = append(equals, dbutils.DbEquals{
+		Name:  "e2",
+		Value: 2,
+	})
+	parseEquals, args := dbutils.ParseEquals(equals, "AND")
+	if parseEquals != "e1 = ? AND e2 = ?" {
+		t.Errorf("The timing doesn't match the expectation. Expected e1 = ? AND e2 = ?, received %s", parseEquals)
+	}
+	i := []interface{}{1, 2}
+	if !reflect.DeepEqual(args, i) {
+		t.Errorf("Arguments don't match the expectation.")
+	}
+}
+
+func TestParseParams(t *testing.T) {
+	params, args := dbutils.ParseParams(map[string]interface{}{"p1": 1, "p2": 2})
+	if !utils.SliceContains(params, "p1") || !utils.SliceContains(params, "p2") {
+		t.Errorf("The keys are not as expected.")
+	}
+	if !utils.SliceContains(args, 1) || !utils.SliceContains(args, 2) {
+		t.Errorf("Arguments don't match the expectation.")
+	}
+}
+
+func TestRepeatValues(t *testing.T) {
+	values := dbutils.RepeatValues(3, ",")
+	if values != "?, ?, ?" {
+		t.Errorf("The result does not match the expectation.")
+	}
+}
+
+type Fill struct {
+	Col1 string `db:"col1"`
+	Col2 string `db:"col2"`
+	Col3 string `db:"col3"`
+}
+
+func TestFillStructFromDb(t *testing.T) {
+	var f Fill
+	expected := Fill{
+		Col1: "upd1",
+		Col2: "2023-10-15",
+		Col3: "1.1",
+	}
+	res, err := db.SyncQ().Query("SELECT * FROM dbtest")
+	if err != nil {
+		panic(err)
+	}
+	err = dbutils.FillStructFromDb(res[0], &f)
+	if err != nil {
+		panic(err)
+	}
+	if f != expected {
+		t.Errorf("The data in the structure is not as expected.")
+	}
+}
