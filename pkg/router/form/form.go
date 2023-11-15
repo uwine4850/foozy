@@ -1,6 +1,7 @@
 package form
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"github.com/uwine4850/foozy/pkg/router"
@@ -9,7 +10,7 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
-	"net/url"
+	netUrl "net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -17,7 +18,7 @@ import (
 
 type Form struct {
 	multipartForm      *multipart.Form
-	applicationForm    url.Values
+	applicationForm    netUrl.Values
 	multipartMaxMemory int64
 	request            *http.Request
 }
@@ -50,7 +51,7 @@ func (f *Form) GetMultipartForm() *multipart.Form {
 	return f.multipartForm
 }
 
-func (f *Form) GetApplicationForm() url.Values {
+func (f *Form) GetApplicationForm() netUrl.Values {
 	return f.applicationForm
 }
 
@@ -139,4 +140,43 @@ func ReplaceFile(pathToFile string, w http.ResponseWriter, file multipart.File, 
 		return err
 	}
 	return nil
+}
+
+func SendApplicationForm(url string, values map[string]string) (*http.Response, error) {
+	formData := netUrl.Values{}
+	for name, value := range values {
+		formData.Set(name, value)
+	}
+	response, err := http.Post(url, "application/x-www-form-urlencoded", bytes.NewBufferString(formData.Encode()))
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+func SendMultipartForm(url string, values map[string]string, files map[string][]string) (*http.Response, error) {
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	for name, value := range files {
+		for i := 0; i < len(value); i++ {
+			file, err := os.Open(value[i])
+			if err != nil {
+				return nil, err
+			}
+			defer file.Close()
+			fileWriter, err := writer.CreateFormFile(name, value[i])
+			if _, err := io.Copy(fileWriter, file); err != nil {
+				return nil, err
+			}
+		}
+	}
+	for name, value := range values {
+		writer.WriteField(name, value)
+	}
+	writer.Close()
+	response, err := http.Post(url, writer.FormDataContentType(), body)
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
 }
