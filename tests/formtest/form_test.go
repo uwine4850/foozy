@@ -65,28 +65,7 @@ func TestMain(m *testing.M) {
 	newRouter.Post("/application-form", applicationForm)
 	newRouter.Post("/multipart-form", multipartForm)
 	newRouter.Post("/save-file", saveFile)
-	newRouter.Post("/fill", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		newForm := form.NewForm(r)
-		err := newForm.Parse()
-		if err != nil {
-			return func() { w.Write([]byte(err.Error())) }
-		}
-		var f Fill
-		err = form.FillStructFromForm(newForm, &f, []string{"isNil"})
-		if err != nil {
-			return func() { w.Write([]byte(err.Error())) }
-		}
-		if f.NilField != nil {
-			return func() { w.Write([]byte("The NilField must be nil.")) }
-		}
-		if f.Field1 == nil {
-			return func() { w.Write([]byte("The Field1 field must be populated.")) }
-		}
-		if f.File == nil {
-			return func() { w.Write([]byte("The File field must be populated.")) }
-		}
-		return func() {}
-	})
+	newRouter.Post("/fill", fill)
 	server := fserer.NewServer(":8000", newRouter)
 	go func() {
 		err = server.Start()
@@ -100,6 +79,29 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 	os.Exit(exitCode)
+}
+
+func fill(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	newForm := form.NewForm(r)
+	err := newForm.Parse()
+	if err != nil {
+		return func() { w.Write([]byte(err.Error())) }
+	}
+	var f Fill
+	err = form.FillStructFromForm(newForm, &f, []string{"isNil"})
+	if err != nil {
+		return func() { w.Write([]byte(err.Error())) }
+	}
+	if f.NilField != nil {
+		return func() { w.Write([]byte("The NilField must be nil.")) }
+	}
+	if f.Field1 == nil {
+		return func() { w.Write([]byte("The Field1 field must be populated.")) }
+	}
+	if f.File == nil {
+		return func() { w.Write([]byte("The File field must be populated.")) }
+	}
+	return func() {}
 }
 
 func saveFile(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
