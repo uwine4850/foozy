@@ -3,6 +3,7 @@ package router
 import (
 	"fmt"
 	interfaces2 "github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/middlewares"
 	"github.com/uwine4850/foozy/pkg/utils"
 	"log"
 	"net/http"
@@ -68,16 +69,30 @@ func (rt *Router) getHandleFunc(pattern string, method string, fn func(w http.Re
 		}
 		// Run middlewares.
 		if rt.middleware != nil {
-			// Running asynchronous middleware.
-			rt.middleware.RunAsyncMddl(writer, request, rt.manager)
 			// Running synchronous middleware.
 			err := rt.middleware.RunMddl(writer, request, rt.manager)
 			if err != nil {
 				panic(err)
 			}
-
+			// Running asynchronous middleware.
+			rt.middleware.RunAsyncMddl(writer, request, rt.manager)
 			// Waiting for all asynchronous middleware to complete.
 			rt.middleware.WaitAsyncMddl()
+			// Handling middleware errors.
+			mddlErr, err := middlewares.GetMddlError(rt.manager)
+			if err != nil {
+				panic(err)
+			}
+			if mddlErr != nil {
+				rt.manager.DelUserContext("mddlerr")
+				ServerError(writer, mddlErr.Error())
+				return
+			}
+			// Checking the skip of the next page. Runs after a more important error check.
+			if middlewares.IsSkipNextPage(rt.manager) {
+				rt.manager.DelUserContext("skipNextPage")
+				return
+			}
 		}
 		if method == "WS" {
 			rt.manager.SetWebsocket(rt.websocket)

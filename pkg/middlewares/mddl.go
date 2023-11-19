@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"errors"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/utils"
 	"net/http"
@@ -64,4 +65,29 @@ func (m *Middleware) RunAsyncMddl(w http.ResponseWriter, r *http.Request, manage
 // WaitAsyncMddl waits for the execution of all asynchronous middleware.
 func (m *Middleware) WaitAsyncMddl() {
 	m.wg.Wait()
+}
+
+func SetMddlError(mddlErr error, manager interfaces.IManager) {
+	manager.SetUserContext("mddlerr", mddlErr)
+}
+
+func GetMddlError(manager interfaces.IManager) (error, error) {
+	mddlErr, ok := manager.GetUserContext("mddlerr")
+	if ok {
+		err, ok := mddlErr.(error)
+		if !ok {
+			return nil, errors.New("mddlerr type is not an error")
+		}
+		return err, nil
+	}
+	return nil, nil
+}
+
+func SkipNextPage(manager interfaces.IManager) {
+	manager.SetUserContext("skipNextPage", true)
+}
+
+func IsSkipNextPage(manager interfaces.IManager) bool {
+	_, ok := manager.GetUserContext("skipNextPage")
+	return ok
 }
