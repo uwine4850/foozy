@@ -4,12 +4,23 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
+	"github.com/uwine4850/foozy/pkg/interfaces"
 	"strconv"
 	"strings"
 )
 
 type SyncQueries struct {
 	db *sql.DB
+	interfaces.IQueryBuild
+}
+
+func NewSyncQueries(qb interfaces.IQueryBuild) *SyncQueries {
+	return &SyncQueries{IQueryBuild: qb}
+}
+
+func (q *SyncQueries) QB() interfaces.IQueryBuild {
+	q.IQueryBuild.SetSyncQ(q)
+	return q.IQueryBuild
 }
 
 // Query sends a query to the database.

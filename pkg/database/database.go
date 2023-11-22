@@ -20,8 +20,8 @@ type Database struct {
 
 func NewDatabase(username string, password string, host string, port string, database string) *Database {
 	d := Database{username: username, password: password, host: host, port: port, database: database}
-	d.SetSyncQueries(&SyncQueries{})
-	d.SetAsyncQueries(&AsyncQueries{})
+	d.SetSyncQueries(NewSyncQueries(&QueryBuild{}))
+	d.SetAsyncQueries(NewAsyncQueries(&QueryBuild{}))
 	return &d
 }
 
