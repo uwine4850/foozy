@@ -47,10 +47,12 @@ type QueryBuild struct {
 }
 
 func (qb *QueryBuild) SetSyncQ(sq interfaces.ISyncQueries) {
+	qb.primaryCommand = ""
 	qb.syncQ = sq
 }
 
 func (qb *QueryBuild) SetAsyncQ(aq interfaces.IAsyncQueries) {
+	qb.primaryCommand = ""
 	qb.asyncQ = aq
 }
 
