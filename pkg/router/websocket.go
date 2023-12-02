@@ -30,18 +30,6 @@ func NewWebsocket(upgrader websocket.Upgrader) *Websocket {
 	return &Websocket{upgrader: upgrader, broadcast: make(chan Message)}
 }
 
-// Connect connecting web sockets to the client.
-// fn func() is responsible for the event that occurs during the connection.
-func (ws *Websocket) Connect(w http.ResponseWriter, r *http.Request, fn func()) error {
-	conn, err := ws.upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		return err
-	}
-	ws.conn = conn
-	fn()
-	return nil
-}
-
 // Close closes the connection to the socket.
 // Works well with the OnClientClose method.
 func (ws *Websocket) Close() error {
@@ -82,13 +70,17 @@ func (ws *Websocket) ReceiveMessages(w http.ResponseWriter, r *http.Request) err
 		return err
 	}
 	defer conn.Close()
-	ws.onConnect(conn)
+	if ws.onConnect != nil {
+		ws.onConnect(conn)
+	}
 	go ws.receiveMessages()
 	for {
 		messageType, msgData, err := conn.ReadMessage()
 		if err != nil {
 			if websocket.IsCloseError(err, websocket.CloseGoingAway) {
-				ws.onClientClose(conn)
+				if ws.onClientClose != nil {
+					ws.onClientClose(conn)
+				}
 				break
 			}
 			return err
@@ -104,6 +96,9 @@ func (ws *Websocket) ReceiveMessages(w http.ResponseWriter, r *http.Request) err
 }
 
 func (ws *Websocket) receiveMessages() {
+	if ws.onMessage == nil {
+		panic("OnMessage handler was not found")
+	}
 	for {
 		msg := <-ws.broadcast
 		ws.onMessage(msg.MsgType, msg.Msg, msg.Conn)

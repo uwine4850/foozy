@@ -91,3 +91,8 @@ func IsSkipNextPage(manager interfaces.IManager) bool {
 	_, ok := manager.GetUserContext("skipNextPage")
 	return ok
 }
+
+func SkipNextPageAndRedirect(manager interfaces.IManager, w http.ResponseWriter, r *http.Request, path string) {
+	http.Redirect(w, r, path, http.StatusFound)
+	SkipNextPage(manager)
+}

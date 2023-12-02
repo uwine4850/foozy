@@ -30,7 +30,6 @@ type IRouter interface {
 }
 
 type IWebsocket interface {
-	Connect(w http.ResponseWriter, r *http.Request, fn func()) error
 	Close() error
 	OnClientClose(fn func(conn *websocket.Conn))
 	OnMessage(fn func(messageType int, msgData []byte, conn *websocket.Conn))
