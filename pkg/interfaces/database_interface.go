@@ -5,16 +5,6 @@ import (
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 )
 
-type IDatabase interface {
-	Connect() error
-	Close() error
-	SetSyncQueries(q ISyncQueries)
-	SetAsyncQueries(q IAsyncQueries)
-	SyncQ() ISyncQueries
-	AsyncQ() IAsyncQueries
-	DatabaseName() string
-}
-
 type ISyncQueries interface {
 	QB() IQueryBuild
 	SetDB(db *sql.DB)

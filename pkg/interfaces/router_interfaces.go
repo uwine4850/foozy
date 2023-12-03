@@ -20,15 +20,6 @@ type IManager interface {
 	DelUserContext(key string)
 }
 
-type IRouter interface {
-	Get(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager IManager) func())
-	Post(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager IManager) func())
-	Ws(pattern string, ws IWebsocket, fn func(w http.ResponseWriter, r *http.Request, manager IManager) func())
-	GetMux() *http.ServeMux
-	SetTemplateEngine(engine ITemplateEngine)
-	SetMiddleware(middleware IMiddleware)
-}
-
 type IWebsocket interface {
 	Close() error
 	OnClientClose(fn func(conn *websocket.Conn))

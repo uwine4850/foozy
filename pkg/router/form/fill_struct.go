@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/uwine4850/foozy/pkg/ferrors"
-	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/utils"
 	"mime/multipart"
 	"reflect"
@@ -21,7 +20,7 @@ type FormFile struct {
 // []FormFile - form files.
 // []string - all other data.
 // The nilIfNotExist parameter sets the name of form fields that should be nil if they are not found (e.g. useful for checkboxes).
-func FillStructFromForm(frm interfaces.IForm, fill interface{}, nilIfNotExist []string) error {
+func FillStructFromForm(frm *Form, fill interface{}, nilIfNotExist []string) error {
 	if reflect.TypeOf(fill).Kind() != reflect.Ptr {
 		return ferrors.ErrParameterNotPointer{Param: "fill"}
 	}
@@ -84,7 +83,7 @@ func checkFieldType(field reflect.StructField) error {
 }
 
 // FrmValueToMap Converts the form to a map.
-func FrmValueToMap(frm interfaces.IForm) map[string]interface{} {
+func FrmValueToMap(frm *Form) map[string]interface{} {
 	formMap := make(map[string]interface{})
 	multipartForm := frm.GetMultipartForm()
 	if multipartForm != nil {

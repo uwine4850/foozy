@@ -2,17 +2,17 @@ package auth
 
 import (
 	"fmt"
+	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
-	"github.com/uwine4850/foozy/pkg/interfaces"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type Auth struct {
-	database  interfaces.IDatabase
+	database  *database.Database
 	tableName string
 }
 
-func NewAuth(database interfaces.IDatabase) (*Auth, error) {
+func NewAuth(database *database.Database) (*Auth, error) {
 	err := CreateAuthTable(database)
 	if err != nil {
 		return nil, err
@@ -100,7 +100,7 @@ func (a *Auth) UserExist(username string) (map[string]interface{}, error) {
 }
 
 // CreateAuthTable creates a user authentication table.
-func CreateAuthTable(database interfaces.IDatabase) error {
+func CreateAuthTable(database *database.Database) error {
 	sql := fmt.Sprintf("CREATE TABLE IF NOT EXISTS `%s`.`auth` "+
 		"(`id` INT NOT NULL AUTO_INCREMENT , "+
 		"`username` VARCHAR(200) NOT NULL , "+
