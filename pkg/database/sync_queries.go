@@ -11,16 +11,16 @@ import (
 
 type SyncQueries struct {
 	db *sql.DB
-	interfaces.IQueryBuild
+	qb interfaces.IQueryBuild
 }
 
 func NewSyncQueries(qb interfaces.IQueryBuild) *SyncQueries {
-	return &SyncQueries{IQueryBuild: qb}
+	return &SyncQueries{qb: qb}
 }
 
-func (q *SyncQueries) QB() interfaces.IQueryBuild {
-	q.IQueryBuild.SetSyncQ(q)
-	return q.IQueryBuild
+func (q *SyncQueries) QB() interfaces.IUserQueryBuild {
+	q.qb.SetSyncQ(q)
+	return q.qb
 }
 
 // Query sends a query to the database.

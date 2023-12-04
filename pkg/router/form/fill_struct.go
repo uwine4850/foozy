@@ -6,6 +6,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/ferrors"
 	"github.com/uwine4850/foozy/pkg/utils"
 	"mime/multipart"
+	netUrl "net/url"
 	"reflect"
 )
 
@@ -82,8 +83,13 @@ func checkFieldType(field reflect.StructField) error {
 	return nil
 }
 
+type IFormGetEnctypeData interface {
+	GetMultipartForm() *multipart.Form
+	GetApplicationForm() netUrl.Values
+}
+
 // FrmValueToMap Converts the form to a map.
-func FrmValueToMap(frm *Form) map[string]interface{} {
+func FrmValueToMap(frm IFormGetEnctypeData) map[string]interface{} {
 	formMap := make(map[string]interface{})
 	multipartForm := frm.GetMultipartForm()
 	if multipartForm != nil {

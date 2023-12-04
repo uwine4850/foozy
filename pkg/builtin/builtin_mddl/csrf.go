@@ -6,7 +6,9 @@ import (
 	"net/http"
 )
 
-func GenerateAndSetCsrf(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
+// GenerateAndSetCsrf A middleware designed to generate a CSRF token. The token is set as a cookie value.
+// To use it you need to run the method in a synchronous or asynchronous handler.
+func GenerateAndSetCsrf(w http.ResponseWriter, r *http.Request, manager interfaces.IManagerData) {
 	csrfCookie, err := r.Cookie("csrf_token")
 	if err != nil || csrfCookie.Value == "" {
 		csrfToken := utils.GenerateCsrfToken()

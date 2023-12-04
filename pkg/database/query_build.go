@@ -33,6 +33,8 @@ type updateValues struct {
 	Args      []interface{}
 }
 
+// QueryBuild builder of a database query.
+// With this builder it is possible to create more flexible queries.
 type QueryBuild struct {
 	selectVal      selectValues
 	insertVal      insertValues
@@ -46,21 +48,25 @@ type QueryBuild struct {
 	asyncQ         interfaces.IAsyncQueries
 }
 
+// SetSyncQ sets the synchronous query interface to communicate with the database.
 func (qb *QueryBuild) SetSyncQ(sq interfaces.ISyncQueries) {
 	qb.primaryCommand = ""
 	qb.syncQ = sq
 }
 
+// SetAsyncQ sets the asynchronous query interface to communicate with the database.
 func (qb *QueryBuild) SetAsyncQ(aq interfaces.IAsyncQueries) {
 	qb.primaryCommand = ""
 	qb.asyncQ = aq
 }
 
+// SetKeyForAsyncQ sets the key for asynchronous requests.
 func (qb *QueryBuild) SetKeyForAsyncQ(key string) {
 	qb.keyForAsyncQ = key
 }
 
-func (qb *QueryBuild) Select(cols string, tableName string) interfaces.IQueryBuild {
+// Select database query.
+func (qb *QueryBuild) Select(cols string, tableName string) interfaces.IUserQueryBuild {
 	if qb.primaryCommand != "" {
 		panic(fmt.Sprintf("you cannot use an %s command while already using a %s command.", "SELECT",
 			qb.primaryCommand))
@@ -72,7 +78,8 @@ func (qb *QueryBuild) Select(cols string, tableName string) interfaces.IQueryBui
 	return qb
 }
 
-func (qb *QueryBuild) Insert(tableName string, params map[string]interface{}) interfaces.IQueryBuild {
+// Insert database query.
+func (qb *QueryBuild) Insert(tableName string, params map[string]interface{}) interfaces.IUserQueryBuild {
 	if qb.primaryCommand != "" {
 		panic(fmt.Sprintf("you cannot use an %s command while already using a %s command.", "INSERT",
 			qb.primaryCommand))
@@ -87,7 +94,9 @@ func (qb *QueryBuild) Insert(tableName string, params map[string]interface{}) in
 	return qb
 }
 
-func (qb *QueryBuild) Delete(tableName string) interfaces.IQueryBuild {
+// Delete database query.
+// Deletes all table data if the Where method is not used.
+func (qb *QueryBuild) Delete(tableName string) interfaces.IUserQueryBuild {
 	if qb.primaryCommand != "" {
 		panic(fmt.Sprintf("you cannot use an %s command while already using a %s command.", "DELETE",
 			qb.primaryCommand))
@@ -98,7 +107,8 @@ func (qb *QueryBuild) Delete(tableName string) interfaces.IQueryBuild {
 	return qb
 }
 
-func (qb *QueryBuild) Update(tableName string, params map[string]interface{}) interfaces.IQueryBuild {
+// Update database query.
+func (qb *QueryBuild) Update(tableName string, params map[string]interface{}) interfaces.IUserQueryBuild {
 	if qb.primaryCommand != "" {
 		panic(fmt.Sprintf("you cannot use an %s command while already using a %s command.", "UPDATE",
 			qb.primaryCommand))
@@ -123,7 +133,11 @@ func (qb *QueryBuild) Update(tableName string, params map[string]interface{}) in
 	return qb
 }
 
-func (qb *QueryBuild) Where(args ...any) interfaces.IQueryBuild {
+// Where adds a condition to the query.
+// Example of using Where("id", "=", 55).
+// For proper performance it is important to select the key character separately, the rest can be a single string.
+// All characters to be selected are in the variable operators.
+func (qb *QueryBuild) Where(args ...any) interfaces.IUserQueryBuild {
 	var isNextValue bool
 	var isNextIN bool
 	var values []interface{}
@@ -164,7 +178,9 @@ func (qb *QueryBuild) Where(args ...any) interfaces.IQueryBuild {
 	return qb
 }
 
-func (qb *QueryBuild) Count() interfaces.IQueryBuild {
+// Count outputs the number of records.
+// Combined with Select only.
+func (qb *QueryBuild) Count() interfaces.IUserQueryBuild {
 	if qb.primaryCommand != "SELECT" {
 		panic("the COUNT command can only be used with the SELECT command")
 	}
@@ -172,6 +188,7 @@ func (qb *QueryBuild) Count() interfaces.IQueryBuild {
 	return qb
 }
 
+// buildPrimaryCommand build a query to the database.
 func (qb *QueryBuild) buildPrimaryCommand() (string, []interface{}) {
 	var queryStr string
 	var args []interface{}
@@ -190,6 +207,7 @@ func (qb *QueryBuild) buildPrimaryCommand() (string, []interface{}) {
 	return queryStr, args
 }
 
+// Ex sending a query to the database and receiving the result (if the query is synchronous).
 func (qb *QueryBuild) Ex() ([]map[string]interface{}, error) {
 	queryStr, args := qb.buildPrimaryCommand()
 	queryStr += qb.queryStr

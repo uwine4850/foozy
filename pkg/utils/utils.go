@@ -38,6 +38,7 @@ func SplitUrlFromFirstSlug(url string) string {
 	return url[:index]
 }
 
+// SliceContains checks to see if the slice contains a value.
 func SliceContains[T comparable](slice []T, item T) bool {
 	for i := 0; i < len(slice); i++ {
 		if slice[i] == item {
@@ -47,6 +48,7 @@ func SliceContains[T comparable](slice []T, item T) bool {
 	return false
 }
 
+// GenerateCsrfToken generates a CSRF token.
 func GenerateCsrfToken() string {
 	tokenBytes := make([]byte, 32)
 	_, err := rand.Read(tokenBytes)
@@ -58,12 +60,15 @@ func GenerateCsrfToken() string {
 	return csrfToken
 }
 
+// MergeMap merges two maps into one.
+// For example, if you pass Map1 and Map2, Map2 data will be added to Map1.
 func MergeMap[T1 comparable, T2 any](map1 *map[T1]T2, map2 map[T1]T2) {
 	for key, value := range map2 {
 		(*map1)[key] = value
 	}
 }
 
+// Join outputs the slice in string format with the specified delimiter.
 func Join[T any](elems []T, sep string) string {
 	var res string
 	for i := 0; i < len(elems); i++ {

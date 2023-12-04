@@ -8,7 +8,7 @@ import (
 	"sync"
 )
 
-type MddlFunc func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
+type MddlFunc func(w http.ResponseWriter, r *http.Request, manager interfaces.IManagerData)
 
 type Middleware struct {
 	preHandlerMiddlewares   map[int]MddlFunc
@@ -25,7 +25,7 @@ func NewMiddleware() *Middleware {
 
 // HandlerMddl the middleware that will be executed before the request handler.
 // id indicates the order of execution of the current middleware. No two identical id's can be created.
-func (m *Middleware) HandlerMddl(id int, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) {
+func (m *Middleware) HandlerMddl(id int, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManagerData)) {
 	if !utils.SliceContains(m.preHandlerId, id) {
 		m.preHandlerId = append(m.preHandlerId, id)
 		m.preHandlerMiddlewares[id] = fn
@@ -35,8 +35,8 @@ func (m *Middleware) HandlerMddl(id int, fn func(w http.ResponseWriter, r *http.
 }
 
 // AsyncHandlerMddl the middleware that will execute asynchronously before the request.
-func (m *Middleware) AsyncHandlerMddl(fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) {
-	m.asyncHandlerMiddlewares = append(m.asyncHandlerMiddlewares, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
+func (m *Middleware) AsyncHandlerMddl(fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManagerData)) {
+	m.asyncHandlerMiddlewares = append(m.asyncHandlerMiddlewares, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManagerData) {
 		defer m.wg.Done()
 		fn(w, r, manager)
 	})
@@ -67,11 +67,13 @@ func (m *Middleware) WaitAsyncMddl() {
 	m.wg.Wait()
 }
 
-func SetMddlError(mddlErr error, manager interfaces.IManager) {
+// SetMddlError sets an error that occurred in the middleware.
+func SetMddlError(mddlErr error, manager interfaces.IManagerData) {
 	manager.SetUserContext("mddlerr", mddlErr)
 }
 
-func GetMddlError(manager interfaces.IManager) (error, error) {
+// GetMddlError get error from middleware. Used in router and in pair with SetMddlError.
+func GetMddlError(manager interfaces.IManagerData) (error, error) {
 	mddlErr, ok := manager.GetUserContext("mddlerr")
 	if ok {
 		err, ok := mddlErr.(error)
@@ -83,16 +85,20 @@ func GetMddlError(manager interfaces.IManager) (error, error) {
 	return nil, nil
 }
 
-func SkipNextPage(manager interfaces.IManager) {
+// SkipNextPage sends a command to the router to skip rendering the next page.
+func SkipNextPage(manager interfaces.IManagerData) {
 	manager.SetUserContext("skipNextPage", true)
 }
 
-func IsSkipNextPage(manager interfaces.IManager) bool {
+// IsSkipNextPage checks if the page rendering should be skipped.
+// The function is built into the router.
+func IsSkipNextPage(manager interfaces.IManagerData) bool {
 	_, ok := manager.GetUserContext("skipNextPage")
 	return ok
 }
 
-func SkipNextPageAndRedirect(manager interfaces.IManager, w http.ResponseWriter, r *http.Request, path string) {
+// SkipNextPageAndRedirect skips the page render and redirects to another page.
+func SkipNextPageAndRedirect(manager interfaces.IManagerData, w http.ResponseWriter, r *http.Request, path string) {
 	http.Redirect(w, r, path, http.StatusFound)
 	SkipNextPage(manager)
 }

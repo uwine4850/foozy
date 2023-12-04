@@ -25,11 +25,13 @@ func NewTemplateEngine() (interfaces.ITemplateEngine, error) {
 	return &TemplateEngine{context: make(map[string]interface{})}, nil
 }
 
+// SetPath sets the path to the template.
 func (e *TemplateEngine) SetPath(path string) {
 	e.path = path
 }
 
-func (e *TemplateEngine) parseFile() error {
+// processingFile processes the template file.
+func (e *TemplateEngine) processingFile() error {
 	file, err := pongo2.FromFile(e.path)
 	if err != nil {
 		return err
@@ -38,8 +40,9 @@ func (e *TemplateEngine) parseFile() error {
 	return nil
 }
 
+// Exec does all the necessary processing for the template and shows the HTML code on the page.
 func (e *TemplateEngine) Exec() error {
-	err := e.parseFile()
+	err := e.processingFile()
 	if err != nil {
 		return err
 	}
@@ -58,6 +61,7 @@ func (e *TemplateEngine) Exec() error {
 	return nil
 }
 
+// SetContext sets the variables for the template.
 func (e *TemplateEngine) SetContext(data map[string]interface{}) {
 	utils.MergeMap(&e.context, data)
 }

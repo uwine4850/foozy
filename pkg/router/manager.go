@@ -20,19 +20,25 @@ func NewManager(engine interfaces2.ITemplateEngine) *Manager {
 	return &Manager{TemplateEngine: engine}
 }
 
+// SetUserContext sets the user context.
+// This context is used only as a means of passing information between handlers.
 func (m *Manager) SetUserContext(key string, value interface{}) {
 	m.userContext.Store(key, value)
 }
 
+// GetUserContext getting the user context.
 func (m *Manager) GetUserContext(key string) (any, bool) {
 	value, ok := m.userContext.Load(key)
 	return value, ok
 }
 
+// DelUserContext deletes a user context by key.
 func (m *Manager) DelUserContext(key string) {
 	m.userContext.Delete(key)
 }
 
+// SetTemplateEngine set the template engine interface.
+// Optional method if the template engine is already installed.
 func (m *Manager) SetTemplateEngine(engine interfaces2.ITemplateEngine) {
 	m.TemplateEngine = engine
 }
@@ -76,10 +82,13 @@ func (m *Manager) GetSlugParams(key string) (string, bool) {
 	return res, ok
 }
 
+// GetWebSocket get an instance for the websocket connection.
+// Works only in the "Ws" handler.
 func (m *Manager) GetWebSocket() interfaces2.IWebsocket {
 	return m.websocket
 }
 
+// SetWebsocket sets the websocket interface.
 func (m *Manager) SetWebsocket(websocket interfaces2.IWebsocket) {
 	m.websocket = websocket
 }

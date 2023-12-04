@@ -37,6 +37,7 @@ func (rt *Router) Post(pattern string, fn func(w http.ResponseWriter, r *http.Re
 	rt.mux.Handle(utils.SplitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "POST", fn))
 }
 
+// Ws Processing a websocket connection. Used only for communication with the client's websocket.
 func (rt *Router) Ws(pattern string, ws interfaces2.IWebsocket, fn func(w http.ResponseWriter, r *http.Request, manager interfaces2.IManager) func()) {
 	rt.websocket = ws
 	rt.mux.Handle(utils.SplitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "WS", fn))
@@ -120,10 +121,12 @@ func (rt *Router) setWR(w http.ResponseWriter, r *http.Request) {
 	rt.request = r
 }
 
+// SetTemplateEngine sets the template engine interface.
 func (rt *Router) SetTemplateEngine(engine interfaces2.ITemplateEngine) {
 	rt.TemplateEngine = engine
 }
 
+// EnableLog enable or disable request log output.
 func (rt *Router) EnableLog(enable bool) {
 	rt.enableLog = enable
 }
@@ -134,6 +137,7 @@ func (rt *Router) printLog(request *http.Request) {
 	}
 }
 
+// SetMiddleware installs the middleware for the handlers.
 func (rt *Router) SetMiddleware(middleware interfaces2.IMiddleware) {
 	rt.middleware = middleware
 }

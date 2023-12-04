@@ -7,6 +7,9 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// Auth structure is designed to manage user authentication.
+// It can be used to create a user, check the correctness of the login data, change the password and
+// check the availability of the user.
 type Auth struct {
 	database  *database.Database
 	tableName string
@@ -21,6 +24,7 @@ func NewAuth(database *database.Database) (*Auth, error) {
 }
 
 // RegisterUser registers the user in the database.
+// It also checks the password and makes sure that there is no user with that login.
 func (a *Auth) RegisterUser(username string, password string) error {
 	user, err := a.database.SyncQ().Select([]string{"username"}, a.tableName, dbutils.WHEquals(map[string]interface{}{"username": username}, "AND"), 1)
 	if err != nil {

@@ -6,7 +6,7 @@ import (
 )
 
 type ISyncQueries interface {
-	QB() IQueryBuild
+	QB() IUserQueryBuild
 	SetDB(db *sql.DB)
 	Query(query string, args ...any) ([]map[string]interface{}, error)
 	Insert(tableName string, params map[string]interface{}) ([]map[string]interface{}, error)
@@ -17,7 +17,7 @@ type ISyncQueries interface {
 }
 
 type IAsyncQueries interface {
-	QB(key string) IQueryBuild
+	QB(key string) IUserQueryBuild
 	SetSyncQueries(queries ISyncQueries)
 	Wait()
 	LoadAsyncRes(key string) (*dbutils.AsyncQueryData, bool)
@@ -30,14 +30,18 @@ type IAsyncQueries interface {
 }
 
 type IQueryBuild interface {
+	IUserQueryBuild
 	SetSyncQ(sq ISyncQueries)
 	SetAsyncQ(aq IAsyncQueries)
 	SetKeyForAsyncQ(key string)
-	Select(cols string, tableName string) IQueryBuild
-	Insert(tableName string, params map[string]interface{}) IQueryBuild
-	Delete(tableName string) IQueryBuild
-	Update(tableName string, params map[string]interface{}) IQueryBuild
-	Where(args ...any) IQueryBuild
-	Count() IQueryBuild
+}
+
+type IUserQueryBuild interface {
+	Select(cols string, tableName string) IUserQueryBuild
+	Insert(tableName string, params map[string]interface{}) IUserQueryBuild
+	Delete(tableName string) IUserQueryBuild
+	Update(tableName string, params map[string]interface{}) IUserQueryBuild
+	Where(args ...any) IUserQueryBuild
+	Count() IUserQueryBuild
 	Ex() ([]map[string]interface{}, error)
 }

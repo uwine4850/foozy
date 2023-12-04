@@ -7,6 +7,9 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces"
 )
 
+// Database structure for accessing the database.
+// It can send both synchronous and asynchronous queries.
+// IMPORTANT: after the end of work it is necessary to close the connection using Close method.
 type Database struct {
 	username string
 	password string
@@ -54,22 +57,27 @@ func (d *Database) Close() error {
 	return nil
 }
 
+// SetSyncQueries sets the synchronous query interface.
 func (d *Database) SetSyncQueries(q interfaces.ISyncQueries) {
 	d.syncQ = q
 }
 
+// SetAsyncQueries sets the asynchronous query interface.
 func (d *Database) SetAsyncQueries(q interfaces.IAsyncQueries) {
 	d.asyncQ = q
 }
 
+// SyncQ getting access to synchronous requests.
 func (d *Database) SyncQ() interfaces.ISyncQueries {
 	return d.syncQ
 }
 
+// AsyncQ getting access to asynchronous requests.
 func (d *Database) AsyncQ() interfaces.IAsyncQueries {
 	return d.asyncQ
 }
 
+// DatabaseName Getting the database name.
 func (d *Database) DatabaseName() string {
 	return d.database
 }

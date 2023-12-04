@@ -22,6 +22,7 @@ func NewServer(addr string, router *router.Router) *Server {
 	return s
 }
 
+// Start starts the server.
 func (s *Server) Start() error {
 	log.Println(fmt.Sprintf("Server start on %s", s.addr))
 	err := s.serv.ListenAndServe()
@@ -35,6 +36,7 @@ func (s *Server) GetServ() *http.Server {
 	return s.serv
 }
 
+// Stop stops the server.
 func (s *Server) Stop() error {
 	err := s.serv.Shutdown(nil)
 	if err != nil {

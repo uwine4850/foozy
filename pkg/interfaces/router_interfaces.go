@@ -6,18 +6,30 @@ import (
 )
 
 type IManager interface {
-	SetTemplateEngine(engine ITemplateEngine)
-	RenderTemplate(w http.ResponseWriter, r *http.Request) error
-	SetTemplatePath(templatePath string)
+	IManagerRender
+	IManagerWebsocket
+	IManagerData
+}
+
+type IManagerData interface {
 	SetContext(data map[string]interface{})
-	SetSlugParams(params map[string]string)
 	GetSlugParams(key string) (string, bool)
 	SetUserContext(key string, value interface{})
 	GetUserContext(key string) (any, bool)
+	DelUserContext(key string)
+}
+
+type IManagerRender interface {
+	SetTemplateEngine(engine ITemplateEngine)
+	RenderTemplate(w http.ResponseWriter, r *http.Request) error
+	SetTemplatePath(templatePath string)
+	SetSlugParams(params map[string]string)
+	RenderJson(data interface{}, w http.ResponseWriter) error
+}
+
+type IManagerWebsocket interface {
 	GetWebSocket() IWebsocket
 	SetWebsocket(websocket IWebsocket)
-	RenderJson(data interface{}, w http.ResponseWriter) error
-	DelUserContext(key string)
 }
 
 type IWebsocket interface {

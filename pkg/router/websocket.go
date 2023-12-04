@@ -95,6 +95,7 @@ func (ws *Websocket) ReceiveMessages(w http.ResponseWriter, r *http.Request) err
 	return nil
 }
 
+// receiveMessages processing of received messages.
 func (ws *Websocket) receiveMessages() {
 	if ws.onMessage == nil {
 		panic("OnMessage handler was not found")

@@ -47,10 +47,12 @@ func (f *Form) Parse() error {
 	return nil
 }
 
+// GetMultipartForm getting multipart/form-data form data.
 func (f *Form) GetMultipartForm() *multipart.Form {
 	return f.multipartForm
 }
 
+// GetApplicationForm getting application/x-www-form-urlencoded form data.
 func (f *Form) GetApplicationForm() netUrl.Values {
 	return f.applicationForm
 }
@@ -66,6 +68,7 @@ func (f *Form) File(key string) (multipart.File, *multipart.FileHeader, error) {
 	return f.request.FormFile(key)
 }
 
+// Files getting multiple files from multipart type input.
 func (f *Form) Files(key string) ([]*multipart.FileHeader, bool) {
 	fi, ok := f.multipartForm.File[key]
 	return fi, ok
@@ -142,6 +145,7 @@ func ReplaceFile(pathToFile string, w http.ResponseWriter, file multipart.File, 
 	return nil
 }
 
+// SendApplicationForm sends a form of type application/x-www-form-urlencoded to the specified address.
 func SendApplicationForm(url string, values map[string]string) (*http.Response, error) {
 	formData := netUrl.Values{}
 	for name, value := range values {
@@ -154,6 +158,8 @@ func SendApplicationForm(url string, values map[string]string) (*http.Response, 
 	return response, nil
 }
 
+// SendMultipartForm sends a form of type multipart/form-data to the specified address.
+// The files argument accepts form field names and a slice with file paths.
 func SendMultipartForm(url string, values map[string]string, files map[string][]string) (*http.Response, error) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
