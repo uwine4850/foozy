@@ -20,7 +20,6 @@ type Router struct {
 	manager        interfaces2.IManager
 	enableLog      bool
 	middleware     interfaces2.IMiddleware
-	websocket      interfaces2.IWebsocket
 }
 
 func NewRouter(manager interfaces2.IManager) *Router {
@@ -29,18 +28,17 @@ func NewRouter(manager interfaces2.IManager) *Router {
 
 // Get Processing a GET request. Called only once.
 func (rt *Router) Get(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces2.IManager) func()) {
-	rt.mux.Handle(utils.SplitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "GET", fn))
+	rt.mux.Handle(utils.SplitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "GET", nil, fn))
 }
 
 // Post Processing a POST request. Called only once.
 func (rt *Router) Post(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces2.IManager) func()) {
-	rt.mux.Handle(utils.SplitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "POST", fn))
+	rt.mux.Handle(utils.SplitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "POST", nil, fn))
 }
 
 // Ws Processing a websocket connection. Used only for communication with the client's websocket.
 func (rt *Router) Ws(pattern string, ws interfaces2.IWebsocket, fn func(w http.ResponseWriter, r *http.Request, manager interfaces2.IManager) func()) {
-	rt.websocket = ws
-	rt.mux.Handle(utils.SplitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "WS", fn))
+	rt.mux.Handle(utils.SplitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "WS", ws, fn))
 }
 
 func (rt *Router) GetMux() *http.ServeMux {
@@ -48,7 +46,7 @@ func (rt *Router) GetMux() *http.ServeMux {
 }
 
 // getHandleFunc This method handles each http method call.
-func (rt *Router) getHandleFunc(pattern string, method string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces2.IManager) func()) http.HandlerFunc {
+func (rt *Router) getHandleFunc(pattern string, method string, ws interfaces2.IWebsocket, fn func(w http.ResponseWriter, r *http.Request, manager interfaces2.IManager) func()) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		rt.setWR(writer, request)
 		if !rt.validateMethod(method) {
@@ -96,7 +94,7 @@ func (rt *Router) getHandleFunc(pattern string, method string, fn func(w http.Re
 			}
 		}
 		if method == "WS" {
-			rt.manager.SetWebsocket(rt.websocket)
+			rt.manager.SetWebsocket(ws)
 		}
 		mustCall := fn(writer, request, rt.manager)
 		mustCall()
