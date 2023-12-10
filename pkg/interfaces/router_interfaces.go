@@ -28,7 +28,7 @@ type IManagerRender interface {
 }
 
 type IManagerWebsocket interface {
-	GetWebSocket() IWebsocket
+	CurrentWebsocket() IWebsocket
 	SetWebsocket(websocket IWebsocket)
 }
 

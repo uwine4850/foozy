@@ -82,9 +82,9 @@ func (m *Manager) GetSlugParams(key string) (string, bool) {
 	return res, ok
 }
 
-// GetWebSocket get an instance for the websocket connection.
+// CurrentWebsocket get an instance for the websocket connection.
 // Works only in the "Ws" handler.
-func (m *Manager) GetWebSocket() interfaces2.IWebsocket {
+func (m *Manager) CurrentWebsocket() interfaces2.IWebsocket {
 	return m.websocket
 }
 

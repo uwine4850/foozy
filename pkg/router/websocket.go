@@ -77,7 +77,7 @@ func (ws *Websocket) ReceiveMessages(w http.ResponseWriter, r *http.Request) err
 	for {
 		messageType, msgData, err := conn.ReadMessage()
 		if err != nil {
-			if websocket.IsCloseError(err, websocket.CloseGoingAway) {
+			if websocket.IsCloseError(err, websocket.CloseGoingAway) || websocket.IsCloseError(err, websocket.CloseNormalClosure) {
 				if ws.onClientClose != nil {
 					ws.onClientClose(conn)
 				}
@@ -104,4 +104,24 @@ func (ws *Websocket) receiveMessages() {
 		msg := <-ws.broadcast
 		ws.onMessage(msg.MsgType, msg.Msg, msg.Conn)
 	}
+}
+
+func WsSendTextMessage(msg string, url string) (*http.Response, error) {
+	dial, response, err := websocket.DefaultDialer.Dial(url, nil)
+	if err != nil {
+		return response, err
+	}
+	err = dial.WriteMessage(websocket.TextMessage, []byte(msg))
+	if err != nil {
+		return response, err
+	}
+	err = dial.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+	if err != nil {
+		return response, err
+	}
+	err = dial.Close()
+	if err != nil {
+		return response, err
+	}
+	return response, nil
 }
