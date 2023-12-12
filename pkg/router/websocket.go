@@ -21,8 +21,8 @@ type Websocket struct {
 	upgrader      websocket.Upgrader
 	conn          *websocket.Conn
 	onMessage     func(messageType int, msgData []byte, conn *websocket.Conn)
-	onClientClose func(conn *websocket.Conn)
-	onConnect     func(conn *websocket.Conn)
+	onClientClose func(w http.ResponseWriter, r *http.Request, conn *websocket.Conn)
+	onConnect     func(w http.ResponseWriter, r *http.Request, conn *websocket.Conn)
 	broadcast     chan Message
 }
 
@@ -41,7 +41,7 @@ func (ws *Websocket) Close() error {
 }
 
 // OnClientClose event that will happen when the client closes the connection.
-func (ws *Websocket) OnClientClose(fn func(conn *websocket.Conn)) {
+func (ws *Websocket) OnClientClose(fn func(w http.ResponseWriter, r *http.Request, conn *websocket.Conn)) {
 	ws.onClientClose = fn
 }
 
@@ -50,7 +50,7 @@ func (ws *Websocket) OnMessage(fn func(messageType int, msgData []byte, conn *we
 	ws.onMessage = fn
 }
 
-func (ws *Websocket) OnConnect(fn func(conn *websocket.Conn)) {
+func (ws *Websocket) OnConnect(fn func(w http.ResponseWriter, r *http.Request, conn *websocket.Conn)) {
 	ws.onConnect = fn
 }
 
@@ -71,7 +71,7 @@ func (ws *Websocket) ReceiveMessages(w http.ResponseWriter, r *http.Request) err
 	}
 	defer conn.Close()
 	if ws.onConnect != nil {
-		ws.onConnect(conn)
+		ws.onConnect(w, r, conn)
 	}
 	go ws.receiveMessages()
 	for {
@@ -79,7 +79,7 @@ func (ws *Websocket) ReceiveMessages(w http.ResponseWriter, r *http.Request) err
 		if err != nil {
 			if websocket.IsCloseError(err, websocket.CloseGoingAway) || websocket.IsCloseError(err, websocket.CloseNormalClosure) {
 				if ws.onClientClose != nil {
-					ws.onClientClose(conn)
+					ws.onClientClose(w, r, conn)
 				}
 				break
 			}
@@ -106,8 +106,8 @@ func (ws *Websocket) receiveMessages() {
 	}
 }
 
-func WsSendTextMessage(msg string, url string) (*http.Response, error) {
-	dial, response, err := websocket.DefaultDialer.Dial(url, nil)
+func WsSendTextMessage(msg string, url string, header http.Header) (*http.Response, error) {
+	dial, response, err := websocket.DefaultDialer.Dial(url, header)
 	if err != nil {
 		return response, err
 	}

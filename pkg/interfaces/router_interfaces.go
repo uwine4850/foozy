@@ -34,9 +34,9 @@ type IManagerWebsocket interface {
 
 type IWebsocket interface {
 	Close() error
-	OnClientClose(fn func(conn *websocket.Conn))
+	OnClientClose(fn func(w http.ResponseWriter, r *http.Request, conn *websocket.Conn))
 	OnMessage(fn func(messageType int, msgData []byte, conn *websocket.Conn))
-	OnConnect(fn func(conn *websocket.Conn))
+	OnConnect(fn func(w http.ResponseWriter, r *http.Request, conn *websocket.Conn))
 	SendMessage(messageType int, msg []byte, conn *websocket.Conn) error
 	ReceiveMessages(w http.ResponseWriter, r *http.Request) error
 }
