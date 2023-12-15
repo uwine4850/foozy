@@ -94,7 +94,11 @@ func FrmValueToMap(frm IFormGetEnctypeData) map[string]interface{} {
 	multipartForm := frm.GetMultipartForm()
 	if multipartForm != nil {
 		for name, value := range multipartForm.Value {
-			formMap[name] = value
+			if value[0] == "" {
+				formMap[name] = []string(nil)
+			} else {
+				formMap[name] = value
+			}
 		}
 		for name, value := range multipartForm.File {
 			var files []FormFile
@@ -111,4 +115,32 @@ func FrmValueToMap(frm IFormGetEnctypeData) map[string]interface{} {
 		}
 	}
 	return formMap
+}
+
+type ErrArgumentNotPointer struct {
+	Name string
+}
+
+func (e ErrArgumentNotPointer) Error() string {
+	return fmt.Sprintf("argument %s is not a pointer", e.Name)
+}
+
+// FieldsNotEmpty checks the specified fields of the structure for emptiness.
+// fieldsName - slice with exact names of structure fields that should not be empty.
+func FieldsNotEmpty(fillStruct interface{}, fieldsName []string) error {
+	if reflect.TypeOf(fillStruct).Kind() != reflect.Pointer {
+		return ErrArgumentNotPointer{"fillStruct"}
+	}
+	of := reflect.ValueOf(fillStruct).Elem()
+	typeOf := reflect.TypeOf(fillStruct).Elem()
+	for i := 0; i < len(fieldsName); i++ {
+		_, ok := typeOf.FieldByName(fieldsName[i])
+		if ok {
+			val := of.FieldByName(fieldsName[i])
+			if val.IsNil() {
+				return errors.New(fmt.Sprintf("field %s is empty", fieldsName[i]))
+			}
+		}
+	}
+	return nil
 }

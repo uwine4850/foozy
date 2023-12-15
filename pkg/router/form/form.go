@@ -105,14 +105,11 @@ func randomiseTheFileName(pathToDir string, fileName string) string {
 
 // SaveFile Saves the file in the specified directory.
 // If the file name is already found, uses the randomiseTheFileName function to randomise the file name.
-func SaveFile(w http.ResponseWriter, file multipart.File, fileHeader *multipart.FileHeader, pathToDir string, buildPath *string) error {
-	defer func(file multipart.File) {
-		err := file.Close()
-		if err != nil {
-			router.ServerError(w, err.Error())
-		}
-	}(file)
-
+func SaveFile(w http.ResponseWriter, fileHeader *multipart.FileHeader, pathToDir string, buildPath *string) error {
+	file, err := fileHeader.Open()
+	if err != nil {
+		return err
+	}
 	fp := randomiseTheFileName(pathToDir, fileHeader.Filename)
 	*buildPath = fp
 	dst, err := os.Create(fp)
@@ -129,16 +126,20 @@ func SaveFile(w http.ResponseWriter, file multipart.File, fileHeader *multipart.
 	if err != nil {
 		return err
 	}
+	err = file.Close()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 // ReplaceFile Changes the specified file to a new file.
-func ReplaceFile(pathToFile string, w http.ResponseWriter, file multipart.File, fileHeader *multipart.FileHeader, pathToDir string, buildPath *string) error {
+func ReplaceFile(pathToFile string, w http.ResponseWriter, fileHeader *multipart.FileHeader, pathToDir string, buildPath *string) error {
 	err := os.Remove(pathToFile)
 	if err != nil {
 		return err
 	}
-	err = SaveFile(w, file, fileHeader, pathToDir, buildPath)
+	err = SaveFile(w, fileHeader, pathToDir, buildPath)
 	if err != nil {
 		return err
 	}
