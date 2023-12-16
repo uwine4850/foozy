@@ -52,12 +52,16 @@ type QueryBuild struct {
 func (qb *QueryBuild) SetSyncQ(sq interfaces.ISyncQueries) {
 	qb.primaryCommand = ""
 	qb.syncQ = sq
+	qb.queryArgs = []interface{}{}
+	qb.queryStr = ""
 }
 
 // SetAsyncQ sets the asynchronous query interface to communicate with the database.
 func (qb *QueryBuild) SetAsyncQ(aq interfaces.IAsyncQueries) {
 	qb.primaryCommand = ""
 	qb.asyncQ = aq
+	qb.queryArgs = []interface{}{}
+	qb.queryStr = ""
 }
 
 // SetKeyForAsyncQ sets the key for asynchronous requests.

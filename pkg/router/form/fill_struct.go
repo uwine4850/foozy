@@ -10,6 +10,51 @@ import (
 	"reflect"
 )
 
+// FillableFormStruct structure is intended for more convenient access to the structure to be filled in.
+// The structure to be filled is passed by pointer, it is filled independently of this structure, so it is up to the
+// user to decide whether to use FillableFormStruct.
+type FillableFormStruct struct {
+	s            interface{}
+	defaultValue func(name string) string
+}
+
+func NewFillableFormStruct(fillStruct interface{}) *FillableFormStruct {
+	if reflect.TypeOf(fillStruct).Kind() != reflect.Pointer {
+		panic("the fillStruct parameter must be a reference to a structure")
+	}
+	return &FillableFormStruct{s: fillStruct}
+}
+
+// GetStruct getting a fillable structure.
+func (f *FillableFormStruct) GetStruct() interface{} {
+	return f.s
+}
+
+// SetDefaultValue sets the function that will be executed when the default value is needed.
+// If it is not set, the default value will be an empty string.
+// func(name string) string - parameter name is the name of the passed key in GetOrDef.
+func (f *FillableFormStruct) SetDefaultValue(val func(name string) string) {
+	f.defaultValue = val
+}
+
+// GetOrDef get slice value or default value if it does not exist.
+// name - name of the structure field. Case-sensitive.
+// index - index of the structure element.
+func (f *FillableFormStruct) GetOrDef(name string, index int) string {
+	value := reflect.ValueOf(f.s).Elem()
+	fieldValue := value.FieldByName(name)
+	if fieldValue.Kind() == reflect.Invalid {
+		panic(fmt.Sprintf("field %s not exist", name))
+	}
+	if fieldValue.IsNil() {
+		if f.defaultValue == nil {
+			return ""
+		}
+		return f.defaultValue(name)
+	}
+	return fieldValue.Index(index).String()
+}
+
 type FormFile struct {
 	Header *multipart.FileHeader
 }
@@ -21,7 +66,8 @@ type FormFile struct {
 // []FormFile - form files.
 // []string - all other data.
 // The nilIfNotExist parameter sets the name of form fields that should be nil if they are not found (e.g. useful for checkboxes).
-func FillStructFromForm(frm *Form, fill interface{}, nilIfNotExist []string) error {
+func FillStructFromForm(frm *Form, fillableStruct *FillableFormStruct, nilIfNotExist []string) error {
+	fill := fillableStruct.GetStruct()
 	if reflect.TypeOf(fill).Kind() != reflect.Ptr {
 		return ferrors.ErrParameterNotPointer{Param: "fill"}
 	}
@@ -131,12 +177,12 @@ func FieldsNotEmpty(fillStruct interface{}, fieldsName []string) error {
 	if reflect.TypeOf(fillStruct).Kind() != reflect.Pointer {
 		return ErrArgumentNotPointer{"fillStruct"}
 	}
-	of := reflect.ValueOf(fillStruct).Elem()
-	typeOf := reflect.TypeOf(fillStruct).Elem()
+	fillValue := reflect.ValueOf(fillStruct).Elem()
+	fillType := reflect.TypeOf(fillStruct).Elem()
 	for i := 0; i < len(fieldsName); i++ {
-		_, ok := typeOf.FieldByName(fieldsName[i])
+		_, ok := fillType.FieldByName(fieldsName[i])
 		if ok {
-			val := of.FieldByName(fieldsName[i])
+			val := fillValue.FieldByName(fieldsName[i])
 			if val.IsNil() {
 				return errors.New(fmt.Sprintf("field %s is empty", fieldsName[i]))
 			}

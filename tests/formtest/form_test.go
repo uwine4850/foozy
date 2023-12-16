@@ -88,7 +88,7 @@ func fill(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) f
 		return func() { w.Write([]byte(err.Error())) }
 	}
 	var f Fill
-	err = form.FillStructFromForm(newForm, &f, []string{"isNil"})
+	err = form.FillStructFromForm(newForm, form.NewFillableFormStruct(&f), []string{"isNil"})
 	if err != nil {
 		return func() { w.Write([]byte(err.Error())) }
 	}

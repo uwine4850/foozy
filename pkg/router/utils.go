@@ -11,9 +11,9 @@ func RedirectError(w http.ResponseWriter, r *http.Request, path string, err stri
 	http.Redirect(w, r, path, http.StatusFound)
 }
 
-// HandleServerError handling by the template engine of an error sent by the HandleServerError function.
+// HandleRedirectError handling by the template engine of an error sent by the HandleRedirectError function.
 // In the template you can get an error using the error variable.
-func HandleServerError(manager interfaces.IManagerData) {
+func HandleRedirectError(manager interfaces.IManagerData) {
 	myError, ok := manager.GetUserContext("error")
 	manager.SetContext(map[string]interface{}{"error": ""})
 	if ok {
