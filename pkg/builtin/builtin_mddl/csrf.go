@@ -1,6 +1,7 @@
 package builtin_mddl
 
 import (
+	"fmt"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/utils"
 	"net/http"
@@ -21,5 +22,6 @@ func GenerateAndSetCsrf(w http.ResponseWriter, r *http.Request, manager interfac
 			Path:     "/",
 		}
 		http.SetCookie(w, cookie)
+		manager.SetContext(map[string]interface{}{"csrf_token": fmt.Sprintf("<input name=\"csrf_token\" type=\"hidden\" value=\"%s\">", csrfToken)})
 	}
 }

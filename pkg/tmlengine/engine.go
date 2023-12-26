@@ -82,7 +82,7 @@ func (e *TemplateEngine) setCsrfVariable(r *http.Request) error {
 		return err
 	}
 	if errors.Is(err, http.ErrNoCookie) {
-		data["csrf_token"] = ""
+		//data["csrf_token"] = ""
 		e.SetContext(data)
 		return nil
 	}
