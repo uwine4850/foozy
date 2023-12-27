@@ -94,8 +94,12 @@ func (q *AsyncQueries) setAsyncRes(key string, _res []map[string]interface{}, er
 // LoadAsyncRes retrieves command execution data by key.
 func (q *AsyncQueries) LoadAsyncRes(key string) (*dbutils.AsyncQueryData, bool) {
 	value, ok := q.asyncRes.Load(key)
-	v := value.(dbutils.AsyncQueryData)
-	return &v, ok
+	if ok {
+		v := value.(dbutils.AsyncQueryData)
+		q.asyncRes.Delete(key)
+		return &v, ok
+	}
+	return nil, ok
 }
 
 // Wait waits for the execution of all asynchronous methods that are started before executing this method.
