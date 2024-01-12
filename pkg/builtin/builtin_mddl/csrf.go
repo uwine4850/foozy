@@ -3,6 +3,7 @@ package builtin_mddl
 import (
 	"fmt"
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/utils"
 	"net/http"
 )
@@ -12,7 +13,11 @@ import (
 func GenerateAndSetCsrf(w http.ResponseWriter, r *http.Request, manager interfaces.IManagerData) {
 	csrfCookie, err := r.Cookie("csrf_token")
 	if err != nil || csrfCookie.Value == "" {
-		csrfToken := utils.GenerateCsrfToken()
+		csrfToken, err := utils.GenerateCsrfToken()
+		if err != nil {
+			router.ServerError(w, err.Error())
+			return
+		}
 		cookie := &http.Cookie{
 			Name:     "csrf_token",
 			Value:    csrfToken,

@@ -1,6 +1,7 @@
 package database
 
 import (
+	"errors"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"sync"
@@ -103,8 +104,22 @@ func (q *AsyncQueries) LoadAsyncRes(key string) (*dbutils.AsyncQueryData, bool) 
 }
 
 // Wait waits for the execution of all asynchronous methods that are started before executing this method.
-// IMPOrTANT: this method must be run before LoadAsyncRes.
+// IMPORTANT: this method must be run before LoadAsyncRes.
 // Several Wait methods can be called if necessary.
 func (q *AsyncQueries) Wait() {
 	q.wg.Wait()
+}
+
+// AsyncResError loads the result of several asynchronous key queries and checks for errors.
+func AsyncResError(keys []string, db *Database) error {
+	for i := 0; i < len(keys); i++ {
+		res, ok := db.AsyncQ().LoadAsyncRes(keys[i])
+		if !ok {
+			return errors.New("key for loading the result of asynchronous query not found")
+		}
+		if res.Error != nil {
+			return res.Error
+		}
+	}
+	return nil
 }

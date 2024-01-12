@@ -1,6 +1,7 @@
 package router
 
 import (
+	"encoding/json"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"net/http"
 )
@@ -32,4 +33,19 @@ func ServerError(w http.ResponseWriter, error string) {
 func ServerForbidden(w http.ResponseWriter) {
 	w.WriteHeader(http.StatusForbidden)
 	w.Write([]byte("403 forbidden"))
+}
+
+// SendJson sends json-formatted data to the page.
+func SendJson(data interface{}, w http.ResponseWriter) error {
+	marshal, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_, err = w.Write(marshal)
+	if err != nil {
+		return err
+	}
+	return nil
 }

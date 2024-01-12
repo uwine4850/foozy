@@ -49,15 +49,15 @@ func SliceContains[T comparable](slice []T, item T) bool {
 }
 
 // GenerateCsrfToken generates a CSRF token.
-func GenerateCsrfToken() string {
+func GenerateCsrfToken() (string, error) {
 	tokenBytes := make([]byte, 32)
 	_, err := rand.Read(tokenBytes)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
 	csrfToken := base64.StdEncoding.EncodeToString(tokenBytes)
-	return csrfToken
+	return csrfToken, nil
 }
 
 // MergeMap merges two maps into one.
@@ -70,13 +70,13 @@ func MergeMap[T1 comparable, T2 any](map1 *map[T1]T2, map2 map[T1]T2) {
 
 // Join outputs the slice in string format with the specified delimiter.
 func Join[T any](elems []T, sep string) string {
-	var res string
+	var res strings.Builder
 	for i := 0; i < len(elems); i++ {
 		if i == len(elems)-1 {
-			res += fmt.Sprintf("%v", elems[i])
+			res.WriteString(fmt.Sprintf("%v", elems[i]))
 		} else {
-			res += fmt.Sprintf("%v%s ", elems[i], sep)
+			res.WriteString(fmt.Sprintf("%v%s ", elems[i], sep))
 		}
 	}
-	return res
+	return res.String()
 }
