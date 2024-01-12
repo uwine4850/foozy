@@ -14,6 +14,7 @@ type ISyncQueries interface {
 	Update(tableName string, params []dbutils.DbEquals, where dbutils.WHOutput) ([]map[string]interface{}, error)
 	Delete(tableName string, where dbutils.WHOutput) ([]map[string]interface{}, error)
 	Count(rows []string, tableName string, where dbutils.WHOutput, limit int) ([]map[string]interface{}, error)
+	Increment(fieldName string, tableName string, where dbutils.WHOutput) ([]map[string]interface{}, error)
 }
 
 type IAsyncQueries interface {
@@ -27,6 +28,7 @@ type IAsyncQueries interface {
 	AsyncUpdate(key string, tableName string, params []dbutils.DbEquals, where dbutils.WHOutput)
 	AsyncDelete(key string, tableName string, where dbutils.WHOutput)
 	AsyncCount(key string, rows []string, tableName string, where dbutils.WHOutput, limit int)
+	AsyncIncrement(key string, fieldName string, tableName string, where dbutils.WHOutput)
 }
 
 type IQueryBuild interface {
@@ -41,6 +43,7 @@ type IUserQueryBuild interface {
 	Insert(tableName string, params map[string]interface{}) IUserQueryBuild
 	Delete(tableName string) IUserQueryBuild
 	Update(tableName string, params map[string]interface{}) IUserQueryBuild
+	Increment(fieldName string, tableName string) IUserQueryBuild
 	Where(args ...any) IUserQueryBuild
 	Count() IUserQueryBuild
 	Ex() ([]map[string]interface{}, error)

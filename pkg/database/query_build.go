@@ -33,6 +33,11 @@ type updateValues struct {
 	Args      []interface{}
 }
 
+type incrementValues struct {
+	FieldName string
+	TableName string
+}
+
 // QueryBuild builder of a database query.
 // With this builder it is possible to create more flexible queries.
 type QueryBuild struct {
@@ -40,6 +45,7 @@ type QueryBuild struct {
 	insertVal      insertValues
 	deleteVal      deleteValues
 	updateVal      updateValues
+	incrementVal   incrementValues
 	primaryCommand string
 	queryStr       string
 	queryArgs      []interface{}
@@ -137,6 +143,18 @@ func (qb *QueryBuild) Update(tableName string, params map[string]interface{}) in
 	return qb
 }
 
+func (qb *QueryBuild) Increment(fieldName string, tableName string) interfaces.IUserQueryBuild {
+	if qb.primaryCommand != "" {
+		panic(fmt.Sprintf("you cannot use an %s command while already using a %s command.", "UPDATE",
+			qb.primaryCommand))
+		return qb
+	}
+	qb.primaryCommand = "INCREMENT"
+	qb.incrementVal.FieldName = fieldName
+	qb.incrementVal.TableName = tableName
+	return qb
+}
+
 // Where adds a condition to the query.
 // Example of using Where("id", "=", 55).
 // For proper performance it is important to select the key character separately, the rest can be a single string.
@@ -207,6 +225,9 @@ func (qb *QueryBuild) buildPrimaryCommand() (string, []interface{}) {
 	case "UPDATE":
 		queryStr += fmt.Sprintf("UPDATE %s SET %s ", qb.updateVal.TableName, qb.updateVal.StrVal)
 		args = qb.updateVal.Args
+	case "INCREMENT":
+		queryStr += fmt.Sprintf("UPDATE `%s` SET `%s`= `%s`+ 1 ",
+			qb.incrementVal.TableName, qb.incrementVal.FieldName, qb.incrementVal.FieldName)
 	}
 	return queryStr, args
 }

@@ -82,6 +82,15 @@ func (q *AsyncQueries) AsyncCount(key string, rows []string, tableName string, w
 	}()
 }
 
+func (q *AsyncQueries) AsyncIncrement(key string, fieldName string, tableName string, where dbutils.WHOutput) {
+	q.wg.Add(1)
+	go func() {
+		defer q.wg.Done()
+		_res, err := q.syncQ.Increment(fieldName, tableName, where)
+		q.setAsyncRes(key, _res, err)
+	}()
+}
+
 // setAsyncRes sets the result of the key command execution.
 func (q *AsyncQueries) setAsyncRes(key string, _res []map[string]interface{}, err error) {
 	queryData := dbutils.AsyncQueryData{}

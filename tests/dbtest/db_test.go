@@ -219,3 +219,10 @@ func TestSyncUpdate(t *testing.T) {
 		t.Errorf("The row has not been updated.")
 	}
 }
+
+func TestIncrement(t *testing.T) {
+	_, err := db.SyncQ().Increment("col4", "dbtest", dbutils.WHOutput{})
+	if err != nil {
+		panic(err)
+	}
+}

@@ -102,3 +102,13 @@ func (q *SyncQueries) Count(rows []string, tableName string, where dbutils.WHOut
 	queryStr := fmt.Sprintf("SELECT COUNT(%s) FROM %s %s %s", strings.Join(rows, ", "), tableName, whereStr, limitStr)
 	return q.Query(queryStr, where.QueryArgs...)
 }
+
+// Increment does an increment of a field of type INT.
+func (q *SyncQueries) Increment(fieldName string, tableName string, where dbutils.WHOutput) ([]map[string]interface{}, error) {
+	var whereStr string
+	if where.QueryStr != "" {
+		whereStr = " WHERE " + where.QueryStr
+	}
+	queryStr := fmt.Sprintf("UPDATE `%s` SET `%s`= `%s`+ 1 %s ", tableName, fieldName, fieldName, whereStr)
+	return q.Query(queryStr, where.QueryArgs...)
+}
