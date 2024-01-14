@@ -2,6 +2,7 @@ package dbutils
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"github.com/uwine4850/foozy/pkg/ferrors"
 	"reflect"
@@ -72,6 +73,60 @@ func FillStructFromDb(dbRes map[string]interface{}, fill interface{}) error {
 			}
 			value.SetString(string(res))
 		}
+	}
+	return nil
+}
+
+// FillMapFromDb fills the map that is passed by reference with values from the database.
+func FillMapFromDb(dbRes map[string]interface{}, fill *map[string]string) error {
+	if *fill == nil {
+		panic("The \"fill\" map must not be of type nil.")
+	}
+	for key, value := range dbRes {
+		if value == nil {
+			(*fill)[key] = ""
+			continue
+		}
+		var _val []byte
+		if reflect.TypeOf(value).Kind() == reflect.Slice {
+			v, ok := value.([]uint8)
+			if !ok {
+				return errors.New(fmt.Sprintf("%s field conversion error", key))
+			}
+			_val = v
+		} else {
+			v, err := anyToBytes(value)
+			if err != nil {
+				return err
+			}
+			_val = v
+		}
+		(*fill)[key] = string(_val)
+	}
+	return nil
+}
+
+// FillReflectValueFromDb fills structure of type reflect.Value with data from a database query.
+func FillReflectValueFromDb(dbRes map[string]interface{}, fill *reflect.Value) error {
+	t := fill.Type()
+	for i := 0; i < t.NumField(); i++ {
+		tagName := t.Field(i).Tag.Get("db")
+		fieldName := t.Field(i).Name
+		var _val []byte
+		if reflect.TypeOf(dbRes[tagName]).Kind() == reflect.Slice {
+			v, ok := dbRes[tagName].([]uint8)
+			if !ok {
+				return errors.New(fmt.Sprintf("%s field conversion error", tagName))
+			}
+			_val = v
+		} else {
+			v, err := anyToBytes(dbRes[tagName])
+			if err != nil {
+				return err
+			}
+			_val = v
+		}
+		fill.FieldByName(fieldName).SetString(string(_val))
 	}
 	return nil
 }
