@@ -21,6 +21,14 @@ type AllView struct {
 	onError func(err error)
 }
 
+func (v *AllView) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
+	return true, func() {}
+}
+
+func (v *AllView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) map[string]interface{} {
+	return map[string]interface{}{}
+}
+
 // Object sets a slice of rows from the database.
 func (v *AllView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (map[string]interface{}, error) {
 	err := v.DB.Connect()
@@ -74,10 +82,6 @@ func (v *AllView) fillObjects(objects []map[string]interface{}) ([]TemplateStruc
 	return objectsMap, nil
 }
 
-func (v *AllView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) map[string]interface{} {
-	return map[string]interface{}{}
-}
-
 func (v *AllView) OnError(e func(err error)) {
 	v.onError = e
 }
@@ -85,6 +89,10 @@ func (v *AllView) OnError(e func(err error)) {
 func (v *AllView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	if v.UserView == nil {
 		panic("the UserView field must not be nil")
+	}
+	permissions, f := v.UserView.Permissions(w, r, manager)
+	if !permissions {
+		return func() { f() }
 	}
 	context := v.UserView.Context(w, r, manager)
 	object, err := v.Object(w, r, manager)

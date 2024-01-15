@@ -32,6 +32,14 @@ type ObjView struct {
 	onError func(err error)
 }
 
+func (v *ObjView) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
+	return true, func() {}
+}
+
+func (v *ObjView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) map[string]interface{} {
+	return map[string]interface{}{}
+}
+
 func (v *ObjView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (map[string]interface{}, error) {
 	err := v.DB.Connect()
 	if err != nil {
@@ -77,13 +85,13 @@ func (v *ObjView) fillObject(object map[string]interface{}) (TemplateStruct, err
 	return TemplateStruct{m: fillMap}, nil
 }
 
-func (v *ObjView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) map[string]interface{} {
-	return map[string]interface{}{}
-}
-
 func (v *ObjView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	if v.UserView == nil {
 		panic("the UserView field must not be nil")
+	}
+	permissions, f := v.UserView.Permissions(w, r, manager)
+	if !permissions {
+		return func() { f() }
 	}
 	context := v.UserView.Context(w, r, manager)
 	object, err := v.Object(w, r, manager)
