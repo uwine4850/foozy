@@ -4,21 +4,19 @@ import (
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	"github.com/uwine4850/foozy/pkg/interfaces"
-	"github.com/uwine4850/foozy/pkg/utils"
 	"net/http"
 	"reflect"
 )
 
 // AllView displays HTML page by passing all data from the selected table to it.
 type AllView struct {
-	UserView
-	Name         string
-	TemplatePath string
-	DB           *database.Database
-	TableName    string
-	FillStruct   interface{}
+	View
+	Name      string
+	DB        *database.Database
+	TableName string
 
-	onError func(err error)
+	FillStruct interface{}
+	onError    func(err error)
 }
 
 func (v *AllView) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
@@ -80,31 +78,4 @@ func (v *AllView) fillObjects(objects []map[string]interface{}) ([]TemplateStruc
 		})
 	}
 	return objectsMap, nil
-}
-
-func (v *AllView) OnError(e func(err error)) {
-	v.onError = e
-}
-
-func (v *AllView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-	if v.UserView == nil {
-		panic("the UserView field must not be nil")
-	}
-	permissions, f := v.UserView.Permissions(w, r, manager)
-	if !permissions {
-		return func() { f() }
-	}
-	context := v.UserView.Context(w, r, manager)
-	object, err := v.Object(w, r, manager)
-	if err != nil {
-		return func() { v.onError(err) }
-	}
-	utils.MergeMap(&context, object)
-	manager.SetContext(context)
-	manager.SetTemplatePath(v.TemplatePath)
-	err = manager.RenderTemplate(w, r)
-	if err != nil {
-		return func() { v.onError(err) }
-	}
-	return func() {}
 }

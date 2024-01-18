@@ -5,7 +5,6 @@ import (
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	"github.com/uwine4850/foozy/pkg/interfaces"
-	"github.com/uwine4850/foozy/pkg/utils"
 	"net/http"
 	"reflect"
 )
@@ -18,16 +17,23 @@ func (e ErrNoSlug) Error() string {
 	return fmt.Sprintf("slug parameter %s not found", e.SlugName)
 }
 
+type ErrNoData struct {
+}
+
+func (e ErrNoData) Error() string {
+	return "no data to display was found"
+}
+
 // ObjView displays only the HTML page only with a specific row from the database.
 // Needs to be used with slug parameter URL path, specify the name of the parameter in the Slug parameter.
 type ObjView struct {
-	UserView
-	Name         string
-	TemplatePath string
-	DB           *database.Database
-	TableName    string
-	FillStruct   interface{}
-	Slug         string
+	View
+
+	Name       string
+	DB         *database.Database
+	TableName  string
+	FillStruct interface{}
+	Slug       string
 
 	onError func(err error)
 }
@@ -61,6 +67,9 @@ func (v *ObjView) Object(w http.ResponseWriter, r *http.Request, manager interfa
 	if err != nil {
 		return nil, err
 	}
+	if res == nil {
+		return nil, ErrNoData{}
+	}
 	object, err := v.fillObject(res[0])
 	if err != nil {
 		return nil, err
@@ -83,31 +92,4 @@ func (v *ObjView) fillObject(object map[string]interface{}) (TemplateStruct, err
 		return TemplateStruct{}, err
 	}
 	return TemplateStruct{m: fillMap}, nil
-}
-
-func (v *ObjView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-	if v.UserView == nil {
-		panic("the UserView field must not be nil")
-	}
-	permissions, f := v.UserView.Permissions(w, r, manager)
-	if !permissions {
-		return func() { f() }
-	}
-	context := v.UserView.Context(w, r, manager)
-	object, err := v.Object(w, r, manager)
-	if err != nil {
-		return func() { v.onError(err) }
-	}
-	utils.MergeMap(&context, object)
-	manager.SetContext(context)
-	manager.SetTemplatePath(v.TemplatePath)
-	err = manager.RenderTemplate(w, r)
-	if err != nil {
-		return func() { v.onError(err) }
-	}
-	return func() {}
-}
-
-func (v *ObjView) OnError(e func(err error)) {
-	v.onError = e
 }
