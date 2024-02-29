@@ -1,6 +1,7 @@
 package router
 
 import (
+	"errors"
 	"fmt"
 	interfaces2 "github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/middlewares"
@@ -36,6 +37,14 @@ func (rt *Router) Post(pattern string, fn func(w http.ResponseWriter, r *http.Re
 	rt.mux.Handle(utils.SplitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "POST", nil, fn))
 }
 
+func (rt *Router) Put(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces2.IManager) func()) {
+	rt.mux.Handle(utils.SplitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "PUT", nil, fn))
+}
+
+func (rt *Router) Delete(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces2.IManager) func()) {
+	rt.mux.Handle(utils.SplitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "DELETE", nil, fn))
+}
+
 // Ws Processing a websocket connection. Used only for communication with the client's websocket.
 func (rt *Router) Ws(pattern string, ws interfaces2.IWebsocket, fn func(w http.ResponseWriter, r *http.Request, manager interfaces2.IManager) func()) {
 	rt.mux.Handle(utils.SplitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "WS", ws, fn))
@@ -67,29 +76,11 @@ func (rt *Router) getHandleFunc(pattern string, method string, ws interfaces2.IW
 			}
 		}
 		// Run middlewares.
-		if rt.middleware != nil {
-			// Running synchronous middleware.
-			err := rt.middleware.RunMddl(writer, request, rt.manager)
-			if err != nil {
-				panic(err)
-			}
-			// Running asynchronous middleware.
-			rt.middleware.RunAsyncMddl(writer, request, rt.manager)
-			// Waiting for all asynchronous middleware to complete.
-			rt.middleware.WaitAsyncMddl()
-			// Handling middleware errors.
-			mddlErr, err := middlewares.GetMddlError(rt.manager)
-			if err != nil {
-				panic(err)
-			}
-			if mddlErr != nil {
-				rt.manager.DelUserContext("mddlerr")
-				ServerError(writer, mddlErr.Error())
-				return
-			}
-			// Checking the skip of the next page. Runs after a more important error check.
-			if middlewares.IsSkipNextPage(rt.manager) {
-				rt.manager.DelUserContext("skipNextPage")
+		if skip, err := rt.runMddl(writer, request); err != nil {
+			ServerError(writer, err.Error())
+			return
+		} else {
+			if skip {
 				return
 			}
 		}
@@ -117,6 +108,35 @@ func (rt *Router) validateMethod(method string) bool {
 func (rt *Router) setWR(w http.ResponseWriter, r *http.Request) {
 	rt.writer = w
 	rt.request = r
+}
+
+func (rt *Router) runMddl(w http.ResponseWriter, r *http.Request) (bool, error) {
+	if rt.middleware != nil {
+		// Running synchronous middleware.
+		err := rt.middleware.RunMddl(w, r, rt.manager)
+		if err != nil {
+			return false, err
+		}
+		// Running asynchronous middleware.
+		rt.middleware.RunAsyncMddl(w, r, rt.manager)
+		// Waiting for all asynchronous middleware to complete.
+		rt.middleware.WaitAsyncMddl()
+		// Handling middleware errors.
+		mddlErr, err := middlewares.GetMddlError(rt.manager)
+		if err != nil {
+			return false, err
+		}
+		if mddlErr != nil {
+			rt.manager.DelUserContext("mddlerr")
+			return false, errors.New(mddlErr.Error())
+		}
+		// Checking the skip of the next page. Runs after a more important error check.
+		if middlewares.IsSkipNextPage(rt.manager) {
+			rt.manager.DelUserContext("skipNextPage")
+			return true, nil
+		}
+	}
+	return false, nil
 }
 
 // SetTemplateEngine sets the template engine interface.

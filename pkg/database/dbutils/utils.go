@@ -37,10 +37,10 @@ func RepeatValues(count int, sep string) string {
 // ScanRows scans the rows that the executed database query provides.
 // According to the number of columns it creates a map of interfaces to be filled. Then fills the map with the value of
 // the row and places it in the slice.
-func ScanRows(rows *sql.Rows, fn func(row map[string]interface{})) {
+func ScanRows(rows *sql.Rows, fn func(row map[string]interface{})) error {
 	columns, err := rows.Columns()
 	if err != nil {
-		panic(err)
+		return err
 	}
 	dataColumns := make([]interface{}, len(columns))
 	for i := range columns {
@@ -50,7 +50,7 @@ func ScanRows(rows *sql.Rows, fn func(row map[string]interface{})) {
 		row := make(map[string]interface{})
 		err := rows.Scan(dataColumns...)
 		if err != nil {
-			panic(err)
+			return err
 		}
 		for i := 0; i < len(columns); i++ {
 			v := dataColumns[i].(*interface{})
@@ -58,6 +58,7 @@ func ScanRows(rows *sql.Rows, fn func(row map[string]interface{})) {
 		}
 		fn(row)
 	}
+	return nil
 }
 
 func ParseParams(params map[string]interface{}) ([]string, []interface{}) {

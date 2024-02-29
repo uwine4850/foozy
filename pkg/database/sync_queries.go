@@ -33,9 +33,11 @@ func (q *SyncQueries) Query(query string, args ...any) ([]map[string]interface{}
 		return nil, err
 	}
 	var rows []map[string]interface{}
-	dbutils.ScanRows(_query, func(row map[string]interface{}) {
+	if err := dbutils.ScanRows(_query, func(row map[string]interface{}) {
 		rows = append(rows, row)
-	})
+	}); err != nil {
+		return nil, err
+	}
 
 	err = _query.Close()
 	if err != nil {
