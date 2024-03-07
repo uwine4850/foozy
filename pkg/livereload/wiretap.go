@@ -20,7 +20,7 @@ func NewWiretap3() *WiretapFiles {
 	return &WiretapFiles{onTrigger: func(filePath string) {}, onStart: func() {}}
 }
 
-// OnStart set the function that will be executed once during the start of the listening session.
+// OnStart set the function that will be executed once during the runServer of the listening session.
 func (f *WiretapFiles) OnStart(fn func()) {
 	f.onStart = fn
 }
@@ -101,7 +101,7 @@ func (f *WiretapFiles) watchFile(filePath string, wg *sync.WaitGroup) error {
 		// If the time is greater than 1.5 seconds and the above conditions are met, the trigger will be fired.
 		// This is to prevent the trigger from being triggered several times, because some editors save a file several times.
 		diff := fileInfo.ModTime().Sub(lastModTime)
-		if fileInfo.ModTime() != lastModTime && diff > 1500*time.Millisecond {
+		if fileInfo.ModTime() != lastModTime && diff > 1000*time.Millisecond {
 			lastModTime = fileInfo.ModTime()
 			f.onTrigger(filePath)
 		}

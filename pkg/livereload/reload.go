@@ -1,81 +1,92 @@
 package livereload
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/uwine4850/foozy/pkg/interfaces"
-	"log"
+	"io"
 	"os"
 	"os/exec"
-	"os/signal"
-	"syscall"
+	"sync"
 )
 
 type Reload struct {
 	pathToServerFile string
 	dirs             []string
 	wiretap          interfaces.IWiretap
-	exitCh           chan os.Signal
+	wg               sync.WaitGroup
+	cmd              *exec.Cmd
+	cmdStart         *exec.Cmd
 }
 
 func NewReload(pathToServerFile string, dirs []string, wiretap interfaces.IWiretap) *Reload {
-	return &Reload{pathToServerFile: pathToServerFile, dirs: dirs, wiretap: wiretap, exitCh: make(chan os.Signal, 1)}
-}
-
-func (r *Reload) onStart() {
-	cmdB := exec.Command("go", "build", r.pathToServerFile)
-	err := cmdB.Run()
-	if err != nil {
-		panic(err)
-	}
-	cmd := exec.Command("./main")
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	r.wiretap.SetUserParams("cmd", cmd)
-
-	signal.Notify(r.exitCh, syscall.SIGINT, syscall.SIGTERM)
-	go func() {
-		select {
-		case <-r.exitCh:
-			c, _ := r.wiretap.GetUserParams("cmd")
-			cmd := c.(*exec.Cmd)
-			err := cmd.Process.Kill()
-			if err != nil {
-				panic(fmt.Sprintf("Error killing process: %v\n", err))
-			}
-		}
-	}()
-	cmd.Run()
-}
-
-func (r *Reload) onTrigger() {
-	c, _ := r.wiretap.GetUserParams("cmd")
-	cmd := c.(*exec.Cmd)
-	err := cmd.Process.Kill()
-	if err != nil {
-		panic(err)
-	}
-	log.Println("Server stopped.")
-	go r.wiretap.GetOnStartFunc()()
+	return &Reload{pathToServerFile: pathToServerFile, dirs: dirs, wiretap: wiretap}
 }
 
 func (r *Reload) Start() {
 	r.wiretap.SetDirs(r.dirs)
+
 	r.wiretap.OnStart(func() {
 		r.onStart()
 	})
 	r.wiretap.OnTrigger(func(filePath string) {
 		r.onTrigger()
 	})
+	err := r.wiretap.Start()
+	if err != nil {
+		panic(err)
+	}
+}
 
-	go func() {
-		err := r.wiretap.Start()
-		if err != nil {
+func (r *Reload) onStart() {
+	r.cmd = exec.Command("go", "build", "-p", "4", r.pathToServerFile)
+	var stderrBuf bytes.Buffer
+	r.cmd.Stderr = io.MultiWriter(&stderrBuf, os.Stderr)
+	if err := r.cmd.Run(); err != nil {
+		fmt.Println("Error:", stderrBuf.String())
+	}
+	r.cmdStart = exec.Command("./main")
+	r.cmdStart.Stdout = os.Stdout
+	r.cmdStart.Stderr = os.Stderr
+	r.wg.Add(1)
+	go r.runServer()
+}
+
+func (r *Reload) onTrigger() {
+	if r.cmdStart.Process == nil {
+		return
+	}
+	err := r.cmdStart.Process.Kill()
+	if err != nil && err.Error() != "os: process already finished" {
+		if err.Error() == "os: process already finished" {
+			fmt.Println("Stop server")
+			r.wg.Wait()
+			r.wiretap.GetOnStartFunc()()
+			return
+		}
+		panic(err)
+	}
+	if r.cmdStart.Process != nil {
+		err = r.cmdStart.Wait()
+		if err != nil && err.Error() != "exec: Wait was already called" {
+			if err.Error() == "signal: killed" {
+				r.wg.Wait()
+				r.wiretap.GetOnStartFunc()()
+				return
+			}
 			panic(err)
 		}
-	}()
+	}
+}
 
-	// Waiting for the program to complete through signals.
-	r.exitCh = make(chan os.Signal, 1)
-	signal.Notify(r.exitCh, syscall.SIGINT, syscall.SIGTERM)
-	<-r.exitCh
+func (r *Reload) runServer() {
+	defer r.wg.Done()
+	err := r.cmdStart.Start()
+	if err != nil {
+		if err.Error() == "signal: killed" {
+			fmt.Println("STOP SERVER")
+			return
+		}
+		panic(err)
+	}
 }
