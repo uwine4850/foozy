@@ -16,7 +16,7 @@ type WiretapFiles struct {
 	wg         sync.WaitGroup
 }
 
-func NewWiretap3() *WiretapFiles {
+func NewWiretap() *WiretapFiles {
 	return &WiretapFiles{onTrigger: func(filePath string) {}, onStart: func() {}}
 }
 

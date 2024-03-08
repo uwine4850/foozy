@@ -15,12 +15,8 @@ type Auth struct {
 	tableName string
 }
 
-func NewAuth(database *database.Database) (*Auth, error) {
-	err := CreateAuthTable(database)
-	if err != nil {
-		return nil, err
-	}
-	return &Auth{database, "auth"}, nil
+func NewAuth(database *database.Database) *Auth {
+	return &Auth{database, "auth"}
 }
 
 // RegisterUser registers the user in the database.
