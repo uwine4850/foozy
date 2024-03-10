@@ -1,6 +1,7 @@
 package livereload
 
 import (
+	"github.com/uwine4850/foozy/pkg/utils"
 	"os"
 	"path/filepath"
 	"sync"
@@ -8,16 +9,17 @@ import (
 )
 
 type WiretapFiles struct {
-	dirs       []string
-	files      []string
-	onTrigger  func(filePath string)
-	onStart    func()
-	UserParams sync.Map
-	wg         sync.WaitGroup
+	dirs        []string
+	excludeDirs []string
+	files       []string
+	onTrigger   func(filePath string)
+	onStart     func()
+	UserParams  sync.Map
+	wg          sync.WaitGroup
 }
 
-func NewWiretap() *WiretapFiles {
-	return &WiretapFiles{onTrigger: func(filePath string) {}, onStart: func() {}}
+func NewWiretap(dirs []string, excludeDirs []string) *WiretapFiles {
+	return &WiretapFiles{dirs: dirs, excludeDirs: excludeDirs}
 }
 
 // OnStart set the function that will be executed once during the runServer of the listening session.
@@ -49,6 +51,10 @@ func (f *WiretapFiles) SetDirs(dirs []string) {
 	f.dirs = dirs
 }
 
+func (f *WiretapFiles) SetExcludeDirs(dirs []string) {
+	f.excludeDirs = dirs
+}
+
 // Start starting a wiretap.
 func (f *WiretapFiles) Start() error {
 	err := f.readDirs()
@@ -60,8 +66,8 @@ func (f *WiretapFiles) Start() error {
 	go f.onStart()
 
 	for i := 0; i < len(f.files); i++ {
-		f.wg.Add(1)
 		filePath := f.files[i]
+		f.wg.Add(1)
 		go func() {
 			err := f.watchFile(filePath, &f.wg)
 			if err != nil {
@@ -121,6 +127,10 @@ func (f *WiretapFiles) readDirs() error {
 					return err
 				}
 				f.files = append(f.files, abs)
+			} else {
+				if utils.SliceContains(f.excludeDirs, path) {
+					return filepath.SkipDir
+				}
 			}
 			return nil
 		}

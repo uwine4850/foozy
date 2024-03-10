@@ -7,25 +7,24 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"strings"
 	"sync"
 )
 
 type Reload struct {
 	pathToServerFile string
-	dirs             []string
 	wiretap          interfaces.IWiretap
 	wg               sync.WaitGroup
 	cmd              *exec.Cmd
 	cmdStart         *exec.Cmd
 }
 
-func NewReload(pathToServerFile string, dirs []string, wiretap interfaces.IWiretap) *Reload {
-	return &Reload{pathToServerFile: pathToServerFile, dirs: dirs, wiretap: wiretap}
+func NewReload(pathToServerFile string, wiretap interfaces.IWiretap) *Reload {
+	return &Reload{pathToServerFile: pathToServerFile, wiretap: wiretap}
 }
 
 func (r *Reload) Start() {
-	r.wiretap.SetDirs(r.dirs)
-
 	r.wiretap.OnStart(func() {
 		r.onStart()
 	})
@@ -45,7 +44,8 @@ func (r *Reload) onStart() {
 	if err := r.cmd.Run(); err != nil {
 		fmt.Println("Error:", stderrBuf.String())
 	}
-	r.cmdStart = exec.Command("./main")
+	binaryFileName := strings.Split(filepath.Base(r.pathToServerFile), ".")[0]
+	r.cmdStart = exec.Command("./" + binaryFileName)
 	r.cmdStart.Stdout = os.Stdout
 	r.cmdStart.Stderr = os.Stderr
 	r.wg.Add(1)
