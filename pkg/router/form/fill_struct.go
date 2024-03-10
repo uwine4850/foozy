@@ -7,7 +7,9 @@ import (
 	"github.com/uwine4850/foozy/pkg/utils"
 	"mime/multipart"
 	netUrl "net/url"
+	"path/filepath"
 	"reflect"
+	"strings"
 )
 
 // FillableFormStruct structure is intended for more convenient access to the structure to be filled in.
@@ -74,7 +76,7 @@ func FillStructFromForm(frm *Form, fillableStruct *FillableFormStruct, nilIfNotE
 	if reflect.TypeOf(fill).Elem().Kind() != reflect.Struct {
 		return ferrors.ErrParameterNotStruct{Param: "fill"}
 	}
-	formMap := FrmValueToMap(frm)
+	orderedForm := FrmValueToOrderedForm(frm)
 	t := reflect.TypeOf(fill).Elem()
 	v := reflect.ValueOf(fill).Elem()
 	for i := 0; i < t.NumField(); i++ {
@@ -89,7 +91,8 @@ func FillStructFromForm(frm *Form, fillableStruct *FillableFormStruct, nilIfNotE
 		if err != nil {
 			return err
 		}
-		formMapItem, ok := formMap[tag]
+		orderedFormValue, ok := orderedForm.GetByName(tag)
+		formValue := orderedFormValue.Value
 		if !ok {
 			// Skips loop iteration if the field is not found, but it must be as nil.
 			if utils.SliceContains(nilIfNotExist, tag) {
@@ -99,18 +102,18 @@ func FillStructFromForm(frm *Form, fillableStruct *FillableFormStruct, nilIfNotE
 			}
 		}
 		// Set files
-		if reflect.DeepEqual(field.Type, reflect.TypeOf([]FormFile{})) && reflect.TypeOf(formMapItem) == reflect.TypeOf([]FormFile{}) {
-			formType, _ := formMapItem.([]FormFile)
+		if reflect.DeepEqual(field.Type, reflect.TypeOf([]FormFile{})) && reflect.TypeOf(formValue) == reflect.TypeOf([]FormFile{}) {
+			formType, _ := formValue.([]FormFile)
 			if !ok {
-				return ferrors.ErrConvertType{Type1: reflect.TypeOf(formMapItem).String(), Type2: "[]FormFile"}
+				return ferrors.ErrConvertType{Type1: reflect.TypeOf(formValue).String(), Type2: "[]FormFile"}
 			}
 			value.Set(reflect.ValueOf(formType))
 		}
 		// Set string
 		if field.Type.Kind() == reflect.Slice && field.Type.Elem().Kind() == reflect.String {
-			formType, ok := formMapItem.([]string)
+			formType, ok := formValue.([]string)
 			if !ok {
-				return ferrors.ErrConvertType{Type1: reflect.TypeOf(formMapItem).String(), Type2: "string"}
+				return ferrors.ErrConvertType{Type1: reflect.TypeOf(formValue).String(), Type2: "string"}
 			}
 			value.Set(reflect.ValueOf(formType))
 		}
@@ -134,33 +137,78 @@ type IFormGetEnctypeData interface {
 	GetApplicationForm() netUrl.Values
 }
 
-// FrmValueToMap Converts the form to a map.
-func FrmValueToMap(frm IFormGetEnctypeData) map[string]interface{} {
-	formMap := make(map[string]interface{})
+// OrderedForm Values can be displayed either by field name or all fields at once.
+type OrderedForm struct {
+	itemCount int
+	names     map[string]int
+	values    []OrderedFormValue
+}
+
+func NewOrderedForm() *OrderedForm {
+	o := &OrderedForm{}
+	o.itemCount = 0
+	o.names = make(map[string]int)
+	return o
+}
+
+// Add adds a new form field.
+func (f *OrderedForm) Add(name string, value interface{}) {
+	f.values = append(f.values, OrderedFormValue{
+		Name:  name,
+		Value: value,
+	})
+	f.itemCount++
+	f.names[name] = f.itemCount
+}
+
+// GetByName getting a field by name.
+func (f *OrderedForm) GetByName(name string) (OrderedFormValue, bool) {
+	getIndex, ok := f.names[name]
+	if !ok {
+		return OrderedFormValue{}, ok
+	}
+	return f.values[getIndex-1], true
+}
+
+// GetAll getting all fields.
+func (f *OrderedForm) GetAll() []OrderedFormValue {
+	return f.values
+}
+
+type OrderedFormValue struct {
+	Name  string
+	Value interface{}
+}
+
+// FrmValueToOrderedForm Converts the form to a OrderedForm.
+func FrmValueToOrderedForm(frm IFormGetEnctypeData) *OrderedForm {
+	orderedForm := NewOrderedForm()
 	multipartForm := frm.GetMultipartForm()
 	if multipartForm != nil {
 		for name, value := range multipartForm.Value {
+			var orderedValue interface{}
 			if value[0] == "" {
-				formMap[name] = []string(nil)
+				orderedValue = []string(nil)
 			} else {
-				formMap[name] = value
+				orderedValue = value
 			}
+			orderedForm.Add(name, orderedValue)
 		}
 		for name, value := range multipartForm.File {
 			var files []FormFile
 			for i := 0; i < len(value); i++ {
 				files = append(files, FormFile{Header: value[i]})
 			}
-			formMap[name] = files
+			orderedForm.Add(name, files)
 		}
 	}
 	applicationForm := frm.GetApplicationForm()
 	if applicationForm != nil {
 		for name, value := range applicationForm {
-			formMap[name] = value
+			orderedForm.Add(name, value)
 		}
 	}
-	return formMap
+	return orderedForm
 }
 
 type ErrArgumentNotPointer struct {
@@ -172,7 +220,7 @@ func (e ErrArgumentNotPointer) Error() string {
 }
 
 // FieldsNotEmpty checks the specified fields of the structure for emptiness.
-// fieldsName - slice with exact names of structure fields that should not be empty.
+// fieldsName - slice with exact names of STRUCTURE fields that should not be empty.
 func FieldsNotEmpty(fillStruct interface{}, fieldsName []string) error {
 	if reflect.TypeOf(fillStruct).Kind() != reflect.Pointer {
 		return ErrArgumentNotPointer{"fillStruct"}
@@ -189,4 +237,55 @@ func FieldsNotEmpty(fillStruct interface{}, fieldsName []string) error {
 		}
 	}
 	return nil
+}
+
+type ErrExtensionNotMatch struct {
+	Field string
+}
+
+func (e ErrExtensionNotMatch) Error() string {
+	return fmt.Sprintf("The extension of the %s field does not match what is expected.", e.Field)
+}
+
+// CheckExtension Check if the file resolution matches the expected one. Can only be used with a structure already
+// filled out in the form.
+// To work, you need to add an ext tag with the necessary extensions (if there are many, separated by commas).
+// For example, ext:".jpg, .jpeg, .png".
+func CheckExtension(fillForm *FillableFormStruct) error {
+	_form := fillForm.GetStruct()
+	if reflect.TypeOf(_form).Kind() != reflect.Ptr {
+		return ferrors.ErrParameterNotPointer{Param: "fill"}
+	}
+	if reflect.TypeOf(_form).Elem().Kind() != reflect.Struct {
+		return ferrors.ErrParameterNotStruct{Param: "fill"}
+	}
+	t := reflect.TypeOf(_form).Elem()
+	v := reflect.ValueOf(_form).Elem()
+	for i := 0; i < t.NumField(); i++ {
+		tag := t.Field(i).Tag.Get("ext")
+		if tag == "" {
+			continue
+		}
+		field := t.Field(i)
+		if field.Type.Elem() != reflect.TypeOf(FormFile{}) {
+			panic("the ext tag can only be added to fields whose type is form.FormFile")
+		}
+		extension := strings.Split(strings.ReplaceAll(tag, " ", ""), ",")
+		files := v.Field(i).Interface().([]FormFile)
+		for i := 0; i < len(files); i++ {
+			checkExtension := checkFileExtension(&files[i], extension)
+			if !checkExtension {
+				return ErrExtensionNotMatch{Field: field.Name}
+			}
+		}
+	}
+	return nil
+}
+
+func checkFileExtension(file *FormFile, extension []string) bool {
+	ext := filepath.Ext(file.Header.Filename)
+	if utils.SliceContains(extension, ext) {
+		return true
+	}
+	return false
 }

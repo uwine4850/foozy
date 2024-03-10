@@ -111,7 +111,9 @@ func SaveFile(w http.ResponseWriter, fileHeader *multipart.FileHeader, pathToDir
 		return err
 	}
 	fp := randomiseTheFileName(pathToDir, fileHeader.Filename)
-	*buildPath = fp
+	if buildPath != nil {
+		*buildPath = fp
+	}
 	dst, err := os.Create(fp)
 	if err != nil {
 		return err
