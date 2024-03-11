@@ -7,11 +7,10 @@ import (
 )
 
 type TemplateView struct {
-	UserView
 	TemplatePath string
 	View
 
-	onError func(err error)
+	onError func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error)
 }
 
 func (v *TemplateView) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
@@ -27,29 +26,29 @@ func (v *TemplateView) Object(w http.ResponseWriter, r *http.Request, manager in
 	return map[string]interface{}{}, nil
 }
 
-func (v *TemplateView) OnError(e func(err error)) {
+func (v *TemplateView) OnError(e func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error)) {
 	v.onError = e
 }
 
 func (v *TemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-	if v.UserView == nil {
-		panic("the UserView field must not be nil")
+	if v.View == nil {
+		panic("the View field must not be nil")
 	}
-	permissions, f := v.UserView.Permissions(w, r, manager)
+	permissions, f := v.View.Permissions(w, r, manager)
 	if !permissions {
 		return func() { f() }
 	}
-	context := v.UserView.Context(w, r, manager)
+	context := v.View.Context(w, r, manager)
 	object, err := v.View.Object(w, r, manager)
 	if err != nil {
-		return func() { v.onError(err) }
+		return func() { v.onError(w, r, manager, err) }
 	}
 	utils.MergeMap(&context, object)
 	manager.SetContext(context)
 	manager.SetTemplatePath(v.TemplatePath)
 	err = manager.RenderTemplate(w, r)
 	if err != nil {
-		return func() { v.onError(err) }
+		return func() { v.onError(w, r, manager, err) }
 	}
 	return func() {}
 }

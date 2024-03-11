@@ -35,7 +35,7 @@ type ObjView struct {
 	FillStruct interface{}
 	Slug       string
 
-	onError func(err error)
+	onError func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error)
 }
 
 func (v *ObjView) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
@@ -54,7 +54,7 @@ func (v *ObjView) Object(w http.ResponseWriter, r *http.Request, manager interfa
 	defer func(db *database.Database) {
 		err := db.Close()
 		if err != nil {
-			v.onError(err)
+			v.onError(w, r, manager, err)
 		}
 	}(v.DB)
 	slugValue, ok := manager.GetSlugParams(v.Slug)
@@ -70,26 +70,25 @@ func (v *ObjView) Object(w http.ResponseWriter, r *http.Request, manager interfa
 	if res == nil {
 		return nil, ErrNoData{}
 	}
-	object, err := v.fillObject(res[0])
+	value, err := v.fillObject(res[0])
 	if err != nil {
 		return nil, err
 	}
-	return map[string]interface{}{v.Name: object}, nil
+	return map[string]interface{}{v.Name: value.Interface()}, nil
 }
 
-func (v *ObjView) fillObject(object map[string]interface{}) (TemplateStruct, error) {
-	if v.FillStruct != nil {
-		value := reflect.New(reflect.TypeOf(v.FillStruct)).Elem()
-		err := dbutils.FillReflectValueFromDb(object, &value)
-		if err != nil {
-			return TemplateStruct{}, err
-		}
-		return TemplateStruct{s: value}, nil
+func (v *ObjView) fillObject(object map[string]interface{}) (*reflect.Value, error) {
+	if v.FillStruct == nil {
+		panic("the FillStruct field must not be nil")
 	}
-	fillMap := make(map[string]string)
-	err := dbutils.FillMapFromDb(object, &fillMap)
+	value := reflect.New(reflect.TypeOf(v.FillStruct)).Elem()
+	err := dbutils.FillReflectValueFromDb(object, &value)
 	if err != nil {
-		return TemplateStruct{}, err
+		return nil, err
 	}
-	return TemplateStruct{m: fillMap}, nil
+	return &value, nil
+}
+
+func (v *ObjView) OnError(e func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error)) {
+	v.onError = e
 }

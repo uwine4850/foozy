@@ -16,7 +16,7 @@ type AllView struct {
 	TableName string
 
 	FillStruct interface{}
-	onError    func(err error)
+	onError    func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error)
 }
 
 func (v *AllView) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
@@ -36,7 +36,7 @@ func (v *AllView) Object(w http.ResponseWriter, r *http.Request, manager interfa
 	defer func(db *database.Database) {
 		err := db.Close()
 		if err != nil {
-			v.onError(err)
+			v.onError(w, r, manager, err)
 		}
 	}(v.DB)
 
@@ -52,30 +52,22 @@ func (v *AllView) Object(w http.ResponseWriter, r *http.Request, manager interfa
 }
 
 // fillObjects fills a structure or map with data from a successful query and wraps this in a TemplateStruct.
-func (v *AllView) fillObjects(objects []map[string]interface{}) ([]TemplateStruct, error) {
-	var objectsStruct []TemplateStruct
-	if v.FillStruct != nil {
-		for i := 0; i < len(objects); i++ {
-			value := reflect.New(reflect.TypeOf(v.FillStruct)).Elem()
-			err := dbutils.FillReflectValueFromDb(objects[i], &value)
-			if err != nil {
-				return nil, err
-			}
-			objectsStruct = append(objectsStruct, TemplateStruct{value, nil})
-		}
-		return objectsStruct, nil
+func (v *AllView) fillObjects(objects []map[string]interface{}) ([]interface{}, error) {
+	if v.FillStruct == nil {
+		panic("the FillStruct field must not be nil")
 	}
-	var objectsMap []TemplateStruct
+	var objectsStruct []interface{}
 	for i := 0; i < len(objects); i++ {
-		m := make(map[string]string)
-		err := dbutils.FillMapFromDb(objects[i], &m)
+		value := reflect.New(reflect.TypeOf(v.FillStruct)).Elem()
+		err := dbutils.FillReflectValueFromDb(objects[i], &value)
 		if err != nil {
 			return nil, err
 		}
-		objectsMap = append(objectsMap, TemplateStruct{
-			s: reflect.Value{},
-			m: m,
-		})
+		objectsStruct = append(objectsStruct, value.Interface())
 	}
-	return objectsMap, nil
+	return objectsStruct, nil
+}
+
+func (v *AllView) OnError(e func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error)) {
+	v.onError = e
 }
