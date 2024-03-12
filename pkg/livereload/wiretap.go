@@ -1,7 +1,9 @@
 package livereload
 
 import (
+	"errors"
 	"github.com/uwine4850/foozy/pkg/utils"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"sync"
@@ -9,13 +11,14 @@ import (
 )
 
 type WiretapFiles struct {
-	dirs        []string
-	excludeDirs []string
-	files       []string
-	onTrigger   func(filePath string)
-	onStart     func()
-	UserParams  sync.Map
-	wg          sync.WaitGroup
+	dirs                []string
+	excludeDirs         []string
+	files               []string
+	onTrigger           func(filePath string)
+	onStart             func()
+	UserParams          sync.Map
+	wg                  sync.WaitGroup
+	excludeDeletedFiles []string
 }
 
 func NewWiretap(dirs []string, excludeDirs []string) *WiretapFiles {
@@ -67,10 +70,18 @@ func (f *WiretapFiles) Start() error {
 
 	for i := 0; i < len(f.files); i++ {
 		filePath := f.files[i]
+		// Skip iteration if file is deleted.
+		if utils.SliceContains(f.excludeDeletedFiles, filePath) {
+			continue
+		}
 		f.wg.Add(1)
 		go func() {
 			err := f.watchFile(filePath, &f.wg)
 			if err != nil {
+				if errors.Is(err, fs.ErrNotExist) {
+					f.excludeDeletedFiles = append(f.excludeDeletedFiles, filePath)
+					return
+				}
 				panic(err)
 			}
 		}()
