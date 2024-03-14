@@ -10,13 +10,13 @@ import (
 
 // AllView displays HTML page by passing all data from the selected table to it.
 type AllView struct {
-	View
-	Name      string
-	DB        *database.Database
-	TableName string
-
+	IView
+	Name       string
+	DB         *database.Database
+	TableName  string
 	FillStruct interface{}
-	onError    func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error)
+
+	context map[string]interface{}
 }
 
 func (v *AllView) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
@@ -27,24 +27,26 @@ func (v *AllView) Context(w http.ResponseWriter, r *http.Request, manager interf
 	return map[string]interface{}{}
 }
 
+func (v *AllView) GetContext() map[string]interface{} {
+	return v.context
+}
+
 // Object sets a slice of rows from the database.
 func (v *AllView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (map[string]interface{}, error) {
 	err := v.DB.Connect()
 	if err != nil {
 		return nil, err
 	}
-	defer func(db *database.Database) {
-		err := db.Close()
-		if err != nil {
-			v.onError(w, r, manager, err)
-		}
-	}(v.DB)
-
 	objects, err := v.DB.SyncQ().Select([]string{"*"}, v.TableName, dbutils.WHOutput{}, 0)
 	if err != nil {
 		return nil, err
 	}
 	fillObjects, err := v.fillObjects(objects)
+	if err != nil {
+		return nil, err
+	}
+	// CLOSE DB
+	err = v.DB.Close()
 	if err != nil {
 		return nil, err
 	}
@@ -68,6 +70,6 @@ func (v *AllView) fillObjects(objects []map[string]interface{}) ([]interface{}, 
 	return objectsStruct, nil
 }
 
-func (v *AllView) OnError(e func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error)) {
-	v.onError = e
+func (v *AllView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+	panic("OnError is not implement")
 }
