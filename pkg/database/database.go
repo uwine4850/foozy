@@ -7,6 +7,13 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces"
 )
 
+type ErrConnectionNotOpen struct {
+}
+
+func (receiver ErrConnectionNotOpen) Error() string {
+	return "The connection is not open."
+}
+
 // Database structure for accessing the database.
 // It can send both synchronous and asynchronous queries.
 // IMPORTANT: after the end of work it is necessary to close the connection using Close method.
@@ -45,6 +52,17 @@ func (d *Database) Connect() error {
 
 	d.syncQ.SetDB(db)
 	d.asyncQ.SetSyncQueries(d.syncQ)
+	return nil
+}
+
+func (d *Database) Ping() error {
+	if d.db == nil {
+		return ErrConnectionNotOpen{}
+	}
+	err := d.db.Ping()
+	if err != nil {
+		return ErrConnectionNotOpen{}
+	}
 	return nil
 }
 

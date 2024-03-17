@@ -95,7 +95,7 @@ func FillStructFromForm(frm *Form, fillableStruct *FillableFormStruct, nilIfNotE
 		formValue := orderedFormValue.Value
 		if !ok {
 			// Skips loop iteration if the field is not found, but it must be as nil.
-			if utils.SliceContains(nilIfNotExist, tag) {
+			if nilIfNotExist != nil && utils.SliceContains(nilIfNotExist, tag) {
 				continue
 			} else {
 				return ErrFormConvertFieldNotFound{tag}
@@ -221,7 +221,8 @@ func (e ErrArgumentNotPointer) Error() string {
 
 // FieldsNotEmpty checks the specified fields of the structure for emptiness.
 // fieldsName - slice with exact names of STRUCTURE fields that should not be empty.
-func FieldsNotEmpty(fillStruct interface{}, fieldsName []string) error {
+func FieldsNotEmpty(fillableStruct *FillableFormStruct, fieldsName []string) error {
+	fillStruct := fillableStruct.GetStruct()
 	if reflect.TypeOf(fillStruct).Kind() != reflect.Pointer {
 		return ErrArgumentNotPointer{"fillStruct"}
 	}
@@ -237,6 +238,27 @@ func FieldsNotEmpty(fillStruct interface{}, fieldsName []string) error {
 		}
 	}
 	return nil
+}
+
+// FieldsName returns a list of field names of the filled structure.
+func FieldsName(fillForm *FillableFormStruct, exclude []string) ([]string, error) {
+	_form := fillForm.GetStruct()
+	if reflect.TypeOf(_form).Kind() != reflect.Ptr {
+		return nil, ferrors.ErrParameterNotPointer{Param: "fillForm"}
+	}
+	if reflect.TypeOf(_form).Elem().Kind() != reflect.Struct {
+		return nil, ferrors.ErrParameterNotStruct{Param: "fillForm"}
+	}
+	t := reflect.TypeOf(_form).Elem()
+	var names []string
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+		if exclude != nil && utils.SliceContains(exclude, field.Name) {
+			continue
+		}
+		names = append(names, field.Name)
+	}
+	return names, nil
 }
 
 type ErrExtensionNotMatch struct {

@@ -7,6 +7,13 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type ErrShortUsername struct {
+}
+
+func (receiver ErrShortUsername) Error() string {
+	return "The username must be equal to or longer than 3 characters."
+}
+
 // Auth structure is designed to manage user authentication.
 // It can be used to create a user, check the correctness of the login data, change the password and
 // check the availability of the user.
@@ -22,6 +29,10 @@ func NewAuth(database *database.Database) *Auth {
 // RegisterUser registers the user in the database.
 // It also checks the password and makes sure that there is no user with that login.
 func (a *Auth) RegisterUser(username string, password string) error {
+	err := a.database.Ping()
+	if err != nil {
+		return err
+	}
 	user, err := a.database.SyncQ().Select([]string{"username"}, a.tableName, dbutils.WHEquals(map[string]interface{}{"username": username}, "AND"), 1)
 	if err != nil {
 		return err
@@ -31,6 +42,9 @@ func (a *Auth) RegisterUser(username string, password string) error {
 	}
 	if len(password) < 6 {
 		return ErrShortPassword{}
+	}
+	if len(username) < 3 {
+		return ErrShortUsername{}
 	}
 	hashPass, err := HashPassword(password)
 	if err != nil {
