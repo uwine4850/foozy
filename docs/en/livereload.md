@@ -9,13 +9,12 @@ saving files.
 ```
 package main
 
-import (
-    "github.com/uwine4850/foozy/pkg/livereload"
-)
+import "github.com/uwine4850/foozy/pkg/livereload"
 
 func main() {
-    rel := livereload.NewReload("project/cmd/main.go", []string{"project", "pkg"}, livereload.NewWiretap3())
-    rel.Start()
+	reload := livereload.NewReload("project/cmd/main.go", livereload.NewWiretap([]string{"project", "pkg"},
+		[]string{}))
+	reload.Start()
 }
 ```
 In this example, the server that is located in the file ``project/cmd/main.go`` is overloaded. A reboot occurs
@@ -86,9 +85,8 @@ if err != nil {
 ## Restarting the server
 To implement this functionality, the ``Reload`` structure is used.
 
-Constructor __NewReload(pathToServerFile string, dirs []string, wiretap interfaces.IWiretap) *Reload__<br>
+Constructor __NewReload(pathToServerFile string, wiretap interfaces.IWiretap) *Reload__<br>
 * pathToServerFile - the path to the file that starts the server, for example, ``project/cmd/main.go``.
-* dirs - directories to be listened to.
 * wiretap - an instance of ``interfaces.IWiretap``.
 
 __Start__

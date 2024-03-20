@@ -55,26 +55,86 @@ Files(key string) ([]*multipart.FileHeader, bool)
 ```
 Returns multiple files from the form(multiple input).
 
+__SaveFile__
+```
+SaveFile(w http.ResponseWriter, fileHeader *multipart.FileHeader, pathToDir string, buildPath *string) error
+```
+Saves the file in the selected location.
+* fileHeader *multipart.FileHeader - file information.
+* pathToDir string - path to the directory to save the file.
+* buildPath *string - request to change string. The full path to the saved file is written in the change.
+
+__ReplaceFile__
+```
+ReplaceFile(pathToFile string, w http.ResponseWriter, fileHeader *multipart.FileHeader, pathToDir string, buildPath *string) error
+```
+Replaces an existing file with another.
+
+__SendApplicationForm__
+```
+SendApplicationForm(url string, values map[string]string) (*http.Response, error)
+```
+Sends a POST request (application/x-www-form-urlencoded) with data to the selected url.
+
+__SendMultipartForm__
+```
+SendMultipartForm(url string, values map[string]string, files map[string][]string) (*http.Response, error)
+```
+Sends a POST request (multipart/form-data) with data to the selected url.
+
+### Fill struct
+
+__type FillableFormStruct struct__
+
+The FillableFormStruct structure is intended for more convenient access to the fillable structure.
+The structure to be filled is passed as a pointer.
+
+*GetStruct() interface{}* - Returns the filled structure.<br>
+*SetDefaultValue(val func(name string) string)* - sets the standard function.<br>
+*GetOrDef(name string, index int) string* - returns the structure value or a standard function if the structure value is missing.<br>
+
+
 ## Global functions of the package
 __FillStructFromForm__.
 ```
-FillStructFromForm(frm interfaces.IForm, fill interface{}) error
+FillStructFromForm(frm *Form, fillableStruct *FillableFormStruct, nilIfNotExist []string) error
 ```
 A method that fills a structure with data from a form.
 The structure must always be passed as a reference.
 For correct operation, you must specify the "form" tag for each field of the structure. For example, `form:<form field name>`.
-Structure fields can be of only two types:
-* []FormFile - form files.
-* []string - all other data.
+* frm *Form - form instance.
+* fillableStruct *FillableFormStruct - an instance of FillableFormStruct.
+* nilIfNotExist - fields that are not found in the form will be nil.
 
-__FrmValueToMap__.
-```
-FrmValueToMap(frm interfaces.IForm) map[string]interface{}
-```
-Converts form data to a map.
+__type OrderedForm struct__
 
-__ReplaceFile__
+A structure that organizes the form for later more convenient use. All fields are ordered according to their order in the form.
+
+*Add(name string, value interface{})* - adds a new form field to the structure.<br>
+*GetByName(name string) (OrderedFormValue, bool)* - returns a form field by its name.<br>
+*GetAll() []OrderedFormValue* - returns all form fields.<br>
+
+__FrmValueToOrderedForm__
 ```
-ReplaceFile(pathToFile string, w http.ResponseWriter, file multipart.File, fileHeader *multipart.FileHeader, pathToDir string, buildPath *string) error
+FrmValueToOrderedForm(frm IFormGetEnctypeData) *OrderedForm
 ```
-Replaces a file from the file system with a new file.
+Fills the form data into the *OrderedForm* structure.
+
+__FieldsNotEmpty__
+```
+FieldsNotEmpty(fillableStruct *FillableFormStruct, fieldsName []string) error
+```
+Checks whether the selected structure fields are empty.
+
+__FieldsName__
+```
+FieldsName(fillForm *FillableFormStruct, exclude []string) ([]string, error)
+```
+Returns the names of the structure's fields.
+
+__CheckExtension__
+```
+CheckExtension(fillForm *FillableFormStruct) error
+```
+Checks if the extension of the form files is as expected. To work correctly, you need to add a type to each field
+FormFile tag *ext* and expected extensions. For example, `ext:".jpeg, .png"`.

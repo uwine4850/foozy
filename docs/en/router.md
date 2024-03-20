@@ -69,6 +69,18 @@ newRouter.Ws("/ws", router.NewWebsocket(router.Upgrader), func(w http.ResponseWr
 })
 ```
 
+__Put__
+```
+Put(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces2.IManager) func()
+```
+A method for handling PUT requests.
+
+__Delete__
+```
+Delete(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces2.IManager) func()
+```
+Method for handling Delete requests.
+
 ### Other methods
 __EnableLog__
 ```
@@ -219,11 +231,11 @@ The web socket interface is implemented using the __github.com/gorilla/websocket
 variable ``Upgrader`` that is required for the web socket to work.
 
 ### Interface methods
-__Connect__
+__OnConnect__
 ```
-Connect(w http.ResponseWriter, r *http.Request, fn func()) error
+OnConnect(fn func(w http.ResponseWriter, r *http.Request, conn *websocket.Conn))
 ```
-Connecting to a client (for example, JavaScript). The ``fn func()`` parameter is a function that will be executed during each connection.
+Функція яка запускається під час підлючення до клієнта.
 
 __Close__
 ```
@@ -233,24 +245,24 @@ Closing the connection.
 
 __OnClientClose__
 ```
-OnClientClose(fn func())
+OnClientClose(fn func(w http.ResponseWriter, r *http.Request, conn *websocket.Conn))
 ```
 A function that will be executed when the client closes the connection.
 
 __OnMessage__
 ```
-OnMessage(fn func(messageType int, msgData []byte))
+OnMessage(fn func(messageType int, msgData []byte, conn *websocket.Conn))
 ```
 When the socket receives the message, the ``fn`` function will be executed.
 
 __SendMessage__
 ```
-SendMessage(messageType int, msg []byte) error
+SendMessage(messageType int, msg []byte, conn *websocket.Conn) error
 ```
 Sending a message to the client.
 
 __ReceiveMessages__
 ```
-ReceiveMessages() error
+ReceiveMessages(w http.ResponseWriter, r *http.Request) error
 ```
 The method that starts receiving messages. This method must be running.

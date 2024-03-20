@@ -9,13 +9,12 @@
 ```
 package main
 
-import (
-    "github.com/uwine4850/foozy/pkg/livereload"
-)
+import "github.com/uwine4850/foozy/pkg/livereload"
 
 func main() {
-    rel := livereload.NewReload("project/cmd/main.go", []string{"project", "pkg"}, livereload.NewWiretap3())
-    rel.Start()
+	reload := livereload.NewReload("project/cmd/main.go", livereload.NewWiretap([]string{"project", "pkg"},
+		[]string{}))
+	reload.Start()
 }
 ```
 У цьому прикладі перевантажується сервер який знаходиться в файлі ``project/cmd/main.go``. Перезавантаження відбувається 
@@ -87,9 +86,8 @@ if err != nil {
 ## Перезавантаження серверу
 Для реалізації цього функціоналу використовується структура ``Reload``.
 
-Конструктор __NewReload(pathToServerFile string, dirs []string, wiretap interfaces.IWiretap) *Reload__<br>
+Конструктор __NewReload(pathToServerFile string, wiretap interfaces.IWiretap) *Reload__<br>
 * pathToServerFile - шлях до файла який запускає сервер, наприклад, ``"project/cmd/main.go``.
-* dirs - директорії які будуть прослуховуватися.
 * wiretap - екземпляр ``interfaces.IWiretap``.
 
 __Start__

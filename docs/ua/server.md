@@ -28,3 +28,15 @@ __Stop__
 Stop() error
 ```
 Зупинка сервера.
+
+__type MicServer struct__
+
+Структура для запуску мікросервіса.
+
+*Start() error* - запуск сервера.
+
+__FoozyAndMic__
+```
+FoozyAndMic(fserver *Server, micServer *MicServer, onError func(err error))
+```
+Запуск одразу звичайного сервера та сервера мікросервіса.

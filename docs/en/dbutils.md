@@ -77,3 +77,16 @@ FillStructFromDb(dbRes map[string]interface{}, fill interface{}) error
 Fills the structure with data from the database.
 Each variable of the filled structure must have a "db" tag, which is responsible for the name of the column in the
 the database, for example, `db: "name"`.
+
+__FillMapFromDb__
+```
+FillMapFromDb(dbRes map[string]interface{}, fill *map[string]string) error
+```
+Fills the map with data from the database.
+
+__FillReflectValueFromDb__
+```
+FillReflectValueFromDb(dbRes map[string]interface{}, fill *reflect.Value) error
+```
+Fills a structure whose type is *reflect.Value. That is, the method fills the data from the database into the structure, which is created with the help
+package reflect.

@@ -55,25 +55,86 @@ Files(key string) ([]*multipart.FileHeader, bool)
 Повертає декілька файлів із форми(multiple input).
 
 ## Глобальні функції пакета
+
+__SaveFile__
+```
+SaveFile(w http.ResponseWriter, fileHeader *multipart.FileHeader, pathToDir string, buildPath *string) error
+```
+Зберігає файл у вибраному місці.
+* fileHeader *multipart.FileHeader - інформація про файл.
+* pathToDir string - шлях до директорії для збереження файлу.
+* buildPath *string - посилання на зміну string. У зміну записується повний шлях до збереженого файлу.
+
+__ReplaceFile__
+```
+ReplaceFile(pathToFile string, w http.ResponseWriter, fileHeader *multipart.FileHeader, pathToDir string, buildPath *string) error
+```
+Заміняє вже існуючий файл іншим.
+
+__SendApplicationForm__
+```
+SendApplicationForm(url string, values map[string]string) (*http.Response, error)
+```
+Надсилає POST запит(application/x-www-form-urlencoded) із даними по вибраному url.
+
+__SendMultipartForm__
+```
+SendMultipartForm(url string, values map[string]string, files map[string][]string) (*http.Response, error)
+```
+Надсилає POST запит(multipart/form-data) із даними по вибраному url.
+
+
+### Fill struct
+
+__type FillableFormStruct struct__
+
+Структура FillableFormStruct призначена для більш зручного доступу до заповнюваної структури.
+Структура, яку потрібно заповнити, передається вказівником.
+
+*GetStruct() interface{}* - Повертає заповнену структуру.<br>
+*SetDefaultValue(val func(name string) string)* - встановлює стандартну функцію.<br>
+*GetOrDef(name string, index int) string* - повертає значення структури або стандартну функцію якщо значення структури відсутнє.<br>
+
 __FillStructFromForm__
 ```
-FillStructFromForm(frm interfaces.IForm, fill interface{}) error
+FillStructFromForm(frm *Form, fillableStruct *FillableFormStruct, nilIfNotExist []string) error
 ```
 Метод, який заповнює структуру даними з форми.
 Структура завжди повинна передаватись як посилання.
 Для коректної роботи необхідно для кожного поля структури вказати тег "form". Наприклад, `form:<ім'я поля форми>`.
-Поля структури можуть бути тільки двох типів:
-* []FormFile - файли форм.
-* []string - всі інші дані.
+* frm *Form - екземпляр форми.
+* fillableStruct *FillableFormStruct - екземпляр FillableFormStruct.
+* nilIfNotExist - поля які не знайшлись у формі будуть nil.
 
-__FrmValueToMap__
-```
-FrmValueToMap(frm interfaces.IForm) map[string]interface{}
-```
-Конвертує дані форму у мапу.
+__type OrderedForm struct__
 
-__ReplaceFile__
+Структура, яка впорядковує форму для подальшого більш зручного використання. Усі поля впорядковані по порядку їхньому порядку у формі.
+
+*Add(name string, value interface{})* - додає нове поле форми у структуру.<br>
+*GetByName(name string) (OrderedFormValue, bool)* - повертає поле форми по його назві.<br>
+*GetAll() []OrderedFormValue* - повертає усі поля форми.<br>
+
+__FrmValueToOrderedForm__
 ```
-ReplaceFile(pathToFile string, w http.ResponseWriter, file multipart.File, fileHeader *multipart.FileHeader, pathToDir string, buildPath *string) error
+FrmValueToOrderedForm(frm IFormGetEnctypeData) *OrderedForm
 ```
-Заміняє файл із файлової системи новим файлом.
+Заповнює дані форми у структуру *OrderedForm*.
+
+__FieldsNotEmpty__
+```
+FieldsNotEmpty(fillableStruct *FillableFormStruct, fieldsName []string) error
+```
+Перевіряє чи не порожні вибрані поля структури.
+
+__FieldsName__
+```
+FieldsName(fillForm *FillableFormStruct, exclude []string) ([]string, error)
+```
+Повертає назви полів структури.
+
+__CheckExtension__
+```
+CheckExtension(fillForm *FillableFormStruct) error
+```
+Перевіряє чи розширення файлів форми відповідає очікуваними. Для правильної роботи потрібно додати до кожного поля типу 
+FormFile тег *ext* і розширення які очікуються. Наприклад, `ext:".jpeg, .png"`.

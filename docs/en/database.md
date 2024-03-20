@@ -17,6 +17,11 @@ Connect() error
 Connects to the database. Initializes the ISyncQueries and IAsyncQueries interfaces.<br>
 __IMPORTANT:__ After you finish working with the database, you need to disconnect from it using the ``Close`` method.
 
+```
+Ping() error
+```
+Checking the connection to the database.
+
 __Close__
 ```
 Close() error

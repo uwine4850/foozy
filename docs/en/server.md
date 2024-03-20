@@ -28,3 +28,15 @@ __Stop__
 Stop() error
 ```
 Stopping the server.
+
+__type MicServer struct__
+
+A structure for running a microservice.
+
+*Start() error* - starting the server.
+
+__FoozyAndMic__
+```
+FoozyAndMic(fserver *Server, micServer *MicServer, onError func(err error))
+```
+Running a normal server and a microservice server at once.

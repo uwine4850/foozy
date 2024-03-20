@@ -69,6 +69,18 @@ newRouter.Ws("/ws", router.NewWebsocket(router.Upgrader), func(w http.ResponseWr
 })
 ```
 
+__Put__
+```
+Put(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces2.IManager) func()
+```
+Метод для обробки запита PUT.
+
+__Delete__
+```
+Delete(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces2.IManager) func()
+```
+Метод для обробки запита Delete.
+
 ### Інші методи
 __EnableLog__
 ```
@@ -218,11 +230,11 @@ DelUserContext(key string)
 змінна ``Upgrader`` яка потрібна роботи веб-сокета.
 
 ### Методи інтерфейсу
-__Connect__
+__OnConnect__
 ```
-Connect(w http.ResponseWriter, r *http.Request, fn func()) error
+OnConnect(fn func(w http.ResponseWriter, r *http.Request, conn *websocket.Conn))
 ```
-Підключення до клієнта(наприклад JavaScript). Параметр ``fn func()`` це функція яка буде виконана під час кожного підключення.
+Функція яка запускається під час підлючення до клієнта.
 
 __Close__
 ```
@@ -232,24 +244,24 @@ Close() error
 
 __OnClientClose__
 ```
-OnClientClose(fn func())
+OnClientClose(fn func(w http.ResponseWriter, r *http.Request, conn *websocket.Conn))
 ```
 Функція яка буде виконана коли клієнт закриє з'єднання.
 
 __OnMessage__
 ```
-OnMessage(fn func(messageType int, msgData []byte))
+OnMessage(fn func(messageType int, msgData []byte, conn *websocket.Conn))
 ```
 Коли сокет отримає повідомлення виконається функція ``fn``.
 
 __SendMessage__
 ```
-SendMessage(messageType int, msg []byte) error
+SendMessage(messageType int, msg []byte, conn *websocket.Conn) error
 ```
 Відправлення повідомлення клієнту.
 
 __ReceiveMessages__
 ```
-ReceiveMessages() error
+ReceiveMessages(w http.ResponseWriter, r *http.Request) error
 ```
 Метод який запускає приймання повідомлень. Цей метод повинен бути запущений.

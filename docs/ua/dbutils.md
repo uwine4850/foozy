@@ -79,3 +79,16 @@ FillStructFromDb(dbRes map[string]interface{}, fill interface{}) error
 Заповнює структуру даними з бази даних.
 Кожна змінна заповнюваної структури повинна мати тег "db", який відповідає за назву стовпця в
 базі даних, наприклад, `db: "name"`.
+
+__FillMapFromDb__
+```
+FillMapFromDb(dbRes map[string]interface{}, fill *map[string]string) error
+```
+Заповнює мапу даними із бази даних.
+
+__FillReflectValueFromDb__
+```
+FillReflectValueFromDb(dbRes map[string]interface{}, fill *reflect.Value) error
+```
+Заповнює структуру тип якої *reflect.Value. Тобто, метод заповнює дані із бази даних у структуру, яка стрворена з допомогою 
+пакету reflect.

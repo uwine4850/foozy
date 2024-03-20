@@ -38,7 +38,7 @@ This describes the global variables that are added using the framework.
 * csrf_token - a global variable that appears only when the parameter named ``csrf_token`` is set to cookies. This
   variable should be used in the HTML form to validate the CSRF token.
 
-## Фільтри
+## Filters
 A brief description of the filters created in the framework.
 
 * unescape - unescape the text.
