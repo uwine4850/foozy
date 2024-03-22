@@ -89,9 +89,9 @@ __type FillableFormStruct struct__
 The FillableFormStruct structure is intended for more convenient access to the fillable structure.
 The structure to be filled is passed as a pointer.
 
-*GetStruct() interface{}* - Returns the filled structure.<br>
-*SetDefaultValue(val func(name string) string)* - sets the standard function.<br>
-*GetOrDef(name string, index int) string* - returns the structure value or a standard function if the structure value is missing.<br>
+* _GetStruct() interface{}_ - Returns the filled structure.<br>
+* _SetDefaultValue(val func(name string) string)_ - sets the standard function.<br>
+* _GetOrDef(name string, index int) string_ - returns the structure value or a standard function if the structure value is missing.<br>
 
 
 ## Global functions of the package
@@ -110,9 +110,9 @@ __type OrderedForm struct__
 
 A structure that organizes the form for later more convenient use. All fields are ordered according to their order in the form.
 
-*Add(name string, value interface{})* - adds a new form field to the structure.<br>
-*GetByName(name string) (OrderedFormValue, bool)* - returns a form field by its name.<br>
-*GetAll() []OrderedFormValue* - returns all form fields.<br>
+* _Add(name string, value interface{})_ - adds a new form field to the structure.<br>
+* GetByName(name string) (OrderedFormValue, bool)_ - returns a form field by its name.<br>
+* GetAll() []OrderedFormValue_ - returns all form fields.<br>
 
 __FrmValueToOrderedForm__
 ```

@@ -33,7 +33,7 @@ __type MicServer struct__
 
 A structure for running a microservice.
 
-*Start() error* - starting the server.
+* _Start() error_ - starting the server.
 
 __FoozyAndMic__
 ```

@@ -91,9 +91,9 @@ __type FillableFormStruct struct__
 Структура FillableFormStruct призначена для більш зручного доступу до заповнюваної структури.
 Структура, яку потрібно заповнити, передається вказівником.
 
-*GetStruct() interface{}* - Повертає заповнену структуру.<br>
-*SetDefaultValue(val func(name string) string)* - встановлює стандартну функцію.<br>
-*GetOrDef(name string, index int) string* - повертає значення структури або стандартну функцію якщо значення структури відсутнє.<br>
+* _GetStruct() interface{}_ - Повертає заповнену структуру.<br>
+* _SetDefaultValue(val func(name string) string)_ - встановлює стандартну функцію.<br>
+* _GetOrDef(name string, index int) string_ - повертає значення структури або стандартну функцію якщо значення структури відсутнє.<br>
 
 __FillStructFromForm__
 ```
@@ -110,9 +110,9 @@ __type OrderedForm struct__
 
 Структура, яка впорядковує форму для подальшого більш зручного використання. Усі поля впорядковані по порядку їхньому порядку у формі.
 
-*Add(name string, value interface{})* - додає нове поле форми у структуру.<br>
-*GetByName(name string) (OrderedFormValue, bool)* - повертає поле форми по його назві.<br>
-*GetAll() []OrderedFormValue* - повертає усі поля форми.<br>
+* _Add(name string, value interface{})_ - додає нове поле форми у структуру.<br>
+* _GetByName(name string) (OrderedFormValue, bool)_ - повертає поле форми по його назві.<br>
+* _GetAll() []OrderedFormValue_ - повертає усі поля форми.<br>
 
 __FrmValueToOrderedForm__
 ```

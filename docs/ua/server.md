@@ -33,7 +33,7 @@ __type MicServer struct__
 
 Структура для запуску мікросервіса.
 
-*Start() error* - запуск сервера.
+* _Start() error_ - запуск сервера.
 
 __FoozyAndMic__
 ```

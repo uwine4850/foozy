@@ -9,6 +9,8 @@ __foozy__ — це легкий та гнучкий веб-фреймворк. �
 * [livereload](https://github.com/uwine4850/foozy/blob/master/docs/ua/livereload.md) — модуль, який можна використати для перезавантаження проекта після оновлення файлів.
 * [middlewares](https://github.com/uwine4850/foozy/blob/master/docs/ua/middlewares.md) — модуль для створення проміжного ПО.
 * [router](https://github.com/uwine4850/foozy/blob/master/docs/ua/router.md) — це найголовніший модуль, з допомогою його функціоналу реалізується маршрутизація проекту та багато іншого.
+* [object](https://github.com/uwine4850/foozy/blob/master/docs/ua/object.md) — пакет для більш простого відображення шаблонів.
+* [mic](https://github.com/uwine4850/foozy/blob/master/docs/ua/mic.md) - package is responsible for the functionality of microservices.
 * [form](https://github.com/uwine4850/foozy/blob/master/docs/ua/form.md) — робота з HTML формами.
 * [server](https://github.com/uwine4850/foozy/blob/master/docs/en/server.md) — надбудова над http.Server для простішого використання та роботи з модулем router.
 * [tmlengine](https://github.com/uwine4850/foozy/blob/master/docs/ua/tmlengine.md) — шаблонізатор проекту. Використовується бібліотека pongo2.
@@ -26,7 +28,7 @@ go get github.com/uwine4850/foozy
 ```
 newRouter := router.NewRouter()
 ```
-Метод ``NewRouter(manager interfaces2.IManager) *Router`` потребує менеджер для роботи, тому код буде виглядати так:
+Метод ``NewRouter(manager interfaces.IManager) *Router`` потребує менеджер для роботи, тому код буде виглядати так:
 ```
 newManager := router.NewManager()
 newRouter := router.NewRouter(newManager)
@@ -65,7 +67,7 @@ newRouter.Get("/home", func(w http.ResponseWriter, r *http.Request, manager inte
     }
 }
 ```
-Для кожного сайту крім HTML потрібен CSS та JavaScript. Його можна додати з допомогою наступного коду:
+Для кожної веб сторінки крім HTML потрібен CSS та JavaScript. Його можна додати з допомогою наступного коду:
 ```
 newRouter.GetMux().Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 ```
