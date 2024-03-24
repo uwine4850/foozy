@@ -8,5 +8,6 @@ type IWiretap interface {
 	GetUserParams(key string) (interface{}, bool)
 	SetDirs(dirs []string)
 	SetExcludeDirs(dirs []string)
+	SetNumberOfFileParts(fileParts int)
 	Start() error
 }
