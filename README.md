@@ -2,6 +2,8 @@
 __foozy__ is a lightweight and flexible web framework. The project is based on the http.ServeMux and http.Server modules.
 Also, modules depend on interfaces whenever possible, so most of them are open to change.
 
+Example project - https://github.com/uwine4850/foozy_proj
+
 Modules that the framework contains: <br>
 * [builtin](https://github.com/uwine4850/foozy/blob/master/docs/en/builtin.md) - built-in ready-made functionality, for example, authentication. It is not necessary to use.
 * [database](https://github.com/uwine4850/foozy/blob/master/docs/en/database.md) - interface for working with the mysql database.
