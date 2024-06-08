@@ -3,10 +3,11 @@ package tmlengine
 import (
 	"errors"
 	"fmt"
+	"net/http"
+
 	"github.com/flosch/pongo2"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/utils"
-	"net/http"
 )
 
 type TemplateEngine struct {
@@ -46,6 +47,7 @@ func (e *TemplateEngine) Exec() error {
 	if err != nil {
 		return err
 	}
+
 	err = e.setCsrfVariable(e.request)
 	if err != nil {
 		return err

@@ -2,20 +2,21 @@ package builtin_mddl
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/utils"
-	"net/http"
 )
 
 // GenerateAndSetCsrf A middleware designed to generate a CSRF token. The token is set as a cookie value.
 // To use it you need to run the method in a synchronous or asynchronous handler.
-func GenerateAndSetCsrf(w http.ResponseWriter, r *http.Request, manager interfaces.IManagerData) {
+func GenerateAndSetCsrf(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
 	csrfCookie, err := r.Cookie("csrf_token")
 	if err != nil || csrfCookie.Value == "" {
 		csrfToken, err := utils.GenerateCsrfToken()
 		if err != nil {
-			router.ServerError(w, err.Error())
+			router.ServerError(w, err.Error(), manager)
 			return
 		}
 		cookie := &http.Cookie{

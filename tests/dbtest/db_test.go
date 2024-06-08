@@ -2,13 +2,14 @@ package dbtest
 
 import (
 	"fmt"
-	"github.com/uwine4850/foozy/pkg/database"
-	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	"os"
 	"testing"
+
+	"github.com/uwine4850/foozy/pkg/database"
+	"github.com/uwine4850/foozy/pkg/database/dbutils"
 )
 
-var db = database.NewDatabase("root", "1111", "localhost", "3406", "foozy_test")
+var db = database.NewDatabase("root", "1111", "localhost", "3408", "foozy_test")
 
 func createDbTest() {
 	_, err := db.SyncQ().Query("INSERT INTO `dbtest` (`col1`, `col2`, `col3`) VALUES (?, ?, ?)",

@@ -2,15 +2,16 @@ package routing
 
 import (
 	"errors"
+	"io"
+	"net/http"
+	"os"
+	"testing"
+
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	router2 "github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/form"
 	fserer "github.com/uwine4850/foozy/pkg/server"
 	"github.com/uwine4850/foozy/pkg/tmlengine"
-	"io"
-	"net/http"
-	"os"
-	"testing"
 )
 
 func TestMain(m *testing.M) {
@@ -46,7 +47,7 @@ func TestMain(m *testing.M) {
 		}
 		return func() {}
 	})
-	server := fserer.NewServer(":8000", newRouter)
+	server := fserer.NewServer(":8030", newRouter)
 	go func() {
 		err = server.Start()
 		if err != nil && !errors.Is(http.ErrServerClosed, err) {
@@ -62,7 +63,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestPage(t *testing.T) {
-	get, err := http.Get("http://localhost:8000/page")
+	get, err := http.Get("http://localhost:8030/page")
 	if err != nil {
 		t.Error(err)
 	}
@@ -80,7 +81,7 @@ func TestPage(t *testing.T) {
 }
 
 func TestPageSlug(t *testing.T) {
-	get, err := http.Get("http://localhost:8000/page/1")
+	get, err := http.Get("http://localhost:8030/page/1")
 	if err != nil {
 		t.Error(err)
 	}
@@ -98,7 +99,7 @@ func TestPageSlug(t *testing.T) {
 }
 
 func TestPageMultipleSlug(t *testing.T) {
-	get, err := http.Get("http://localhost:8000/page2/1/name")
+	get, err := http.Get("http://localhost:8030/page2/1/name")
 	if err != nil {
 		t.Error(err)
 	}
@@ -116,7 +117,7 @@ func TestPageMultipleSlug(t *testing.T) {
 }
 
 func TestPost(t *testing.T) {
-	resp, err := form.SendApplicationForm("http://localhost:8000/post/12", map[string]string{})
+	resp, err := form.SendApplicationForm("http://localhost:8030/post/12", map[string]string{})
 	if err != nil {
 		t.Error(err)
 	}

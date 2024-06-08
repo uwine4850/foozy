@@ -3,12 +3,13 @@ package router
 import (
 	"errors"
 	"fmt"
-	interfaces2 "github.com/uwine4850/foozy/pkg/interfaces"
-	"github.com/uwine4850/foozy/pkg/middlewares"
-	"github.com/uwine4850/foozy/pkg/utils"
 	"log"
 	"net/http"
 	"strings"
+
+	interfaces2 "github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/middlewares"
+	"github.com/uwine4850/foozy/pkg/utils"
 )
 
 type Router struct {
@@ -77,7 +78,7 @@ func (rt *Router) getHandleFunc(pattern string, method string, ws interfaces2.IW
 		}
 		// Run middlewares.
 		if skip, err := rt.runMddl(writer, request); err != nil {
-			ServerError(writer, err.Error())
+			ServerError(writer, err.Error(), rt.manager)
 			return
 		} else {
 			if skip {

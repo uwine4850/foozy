@@ -2,13 +2,14 @@ package middlewares
 
 import (
 	"errors"
-	"github.com/uwine4850/foozy/pkg/interfaces"
-	"github.com/uwine4850/foozy/pkg/utils"
 	"net/http"
 	"sync"
+
+	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/utils"
 )
 
-type MddlFunc func(w http.ResponseWriter, r *http.Request, manager interfaces.IManagerData)
+type MddlFunc func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 
 type Middleware struct {
 	preHandlerMiddlewares   map[int]MddlFunc
@@ -25,7 +26,7 @@ func NewMiddleware() *Middleware {
 
 // HandlerMddl the middleware that will be executed before the request handler.
 // id indicates the order of execution of the current middleware. No two identical id's can be created.
-func (m *Middleware) HandlerMddl(id int, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManagerData)) {
+func (m *Middleware) HandlerMddl(id int, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) {
 	if !utils.SliceContains(m.preHandlerId, id) {
 		m.preHandlerId = append(m.preHandlerId, id)
 		m.preHandlerMiddlewares[id] = fn
@@ -35,8 +36,8 @@ func (m *Middleware) HandlerMddl(id int, fn func(w http.ResponseWriter, r *http.
 }
 
 // AsyncHandlerMddl the middleware that will execute asynchronously before the request.
-func (m *Middleware) AsyncHandlerMddl(fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManagerData)) {
-	m.asyncHandlerMiddlewares = append(m.asyncHandlerMiddlewares, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManagerData) {
+func (m *Middleware) AsyncHandlerMddl(fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) {
+	m.asyncHandlerMiddlewares = append(m.asyncHandlerMiddlewares, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
 		defer m.wg.Done()
 		fn(w, r, manager)
 	})

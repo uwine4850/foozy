@@ -2,18 +2,22 @@ package router
 
 import (
 	"encoding/json"
-	interfaces2 "github.com/uwine4850/foozy/pkg/interfaces"
-	"github.com/uwine4850/foozy/pkg/utils"
 	"net/http"
 	"sync"
+
+	interfaces2 "github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/utils"
 )
 
 type Manager struct {
-	TemplateEngine interfaces2.ITemplateEngine
-	templatePath   string
-	slugParams     map[string]string
-	userContext    sync.Map
-	websocket      interfaces2.IWebsocket
+	TemplateEngine   interfaces2.ITemplateEngine
+	templatePath     string
+	slugParams       map[string]string
+	userContext      sync.Map
+	websocket        interfaces2.IWebsocket
+	debug            bool
+	errorLogging     bool
+	errorLoggingPath string
 }
 
 func NewManager(engine interfaces2.ITemplateEngine) *Manager {
@@ -105,4 +109,28 @@ func (m *Manager) RenderJson(data interface{}, w http.ResponseWriter) error {
 		return err
 	}
 	return nil
+}
+
+func (m *Manager) Debug(enable bool) {
+	m.debug = enable
+}
+
+func (m *Manager) IsDebug() bool {
+	return m.debug
+}
+
+func (m *Manager) ErrorLogging(enable bool) {
+	m.errorLogging = enable
+}
+
+func (m *Manager) IsErrorLogging() bool {
+	return m.errorLogging
+}
+
+func (m *Manager) ErrorLoggingFile(path string) {
+	m.errorLoggingPath = path
+}
+
+func (m *Manager) GetErrorLoggingFile() string {
+	return m.errorLoggingPath
 }

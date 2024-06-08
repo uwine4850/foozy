@@ -2,6 +2,11 @@ package main
 
 import (
 	"errors"
+	"io"
+	"net/http"
+	"os"
+	"testing"
+
 	"github.com/uwine4850/foozy/pkg/builtin/builtin_mddl"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/middlewares"
@@ -10,10 +15,6 @@ import (
 	fserer "github.com/uwine4850/foozy/pkg/server"
 	"github.com/uwine4850/foozy/pkg/tmlengine"
 	"github.com/uwine4850/foozy/pkg/utils"
-	"io"
-	"net/http"
-	"os"
-	"testing"
 )
 
 type Fill struct {
@@ -66,7 +67,7 @@ func TestMain(m *testing.M) {
 	newRouter.Post("/multipart-form", multipartForm)
 	newRouter.Post("/save-file", saveFile)
 	newRouter.Post("/fill", fill)
-	server := fserer.NewServer(":8000", newRouter)
+	server := fserer.NewServer(":8020", newRouter)
 	go func() {
 		err = server.Start()
 		if err != nil && !errors.Is(http.ErrServerClosed, err) {
@@ -115,7 +116,7 @@ func saveFile(w http.ResponseWriter, r *http.Request, manager interfaces.IManage
 		return func() { w.Write([]byte(err.Error())) }
 	}
 	var path string
-	err = form.SaveFile(w, header, "./saved_files", &path)
+	err = form.SaveFile(w, header, "./saved_files", &path, manager)
 	if err != nil {
 		return func() { w.Write([]byte(err.Error())) }
 	}
@@ -159,7 +160,7 @@ func applicationForm(w http.ResponseWriter, r *http.Request, manager interfaces.
 }
 
 func TestApplicationForm(t *testing.T) {
-	resp, err := form.SendApplicationForm("http://localhost:8000/application-form", map[string]string{"f1": "v1", "f2": "v2"})
+	resp, err := form.SendApplicationForm("http://localhost:8020/application-form", map[string]string{"f1": "v1", "f2": "v2"})
 	if err != nil {
 		t.Error(err)
 	}
@@ -177,7 +178,7 @@ func TestApplicationForm(t *testing.T) {
 }
 
 func TestMultipartForm(t *testing.T) {
-	multipartForm, err := form.SendMultipartForm("http://localhost:8000/multipart-form", map[string]string{"f1": "v1"}, map[string][]string{"file": {"x.png"}})
+	multipartForm, err := form.SendMultipartForm("http://localhost:8020/multipart-form", map[string]string{"f1": "v1"}, map[string][]string{"file": {"x.png"}})
 	if err != nil {
 		t.Error(err)
 	}
@@ -192,7 +193,7 @@ func TestMultipartForm(t *testing.T) {
 }
 
 func TestSaveFile(t *testing.T) {
-	sendMultipartForm, err := form.SendMultipartForm("http://localhost:8000/save-file", map[string]string{}, map[string][]string{"file": {"x.png"}})
+	sendMultipartForm, err := form.SendMultipartForm("http://localhost:8020/save-file", map[string]string{}, map[string][]string{"file": {"x.png"}})
 	if err != nil {
 		t.Error(err)
 	}
@@ -207,7 +208,7 @@ func TestSaveFile(t *testing.T) {
 }
 
 func TestFillStructFromForm(t *testing.T) {
-	multipartForm, err := form.SendMultipartForm("http://localhost:8000/fill", map[string]string{"f1": "v1"}, map[string][]string{"file": {"x.png"}})
+	multipartForm, err := form.SendMultipartForm("http://localhost:8020/fill", map[string]string{"f1": "v1"}, map[string][]string{"file": {"x.png"}})
 	if err != nil {
 		t.Error(err)
 	}

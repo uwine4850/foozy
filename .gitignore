@@ -2,3 +2,6 @@ templates
 static
 project
 mysql
+.idea
+docker
+main.go

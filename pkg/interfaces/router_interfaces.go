@@ -1,14 +1,25 @@
 package interfaces
 
 import (
-	"github.com/gorilla/websocket"
 	"net/http"
+
+	"github.com/gorilla/websocket"
 )
 
 type IManager interface {
 	IManagerRender
 	IManagerWebsocket
 	IManagerData
+	IManagerConfig
+}
+
+type IManagerConfig interface {
+	Debug(enable bool)
+	IsDebug() bool
+	ErrorLogging(enable bool)
+	IsErrorLogging() bool
+	ErrorLoggingFile(path string)
+	GetErrorLoggingFile() string
 }
 
 type IManagerData interface {
