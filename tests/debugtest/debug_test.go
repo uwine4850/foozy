@@ -9,20 +9,21 @@ import (
 
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router"
+	"github.com/uwine4850/foozy/pkg/router/manager"
 	"github.com/uwine4850/foozy/pkg/server"
 	"github.com/uwine4850/foozy/pkg/tmlengine"
 	"github.com/uwine4850/foozy/pkg/utils"
 )
 
 var newTmplEngine, err = tmlengine.NewTemplateEngine()
-var manager = router.NewManager(newTmplEngine)
+var mngr = manager.NewManager(newTmplEngine)
 
 func TestMain(m *testing.M) {
-	manager.ErrorLoggingFile("test.log")
+	mngr.ErrorLoggingFile("test.log")
 	if err != nil {
 		panic(err)
 	}
-	newRouter := router.NewRouter(manager)
+	newRouter := router.NewRouter(mngr)
 	newRouter.EnableLog(false)
 	newRouter.SetTemplateEngine(&tmlengine.TemplateEngine{})
 	newRouter.Get("/server-err", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -50,7 +51,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestServerErrorDebTrue(t *testing.T) {
-	manager.Debug(true)
+	mngr.Debug(true)
 	get, err := http.Get("http://localhost:8040/server-err")
 	if err != nil {
 		t.Error(err)
@@ -69,7 +70,7 @@ func TestServerErrorDebTrue(t *testing.T) {
 }
 
 func TestServerErrorDebFalse(t *testing.T) {
-	manager.Debug(false)
+	mngr.Debug(false)
 	get, err := http.Get("http://localhost:8040/server-err")
 	if err != nil {
 		t.Error(err)
@@ -88,7 +89,7 @@ func TestServerErrorDebFalse(t *testing.T) {
 }
 
 func TestServerForbidden(t *testing.T) {
-	manager.Debug(false)
+	mngr.Debug(false)
 	get, err := http.Get("http://localhost:8040/server-forbidden")
 	if err != nil {
 		t.Error(err)
@@ -107,8 +108,8 @@ func TestServerForbidden(t *testing.T) {
 }
 
 func TestLogging(t *testing.T) {
-	manager.ErrorLogging(true)
-	manager.Debug(true)
+	mngr.ErrorLogging(true)
+	mngr.Debug(true)
 	get, err := http.Get("http://localhost:8040/server-logging")
 	if err != nil {
 		t.Error(err)
@@ -122,5 +123,5 @@ func TestLogging(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	manager.ErrorLogging(false)
+	mngr.ErrorLogging(false)
 }

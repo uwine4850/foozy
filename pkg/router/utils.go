@@ -17,7 +17,7 @@ func RedirectError(w http.ResponseWriter, r *http.Request, path string, err stri
 
 // CatchRedirectError handling by the template engine of an error sent by the CatchRedirectError function.
 // In the template you can get an error using the error variable.
-func CatchRedirectError(manager interfaces.IManagerData) {
+func CatchRedirectError(manager interfaces.IManager) {
 	myError, ok := manager.GetUserContext("error")
 	manager.SetContext(map[string]interface{}{"error": ""})
 	if ok {

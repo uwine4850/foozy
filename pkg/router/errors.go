@@ -10,9 +10,9 @@ func (e ErrTemplatePathNotSet) Error() string {
 }
 
 type ErrTemplatePathNotExist struct {
-	path string
+	Path string
 }
 
 func (e ErrTemplatePathNotExist) Error() string {
-	return fmt.Sprintf("The path to the \"%s\" template was not found.", e.path)
+	return fmt.Sprintf("The path to the \"%s\" template was not found.", e.Path)
 }

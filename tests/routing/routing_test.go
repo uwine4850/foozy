@@ -10,6 +10,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	router2 "github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/form"
+	"github.com/uwine4850/foozy/pkg/router/manager"
 	fserer "github.com/uwine4850/foozy/pkg/server"
 	"github.com/uwine4850/foozy/pkg/tmlengine"
 )
@@ -19,7 +20,7 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
-	newRouter := router2.NewRouter(router2.NewManager(newTmplEngine))
+	newRouter := router2.NewRouter(manager.NewManager(newTmplEngine))
 	newRouter.EnableLog(false)
 	newRouter.SetTemplateEngine(&tmlengine.TemplateEngine{})
 	newRouter.Get("/page", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {

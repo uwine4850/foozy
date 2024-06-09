@@ -23,18 +23,18 @@ type IManagerConfig interface {
 }
 
 type IManagerData interface {
-	SetContext(data map[string]interface{})
-	GetSlugParams(key string) (string, bool)
 	SetUserContext(key string, value interface{})
 	GetUserContext(key string) (any, bool)
 	DelUserContext(key string)
+	SetSlugParams(params map[string]string)
+	GetSlugParams(key string) (string, bool)
 }
 
 type IManagerRender interface {
+	SetContext(data map[string]interface{})
 	SetTemplateEngine(engine ITemplateEngine)
 	RenderTemplate(w http.ResponseWriter, r *http.Request) error
 	SetTemplatePath(templatePath string)
-	SetSlugParams(params map[string]string)
 	RenderJson(data interface{}, w http.ResponseWriter) error
 }
 
