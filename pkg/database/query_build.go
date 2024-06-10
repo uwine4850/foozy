@@ -2,11 +2,12 @@ package database
 
 import (
 	"fmt"
+	"reflect"
+	"strings"
+
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/utils"
-	"reflect"
-	"strings"
 )
 
 var operators = []string{"!=", "=", "<", ">", "<=", ">=", "IN"}
@@ -80,7 +81,6 @@ func (qb *QueryBuild) Select(cols string, tableName string) interfaces.IUserQuer
 	if qb.primaryCommand != "" {
 		panic(fmt.Sprintf("you cannot use an %s command while already using a %s command.", "SELECT",
 			qb.primaryCommand))
-		return qb
 	}
 	qb.primaryCommand = "SELECT"
 	qb.selectVal.Cols = cols
@@ -93,7 +93,6 @@ func (qb *QueryBuild) Insert(tableName string, params map[string]interface{}) in
 	if qb.primaryCommand != "" {
 		panic(fmt.Sprintf("you cannot use an %s command while already using a %s command.", "INSERT",
 			qb.primaryCommand))
-		return qb
 	}
 	qb.primaryCommand = "INSERT"
 	keys, args := dbutils.ParseParams(params)
@@ -110,7 +109,6 @@ func (qb *QueryBuild) Delete(tableName string) interfaces.IUserQueryBuild {
 	if qb.primaryCommand != "" {
 		panic(fmt.Sprintf("you cannot use an %s command while already using a %s command.", "DELETE",
 			qb.primaryCommand))
-		return qb
 	}
 	qb.primaryCommand = "DELETE"
 	qb.deleteVal.TableName = tableName
@@ -122,7 +120,6 @@ func (qb *QueryBuild) Update(tableName string, params map[string]interface{}) in
 	if qb.primaryCommand != "" {
 		panic(fmt.Sprintf("you cannot use an %s command while already using a %s command.", "UPDATE",
 			qb.primaryCommand))
-		return qb
 	}
 	qb.primaryCommand = "UPDATE"
 	var strVal string
@@ -147,7 +144,6 @@ func (qb *QueryBuild) Increment(fieldName string, tableName string) interfaces.I
 	if qb.primaryCommand != "" {
 		panic(fmt.Sprintf("you cannot use an %s command while already using a %s command.", "UPDATE",
 			qb.primaryCommand))
-		return qb
 	}
 	qb.primaryCommand = "INCREMENT"
 	qb.incrementVal.FieldName = fieldName

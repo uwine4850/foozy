@@ -1,6 +1,7 @@
 package dbtest
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"testing"
@@ -61,7 +62,10 @@ func TestMain(m *testing.M) {
 	clearDbAsyncTest()
 	createDbAsyncTest()
 	exitCode := m.Run()
-	db.Close()
+	err = db.Close()
+	if err != nil {
+		panic(err)
+	}
 	os.Exit(exitCode)
 }
 
@@ -69,6 +73,19 @@ func TestConnect(t *testing.T) {
 	err := db.Connect()
 	if err != nil {
 		t.Error(err)
+	}
+}
+
+func TestConnectErrorAndClose(t *testing.T) {
+	err := db.Close()
+	if err != nil {
+		t.Error(err)
+	}
+	if err = db.Ping(); err != nil {
+		connErr := database.ErrConnectionNotOpen{}
+		if !errors.Is(err, connErr) {
+			t.Errorf("The connection is open.")
+		}
 	}
 }
 
@@ -203,9 +220,9 @@ func TestSyncDelete(t *testing.T) {
 
 func TestSyncUpdate(t *testing.T) {
 	_, err := db.SyncQ().Update("dbtest", []dbutils.DbEquals{
-		{"col1", "upd1"},
-		{"col2", "2023-10-15"},
-		{"col3", 1.1},
+		{Name: "col1", Value: "upd1"},
+		{Name: "col2", Value: "2023-10-15"},
+		{Name: "col3", Value: 1.1},
 	}, dbutils.WHEquals(map[string]interface{}{"col1": "test2"}, "AND"))
 	if err != nil {
 		t.Error(err)

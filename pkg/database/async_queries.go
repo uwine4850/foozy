@@ -2,9 +2,10 @@ package database
 
 import (
 	"errors"
+	"sync"
+
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	"github.com/uwine4850/foozy/pkg/interfaces"
-	"sync"
 )
 
 type AsyncQueries struct {

@@ -3,10 +3,11 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"github.com/uwine4850/foozy/pkg/database/dbutils"
-	"github.com/uwine4850/foozy/pkg/interfaces"
 	"strconv"
 	"strings"
+
+	"github.com/uwine4850/foozy/pkg/database/dbutils"
+	"github.com/uwine4850/foozy/pkg/interfaces"
 )
 
 type SyncQueries struct {
