@@ -1,10 +1,11 @@
 package dbtest
 
 import (
-	"github.com/uwine4850/foozy/pkg/database/dbutils"
-	"github.com/uwine4850/foozy/pkg/utils"
 	"reflect"
 	"testing"
+
+	"github.com/uwine4850/foozy/pkg/database/dbutils"
+	"github.com/uwine4850/foozy/pkg/utils"
 )
 
 func TestParseString(t *testing.T) {
@@ -112,11 +113,11 @@ func TestFillStructFromDb(t *testing.T) {
 	}
 	res, err := db.SyncQ().Query("SELECT * FROM dbtest")
 	if err != nil {
-		panic(err)
+		t.Error(err)
 	}
 	err = dbutils.FillStructFromDb(res[0], &f)
 	if err != nil {
-		panic(err)
+		t.Error(err)
 	}
 	if f != expected {
 		t.Errorf("The data in the structure is not as expected.")

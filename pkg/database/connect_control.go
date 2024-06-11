@@ -5,20 +5,22 @@ import (
 	"slices"
 )
 
-type ConnectControl struct {
+// ControlConnect manages connections to the database. You can only use one database instance per connection.
+type ControlConnect struct {
 	openConnections      []*Database
 	openNamedConnections map[string]*Database
 }
 
-func (cc *ConnectControl) GetOpenConnections() []*Database {
+func (cc *ControlConnect) GetOpenUnnamedConnections() []*Database {
 	return cc.openConnections
 }
 
-func (cc *ConnectControl) GetOpenNamedConnections() map[string]*Database {
+func (cc *ControlConnect) GetOpenNamedConnections() map[string]*Database {
 	return cc.openNamedConnections
 }
 
-func (cc *ConnectControl) OpenConnection(db *Database) error {
+// OpenUnnamedConnection opens one unnamed connection to the database.
+func (cc *ControlConnect) OpenUnnamedConnection(db *Database) error {
 	if slices.Contains(cc.openConnections, db) {
 		return ErrConnectionAlreadyExists{}
 	}
@@ -30,7 +32,8 @@ func (cc *ConnectControl) OpenConnection(db *Database) error {
 	}
 }
 
-func (cc *ConnectControl) CloseConnectionByIndex(index int) error {
+// CloseUnnamedConnectionByIndex closes unnamed connections by id.
+func (cc *ControlConnect) CloseUnnamedConnectionByIndex(index int) error {
 	if index >= 0 && index < len(cc.openConnections) {
 		if err := cc.openConnections[index].Close(); err != nil {
 			return err
@@ -41,7 +44,8 @@ func (cc *ConnectControl) CloseConnectionByIndex(index int) error {
 	return ErrConnectionNotExists{}
 }
 
-func (cc *ConnectControl) CloseAllConnection() error {
+// CloseAllUnnamedConnection closes all unnamed connections.
+func (cc *ControlConnect) CloseAllUnnamedConnection() error {
 	for i := 0; i < len(cc.openConnections); i++ {
 		err := cc.openConnections[i].Close()
 		if err != nil {
@@ -52,13 +56,14 @@ func (cc *ConnectControl) CloseAllConnection() error {
 	return nil
 }
 
-func (cc *ConnectControl) makeNamedConnectionMap() {
+func (cc *ControlConnect) makeNamedConnectionMap() {
 	if cc.openNamedConnections == nil {
 		cc.openNamedConnections = make(map[string]*Database)
 	}
 }
 
-func (cc *ConnectControl) OpenNamedConnection(name string, db *Database) error {
+// OpenNamedConnection opens a named connection.
+func (cc *ControlConnect) OpenNamedConnection(name string, db *Database) error {
 	_, ok := cc.openNamedConnections[name]
 	if ok {
 		return ErrNamedConnectionAlreadyExists{name}
@@ -75,7 +80,8 @@ func (cc *ConnectControl) OpenNamedConnection(name string, db *Database) error {
 	}
 }
 
-func (cc *ConnectControl) CloseNamedConnection(name string) error {
+// CloseNamedConnection closes a named connection by name.
+func (cc *ControlConnect) CloseNamedConnection(name string) error {
 	cc.makeNamedConnectionMap()
 	_, ok := cc.openNamedConnections[name]
 	if ok {
@@ -90,7 +96,8 @@ func (cc *ConnectControl) CloseNamedConnection(name string) error {
 	}
 }
 
-func (cc *ConnectControl) CloseAllNamedConnection() error {
+// CloseAllNamedConnection closes the entire named connection.
+func (cc *ControlConnect) CloseAllNamedConnection() error {
 	cc.makeNamedConnectionMap()
 	for _, conn := range cc.openNamedConnections {
 		if err := conn.Close(); err != nil {
