@@ -11,6 +11,10 @@ type ControlConnect struct {
 	openNamedConnections map[string]*Database
 }
 
+func NewConnectControl() *ControlConnect {
+	return &ControlConnect{}
+}
+
 func (cc *ControlConnect) GetOpenUnnamedConnections() []*Database {
 	return cc.openConnections
 }

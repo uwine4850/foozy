@@ -9,10 +9,20 @@ import (
 
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	router2 "github.com/uwine4850/foozy/pkg/router"
+	"github.com/uwine4850/foozy/pkg/router/cookies"
 	"github.com/uwine4850/foozy/pkg/router/form"
 	"github.com/uwine4850/foozy/pkg/router/manager"
+	"github.com/uwine4850/foozy/pkg/router/tmlengine"
 	fserer "github.com/uwine4850/foozy/pkg/server"
-	"github.com/uwine4850/foozy/pkg/tmlengine"
+)
+
+type SessionData struct {
+	UserID string
+}
+
+var (
+	hashKey  = []byte("1234567890abcdef1234567890abcdef") // 32 bytes
+	blockKey = []byte("abcdefghijklmnopqrstuvwx12345678") // 32 bytes
 )
 
 func TestMain(m *testing.M) {
@@ -27,25 +37,44 @@ func TestMain(m *testing.M) {
 		return func() { w.Write([]byte("OK")) }
 	})
 	newRouter.Get("/page/<id>", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		id, _ := manager.GetSlugParams("id")
+		id, _ := manager.OneTimeData().GetSlugParams("id")
 		if id == "1" {
 			return func() { w.Write([]byte("OK")) }
 		}
 		return func() {}
 	})
 	newRouter.Get("/page2/<id>/<name>", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		id, _ := manager.GetSlugParams("id")
-		name, _ := manager.GetSlugParams("name")
+		id, _ := manager.OneTimeData().GetSlugParams("id")
+		name, _ := manager.OneTimeData().GetSlugParams("name")
 		if id == "1" && name == "name" {
 			return func() { w.Write([]byte("OK")) }
 		}
 		return func() {}
 	})
 	newRouter.Post("/post/<id>", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		id, _ := manager.GetSlugParams("id")
+		id, _ := manager.OneTimeData().GetSlugParams("id")
 		if id == "12" {
 			return func() { w.Write([]byte("OK")) }
 		}
+		return func() {}
+	})
+	newRouter.Get("/session-create", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+		if err := cookies.CreateSecureCookieData(hashKey, blockKey, w, &http.Cookie{
+			Name:     "session",
+			Path:     "/",
+			HttpOnly: true,
+			Secure:   true,
+		}, &SessionData{UserID: "111"}); err != nil {
+			panic(err)
+		}
+		return func() {}
+	})
+	newRouter.Get("/session-read", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+		var data SessionData
+		if err := cookies.ReadSecureCookieData(hashKey, blockKey, r, "session", &data); err != nil {
+			panic(err)
+		}
+		w.Write([]byte(data.UserID))
 		return func() {}
 	})
 	server := fserer.NewServer(":8030", newRouter)

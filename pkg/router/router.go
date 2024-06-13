@@ -8,7 +8,8 @@ import (
 	"strings"
 
 	interfaces2 "github.com/uwine4850/foozy/pkg/interfaces"
-	"github.com/uwine4850/foozy/pkg/middlewares"
+	"github.com/uwine4850/foozy/pkg/router/manager"
+	"github.com/uwine4850/foozy/pkg/router/middlewares"
 	"github.com/uwine4850/foozy/pkg/utils"
 )
 
@@ -17,8 +18,6 @@ type Router struct {
 	request        *http.Request
 	writer         http.ResponseWriter
 	TemplateEngine interfaces2.ITemplateEngine
-	templatePath   string
-	context        map[string]interface{}
 	manager        interfaces2.IManager
 	enableLog      bool
 	middleware     interfaces2.IMiddleware
@@ -64,6 +63,8 @@ func (rt *Router) getHandleFunc(pattern string, method string, ws interfaces2.IW
 		}
 		rt.printLog(request)
 
+		rt.manager.SetOneTimeData(manager.NewManagerData())
+
 		// Check if the url matches its pattern with possible slug fields.
 		parseUrl := ParseSlugIndex(utils.SplitUrl(pattern))
 		if request.URL.Path != "/" && len(parseUrl) > 0 {
@@ -73,7 +74,7 @@ func (rt *Router) getHandleFunc(pattern string, method string, ws interfaces2.IW
 				return
 			}
 			if params != nil {
-				rt.manager.SetSlugParams(params)
+				rt.manager.OneTimeData().SetSlugParams(params)
 			}
 		}
 		// Run middlewares.
@@ -123,17 +124,17 @@ func (rt *Router) runMddl(w http.ResponseWriter, r *http.Request) (bool, error) 
 		// Waiting for all asynchronous middleware to complete.
 		rt.middleware.WaitAsyncMddl()
 		// Handling middleware errors.
-		mddlErr, err := middlewares.GetMddlError(rt.manager)
+		mddlErr, err := middlewares.GetMddlError(rt.manager.OneTimeData())
 		if err != nil {
 			return false, err
 		}
 		if mddlErr != nil {
-			rt.manager.DelUserContext("mddlerr")
+			rt.manager.OneTimeData().DelUserContext("mddlerr")
 			return false, errors.New(mddlErr.Error())
 		}
 		// Checking the skip of the next page. Runs after a more important error check.
-		if middlewares.IsSkipNextPage(rt.manager) {
-			rt.manager.DelUserContext("skipNextPage")
+		if middlewares.IsSkipNextPage(rt.manager.OneTimeData()) {
+			rt.manager.OneTimeData().DelUserContext("skipNextPage")
 			return true, nil
 		}
 	}

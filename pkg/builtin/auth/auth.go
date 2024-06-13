@@ -2,8 +2,13 @@ package auth
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
+	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/router/cookies"
+	"github.com/uwine4850/foozy/pkg/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -14,16 +19,30 @@ func (receiver ErrShortUsername) Error() string {
 	return "The username must be equal to or longer than 3 characters."
 }
 
+type AuthCookie struct {
+	UID string
+}
+
+type User struct {
+	Id       string `db:"id"`
+	Username string `db:"username"`
+}
+
 // Auth structure is designed to manage user authentication.
 // It can be used to create a user, check the correctness of the login data, change the password and
 // check the availability of the user.
 type Auth struct {
 	database  *database.Database
 	tableName string
+	w         http.ResponseWriter
+	manager   interfaces.IManager
 }
 
-func NewAuth(database *database.Database) *Auth {
-	return &Auth{database, "auth"}
+func NewAuth(database *database.Database, w http.ResponseWriter, manager interfaces.IManager) *Auth {
+	if !utils.IsPointer(manager) {
+		panic("The manager must be passed by pointer.")
+	}
+	return &Auth{database, "auth", w, manager}
 }
 
 // RegisterUser registers the user in the database.
@@ -57,17 +76,53 @@ func (a *Auth) RegisterUser(username string, password string) error {
 	return nil
 }
 
-// LoginUser User Login. This method only checks if the login details match.
+// LoginUser check if the password and login are the same.
+// Creates a cookie entry.
+// Adds a USER variable to the user context, which contains user data from the auth table.
 func (a *Auth) LoginUser(username string, password string) error {
-	user, err := a.UserExist(username)
+	userDB, err := a.UserExist(username)
 	if err != nil {
 		return err
 	}
-	if user == nil {
+	if userDB == nil {
 		return ErrUserNotExist{username}
 	}
-	err = ComparePassword(dbutils.ParseString(user["password"]), password)
+	err = ComparePassword(dbutils.ParseString(userDB["password"]), password)
 	if err != nil {
+		return err
+	}
+	var user User
+	if err := dbutils.FillStructFromDb(userDB, &user); err != nil {
+		return err
+	}
+	if err := a.addUserCookie(user.Id); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *Auth) UpdateAuthCookie(r *http.Request) error {
+	hashKey := a.manager.Get32BytesKeys()["HashKey"]
+	blockKey := a.manager.Get32BytesKeys()["BlockKey"]
+	var authCookie AuthCookie
+	if err := cookies.ReadSecureCookieData([]byte(hashKey), []byte(blockKey), r, "AUTH", &authCookie); err != nil {
+		return err
+	}
+	if err := a.addUserCookie(authCookie.UID); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *Auth) addUserCookie(uid string) error {
+	hashKey := a.manager.Get32BytesKeys()["HashKey"]
+	blockKey := a.manager.Get32BytesKeys()["BlockKey"]
+	if err := cookies.CreateSecureCookieData([]byte(hashKey), []byte(blockKey), a.w, &http.Cookie{
+		Name:     "AUTH",
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+	}, &AuthCookie{UID: uid}); err != nil {
 		return err
 	}
 	return nil
@@ -93,11 +148,10 @@ func (a *Auth) ChangePassword(username string, oldPassword string, newPassword s
 	if err != nil {
 		return err
 	}
-	update, err := a.database.SyncQ().Update(a.tableName, []dbutils.DbEquals{{"password", password}}, dbutils.WHEquals(map[string]interface{}{"username": username}, "AND"))
+	_, err = a.database.SyncQ().Update(a.tableName, []dbutils.DbEquals{{Name: "password", Value: password}}, dbutils.WHEquals(map[string]interface{}{"username": username}, "AND"))
 	if err != nil {
 		return err
 	}
-	fmt.Println(update)
 	return nil
 }
 

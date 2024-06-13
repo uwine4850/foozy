@@ -1,11 +1,12 @@
 package object
 
 import (
+	"net/http"
+	"reflect"
+
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	"github.com/uwine4850/foozy/pkg/interfaces"
-	"net/http"
-	"reflect"
 )
 
 type MultipleObject struct {
@@ -44,7 +45,7 @@ func (v *MultipleObjectView) Object(w http.ResponseWriter, r *http.Request, mana
 		return nil, err
 	}
 	for i := 0; i < len(v.MultipleObjects); i++ {
-		slugValue, ok := manager.GetSlugParams(v.MultipleObjects[i].SlugName)
+		slugValue, ok := manager.OneTimeData().GetSlugParams(v.MultipleObjects[i].SlugName)
 		if !ok {
 			return nil, ErrNoSlug{v.MultipleObjects[i].SlugName}
 		}

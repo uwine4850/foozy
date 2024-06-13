@@ -2,11 +2,12 @@ package object
 
 import (
 	"fmt"
+	"net/http"
+	"reflect"
+
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	"github.com/uwine4850/foozy/pkg/interfaces"
-	"net/http"
-	"reflect"
 )
 
 type ErrNoSlug struct {
@@ -55,7 +56,7 @@ func (v *ObjView) Object(w http.ResponseWriter, r *http.Request, manager interfa
 	if err != nil {
 		return nil, err
 	}
-	slugValue, ok := manager.GetSlugParams(v.Slug)
+	slugValue, ok := manager.OneTimeData().GetSlugParams(v.Slug)
 	if !ok {
 		return nil, ErrNoSlug{v.Slug}
 	}

@@ -10,7 +10,7 @@ import (
 
 // RedirectError redirect to the page and provide error information for it.
 func RedirectError(w http.ResponseWriter, r *http.Request, path string, err string, manager interfaces.IManager) {
-	manager.SetUserContext("RedirectError", err)
+	manager.OneTimeData().SetUserContext("RedirectError", err)
 	http.Redirect(w, r, path, http.StatusFound)
 	debug.ErrorLogginIfEnable(err, manager)
 }
@@ -18,11 +18,11 @@ func RedirectError(w http.ResponseWriter, r *http.Request, path string, err stri
 // CatchRedirectError handling by the template engine of an error sent by the CatchRedirectError function.
 // In the template you can get an error using the error variable.
 func CatchRedirectError(manager interfaces.IManager) {
-	myError, ok := manager.GetUserContext("RedirectError")
+	myError, ok := manager.OneTimeData().GetUserContext("RedirectError")
 	manager.SetContext(map[string]interface{}{"RedirectError": ""})
 	if ok {
 		manager.SetContext(map[string]interface{}{"RedirectError": myError.(string)})
-		manager.DelUserContext("RedirectError")
+		manager.OneTimeData().DelUserContext("RedirectError")
 	}
 }
 

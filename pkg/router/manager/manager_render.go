@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/uwine4850/foozy/pkg/interfaces"
-	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/utils"
 )
 
@@ -32,10 +31,12 @@ func (m *ManagerRender) SetTemplateEngine(engine interfaces.ITemplateEngine) {
 // RenderTemplate Rendering a template using a template engine.
 func (m *ManagerRender) RenderTemplate(w http.ResponseWriter, r *http.Request) error {
 	if m.templatePath == "" {
-		return &router.ErrTemplatePathNotSet{}
+		// return &router.ErrTemplatePathNotSet{}
+		panic("AA")
 	}
 	if !utils.PathExist(m.templatePath) {
-		return &router.ErrTemplatePathNotExist{Path: m.templatePath}
+		// return &router.ErrTemplatePathNotExist{Path: m.templatePath}
+		panic("!!!!")
 	}
 	m.TemplateEngine.SetPath(m.templatePath)
 	m.TemplateEngine.SetResponseWriter(w)

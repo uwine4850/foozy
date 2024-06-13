@@ -69,12 +69,12 @@ func (m *Middleware) WaitAsyncMddl() {
 }
 
 // SetMddlError sets an error that occurred in the middleware.
-func SetMddlError(mddlErr error, manager interfaces.IManagerData) {
+func SetMddlError(mddlErr error, manager interfaces.IManagerOneTimeData) {
 	manager.SetUserContext("mddlerr", mddlErr)
 }
 
 // GetMddlError get error from middleware. Used in router and in pair with SetMddlError.
-func GetMddlError(manager interfaces.IManagerData) (error, error) {
+func GetMddlError(manager interfaces.IManagerOneTimeData) (error, error) {
 	mddlErr, ok := manager.GetUserContext("mddlerr")
 	if ok {
 		err, ok := mddlErr.(error)
@@ -87,19 +87,19 @@ func GetMddlError(manager interfaces.IManagerData) (error, error) {
 }
 
 // SkipNextPage sends a command to the router to skip rendering the next page.
-func SkipNextPage(manager interfaces.IManagerData) {
+func SkipNextPage(manager interfaces.IManagerOneTimeData) {
 	manager.SetUserContext("skipNextPage", true)
 }
 
 // IsSkipNextPage checks if the page rendering should be skipped.
 // The function is built into the router.
-func IsSkipNextPage(manager interfaces.IManagerData) bool {
+func IsSkipNextPage(manager interfaces.IManagerOneTimeData) bool {
 	_, ok := manager.GetUserContext("skipNextPage")
 	return ok
 }
 
 // SkipNextPageAndRedirect skips the page render and redirects to another page.
-func SkipNextPageAndRedirect(manager interfaces.IManagerData, w http.ResponseWriter, r *http.Request, path string) {
+func SkipNextPageAndRedirect(manager interfaces.IManagerOneTimeData, w http.ResponseWriter, r *http.Request, path string) {
 	http.Redirect(w, r, path, http.StatusFound)
 	SkipNextPage(manager)
 }

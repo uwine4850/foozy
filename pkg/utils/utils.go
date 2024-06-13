@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"os"
+	"reflect"
 	"strings"
 )
 
@@ -79,4 +80,8 @@ func Join[T any](elems []T, sep string) string {
 		}
 	}
 	return res.String()
+}
+
+func IsPointer(a any) bool {
+	return reflect.TypeOf(a).Kind() == reflect.Pointer
 }

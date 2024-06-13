@@ -9,8 +9,12 @@ import (
 type IManager interface {
 	IManagerRender
 	IManagerWebsocket
-	IManagerData
 	IManagerConfig
+	Render() IManagerRender
+	WS() IManagerWebsocket
+	OneTimeData() IManagerOneTimeData
+	SetOneTimeData(manager IManagerOneTimeData)
+	Config() IManagerConfig
 }
 
 type IManagerConfig interface {
@@ -20,9 +24,11 @@ type IManagerConfig interface {
 	IsErrorLogging() bool
 	ErrorLoggingFile(path string)
 	GetErrorLoggingFile() string
+	Generate32BytesKeys()
+	Get32BytesKeys() map[string]string
 }
 
-type IManagerData interface {
+type IManagerOneTimeData interface {
 	SetUserContext(key string, value interface{})
 	GetUserContext(key string) (any, bool)
 	DelUserContext(key string)

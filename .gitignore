@@ -5,3 +5,4 @@ mysql
 .idea
 docker
 main.go
+stress_test
