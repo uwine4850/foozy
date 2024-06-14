@@ -2,6 +2,7 @@ package interfaces
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -17,6 +18,16 @@ type IManager interface {
 	Config() IManagerConfig
 }
 
+type IKey interface {
+	HashKey() string
+	OldHashKey() string
+	BlockKey() string
+	OldBlockKey() string
+	StaticKey() string
+	Date() time.Time
+	GenerateBytesKeys(length int)
+}
+
 type IManagerConfig interface {
 	Debug(enable bool)
 	IsDebug() bool
@@ -25,7 +36,7 @@ type IManagerConfig interface {
 	ErrorLoggingFile(path string)
 	GetErrorLoggingFile() string
 	Generate32BytesKeys()
-	Get32BytesKeys() map[string]string
+	Get32BytesKey() IKey
 }
 
 type IManagerOneTimeData interface {

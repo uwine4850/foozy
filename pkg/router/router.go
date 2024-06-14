@@ -65,6 +65,8 @@ func (rt *Router) getHandleFunc(pattern string, method string, ws interfaces2.IW
 
 		rt.manager.SetOneTimeData(manager.NewManagerData())
 
+		rt.manager.OneTimeData().SetUserContext("URL_PATTERN", pattern)
+
 		// Check if the url matches its pattern with possible slug fields.
 		parseUrl := ParseSlugIndex(utils.SplitUrl(pattern))
 		if request.URL.Path != "/" && len(parseUrl) > 0 {

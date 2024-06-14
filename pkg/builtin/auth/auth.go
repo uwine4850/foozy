@@ -3,6 +3,7 @@ package auth
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
@@ -20,7 +21,8 @@ func (receiver ErrShortUsername) Error() string {
 }
 
 type AuthCookie struct {
-	UID string
+	UID     string
+	KeyDate time.Time
 }
 
 type User struct {
@@ -79,33 +81,31 @@ func (a *Auth) RegisterUser(username string, password string) error {
 // LoginUser check if the password and login are the same.
 // Creates a cookie entry.
 // Adds a USER variable to the user context, which contains user data from the auth table.
-func (a *Auth) LoginUser(username string, password string) error {
+func (a *Auth) LoginUser(username string, password string) (*User, error) {
 	userDB, err := a.UserExist(username)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if userDB == nil {
-		return ErrUserNotExist{username}
+		return nil, ErrUserNotExist{username}
 	}
 	err = ComparePassword(dbutils.ParseString(userDB["password"]), password)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	var user User
 	if err := dbutils.FillStructFromDb(userDB, &user); err != nil {
-		return err
+		return nil, err
 	}
 	if err := a.addUserCookie(user.Id); err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return &user, nil
 }
 
-func (a *Auth) UpdateAuthCookie(r *http.Request) error {
-	hashKey := a.manager.Get32BytesKeys()["HashKey"]
-	blockKey := a.manager.Get32BytesKeys()["BlockKey"]
+func (a *Auth) UpdateAuthCookie(hashKey []byte, blockKey []byte, r *http.Request) error {
 	var authCookie AuthCookie
-	if err := cookies.ReadSecureCookieData([]byte(hashKey), []byte(blockKey), r, "AUTH", &authCookie); err != nil {
+	if err := cookies.ReadSecureCookieData(hashKey, blockKey, r, "AUTH", &authCookie); err != nil {
 		return err
 	}
 	if err := a.addUserCookie(authCookie.UID); err != nil {
@@ -115,14 +115,22 @@ func (a *Auth) UpdateAuthCookie(r *http.Request) error {
 }
 
 func (a *Auth) addUserCookie(uid string) error {
-	hashKey := a.manager.Get32BytesKeys()["HashKey"]
-	blockKey := a.manager.Get32BytesKeys()["BlockKey"]
-	if err := cookies.CreateSecureCookieData([]byte(hashKey), []byte(blockKey), a.w, &http.Cookie{
+	k := a.manager.Config().Get32BytesKey()
+	if err := cookies.CreateSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), a.w, &http.Cookie{
 		Name:     "AUTH",
 		Path:     "/",
 		HttpOnly: true,
 		Secure:   true,
-	}, &AuthCookie{UID: uid}); err != nil {
+	}, &AuthCookie{UID: uid, KeyDate: a.manager.Get32BytesKey().Date()}); err != nil {
+		return err
+	}
+	authDate := a.manager.Get32BytesKey().Date()
+	if err := cookies.CreateSecureNoHMACCookieData([]byte(k.StaticKey()), a.w, &http.Cookie{
+		Name:     "AUTH_DATE",
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+	}, &authDate); err != nil {
 		return err
 	}
 	return nil
