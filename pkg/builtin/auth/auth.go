@@ -103,6 +103,9 @@ func (a *Auth) LoginUser(username string, password string) (*User, error) {
 	return &user, nil
 }
 
+// Update Auth Cookie updates the cookie encoding.
+// IMPORTANT: to work, you need to decode the data; accordingly, in the hashKey and blockKey fields you need to use the keys
+// with which they were encoded. Next, the function itself will take new keys from ManagerConf.
 func (a *Auth) UpdateAuthCookie(hashKey []byte, blockKey []byte, r *http.Request) error {
 	var authCookie AuthCookie
 	if err := cookies.ReadSecureCookieData(hashKey, blockKey, r, "AUTH", &authCookie); err != nil {

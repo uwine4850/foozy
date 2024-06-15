@@ -11,6 +11,10 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
 )
 
+// Auth is used to determine when to change the AUTH cookie encoding.
+// When keys are changed, a change date is set. If the date does not match, then you need to change the encoding.
+// It is important to note that only previous keys are saved; accordingly, it is impossible to update the encoding
+// if two or more key iterations have passed, because the old keys are no longer known.
 func Auth(loginUrl string, db *database.Database) middlewares.MddlFunc {
 	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
 		pattern, ok := manager.OneTimeData().GetUserContext("URL_PATTERN")

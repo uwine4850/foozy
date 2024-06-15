@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router"
@@ -41,6 +42,7 @@ func TestMain(m *testing.M) {
 		if err != nil && !errors.Is(http.ErrServerClosed, err) {
 			panic(err)
 		}
+		time.Sleep(500 * time.Millisecond)
 	}()
 	exitCode := m.Run()
 	err = server.Stop()

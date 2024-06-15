@@ -9,6 +9,11 @@ import (
 
 const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
+// Key structure that generates and stores three types of keys:
+// hashKey is a key that is used for HMAC and can be dynamic.
+// blockKey - a key that is used for encoding and can be dynamic.
+// staticKey - a key that cannot change.
+// The old keys haskKey and blockKey are also stored here.
 type Key struct {
 	hashKey     string
 	oldHashKey  string
@@ -42,6 +47,8 @@ func (k *Key) Date() time.Time {
 	return k.date
 }
 
+// GenerateBytesKeys generates keys.
+// hashKey and blockKey will be updated. staticKey will only be generated once, cannot be regenerated.
 func (k *Key) GenerateBytesKeys(length int) {
 	k.oldHashKey = k.hashKey
 	k.oldBlockKey = k.blockKey

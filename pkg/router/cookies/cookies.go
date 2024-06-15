@@ -7,6 +7,8 @@ import (
 	"github.com/uwine4850/foozy/pkg/secure"
 )
 
+// CreateSecureCookieData creates cookie data using encoding and HMAC.
+// hashKey is responsible for HMAC, and blockKey is for encoding.
 func CreateSecureCookieData(hashKey []byte, blockKey []byte, w http.ResponseWriter, cookie *http.Cookie, cookieValue interface{}) error {
 	secureValue, err := secure.CreateSecureData(hashKey, blockKey, cookieValue)
 	if err != nil {
@@ -17,6 +19,8 @@ func CreateSecureCookieData(hashKey []byte, blockKey []byte, w http.ResponseWrit
 	return nil
 }
 
+// ReadSecureCookieData reads data encoded with CreateSecureCookieData.
+// hashKey is responsible for HMAC, and blockKey is for encoding.
 func ReadSecureCookieData(hashKey []byte, blockKey []byte, r *http.Request, name string, readCookie interface{}) error {
 	cookie, err := r.Cookie(name)
 	if err != nil {
@@ -28,6 +32,7 @@ func ReadSecureCookieData(hashKey []byte, blockKey []byte, r *http.Request, name
 	return nil
 }
 
+// CreateSecureNoHMACCookieData creates an encoding of the cookie data, but without HMAC.
 func CreateSecureNoHMACCookieData(key []byte, w http.ResponseWriter, cookie *http.Cookie, cookieValue interface{}) error {
 	data, err := json.Marshal(cookieValue)
 	if err != nil {
@@ -42,6 +47,7 @@ func CreateSecureNoHMACCookieData(key []byte, w http.ResponseWriter, cookie *htt
 	return nil
 }
 
+// ReadSecureNoHMACCookieData reads data that was encoded using CreateSecureNoHMACCookieData.
 func ReadSecureNoHMACCookieData(key []byte, r *http.Request, name string, readValue interface{}) error {
 	cookie, err := r.Cookie(name)
 	if err != nil {
