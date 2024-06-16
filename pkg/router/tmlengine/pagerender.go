@@ -1,4 +1,4 @@
-package manager
+package tmlengine
 
 import (
 	"encoding/json"
@@ -8,35 +8,37 @@ import (
 	"github.com/uwine4850/foozy/pkg/utils"
 )
 
-type ManagerRender struct {
+type Render struct {
 	TemplateEngine interfaces.ITemplateEngine
 	templatePath   string
 }
 
-func NewManagerRender(engine interfaces.ITemplateEngine) *ManagerRender {
-	return &ManagerRender{TemplateEngine: engine}
+func NewRender() (*Render, error) {
+	if engine, err := NewTemplateEngine(); err != nil {
+		return nil, err
+	} else {
+		return &Render{TemplateEngine: engine}, nil
+	}
 }
 
 // SetContext Setting variables for html template.
-func (m *ManagerRender) SetContext(data map[string]interface{}) {
+func (m *Render) SetContext(data map[string]interface{}) {
 	m.TemplateEngine.SetContext(data)
 }
 
 // SetTemplateEngine set the template engine interface.
 // Optional method if the template engine is already installed.
-func (m *ManagerRender) SetTemplateEngine(engine interfaces.ITemplateEngine) {
+func (m *Render) SetTemplateEngine(engine interfaces.ITemplateEngine) {
 	m.TemplateEngine = engine
 }
 
 // RenderTemplate Rendering a template using a template engine.
-func (m *ManagerRender) RenderTemplate(w http.ResponseWriter, r *http.Request) error {
+func (m *Render) RenderTemplate(w http.ResponseWriter, r *http.Request) error {
 	if m.templatePath == "" {
-		// return &router.ErrTemplatePathNotSet{}
-		panic("AA")
+		return ErrTemplatePathNotSet{}
 	}
 	if !utils.PathExist(m.templatePath) {
-		// return &router.ErrTemplatePathNotExist{Path: m.templatePath}
-		panic("!!!!")
+		return ErrTemplatePathNotExist{Path: m.templatePath}
 	}
 	m.TemplateEngine.SetPath(m.templatePath)
 	m.TemplateEngine.SetResponseWriter(w)
@@ -49,12 +51,12 @@ func (m *ManagerRender) RenderTemplate(w http.ResponseWriter, r *http.Request) e
 }
 
 // SetTemplatePath Setting the path to the template that the templating engine renders.
-func (m *ManagerRender) SetTemplatePath(templatePath string) {
+func (m *Render) SetTemplatePath(templatePath string) {
 	m.templatePath = templatePath
 }
 
 // RenderJson displays data in json format on the page.
-func (m *ManagerRender) RenderJson(data interface{}, w http.ResponseWriter) error {
+func (m *Render) RenderJson(data interface{}, w http.ResponseWriter) error {
 	marshal, err := json.Marshal(data)
 	if err != nil {
 		return err

@@ -1,9 +1,10 @@
 package object
 
 import (
+	"net/http"
+
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/utils"
-	"net/http"
 )
 
 type TemplateView struct {
@@ -25,9 +26,9 @@ func (v *TemplateView) Call(w http.ResponseWriter, r *http.Request, manager inte
 	if !permissions {
 		return func() { f() }
 	}
-	manager.SetContext(objectContext)
-	manager.SetTemplatePath(v.TemplatePath)
-	err = manager.RenderTemplate(w, r)
+	manager.Render().SetContext(objectContext)
+	manager.Render().SetTemplatePath(v.TemplatePath)
+	err = manager.Render().RenderTemplate(w, r)
 	if err != nil {
 		return func() { v.View.OnError(w, r, manager, err) }
 	}

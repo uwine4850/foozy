@@ -22,15 +22,10 @@ import (
 	"github.com/uwine4850/foozy/pkg/server/globalflow"
 )
 
-var newTmplEngine, err = tmlengine.NewTemplateEngine()
-var mng = manager.NewManager(newTmplEngine)
+var mng = manager.NewManager(nil)
 var newRouter = router.NewRouter(mng)
 
 func TestMain(m *testing.M) {
-	if err != nil {
-		panic(err)
-	}
-
 	_db := database.NewDatabase("root", "1111", "localhost", "3408", "foozy_test")
 	if err := _db.Connect(); err != nil {
 		panic(err)
@@ -57,19 +52,19 @@ func TestMain(m *testing.M) {
 		db := database.NewDatabase("root", "1111", "localhost", "3408", "foozy_test")
 		cc := database.NewConnectControl()
 		if err := cc.OpenUnnamedConnection(db); err != nil {
-			return func() { router.ServerError(w, err.Error(), manager) }
+			return func() { router.ServerError(w, err.Error(), manager.Config()) }
 		}
 		defer func() {
 			if err := cc.CloseAllUnnamedConnection(); err != nil {
-				router.ServerError(w, err.Error(), manager)
+				router.ServerError(w, err.Error(), manager.Config())
 			}
 		}()
 		if err := auth.CreateAuthTable(db); err != nil {
-			return func() { router.ServerError(w, err.Error(), manager) }
+			return func() { router.ServerError(w, err.Error(), manager.Config()) }
 		}
 		au := auth.NewAuth(db, w, manager)
 		if err := au.RegisterUser("test", "111111"); err != nil {
-			return func() { router.ServerError(w, err.Error(), manager) }
+			return func() { router.ServerError(w, err.Error(), manager.Config()) }
 		}
 		return func() {}
 	})
@@ -77,32 +72,32 @@ func TestMain(m *testing.M) {
 		db := database.NewDatabase("root", "1111", "localhost", "3408", "foozy_test")
 		cc := database.NewConnectControl()
 		if err := cc.OpenUnnamedConnection(db); err != nil {
-			return func() { router.ServerError(w, err.Error(), manager) }
+			return func() { router.ServerError(w, err.Error(), manager.Config()) }
 		}
 		defer func() {
 			if err := cc.CloseAllUnnamedConnection(); err != nil {
-				router.ServerError(w, err.Error(), manager)
+				router.ServerError(w, err.Error(), manager.Config())
 			}
 		}()
 		au := auth.NewAuth(db, w, manager)
 		if _, err := au.LoginUser("test", "111111"); err != nil {
-			return func() { router.ServerError(w, err.Error(), manager) }
+			return func() { router.ServerError(w, err.Error(), manager.Config()) }
 		}
 		return func() {}
 	})
 	newRouter.Get("/uid", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		k := manager.Get32BytesKey()
+		k := manager.Config().Get32BytesKey()
 		var a auth.AuthCookie
 		if err := cookies.ReadSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), r, "AUTH", &a); err != nil {
-			return func() { router.ServerError(w, err.Error(), manager) }
+			return func() { router.ServerError(w, err.Error(), manager.Config()) }
 		}
 		return func() {}
 	})
 	newRouter.Get("/upd-keys", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		k := manager.Get32BytesKey()
+		k := manager.Config().Get32BytesKey()
 		var a auth.AuthCookie
 		if err := cookies.ReadSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), r, "AUTH", &a); err != nil {
-			return func() { router.ServerError(w, err.Error(), manager) }
+			return func() { router.ServerError(w, err.Error(), manager.Config()) }
 		}
 		return func() {}
 	})

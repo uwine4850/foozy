@@ -25,7 +25,7 @@ func Auth(loginUrl string, db *database.Database) middlewares.MddlFunc {
 		if pattern == loginUrl {
 			return
 		}
-		k := manager.Get32BytesKey()
+		k := manager.Config().Get32BytesKey()
 		var auth_date time.Time
 		if err := cookies.ReadSecureNoHMACCookieData([]byte(k.StaticKey()), r, "AUTH_DATE", &auth_date); err != nil {
 			middlewares.SetMddlError(err, manager.OneTimeData())

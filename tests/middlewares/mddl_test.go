@@ -16,14 +16,10 @@ import (
 	"github.com/uwine4850/foozy/pkg/server"
 )
 
-var newTmplEngine, err = tmlengine.NewTemplateEngine()
-var mng = manager.NewManager(newTmplEngine)
+var mng = manager.NewManager(nil)
 var newRouter = router.NewRouter(mng)
 
 func TestMain(m *testing.M) {
-	if err != nil {
-		panic(err)
-	}
 	mng.Config().Debug(true)
 	newRouter.EnableLog(false)
 	newRouter.SetTemplateEngine(&tmlengine.TemplateEngine{})
@@ -35,14 +31,14 @@ func TestMain(m *testing.M) {
 	})
 	server := server.NewServer(":8050", newRouter)
 	go func() {
-		err = server.Start()
+		err := server.Start()
 		if err != nil && !errors.Is(http.ErrServerClosed, err) {
 			panic(err)
 		}
 		time.Sleep(500 * time.Millisecond)
 	}()
 	exitCode := m.Run()
-	err = server.Stop()
+	err := server.Stop()
 	if err != nil {
 		panic(err)
 	}

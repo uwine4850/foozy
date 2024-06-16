@@ -8,13 +8,13 @@ import (
 )
 
 type IManager interface {
-	IManagerRender
-	IManagerWebsocket
-	IManagerConfig
-	Render() IManagerRender
+	Render() IRender
+	SetRender(render IRender)
+	SetWS(ws IManagerWebsocket)
 	WS() IManagerWebsocket
 	OneTimeData() IManagerOneTimeData
 	SetOneTimeData(manager IManagerOneTimeData)
+	SetConfig(cnf IManagerConfig)
 	Config() IManagerConfig
 }
 
@@ -45,14 +45,6 @@ type IManagerOneTimeData interface {
 	DelUserContext(key string)
 	SetSlugParams(params map[string]string)
 	GetSlugParams(key string) (string, bool)
-}
-
-type IManagerRender interface {
-	SetContext(data map[string]interface{})
-	SetTemplateEngine(engine ITemplateEngine)
-	RenderTemplate(w http.ResponseWriter, r *http.Request) error
-	SetTemplatePath(templatePath string)
-	RenderJson(data interface{}, w http.ResponseWriter) error
 }
 
 type IManagerWebsocket interface {

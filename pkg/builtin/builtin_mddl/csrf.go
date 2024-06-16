@@ -16,7 +16,7 @@ func GenerateAndSetCsrf(w http.ResponseWriter, r *http.Request, manager interfac
 	if err != nil || csrfCookie.Value == "" {
 		csrfToken, err := utils.GenerateCsrfToken()
 		if err != nil {
-			router.ServerError(w, err.Error(), manager)
+			router.ServerError(w, err.Error(), manager.Config())
 			return
 		}
 		cookie := &http.Cookie{
@@ -28,6 +28,6 @@ func GenerateAndSetCsrf(w http.ResponseWriter, r *http.Request, manager interfac
 			Path:     "/",
 		}
 		http.SetCookie(w, cookie)
-		manager.SetContext(map[string]interface{}{"csrf_token": fmt.Sprintf("<input name=\"csrf_token\" type=\"hidden\" value=\"%s\">", csrfToken)})
+		manager.Render().SetContext(map[string]interface{}{"csrf_token": fmt.Sprintf("<input name=\"csrf_token\" type=\"hidden\" value=\"%s\">", csrfToken)})
 	}
 }

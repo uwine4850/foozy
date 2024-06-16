@@ -7,18 +7,12 @@ import (
 
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router/manager"
-	"github.com/uwine4850/foozy/pkg/router/tmlengine"
 	"github.com/uwine4850/foozy/pkg/server/globalflow"
 )
 
-var tmpl, err = tmlengine.NewTemplateEngine()
-
-var mng = manager.NewManager(tmpl)
+var mng = manager.NewManager(nil)
 
 func TestMain(m *testing.M) {
-	if err != nil {
-		panic(err)
-	}
 	mng.SetOneTimeData(manager.NewManagerData())
 	gf := globalflow.NewGlobalFlow(1)
 	gf.AddTask(func(manager interfaces.IManager) {

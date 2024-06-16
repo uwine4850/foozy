@@ -26,11 +26,11 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	newTmplEngine, err := tmlengine.NewTemplateEngine()
+	render, err := tmlengine.NewRender()
 	if err != nil {
 		panic(err)
 	}
-	newRouter := router2.NewRouter(manager.NewManager(newTmplEngine))
+	newRouter := router2.NewRouter(manager.NewManager(render))
 	newRouter.EnableLog(false)
 	newRouter.SetTemplateEngine(&tmlengine.TemplateEngine{})
 	newRouter.Get("/page", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {

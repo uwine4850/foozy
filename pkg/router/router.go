@@ -81,7 +81,7 @@ func (rt *Router) getHandleFunc(pattern string, method string, ws interfaces2.IW
 		}
 		// Run middlewares.
 		if skip, err := rt.runMddl(writer, request); err != nil {
-			ServerError(writer, err.Error(), rt.manager)
+			ServerError(writer, err.Error(), rt.manager.Config())
 			return
 		} else {
 			if skip {
@@ -89,7 +89,7 @@ func (rt *Router) getHandleFunc(pattern string, method string, ws interfaces2.IW
 			}
 		}
 		if method == "WS" {
-			rt.manager.SetWebsocket(ws)
+			rt.manager.WS().SetWebsocket(ws)
 		}
 		mustCall := fn(writer, request, rt.manager)
 		mustCall()
@@ -103,7 +103,7 @@ func (rt *Router) validateMethod(method string) bool {
 	}
 	if rt.request.Method != method {
 		rt.writer.Header().Set("Allow", method)
-		http.Error(rt.writer, fmt.Sprintf("Method %s Not Allowed", rt.request.Method), 405)
+		http.Error(rt.writer, fmt.Sprintf("Method %s Not Allowed", rt.request.Method), http.StatusMethodNotAllowed)
 		return false
 	}
 	return true
@@ -155,7 +155,7 @@ func (rt *Router) EnableLog(enable bool) {
 
 func (rt *Router) printLog(request *http.Request) {
 	if rt.enableLog {
-		log.Println(fmt.Sprintf("%s %s", request.Method, request.URL.Path))
+		log.Printf("%s %s", request.Method, request.URL.Path)
 	}
 }
 

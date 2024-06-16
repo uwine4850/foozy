@@ -124,10 +124,10 @@ func (a *Auth) addUserCookie(uid string) error {
 		Path:     "/",
 		HttpOnly: true,
 		Secure:   true,
-	}, &AuthCookie{UID: uid, KeyDate: a.manager.Get32BytesKey().Date()}); err != nil {
+	}, &AuthCookie{UID: uid, KeyDate: a.manager.Config().Get32BytesKey().Date()}); err != nil {
 		return err
 	}
-	authDate := a.manager.Get32BytesKey().Date()
+	authDate := a.manager.Config().Get32BytesKey().Date()
 	if err := cookies.CreateSecureNoHMACCookieData([]byte(k.StaticKey()), a.w, &http.Cookie{
 		Name:     "AUTH_DATE",
 		Path:     "/",

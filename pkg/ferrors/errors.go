@@ -34,3 +34,11 @@ type ErrUnsupportedTypeConvert struct {
 func (e ErrUnsupportedTypeConvert) Error() string {
 	return fmt.Sprintf("Unsupported type: %s", e.Type)
 }
+
+type ErrValueNotPointer struct {
+	ValueName string
+}
+
+func (e ErrValueNotPointer) Error() string {
+	return fmt.Sprintf("%s value is not a pointer", e.ValueName)
+}

@@ -12,6 +12,6 @@ import (
 func KeyUpdater(delaySec int) globalflow.Task {
 	return func(manager interfaces.IManager) {
 		time.Sleep(time.Duration(delaySec) * time.Second)
-		manager.Get32BytesKey().GenerateBytesKeys(32)
+		manager.Config().Get32BytesKey().GenerateBytesKeys(32)
 	}
 }

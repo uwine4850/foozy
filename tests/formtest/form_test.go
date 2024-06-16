@@ -57,11 +57,11 @@ func TestMain(m *testing.M) {
 
 	mddl := middlewares.NewMiddleware()
 	mddl.AsyncHandlerMddl(builtin_mddl.GenerateAndSetCsrf)
-	newTmplEngine, err := tmlengine.NewTemplateEngine()
+	render, err := tmlengine.NewRender()
 	if err != nil {
 		panic(err)
 	}
-	newRouter := router2.NewRouter(manager.NewManager(newTmplEngine))
+	newRouter := router2.NewRouter(manager.NewManager(render))
 	newRouter.EnableLog(false)
 	newRouter.SetTemplateEngine(&tmlengine.TemplateEngine{})
 	newRouter.SetMiddleware(mddl)
@@ -119,7 +119,7 @@ func saveFile(w http.ResponseWriter, r *http.Request, manager interfaces.IManage
 		return func() { w.Write([]byte(err.Error())) }
 	}
 	var path string
-	err = form.SaveFile(w, header, "./saved_files", &path, manager)
+	err = form.SaveFile(w, header, "./saved_files", &path, manager.Config())
 	if err != nil {
 		return func() { w.Write([]byte(err.Error())) }
 	}
