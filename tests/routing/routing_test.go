@@ -5,10 +5,11 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 	"testing"
 
 	"github.com/uwine4850/foozy/pkg/interfaces"
-	router2 "github.com/uwine4850/foozy/pkg/router"
+	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/cookies"
 	"github.com/uwine4850/foozy/pkg/router/form"
 	"github.com/uwine4850/foozy/pkg/router/manager"
@@ -30,7 +31,7 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
-	newRouter := router2.NewRouter(manager.NewManager(render))
+	newRouter := router.NewRouter(manager.NewManager(render))
 	newRouter.EnableLog(false)
 	newRouter.SetTemplateEngine(&tmlengine.TemplateEngine{})
 	newRouter.Get("/page", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -75,6 +76,16 @@ func TestMain(m *testing.M) {
 			panic(err)
 		}
 		w.Write([]byte(data.UserID))
+		return func() {}
+	})
+	newRouter.Get("/redirect-error", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+		router.RedirectError(w, r, "/catch-redirect-error", "error", manager)
+		return func() {}
+	})
+	newRouter.Get("/catch-redirect-error", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+		router.CatchRedirectError(r, manager)
+		_, ok := manager.Render().GetContext()["REDIRECT_ERROR"]
+		w.Write([]byte(strconv.FormatBool(ok)))
 		return func() {}
 	})
 	server := fserer.NewServer(":8030", newRouter)
@@ -157,5 +168,26 @@ func TestPost(t *testing.T) {
 	}
 	if string(responseBody) != "OK" {
 		t.Errorf("Error during POST method processing.")
+	}
+}
+
+func TestRedirectError(t *testing.T) {
+	get, err := http.Get("http://localhost:8030/redirect-error")
+	if err != nil {
+		t.Error(err)
+	}
+
+	body, err := io.ReadAll(get.Body)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if string(body) == "false" {
+		t.Errorf("The error from RedirectError was passed, but was written to the template engine context.")
+	}
+
+	err = get.Body.Close()
+	if err != nil {
+		t.Error(err)
 	}
 }
