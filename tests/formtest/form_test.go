@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/uwine4850/foozy/pkg/builtin/builtin_mddl"
 	"github.com/uwine4850/foozy/pkg/interfaces"
@@ -75,7 +74,6 @@ func TestMain(m *testing.M) {
 		if err != nil && !errors.Is(http.ErrServerClosed, err) {
 			panic(err)
 		}
-		time.Sleep(500 * time.Millisecond)
 	}()
 	exitCode := m.Run()
 	err = server.Stop()

@@ -6,3 +6,4 @@ mysql
 docker
 main.go
 stress_test
+.vscode

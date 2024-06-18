@@ -13,37 +13,60 @@ type Render struct {
 	templatePath   string
 }
 
-func NewRender() (*Render, error) {
-	if engine, err := NewTemplateEngine(); err != nil {
+func NewRender() (interfaces.IRender, error) {
+	render := Render{}
+	newRender, err := render.New()
+	if err != nil {
+		return nil, err
+	}
+	return newRender.(interfaces.IRender), nil
+}
+
+func (rn *Render) New() (interface{}, error) {
+	var engine interfaces.ITemplateEngine
+	if rn.TemplateEngine != nil {
+		engine = rn.TemplateEngine
+	} else {
+		engine = &TemplateEngine{}
+	}
+	if engine, err := engine.New(); err != nil {
 		return nil, err
 	} else {
-		return &Render{TemplateEngine: engine}, nil
+		return &Render{TemplateEngine: engine.(interfaces.ITemplateEngine)}, nil
 	}
 }
 
 // SetContext Setting variables for html template.
-func (m *Render) SetContext(data map[string]interface{}) {
-	m.TemplateEngine.SetContext(data)
+func (rn *Render) SetContext(data map[string]interface{}) {
+	rn.TemplateEngine.SetContext(data)
+}
+
+func (rn *Render) GetContext() map[string]interface{} {
+	return rn.TemplateEngine.GetContext()
 }
 
 // SetTemplateEngine set the template engine interface.
 // Optional method if the template engine is already installed.
-func (m *Render) SetTemplateEngine(engine interfaces.ITemplateEngine) {
-	m.TemplateEngine = engine
+func (rn *Render) SetTemplateEngine(engine interfaces.ITemplateEngine) {
+	rn.TemplateEngine = engine
+}
+
+func (rn *Render) GetTemplateEngine() interfaces.ITemplateEngine {
+	return rn.TemplateEngine
 }
 
 // RenderTemplate Rendering a template using a template engine.
-func (m *Render) RenderTemplate(w http.ResponseWriter, r *http.Request) error {
-	if m.templatePath == "" {
+func (rn *Render) RenderTemplate(w http.ResponseWriter, r *http.Request) error {
+	if rn.templatePath == "" {
 		return ErrTemplatePathNotSet{}
 	}
-	if !utils.PathExist(m.templatePath) {
-		return ErrTemplatePathNotExist{Path: m.templatePath}
+	if !utils.PathExist(rn.templatePath) {
+		return ErrTemplatePathNotExist{Path: rn.templatePath}
 	}
-	m.TemplateEngine.SetPath(m.templatePath)
-	m.TemplateEngine.SetResponseWriter(w)
-	m.TemplateEngine.SetRequest(r)
-	err := m.TemplateEngine.Exec()
+	rn.TemplateEngine.SetPath(rn.templatePath)
+	rn.TemplateEngine.SetResponseWriter(w)
+	rn.TemplateEngine.SetRequest(r)
+	err := rn.TemplateEngine.Exec()
 	if err != nil {
 		return err
 	}
@@ -51,12 +74,12 @@ func (m *Render) RenderTemplate(w http.ResponseWriter, r *http.Request) error {
 }
 
 // SetTemplatePath Setting the path to the template that the templating engine renders.
-func (m *Render) SetTemplatePath(templatePath string) {
-	m.templatePath = templatePath
+func (rn *Render) SetTemplatePath(templatePath string) {
+	rn.templatePath = templatePath
 }
 
 // RenderJson displays data in json format on the page.
-func (m *Render) RenderJson(data interface{}, w http.ResponseWriter) error {
+func (rn *Render) RenderJson(data interface{}, w http.ResponseWriter) error {
 	marshal, err := json.Marshal(data)
 	if err != nil {
 		return err
@@ -66,5 +89,27 @@ func (m *Render) RenderJson(data interface{}, w http.ResponseWriter) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+// CreateAndSetNewRenderInstance creates and sets a new Render instance into the manager.
+func CreateAndSetNewRenderInstance(manager interfaces.IManager) error {
+	render := manager.Render()
+
+	var newRender interfaces.IRender
+	err := utils.CreateNewInstance(render, &newRender)
+	if err != nil {
+		return err
+	}
+	tmplEngine := render.GetTemplateEngine()
+
+	var newTmplEngine interfaces.ITemplateEngine
+	err = utils.CreateNewInstance(tmplEngine, &newTmplEngine)
+	if err != nil {
+		return err
+	}
+
+	newRender.SetTemplateEngine(newTmplEngine)
+	manager.SetRender(newRender)
 	return nil
 }

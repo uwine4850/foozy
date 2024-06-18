@@ -7,6 +7,9 @@ import (
 	"os"
 	"reflect"
 	"strings"
+
+	"github.com/uwine4850/foozy/pkg/ferrors"
+	"github.com/uwine4850/foozy/pkg/interfaces"
 )
 
 func PathExist(path string) bool {
@@ -84,4 +87,27 @@ func Join[T any](elems []T, sep string) string {
 
 func IsPointer(a any) bool {
 	return reflect.TypeOf(a).Kind() == reflect.Pointer
+}
+
+// CreateNewInstance сreates a new instance of a structure. The structure must implement the interface interfaces.INewInstance.
+// The <new> argument takes a pointer to the structure that will contain the new instance.
+func CreateNewInstance(ins interfaces.INewInstance, new interface{}) error {
+	if !IsPointer(new) {
+		panic(ferrors.ErrParameterNotPointer{Param: "new"})
+	}
+	var typeIns reflect.Type
+	if reflect.TypeOf(ins).Kind() == reflect.Ptr {
+		typeIns = reflect.TypeOf(ins).Elem()
+	} else {
+		typeIns = reflect.TypeOf(ins)
+	}
+
+	reflectIns := reflect.New(typeIns).Interface().(interfaces.INewInstance)
+	newIns, err := reflectIns.New()
+	if err != nil {
+		return err
+	}
+	newInsInterface := reflect.ValueOf(newIns).Interface()
+	reflect.ValueOf(new).Elem().Set(reflect.ValueOf(newInsInterface))
+	return nil
 }

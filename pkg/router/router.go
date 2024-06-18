@@ -7,9 +7,10 @@ import (
 	"net/http"
 	"strings"
 
-	interfaces2 "github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router/manager"
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
+	"github.com/uwine4850/foozy/pkg/router/tmlengine"
 	"github.com/uwine4850/foozy/pkg/utils"
 )
 
@@ -17,36 +18,36 @@ type Router struct {
 	mux            http.ServeMux
 	request        *http.Request
 	writer         http.ResponseWriter
-	TemplateEngine interfaces2.ITemplateEngine
-	manager        interfaces2.IManager
+	TemplateEngine interfaces.ITemplateEngine
+	manager        interfaces.IManager
 	enableLog      bool
-	middleware     interfaces2.IMiddleware
+	middleware     interfaces.IMiddleware
 }
 
-func NewRouter(manager interfaces2.IManager) *Router {
+func NewRouter(manager interfaces.IManager) *Router {
 	return &Router{mux: *http.NewServeMux(), manager: manager}
 }
 
 // Get Processing a GET request. Called only once.
-func (rt *Router) Get(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces2.IManager) func()) {
+func (rt *Router) Get(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
 	rt.mux.Handle(utils.SplitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "GET", nil, fn))
 }
 
 // Post Processing a POST request. Called only once.
-func (rt *Router) Post(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces2.IManager) func()) {
+func (rt *Router) Post(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
 	rt.mux.Handle(utils.SplitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "POST", nil, fn))
 }
 
-func (rt *Router) Put(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces2.IManager) func()) {
+func (rt *Router) Put(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
 	rt.mux.Handle(utils.SplitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "PUT", nil, fn))
 }
 
-func (rt *Router) Delete(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces2.IManager) func()) {
+func (rt *Router) Delete(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
 	rt.mux.Handle(utils.SplitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "DELETE", nil, fn))
 }
 
 // Ws Processing a websocket connection. Used only for communication with the client's websocket.
-func (rt *Router) Ws(pattern string, ws interfaces2.IWebsocket, fn func(w http.ResponseWriter, r *http.Request, manager interfaces2.IManager) func()) {
+func (rt *Router) Ws(pattern string, ws interfaces.IWebsocket, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
 	rt.mux.Handle(utils.SplitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "WS", ws, fn))
 }
 
@@ -55,7 +56,7 @@ func (rt *Router) GetMux() *http.ServeMux {
 }
 
 // getHandleFunc This method handles each http method call.
-func (rt *Router) getHandleFunc(pattern string, method string, ws interfaces2.IWebsocket, fn func(w http.ResponseWriter, r *http.Request, manager interfaces2.IManager) func()) http.HandlerFunc {
+func (rt *Router) getHandleFunc(pattern string, method string, ws interfaces.IWebsocket, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		rt.setWR(writer, request)
 		if !rt.validateMethod(method) {
@@ -63,8 +64,14 @@ func (rt *Router) getHandleFunc(pattern string, method string, ws interfaces2.IW
 		}
 		rt.printLog(request)
 
-		rt.manager.SetOneTimeData(manager.NewManagerData())
-
+		if err := manager.CreateAndSetNewManagerData(rt.manager); err != nil {
+			ServerError(writer, err.Error(), rt.manager.Config())
+		}
+		if rt.manager.Render() != nil {
+			if err := tmlengine.CreateAndSetNewRenderInstance(rt.manager); err != nil {
+				ServerError(writer, err.Error(), rt.manager.Config())
+			}
+		}
 		rt.manager.OneTimeData().SetUserContext("URL_PATTERN", pattern)
 
 		// Check if the url matches its pattern with possible slug fields.
@@ -144,7 +151,7 @@ func (rt *Router) runMddl(w http.ResponseWriter, r *http.Request) (bool, error) 
 }
 
 // SetTemplateEngine sets the template engine interface.
-func (rt *Router) SetTemplateEngine(engine interfaces2.ITemplateEngine) {
+func (rt *Router) SetTemplateEngine(engine interfaces.ITemplateEngine) {
 	rt.TemplateEngine = engine
 }
 
@@ -160,7 +167,7 @@ func (rt *Router) printLog(request *http.Request) {
 }
 
 // SetMiddleware installs the middleware for the handlers.
-func (rt *Router) SetMiddleware(middleware interfaces2.IMiddleware) {
+func (rt *Router) SetMiddleware(middleware interfaces.IMiddleware) {
 	rt.middleware = middleware
 }
 

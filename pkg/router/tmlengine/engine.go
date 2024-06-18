@@ -19,10 +19,15 @@ type TemplateEngine struct {
 }
 
 func NewTemplateEngine() (interfaces.ITemplateEngine, error) {
-	err := RegisterMultipleGlobalFilter(BuiltinFilters)
+	newTemplate, err := (&TemplateEngine{}).New()
 	if err != nil {
 		return nil, err
 	}
+	return newTemplate.(interfaces.ITemplateEngine), nil
+}
+
+func (e *TemplateEngine) New() (interface{}, error) {
+	RegisterMultipleGlobalFilter(BuiltinFilters)
 	return &TemplateEngine{context: make(map[string]interface{})}, nil
 }
 
@@ -67,6 +72,10 @@ func (e *TemplateEngine) Exec() error {
 // SetContext sets the variables for the template.
 func (e *TemplateEngine) SetContext(data map[string]interface{}) {
 	utils.MergeMap(&e.context, data)
+}
+
+func (e *TemplateEngine) GetContext() map[string]interface{} {
+	return e.context
 }
 
 func (e *TemplateEngine) clearContext() {

@@ -2,9 +2,10 @@ package tmlengine
 
 import (
 	"fmt"
-	"github.com/flosch/pongo2"
 	"html"
 	"strings"
+
+	"github.com/flosch/pongo2"
 )
 
 type Filter struct {
@@ -39,21 +40,13 @@ var BuiltinFilters = []Filter{
 }
 
 // RegisterGlobalFilter globally registers the pongo2 filter.
-func RegisterGlobalFilter(name string, fn pongo2.FilterFunction) error {
-	err := pongo2.RegisterFilter(name, fn)
-	if err != nil {
-		return err
-	}
-	return nil
+func RegisterGlobalFilter(name string, fn pongo2.FilterFunction) {
+	pongo2.RegisterFilter(name, fn)
 }
 
 // RegisterMultipleGlobalFilter globally registers multiple pongo2 filters.
-func RegisterMultipleGlobalFilter(filters []Filter) error {
+func RegisterMultipleGlobalFilter(filters []Filter) {
 	for i := 0; i < len(filters); i++ {
-		err := RegisterGlobalFilter(filters[i].Name, filters[i].Fn)
-		if err != nil {
-			return err
-		}
+		RegisterGlobalFilter(filters[i].Name, filters[i].Fn)
 	}
-	return nil
 }

@@ -40,6 +40,7 @@ type IManagerConfig interface {
 }
 
 type IManagerOneTimeData interface {
+	INewInstance
 	SetUserContext(key string, value interface{})
 	GetUserContext(key string) (any, bool)
 	DelUserContext(key string)
