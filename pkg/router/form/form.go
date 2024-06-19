@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/utils"
 )
@@ -79,11 +80,11 @@ func (f *Form) Files(key string) ([]*multipart.FileHeader, bool) {
 // ValidateCsrfToken checks the validity of the csrf token. If no errors are detected, the token is valid.
 // It is desirable to use this method only after Parse() method.
 func (f *Form) ValidateCsrfToken() error {
-	csrfToken := f.Value("csrf_token")
+	csrfToken := f.Value(namelib.CSRF_TOKEN_COOKIE)
 	if csrfToken == "" {
 		return ErrCsrfTokenNotFound{}
 	}
-	cookie, err := f.request.Cookie("csrf_token")
+	cookie, err := f.request.Cookie(namelib.CSRF_TOKEN_COOKIE)
 	if err != nil {
 		return err
 	}
@@ -176,6 +177,9 @@ func SendMultipartForm(url string, values map[string]string, files map[string][]
 			}
 			defer file.Close()
 			fileWriter, err := writer.CreateFormFile(name, value[i])
+			if err != nil {
+				return nil, err
+			}
 			if _, err := io.Copy(fileWriter, file); err != nil {
 				return nil, err
 			}

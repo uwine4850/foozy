@@ -1,15 +1,15 @@
 package form
 
 import (
-	"errors"
 	"fmt"
-	"github.com/uwine4850/foozy/pkg/ferrors"
-	"github.com/uwine4850/foozy/pkg/utils"
 	"mime/multipart"
 	netUrl "net/url"
 	"path/filepath"
 	"reflect"
 	"strings"
+
+	"github.com/uwine4850/foozy/pkg/ferrors"
+	"github.com/uwine4850/foozy/pkg/utils"
 )
 
 // FillableFormStruct structure is intended for more convenient access to the structure to be filled in.
@@ -124,10 +124,10 @@ func FillStructFromForm(frm *Form, fillableStruct *FillableFormStruct, nilIfNotE
 // checkFieldType checks if the type of field to be filled is correct.
 func checkFieldType(field reflect.StructField) error {
 	if field.Type.Kind() != reflect.Slice {
-		return errors.New(fmt.Sprintf("the %s field should be slice", field.Name))
+		return fmt.Errorf("the %s field should be slice", field.Name)
 	}
 	if field.Type.Elem() != reflect.TypeOf("") && field.Type.Elem() != reflect.TypeOf(FormFile{}) {
-		return errors.New(fmt.Sprintf("the %s field can only be of two types: []string or []FormFile.", field.Name))
+		return fmt.Errorf("the %s field can only be of two types: []string or []FormFile", field.Name)
 	}
 	return nil
 }
@@ -233,7 +233,7 @@ func FieldsNotEmpty(fillableStruct *FillableFormStruct, fieldsName []string) err
 		if ok {
 			val := fillValue.FieldByName(fieldsName[i])
 			if val.IsNil() {
-				return errors.New(fmt.Sprintf("field %s is empty", fieldsName[i]))
+				return fmt.Errorf("field %s is empty", fieldsName[i])
 			}
 		}
 	}

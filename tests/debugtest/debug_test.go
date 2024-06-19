@@ -21,7 +21,6 @@ var mngr = manager.NewManager(nil)
 func TestMain(m *testing.M) {
 	mngr.Config().ErrorLoggingFile("test.log")
 	newRouter := router.NewRouter(mngr)
-	newRouter.EnableLog(false)
 	newRouter.SetTemplateEngine(&tmlengine.TemplateEngine{})
 	newRouter.Get("/server-err", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		return func() { router.ServerError(w, "error", manager.Config()) }

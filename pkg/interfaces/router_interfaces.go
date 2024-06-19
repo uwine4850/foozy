@@ -31,6 +31,8 @@ type IKey interface {
 type IManagerConfig interface {
 	Debug(enable bool)
 	IsDebug() bool
+	PrintLog(enable bool)
+	IsPrintLog() bool
 	ErrorLogging(enable bool)
 	IsErrorLogging() bool
 	ErrorLoggingFile(path string)

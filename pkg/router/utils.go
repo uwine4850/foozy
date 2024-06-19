@@ -8,12 +8,13 @@ import (
 
 	"github.com/uwine4850/foozy/pkg/debug"
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/namelib"
 )
 
 // RedirectError redirect to the page and provide error information for it.
 func RedirectError(w http.ResponseWriter, r *http.Request, path string, _err string, manager interfaces.IManager) {
 	uval := url.Values{}
-	uval.Add("REDIRECT_ERROR", _err)
+	uval.Add(namelib.REDIRECT_ERROR, _err)
 	newUrl := fmt.Sprintf("%s?%s", path, uval.Encode())
 	http.Redirect(w, r, newUrl, http.StatusFound)
 	debug.ErrorLogginIfEnable(_err, manager.Config())
@@ -23,9 +24,9 @@ func RedirectError(w http.ResponseWriter, r *http.Request, path string, _err str
 // In the template you can get an error using the error variable.
 func CatchRedirectError(r *http.Request, manager interfaces.IManager) {
 	q := r.URL.Query()
-	redirectError := q.Get("REDIRECT_ERROR")
+	redirectError := q.Get(namelib.REDIRECT_ERROR)
 	if redirectError != "" {
-		manager.Render().SetContext(map[string]interface{}{"REDIRECT_ERROR": redirectError})
+		manager.Render().SetContext(map[string]interface{}{namelib.REDIRECT_ERROR: redirectError})
 	}
 }
 

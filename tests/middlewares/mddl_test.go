@@ -21,7 +21,6 @@ var newRouter = router.NewRouter(mng)
 
 func TestMain(m *testing.M) {
 	mng.Config().Debug(true)
-	newRouter.EnableLog(false)
 	newRouter.SetTemplateEngine(&tmlengine.TemplateEngine{})
 	newRouter.Get("/mddl", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		return func() { w.Write([]byte("OK")) }

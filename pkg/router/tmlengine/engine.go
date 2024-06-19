@@ -7,6 +7,7 @@ import (
 
 	"github.com/flosch/pongo2"
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/utils"
 )
 
@@ -92,7 +93,7 @@ func (e *TemplateEngine) SetRequest(r *http.Request) {
 
 // setCsrfVariable sets the csrf token as a variable for the templating context.
 func (e *TemplateEngine) setCsrfVariable(r *http.Request) error {
-	token, err := r.Cookie("csrf_token")
+	token, err := r.Cookie(namelib.CSRF_TOKEN_COOKIE)
 	data := make(map[string]interface{})
 	if err != nil && !errors.Is(err, http.ErrNoCookie) {
 		return err
@@ -101,7 +102,7 @@ func (e *TemplateEngine) setCsrfVariable(r *http.Request) error {
 		e.SetContext(data)
 		return nil
 	}
-	data["csrf_token"] = fmt.Sprintf("<input name=\"csrf_token\" type=\"hidden\" value=\"%s\">", token.Value)
+	data[namelib.CSRF_TOKEN_COOKIE] = fmt.Sprintf("<input name=\"%s\" type=\"hidden\" value=\"%s\">", namelib.CSRF_TOKEN_COOKIE, token.Value)
 	e.SetContext(data)
 	return nil
 }

@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router/manager"
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
 	"github.com/uwine4850/foozy/pkg/router/tmlengine"
@@ -20,7 +21,6 @@ type Router struct {
 	writer         http.ResponseWriter
 	TemplateEngine interfaces.ITemplateEngine
 	manager        interfaces.IManager
-	enableLog      bool
 	middleware     interfaces.IMiddleware
 }
 
@@ -72,7 +72,7 @@ func (rt *Router) getHandleFunc(pattern string, method string, ws interfaces.IWe
 				ServerError(writer, err.Error(), rt.manager.Config())
 			}
 		}
-		rt.manager.OneTimeData().SetUserContext("URL_PATTERN", pattern)
+		rt.manager.OneTimeData().SetUserContext(namelib.URL_PATTERN, pattern)
 
 		// Check if the url matches its pattern with possible slug fields.
 		parseUrl := ParseSlugIndex(utils.SplitUrl(pattern))
@@ -138,12 +138,10 @@ func (rt *Router) runMddl(w http.ResponseWriter, r *http.Request) (bool, error) 
 			return false, err
 		}
 		if mddlErr != nil {
-			rt.manager.OneTimeData().DelUserContext("mddlerr")
 			return false, errors.New(mddlErr.Error())
 		}
 		// Checking the skip of the next page. Runs after a more important error check.
 		if middlewares.IsSkipNextPage(rt.manager.OneTimeData()) {
-			rt.manager.OneTimeData().DelUserContext("skipNextPage")
 			return true, nil
 		}
 	}
@@ -155,13 +153,8 @@ func (rt *Router) SetTemplateEngine(engine interfaces.ITemplateEngine) {
 	rt.TemplateEngine = engine
 }
 
-// EnableLog enable or disable request log output.
-func (rt *Router) EnableLog(enable bool) {
-	rt.enableLog = enable
-}
-
 func (rt *Router) printLog(request *http.Request) {
-	if rt.enableLog {
+	if rt.manager.Config().IsPrintLog() {
 		log.Printf("%s %s", request.Method, request.URL.Path)
 	}
 }

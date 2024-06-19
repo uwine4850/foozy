@@ -2,6 +2,7 @@ package authtest
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -13,6 +14,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/builtin/builtin_mddl"
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/cookies"
 	"github.com/uwine4850/foozy/pkg/router/manager"
@@ -30,7 +32,7 @@ func TestMain(m *testing.M) {
 	if err := _db.Connect(); err != nil {
 		panic(err)
 	}
-	_, err := _db.SyncQ().Query("DELETE FROM auth")
+	_, err := _db.SyncQ().Query(fmt.Sprintf("DELETE FROM %s", namelib.AUTH_TABLE))
 	if err != nil {
 		panic(err)
 	}
@@ -46,7 +48,6 @@ func TestMain(m *testing.M) {
 	mddl := middlewares.NewMiddleware()
 	mddl.HandlerMddl(0, builtin_mddl.Auth("/login", mddlDb))
 
-	newRouter.EnableLog(false)
 	newRouter.SetTemplateEngine(&tmlengine.TemplateEngine{})
 	newRouter.Get("/register", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		db := database.NewDatabase("root", "1111", "localhost", "3408", "foozy_test")
@@ -88,7 +89,7 @@ func TestMain(m *testing.M) {
 	newRouter.Get("/uid", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		k := manager.Config().Get32BytesKey()
 		var a auth.AuthCookie
-		if err := cookies.ReadSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), r, "AUTH", &a); err != nil {
+		if err := cookies.ReadSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), r, namelib.AUTH_COOKIE, &a); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager.Config()) }
 		}
 		return func() {}
@@ -96,7 +97,7 @@ func TestMain(m *testing.M) {
 	newRouter.Get("/upd-keys", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		k := manager.Config().Get32BytesKey()
 		var a auth.AuthCookie
-		if err := cookies.ReadSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), r, "AUTH", &a); err != nil {
+		if err := cookies.ReadSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), r, namelib.AUTH_COOKIE, &a); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager.Config()) }
 		}
 		return func() {}

@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/cookies"
 	"github.com/uwine4850/foozy/pkg/router/form"
@@ -32,7 +33,6 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 	newRouter := router.NewRouter(manager.NewManager(render))
-	newRouter.EnableLog(false)
 	newRouter.SetTemplateEngine(&tmlengine.TemplateEngine{})
 	newRouter.Get("/page", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		return func() { w.Write([]byte("OK")) }
@@ -84,7 +84,7 @@ func TestMain(m *testing.M) {
 	})
 	newRouter.Get("/catch-redirect-error", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		router.CatchRedirectError(r, manager)
-		_, ok := manager.Render().GetContext()["REDIRECT_ERROR"]
+		_, ok := manager.Render().GetContext()[namelib.REDIRECT_ERROR]
 		w.Write([]byte(strconv.FormatBool(ok)))
 		return func() {}
 	})

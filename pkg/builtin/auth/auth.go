@@ -8,6 +8,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router/cookies"
 	"github.com/uwine4850/foozy/pkg/utils"
 	"golang.org/x/crypto/bcrypt"
@@ -44,7 +45,7 @@ func NewAuth(database *database.Database, w http.ResponseWriter, manager interfa
 	if !utils.IsPointer(manager) {
 		panic("The manager must be passed by pointer.")
 	}
-	return &Auth{database, "auth", w, manager}
+	return &Auth{database, namelib.AUTH_TABLE, w, manager}
 }
 
 // RegisterUser registers the user in the database.
@@ -108,7 +109,7 @@ func (a *Auth) LoginUser(username string, password string) (*User, error) {
 // with which they were encoded. Next, the function itself will take new keys from ManagerConf.
 func (a *Auth) UpdateAuthCookie(hashKey []byte, blockKey []byte, r *http.Request) error {
 	var authCookie AuthCookie
-	if err := cookies.ReadSecureCookieData(hashKey, blockKey, r, "AUTH", &authCookie); err != nil {
+	if err := cookies.ReadSecureCookieData(hashKey, blockKey, r, namelib.AUTH_COOKIE, &authCookie); err != nil {
 		return err
 	}
 	if err := a.addUserCookie(authCookie.UID); err != nil {
@@ -120,7 +121,7 @@ func (a *Auth) UpdateAuthCookie(hashKey []byte, blockKey []byte, r *http.Request
 func (a *Auth) addUserCookie(uid string) error {
 	k := a.manager.Config().Get32BytesKey()
 	if err := cookies.CreateSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), a.w, &http.Cookie{
-		Name:     "AUTH",
+		Name:     namelib.AUTH_COOKIE,
 		Path:     "/",
 		HttpOnly: true,
 		Secure:   true,
@@ -129,7 +130,7 @@ func (a *Auth) addUserCookie(uid string) error {
 	}
 	authDate := a.manager.Config().Get32BytesKey().Date()
 	if err := cookies.CreateSecureNoHMACCookieData([]byte(k.StaticKey()), a.w, &http.Cookie{
-		Name:     "AUTH_DATE",
+		Name:     namelib.AUTH_DATE_COOKIE,
 		Path:     "/",
 		HttpOnly: true,
 		Secure:   true,
@@ -180,10 +181,10 @@ func (a *Auth) UserExist(username string) (map[string]interface{}, error) {
 
 // CreateAuthTable creates a user authentication table.
 func CreateAuthTable(database *database.Database) error {
-	sql := fmt.Sprintf("CREATE TABLE IF NOT EXISTS `%s`.`auth` "+
+	sql := fmt.Sprintf("CREATE TABLE IF NOT EXISTS `%s`.`%s` "+
 		"(`id` INT NOT NULL AUTO_INCREMENT , "+
 		"`username` VARCHAR(200) NOT NULL , "+
-		"`password` TEXT NOT NULL , PRIMARY KEY (`id`))", database.DatabaseName())
+		"`password` TEXT NOT NULL , PRIMARY KEY (`id`))", database.DatabaseName(), namelib.AUTH_TABLE)
 	_, err := database.SyncQ().Query(sql)
 	if err != nil {
 		return err

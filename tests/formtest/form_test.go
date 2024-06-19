@@ -61,7 +61,6 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 	newRouter := router2.NewRouter(manager.NewManager(render))
-	newRouter.EnableLog(false)
 	newRouter.SetTemplateEngine(&tmlengine.TemplateEngine{})
 	newRouter.SetMiddleware(mddl)
 	newRouter.Post("/application-form", applicationForm)

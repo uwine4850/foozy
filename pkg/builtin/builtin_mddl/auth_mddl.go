@@ -1,12 +1,14 @@
 package builtin_mddl
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/uwine4850/foozy/pkg/builtin/auth"
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router/cookies"
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
 )
@@ -17,7 +19,7 @@ import (
 // if two or more key iterations have passed, because the old keys are no longer known.
 func Auth(loginUrl string, db *database.Database) middlewares.MddlFunc {
 	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
-		pattern, ok := manager.OneTimeData().GetUserContext("URL_PATTERN")
+		pattern, ok := manager.OneTimeData().GetUserContext(namelib.URL_PATTERN)
 		if !ok {
 			middlewares.SetMddlError(ErrUrlPatternNotExist{}, manager.OneTimeData())
 			return
@@ -27,7 +29,7 @@ func Auth(loginUrl string, db *database.Database) middlewares.MddlFunc {
 		}
 		k := manager.Config().Get32BytesKey()
 		var auth_date time.Time
-		if err := cookies.ReadSecureNoHMACCookieData([]byte(k.StaticKey()), r, "AUTH_DATE", &auth_date); err != nil {
+		if err := cookies.ReadSecureNoHMACCookieData([]byte(k.StaticKey()), r, namelib.AUTH_DATE_COOKIE, &auth_date); err != nil {
 			middlewares.SetMddlError(err, manager.OneTimeData())
 			return
 		}
@@ -59,5 +61,5 @@ type ErrUrlPatternNotExist struct {
 }
 
 func (e ErrUrlPatternNotExist) Error() string {
-	return "Data behind the URL_PATTERN key was not found."
+	return fmt.Sprintf("Data behind the %s key was not found.", namelib.URL_PATTERN)
 }

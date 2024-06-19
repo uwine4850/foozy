@@ -71,6 +71,7 @@ func (k *Key) generateKeys(length int) []byte {
 
 type ManagerConf struct {
 	debug            bool
+	printLog         bool
 	errorLogging     bool
 	errorLoggingPath string
 	key              Key
@@ -86,6 +87,14 @@ func (m *ManagerConf) Debug(enable bool) {
 
 func (m *ManagerConf) IsDebug() bool {
 	return m.debug
+}
+
+func (m *ManagerConf) PrintLog(enable bool) {
+	m.printLog = enable
+}
+
+func (m *ManagerConf) IsPrintLog() bool {
+	return m.printLog
 }
 
 func (m *ManagerConf) ErrorLogging(enable bool) {
