@@ -12,7 +12,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/manager"
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
 	"github.com/uwine4850/foozy/pkg/router/tmlengine"
-	"github.com/uwine4850/foozy/pkg/utils"
+	"github.com/uwine4850/foozy/pkg/utils/fstring"
 )
 
 type Router struct {
@@ -30,25 +30,25 @@ func NewRouter(manager interfaces.IManager) *Router {
 
 // Get Processing a GET request. Called only once.
 func (rt *Router) Get(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
-	rt.mux.Handle(utils.SplitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "GET", nil, fn))
+	rt.mux.Handle(splitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "GET", nil, fn))
 }
 
 // Post Processing a POST request. Called only once.
 func (rt *Router) Post(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
-	rt.mux.Handle(utils.SplitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "POST", nil, fn))
+	rt.mux.Handle(splitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "POST", nil, fn))
 }
 
 func (rt *Router) Put(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
-	rt.mux.Handle(utils.SplitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "PUT", nil, fn))
+	rt.mux.Handle(splitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "PUT", nil, fn))
 }
 
 func (rt *Router) Delete(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
-	rt.mux.Handle(utils.SplitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "DELETE", nil, fn))
+	rt.mux.Handle(splitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "DELETE", nil, fn))
 }
 
 // Ws Processing a websocket connection. Used only for communication with the client's websocket.
 func (rt *Router) Ws(pattern string, ws interfaces.IWebsocket, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
-	rt.mux.Handle(utils.SplitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "WS", ws, fn))
+	rt.mux.Handle(splitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "WS", ws, fn))
 }
 
 func (rt *Router) GetMux() *http.ServeMux {
@@ -75,9 +75,9 @@ func (rt *Router) getHandleFunc(pattern string, method string, ws interfaces.IWe
 		rt.manager.OneTimeData().SetUserContext(namelib.URL_PATTERN, pattern)
 
 		// Check if the url matches its pattern with possible slug fields.
-		parseUrl := ParseSlugIndex(utils.SplitUrl(pattern))
+		parseUrl := ParseSlugIndex(fstring.SplitUrl(pattern))
 		if request.URL.Path != "/" && len(parseUrl) > 0 {
-			res, params := HandleSlugUrls(parseUrl, utils.SplitUrl(pattern), utils.SplitUrl(request.URL.Path))
+			res, params := HandleSlugUrls(parseUrl, fstring.SplitUrl(pattern), fstring.SplitUrl(request.URL.Path))
 			if res != request.URL.Path {
 				http.NotFound(writer, request)
 				return
@@ -208,4 +208,13 @@ func HandleSlugUrls(parseUrl map[int]bool, slugUrl []string, url []string) (stri
 	}
 	res := "/" + strings.Join(slugUrl, "/")
 	return res, params
+}
+
+// SplitUrlFromFirstSlug returns the left side of the url before the "<" sign.
+func splitUrlFromFirstSlug(url string) string {
+	index := strings.Index(url, "<")
+	if index == -1 {
+		return url
+	}
+	return url[:index]
 }

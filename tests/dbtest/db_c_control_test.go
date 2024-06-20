@@ -8,9 +8,13 @@ import (
 	"github.com/uwine4850/foozy/pkg/database"
 )
 
-var dbcc1 = database.NewDatabase("root", "1111", "localhost", "3408", "foozy_test")
-var dbcc2 = database.NewDatabase("root", "1111", "localhost", "3408", "foozy_test")
-var dbcc3 = database.NewDatabase("root", "1111", "localhost", "3408", "foozy_test")
+var dbArgs = database.DbArgs{
+	Username: "root", Password: "1111", Host: "localhost", Port: "3408", DatabaseName: "foozy_test",
+}
+
+var dbcc1 = database.NewDatabase(dbArgs)
+var dbcc2 = database.NewDatabase(dbArgs)
+var dbcc3 = database.NewDatabase(dbArgs)
 
 func TestOpenCloseAllConnections(t *testing.T) {
 	cc := database.ControlConnect{}

@@ -1,9 +1,8 @@
 package manager
 
 import (
-	"github.com/uwine4850/foozy/pkg/ferrors"
 	"github.com/uwine4850/foozy/pkg/interfaces"
-	"github.com/uwine4850/foozy/pkg/utils"
+	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
 type Manager struct {
@@ -18,15 +17,15 @@ func (m *Manager) Render() interfaces.IRender {
 }
 
 func (m *Manager) SetRender(render interfaces.IRender) {
-	if !utils.IsPointer(render) {
-		panic(ferrors.ErrValueNotPointer{ValueName: "render"})
+	if !typeopr.IsPointer(render) {
+		panic(typeopr.ErrValueNotPointer{Value: "render"})
 	}
 	m.render = render
 }
 
 func (m *Manager) SetWS(ws interfaces.IManagerWebsocket) {
-	if !utils.IsPointer(ws) {
-		panic(ferrors.ErrValueNotPointer{ValueName: "ws"})
+	if !typeopr.IsPointer(ws) {
+		panic(typeopr.ErrValueNotPointer{Value: "ws"})
 	}
 	m.managerWebsocket = ws
 }
@@ -40,8 +39,8 @@ func (m *Manager) OneTimeData() interfaces.IManagerOneTimeData {
 }
 
 func (m *Manager) SetConfig(cnf interfaces.IManagerConfig) {
-	if !utils.IsPointer(cnf) {
-		panic(ferrors.ErrValueNotPointer{ValueName: "cnf"})
+	if !typeopr.IsPointer(cnf) {
+		panic(typeopr.ErrValueNotPointer{Value: "cnf"})
 	}
 	m.managerConf = cnf
 }
@@ -51,8 +50,8 @@ func (m *Manager) Config() interfaces.IManagerConfig {
 }
 
 func (m *Manager) SetOneTimeData(manager interfaces.IManagerOneTimeData) {
-	if !utils.IsPointer(manager) {
-		panic(ferrors.ErrValueNotPointer{ValueName: "manager"})
+	if !typeopr.IsPointer(manager) {
+		panic(typeopr.ErrValueNotPointer{Value: "manager"})
 	}
 	m.managerData = manager
 }

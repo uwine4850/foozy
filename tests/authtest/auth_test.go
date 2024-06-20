@@ -24,11 +24,15 @@ import (
 	"github.com/uwine4850/foozy/pkg/server/globalflow"
 )
 
+var dbArgs = database.DbArgs{
+	Username: "root", Password: "1111", Host: "localhost", Port: "3408", DatabaseName: "foozy_test",
+}
+
 var mng = manager.NewManager(nil)
 var newRouter = router.NewRouter(mng)
 
 func TestMain(m *testing.M) {
-	_db := database.NewDatabase("root", "1111", "localhost", "3408", "foozy_test")
+	_db := database.NewDatabase(dbArgs)
 	if err := _db.Connect(); err != nil {
 		panic(err)
 	}
@@ -40,7 +44,7 @@ func TestMain(m *testing.M) {
 	mng.Config().Generate32BytesKeys()
 	mng.Config().Debug(true)
 
-	mddlDb := database.NewDatabase("root", "1111", "localhost", "3408", "foozy_test")
+	mddlDb := database.NewDatabase(dbArgs)
 	if err := mddlDb.Connect(); err != nil {
 		panic(err)
 	}
@@ -50,7 +54,7 @@ func TestMain(m *testing.M) {
 
 	newRouter.SetTemplateEngine(&tmlengine.TemplateEngine{})
 	newRouter.Get("/register", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		db := database.NewDatabase("root", "1111", "localhost", "3408", "foozy_test")
+		db := database.NewDatabase(dbArgs)
 		cc := database.NewConnectControl()
 		if err := cc.OpenUnnamedConnection(db); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager.Config()) }
@@ -70,7 +74,7 @@ func TestMain(m *testing.M) {
 		return func() {}
 	})
 	newRouter.Get("/login", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		db := database.NewDatabase("root", "1111", "localhost", "3408", "foozy_test")
+		db := database.NewDatabase(dbArgs)
 		cc := database.NewConnectControl()
 		if err := cc.OpenUnnamedConnection(db); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager.Config()) }

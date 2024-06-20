@@ -3,9 +3,18 @@ package database
 import (
 	"database/sql"
 	"fmt"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 )
+
+type DbArgs struct {
+	Username     string
+	Password     string
+	Host         string
+	Port         string
+	DatabaseName string
+}
 
 type ErrConnectionNotOpen struct {
 }
@@ -28,8 +37,8 @@ type Database struct {
 	asyncQ   interfaces.IAsyncQueries
 }
 
-func NewDatabase(username string, password string, host string, port string, database string) *Database {
-	d := Database{username: username, password: password, host: host, port: port, database: database}
+func NewDatabase(args DbArgs) *Database {
+	d := Database{username: args.Username, password: args.Password, host: args.Host, port: args.Port, database: args.DatabaseName}
 	d.SetSyncQueries(NewSyncQueries(&QueryBuild{}))
 	d.SetAsyncQueries(NewAsyncQueries(&QueryBuild{}))
 	return &d

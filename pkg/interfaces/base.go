@@ -1,5 +1,5 @@
 package interfaces
 
-type INewInstance interface {
-	New() (interface{}, error)
-}
+// type INewInstance interface {
+// 	New() (interface{}, error)
+// }

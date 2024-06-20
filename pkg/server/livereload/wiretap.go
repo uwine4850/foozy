@@ -2,12 +2,13 @@ package livereload
 
 import (
 	"errors"
-	"github.com/uwine4850/foozy/pkg/utils"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"sync"
 	"time"
+
+	"github.com/uwine4850/foozy/pkg/utils/fslice"
 )
 
 type WiretapFiles struct {
@@ -106,7 +107,7 @@ func (f *WiretapFiles) Start() error {
 				for j := 0; j < len(slices[i]); j++ {
 					filePath := slices[i][j]
 					// Skip iteration if file is deleted.
-					if utils.SliceContains(f.excludeDeletedFiles, filePath) {
+					if fslice.SliceContains(f.excludeDeletedFiles, filePath) {
 						continue
 					}
 					err := f.watchFile(filePath, &filesModTime)
@@ -169,7 +170,7 @@ func (f *WiretapFiles) readDirs() error {
 				}
 				f.files = append(f.files, abs)
 			} else {
-				if utils.SliceContains(f.excludeDirs, path) {
+				if fslice.SliceContains(f.excludeDirs, path) {
 					return filepath.SkipDir
 				}
 			}

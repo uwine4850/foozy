@@ -16,7 +16,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router"
-	"github.com/uwine4850/foozy/pkg/utils"
+	"github.com/uwine4850/foozy/pkg/utils/fstring"
 )
 
 type Form struct {
@@ -97,7 +97,7 @@ func (f *Form) ValidateCsrfToken() error {
 // randomiseTheFileName If the file name already exists, randomises it and returns the new file path.
 func randomiseTheFileName(pathToDir string, fileName string) string {
 	outputFilepath := filepath.Join(pathToDir, fileName)
-	if utils.PathExist(outputFilepath) {
+	if fstring.PathExist(outputFilepath) {
 		hash := sha256.Sum256([]byte(fileName))
 		hashData := hex.EncodeToString(hash[:])
 		ext := filepath.Ext(fileName)

@@ -5,7 +5,8 @@ import (
 	"net/http"
 
 	"github.com/uwine4850/foozy/pkg/interfaces"
-	"github.com/uwine4850/foozy/pkg/utils"
+	"github.com/uwine4850/foozy/pkg/typeopr"
+	"github.com/uwine4850/foozy/pkg/utils/fstring"
 )
 
 type Render struct {
@@ -60,7 +61,7 @@ func (rn *Render) RenderTemplate(w http.ResponseWriter, r *http.Request) error {
 	if rn.templatePath == "" {
 		return ErrTemplatePathNotSet{}
 	}
-	if !utils.PathExist(rn.templatePath) {
+	if !fstring.PathExist(rn.templatePath) {
 		return ErrTemplatePathNotExist{Path: rn.templatePath}
 	}
 	rn.TemplateEngine.SetPath(rn.templatePath)
@@ -97,14 +98,14 @@ func CreateAndSetNewRenderInstance(manager interfaces.IManager) error {
 	render := manager.Render()
 
 	var newRender interfaces.IRender
-	err := utils.CreateNewInstance(render, &newRender)
+	err := typeopr.CreateNewInstance(render, &newRender)
 	if err != nil {
 		return err
 	}
 	tmplEngine := render.GetTemplateEngine()
 
 	var newTmplEngine interfaces.ITemplateEngine
-	err = utils.CreateNewInstance(tmplEngine, &newTmplEngine)
+	err = typeopr.CreateNewInstance(tmplEngine, &newTmplEngine)
 	if err != nil {
 		return err
 	}

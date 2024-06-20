@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
-	"github.com/uwine4850/foozy/pkg/utils"
+	"github.com/uwine4850/foozy/pkg/utils/fslice"
 )
 
 func TestParseString(t *testing.T) {
@@ -83,10 +83,10 @@ func TestParseEquals(t *testing.T) {
 
 func TestParseParams(t *testing.T) {
 	params, args := dbutils.ParseParams(map[string]interface{}{"p1": 1, "p2": 2})
-	if !utils.SliceContains(params, "p1") || !utils.SliceContains(params, "p2") {
+	if !fslice.SliceContains(params, "p1") || !fslice.SliceContains(params, "p2") {
 		t.Errorf("The keys are not as expected.")
 	}
-	if !utils.SliceContains(args, 1) || !utils.SliceContains(args, 2) {
+	if !fslice.SliceContains(args, 1) || !fslice.SliceContains(args, 2) {
 		t.Errorf("Arguments don't match the expectation.")
 	}
 }

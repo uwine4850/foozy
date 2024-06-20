@@ -10,7 +10,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 )
 
-var db = database.NewDatabase("root", "1111", "localhost", "3408", "foozy_test")
+var db = database.NewDatabase(dbArgs)
 
 func createDbTest() {
 	_, err := db.SyncQ().Query("INSERT INTO `dbtest` (`col1`, `col2`, `col3`) VALUES (?, ?, ?)",

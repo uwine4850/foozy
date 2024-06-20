@@ -8,8 +8,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/uwine4850/foozy/pkg/ferrors"
-	"github.com/uwine4850/foozy/pkg/utils"
+	"github.com/uwine4850/foozy/pkg/typeopr"
+	"github.com/uwine4850/foozy/pkg/utils/fslice"
 )
 
 // FillableFormStruct structure is intended for more convenient access to the structure to be filled in.
@@ -70,11 +70,11 @@ type FormFile struct {
 // The nilIfNotExist parameter sets the name of form fields that should be nil if they are not found (e.g. useful for checkboxes).
 func FillStructFromForm(frm *Form, fillableStruct *FillableFormStruct, nilIfNotExist []string) error {
 	fill := fillableStruct.GetStruct()
-	if reflect.TypeOf(fill).Kind() != reflect.Ptr {
-		return ferrors.ErrParameterNotPointer{Param: "fill"}
+	if !typeopr.IsPointer(fill) {
+		return typeopr.ErrValueNotPointer{Value: "fill"}
 	}
-	if reflect.TypeOf(fill).Elem().Kind() != reflect.Struct {
-		return ferrors.ErrParameterNotStruct{Param: "fill"}
+	if !typeopr.PtrIsStruct(fill) {
+		return typeopr.ErrParameterNotStruct{Param: "fill"}
 	}
 	orderedForm := FrmValueToOrderedForm(frm)
 	t := reflect.TypeOf(fill).Elem()
@@ -95,7 +95,7 @@ func FillStructFromForm(frm *Form, fillableStruct *FillableFormStruct, nilIfNotE
 		formValue := orderedFormValue.Value
 		if !ok {
 			// Skips loop iteration if the field is not found, but it must be as nil.
-			if nilIfNotExist != nil && utils.SliceContains(nilIfNotExist, tag) {
+			if nilIfNotExist != nil && fslice.SliceContains(nilIfNotExist, tag) {
 				continue
 			} else {
 				return ErrFormConvertFieldNotFound{tag}
@@ -105,7 +105,7 @@ func FillStructFromForm(frm *Form, fillableStruct *FillableFormStruct, nilIfNotE
 		if reflect.DeepEqual(field.Type, reflect.TypeOf([]FormFile{})) && reflect.TypeOf(formValue) == reflect.TypeOf([]FormFile{}) {
 			formType, _ := formValue.([]FormFile)
 			if !ok {
-				return ferrors.ErrConvertType{Type1: reflect.TypeOf(formValue).String(), Type2: "[]FormFile"}
+				return typeopr.ErrConvertType{Type1: reflect.TypeOf(formValue).String(), Type2: "[]FormFile"}
 			}
 			value.Set(reflect.ValueOf(formType))
 		}
@@ -113,7 +113,7 @@ func FillStructFromForm(frm *Form, fillableStruct *FillableFormStruct, nilIfNotE
 		if field.Type.Kind() == reflect.Slice && field.Type.Elem().Kind() == reflect.String {
 			formType, ok := formValue.([]string)
 			if !ok {
-				return ferrors.ErrConvertType{Type1: reflect.TypeOf(formValue).String(), Type2: "string"}
+				return typeopr.ErrConvertType{Type1: reflect.TypeOf(formValue).String(), Type2: "string"}
 			}
 			value.Set(reflect.ValueOf(formType))
 		}
@@ -243,17 +243,17 @@ func FieldsNotEmpty(fillableStruct *FillableFormStruct, fieldsName []string) err
 // FieldsName returns a list of field names of the filled structure.
 func FieldsName(fillForm *FillableFormStruct, exclude []string) ([]string, error) {
 	_form := fillForm.GetStruct()
-	if reflect.TypeOf(_form).Kind() != reflect.Ptr {
-		return nil, ferrors.ErrParameterNotPointer{Param: "fillForm"}
+	if !typeopr.IsPointer(_form) {
+		return nil, typeopr.ErrValueNotPointer{Value: "fillForm"}
 	}
-	if reflect.TypeOf(_form).Elem().Kind() != reflect.Struct {
-		return nil, ferrors.ErrParameterNotStruct{Param: "fillForm"}
+	if !typeopr.PtrIsStruct(_form) {
+		return nil, typeopr.ErrParameterNotStruct{Param: "fillForm"}
 	}
 	t := reflect.TypeOf(_form).Elem()
 	var names []string
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
-		if exclude != nil && utils.SliceContains(exclude, field.Name) {
+		if exclude != nil && fslice.SliceContains(exclude, field.Name) {
 			continue
 		}
 		names = append(names, field.Name)
@@ -275,11 +275,11 @@ func (e ErrExtensionNotMatch) Error() string {
 // For example, ext:".jpg, .jpeg, .png".
 func CheckExtension(fillForm *FillableFormStruct) error {
 	_form := fillForm.GetStruct()
-	if reflect.TypeOf(_form).Kind() != reflect.Ptr {
-		return ferrors.ErrParameterNotPointer{Param: "fill"}
+	if !typeopr.IsPointer(_form) {
+		return typeopr.ErrValueNotPointer{Value: "fill"}
 	}
-	if reflect.TypeOf(_form).Elem().Kind() != reflect.Struct {
-		return ferrors.ErrParameterNotStruct{Param: "fill"}
+	if !typeopr.PtrIsStruct(_form) {
+		return typeopr.ErrParameterNotStruct{Param: "fill"}
 	}
 	t := reflect.TypeOf(_form).Elem()
 	v := reflect.ValueOf(_form).Elem()
@@ -306,7 +306,7 @@ func CheckExtension(fillForm *FillableFormStruct) error {
 
 func checkFileExtension(file *FormFile, extension []string) bool {
 	ext := filepath.Ext(file.Header.Filename)
-	if utils.SliceContains(extension, ext) {
+	if fslice.SliceContains(extension, ext) {
 		return true
 	}
 	return false

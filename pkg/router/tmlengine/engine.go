@@ -8,7 +8,7 @@ import (
 	"github.com/flosch/pongo2"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
-	"github.com/uwine4850/foozy/pkg/utils"
+	"github.com/uwine4850/foozy/pkg/utils/fmap"
 )
 
 type TemplateEngine struct {
@@ -72,7 +72,7 @@ func (e *TemplateEngine) Exec() error {
 
 // SetContext sets the variables for the template.
 func (e *TemplateEngine) SetContext(data map[string]interface{}) {
-	utils.MergeMap(&e.context, data)
+	fmap.MergeMap(&e.context, data)
 }
 
 func (e *TemplateEngine) GetContext() map[string]interface{} {

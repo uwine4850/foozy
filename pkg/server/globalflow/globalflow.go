@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/uwine4850/foozy/pkg/interfaces"
-	"github.com/uwine4850/foozy/pkg/utils"
+	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
 type Task func(manager interfaces.IManager)
@@ -47,7 +47,7 @@ func (gf *GlobalFlow) AddNotWaitTask(task Task) {
 
 // Run starts the execution of two types of tasks in two separate goroutines.
 func (gf *GlobalFlow) Run(manager interfaces.IManager) {
-	if !utils.IsPointer(manager) {
+	if !typeopr.IsPointer(manager) {
 		panic("The manager must be passed by pointer.")
 	}
 	var wg sync.WaitGroup

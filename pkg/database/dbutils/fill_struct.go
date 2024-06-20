@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/uwine4850/foozy/pkg/ferrors"
 	"reflect"
+
+	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
 func anyToBytes(value interface{}) ([]byte, error) {
@@ -25,7 +26,7 @@ func anyToBytes(value interface{}) ([]byte, error) {
 	case reflect.String:
 		buf.WriteString(val.String())
 	default:
-		return nil, ferrors.ErrUnsupportedTypeConvert{Type: val.Kind().String()}
+		return nil, fmt.Errorf("unsupported convert type %s", val.Kind().String())
 	}
 	return buf.Bytes(), nil
 }
@@ -34,11 +35,11 @@ func anyToBytes(value interface{}) ([]byte, error) {
 // Each variable of the structure to be filled must have a "db" tag which is responsible for the name of the column in
 // the database, e.g. `db: "name"`.
 func FillStructFromDb(dbRes map[string]interface{}, fill interface{}) error {
-	if reflect.TypeOf(fill).Kind() != reflect.Ptr {
-		return ferrors.ErrParameterNotPointer{Param: "fill"}
+	if !typeopr.IsPointer(fill) {
+		return typeopr.ErrValueNotPointer{Value: "fill"}
 	}
-	if reflect.TypeOf(fill).Elem().Kind() != reflect.Struct {
-		return ferrors.ErrParameterNotStruct{Param: "fill"}
+	if !typeopr.PtrIsStruct(fill) {
+		return typeopr.ErrParameterNotStruct{Param: "fill"}
 	}
 
 	t := reflect.TypeOf(fill).Elem()
@@ -62,7 +63,7 @@ func FillStructFromDb(dbRes map[string]interface{}, fill interface{}) error {
 			if reflect.TypeOf(dbResField).Kind() == reflect.Slice {
 				res, ok = dbResField.([]uint8)
 				if !ok {
-					return ferrors.ErrConvertType{Type1: reflect.TypeOf(dbResField).String(), Type2: "[]uint8"}
+					return typeopr.ErrConvertType{Type1: reflect.TypeOf(dbResField).String(), Type2: "[]uint8"}
 				}
 			} else {
 				toBytes, err := anyToBytes(dbResField)

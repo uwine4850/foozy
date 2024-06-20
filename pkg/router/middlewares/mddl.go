@@ -7,7 +7,7 @@ import (
 
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
-	"github.com/uwine4850/foozy/pkg/utils"
+	"github.com/uwine4850/foozy/pkg/utils/fslice"
 )
 
 type MddlFunc func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
@@ -28,7 +28,7 @@ func NewMiddleware() *Middleware {
 // HandlerMddl the middleware that will be executed before the request handler.
 // id indicates the order of execution of the current middleware. No two identical id's can be created.
 func (m *Middleware) HandlerMddl(id int, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) {
-	if !utils.SliceContains(m.preHandlerId, id) {
+	if !fslice.SliceContains(m.preHandlerId, id) {
 		m.preHandlerId = append(m.preHandlerId, id)
 		m.preHandlerMiddlewares[id] = fn
 	} else {

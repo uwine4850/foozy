@@ -7,7 +7,7 @@ import (
 
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	"github.com/uwine4850/foozy/pkg/interfaces"
-	"github.com/uwine4850/foozy/pkg/utils"
+	"github.com/uwine4850/foozy/pkg/utils/fslice"
 )
 
 var operators = []string{"!=", "=", "<", ">", "<=", ">=", "IN"}
@@ -179,7 +179,7 @@ func (qb *QueryBuild) Where(args ...any) interfaces.IUserQueryBuild {
 			values = append(values, args[i])
 			continue
 		}
-		if reflect.TypeOf(args[i]).Kind() == reflect.String && utils.SliceContains(operators, reflect.ValueOf(args[i]).String()) {
+		if reflect.TypeOf(args[i]).Kind() == reflect.String && fslice.SliceContains(operators, reflect.ValueOf(args[i]).String()) {
 			isNextValue = true
 			if reflect.ValueOf(args[i]).String() == "IN" {
 				isNextIN = true

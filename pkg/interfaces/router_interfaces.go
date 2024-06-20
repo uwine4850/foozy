@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/uwine4850/foozy/pkg/interfaces/intrnew"
 )
 
 type IManager interface {
@@ -42,7 +43,7 @@ type IManagerConfig interface {
 }
 
 type IManagerOneTimeData interface {
-	INewInstance
+	intrnew.INewInstance
 	SetUserContext(key string, value interface{})
 	GetUserContext(key string) (any, bool)
 	DelUserContext(key string)

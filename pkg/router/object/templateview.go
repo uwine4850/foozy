@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/uwine4850/foozy/pkg/interfaces"
-	"github.com/uwine4850/foozy/pkg/utils"
+	"github.com/uwine4850/foozy/pkg/utils/fmap"
 )
 
 type TemplateView struct {
@@ -21,7 +21,7 @@ func (v *TemplateView) Call(w http.ResponseWriter, r *http.Request, manager inte
 		return func() { v.View.OnError(w, r, manager, err) }
 	}
 	_context := v.View.Context(w, r, manager)
-	utils.MergeMap(&objectContext, _context)
+	fmap.MergeMap(&objectContext, _context)
 	permissions, f := v.View.Permissions(w, r, manager)
 	if !permissions {
 		return func() { f() }

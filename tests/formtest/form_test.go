@@ -15,7 +15,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
 	"github.com/uwine4850/foozy/pkg/router/tmlengine"
 	fserer "github.com/uwine4850/foozy/pkg/server"
-	"github.com/uwine4850/foozy/pkg/utils"
+	"github.com/uwine4850/foozy/pkg/utils/fstring"
 )
 
 type Fill struct {
@@ -120,7 +120,7 @@ func saveFile(w http.ResponseWriter, r *http.Request, manager interfaces.IManage
 	if err != nil {
 		return func() { w.Write([]byte(err.Error())) }
 	}
-	if !utils.PathExist(path) {
+	if !fstring.PathExist(path) {
 		return func() { w.Write([]byte("File not found.")) }
 	}
 	return func() {}

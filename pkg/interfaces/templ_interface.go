@@ -1,9 +1,13 @@
 package interfaces
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/uwine4850/foozy/pkg/interfaces/intrnew"
+)
 
 type ITemplateEngine interface {
-	INewInstance
+	intrnew.INewInstance
 	SetPath(files string)
 	Exec() error
 	SetContext(data map[string]interface{})
@@ -13,7 +17,7 @@ type ITemplateEngine interface {
 }
 
 type IRender interface {
-	INewInstance
+	intrnew.INewInstance
 	SetContext(data map[string]interface{})
 	GetContext() map[string]interface{}
 	SetTemplateEngine(engine ITemplateEngine)

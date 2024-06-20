@@ -3,12 +3,12 @@ package utilstest
 import (
 	"testing"
 
-	"github.com/uwine4850/foozy/pkg/interfaces"
-	"github.com/uwine4850/foozy/pkg/utils"
+	"github.com/uwine4850/foozy/pkg/interfaces/intrnew"
+	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
 type ITStruct interface {
-	interfaces.INewInstance
+	intrnew.INewInstance
 	Method()
 }
 
@@ -23,7 +23,7 @@ func (t *TStruct) Method() {}
 func TestCreateNewInstance(t *testing.T) {
 	ff := &TStruct{}
 	var newStruct ITStruct
-	if err := utils.CreateNewInstance(ff, &newStruct); err != nil {
+	if err := typeopr.CreateNewInstance(ff, &newStruct); err != nil {
 		t.Error(err)
 	}
 }

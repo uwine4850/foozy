@@ -13,7 +13,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/manager"
 	"github.com/uwine4850/foozy/pkg/router/tmlengine"
 	"github.com/uwine4850/foozy/pkg/server"
-	"github.com/uwine4850/foozy/pkg/utils"
+	"github.com/uwine4850/foozy/pkg/utils/fstring"
 )
 
 var mngr = manager.NewManager(nil)
@@ -111,7 +111,7 @@ func TestLogging(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if utils.PathExist("test.log") {
+	if fstring.PathExist("test.log") {
 		os.Remove("test.log")
 	} else {
 		t.Errorf("Log file not found.")

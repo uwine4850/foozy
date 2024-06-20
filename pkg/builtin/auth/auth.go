@@ -10,7 +10,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router/cookies"
-	"github.com/uwine4850/foozy/pkg/utils"
+	"github.com/uwine4850/foozy/pkg/typeopr"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -42,7 +42,7 @@ type Auth struct {
 }
 
 func NewAuth(database *database.Database, w http.ResponseWriter, manager interfaces.IManager) *Auth {
-	if !utils.IsPointer(manager) {
+	if !typeopr.IsPointer(manager) {
 		panic("The manager must be passed by pointer.")
 	}
 	return &Auth{database, namelib.AUTH_TABLE, w, manager}

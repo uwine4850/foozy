@@ -4,7 +4,7 @@ import (
 	"sync"
 
 	"github.com/uwine4850/foozy/pkg/interfaces"
-	"github.com/uwine4850/foozy/pkg/utils"
+	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
 type OneTimeData struct {
@@ -53,7 +53,7 @@ func CreateAndSetNewManagerData(manager interfaces.IManager) error {
 	md := manager.OneTimeData()
 
 	var newMD interfaces.IManagerOneTimeData
-	err := utils.CreateNewInstance(md, &newMD)
+	err := typeopr.CreateNewInstance(md, &newMD)
 	if err != nil {
 		return err
 	}
