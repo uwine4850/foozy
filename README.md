@@ -5,18 +5,25 @@ Also, modules depend on interfaces whenever possible, so most of them are open t
 Example project - https://github.com/uwine4850/foozy_proj
 
 Modules that the framework contains: <br>
-* [builtin](https://github.com/uwine4850/foozy/blob/master/docs/en/builtin.md) - built-in ready-made functionality, for example, authentication. It is not necessary to use.
-* [database](https://github.com/uwine4850/foozy/blob/master/docs/en/database.md) - interface for working with the mysql database.
-* [interfaces](https://github.com/uwine4850/foozy/blob/master/docs/en/interfaces.md) - all golang interfaces used in the project.
-* [livereload](https://github.com/uwine4850/foozy/blob/master/docs/en/livereload.md) - a module that can be used to restart the project after updating the files.
-* [middlewares](https://github.com/uwine4850/foozy/blob/master/docs/en/middlewares.md) - module for creating middleware.
-* [router](https://github.com/uwine4850/foozy/blob/master/docs/en/router.md) is the most important module, with the help of its functionality, project routing and much more are implemented.
-* [object](https://github.com/uwine4850/foozy/blob/master/docs/en/object.md) — a package for easier display of templates.
-* [mic](https://github.com/uwine4850/foozy/blob/master/docs/en/mic.md) — a package for easier display of templates.
-* [form](https://github.com/uwine4850/foozy/blob/master/docs/en/form.md) - work with HTML forms.
-* [server](https://github.com/uwine4850/foozy/blob/master/docs/en/server.md) - an add-on over http. Server for easier use and work with the router module.
-* [tmlengine](https://github.com/uwine4850/foozy/blob/master/docs/en/tmlengine.md) - project templating engine. The pongo2 library is used.
-* [utils](https://github.com/uwine4850/foozy/blob/master/docs/en/utils.md) - general auxiliary functionality, for example, CSRF token generation.
+* [builtin](https://github.com/uwine4850/foozy/blob/master/docs/en/builtin/builtin.md) — built-in ready-made functionality, for example, authentication. It is not necessary to use.
+* [database](https://github.com/uwine4850/foozy/blob/master/docs/en/database/database.md) — an interface for working with the mysql database.
+  * [dbutils](https://github.com/uwine4850/foozy/blob/master/docs/en/database/dbutils/dbutils.md) — auxiliary functionality for using the database package.
+  * [sync_queres](https://github.com/uwine4850/foozy/blob/master/docs/en/database/sync_queries.md) — synchronous requests to the database.
+  * [async_queres](https://github.com/uwine4850/foozy/blob/master/docs/en/database/async_queries.md) — asynchronous requests to the database.
+* [interfaces](https://github.com/uwine4850/foozy/blob/master/docs/en/interfaces/interfaces.md) — all golang interfaces used in the project.
+* [router](https://github.com/uwine4850/foozy/blob/master/docs/en/router/router.md) — is the most important module, with the help of its functionality project routing and much more is implemented.
+  * [manager](https://github.com/uwine4850/foozy/blob/master/docs/en/router/manager/manager.md) — a package for managing processors.
+  * [websocket](https://github.com/uwine4850/foozy/blob/master/docs/en/router/websocket.md) — a package for interaction with websockets.
+  * [form](https://github.com/uwine4850/foozy/blob/master/docs/en/router/form/form.md) — working with HTML forms.
+	* [fill_struct](https://github.com/uwine4850/foozy/blob/master/docs/en/router/form/form.md) — various manipulations with form data.
+  * [middlewares](https://github.com/uwine4850/foozy/blob/master/docs/en/router/middlewares/middlewares.md) — a module for creating middleware.
+  * [object](https://github.com/uwine4850/foozy/blob/master/docs/en/router/object/object.md) — a package for simpler display of templates.
+  * [mic](https://github.com/uwine4850/foozy/blob/master/docs/router/mic/en/router/mic/mic.md) — package is responsible for the functionality of microservices.
+  * [tmlengine](https://github.com/uwine4850/foozy/blob/master/docs/router/tmlengine/en/tmlengine.md) — project templater. The pongo2 library is used.
+* [server](https://github.com/uwine4850/foozy/blob/master/docs/en/server/server.md) — add-on to http.Server for easier use and work with the router module.
+  * [livereload](https://github.com/uwine4850/foozy/blob/master/docs/en/server/livereload/livereload.md) — a module that can be used to restart the project after updating the files.
+* [utils](https://github.com/uwine4850/foozy/blob/master/docs/en/utils/utils.md) — general auxiliary functionality, for example, CSRF token generation.
+
 ## Getting started
 
 ### Installation
@@ -29,44 +36,43 @@ First you need to use a router ``router.Router``, for example:
 ```
 newRouter := router.NewRouter()
 ```
-The ``NewRouter(manager interfaces2.IManager) *Router`` method needs a manager to work, so the code will look like this:
+The ``NewRouter(manager interfaces.IManager) *Router`` method needs a manager to work, so the code will look like this:
 ```
 newManager := router.NewManager()
 newRouter := router.NewRouter(newManager)
 ```
-The manager, in turn, needs the templating engine ``NewManager(engine interfaces2.ITemplateEngine) *Manager`` to work.
+In turn, the manager needs a render structure to work ``NewManager(render interfaces.IRender) *Manager`` to work.
 You need to add it:
 ```
-newTmplEngine, err := tmlengine.NewTemplateEngine()
+render, err := tmlengine.NewRender()
 if err != nil {
     panic(err)
 }
-newManager := router.NewManager(newTmplEngine)
+newManager := router.NewManager(render)
 newRouter := router.NewRouter(newManager)
 ```
 Next, you need to set the routes for the work. For example, to go to page __/home__ you need to make the following handler:
 ```
-newRouter.Get("/home", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
-    manager.SetTemplatePath("templates/home.html")
-    err := manager.RenderTemplate(w, r)
-    if err != nil {
-        panic(err)
+newRouter.Get("/home", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+    manager.Render().SetTemplatePath("templates/home.html")
+	if err := manager.Render().RenderTemplate(w, r); err != nil {
+	    panic(err)
     }
+    return func() {}
 })
 ```
 This code runs the handler at the address __/home __. When the user clicks on it, he will receive an HTML template by address
-__ templates/home.html __, this template is set using "manager.SetTemplatePath (" templates/home.html ")," then
-it is displayed using "manager.RenderTemplate (w, r)." <br>
+__ templates/home.html __, this template is set using ``manager.Render().SetTemplatePath("templates/home.html")``, then it is displayed using "manager.RenderTemplate (w, r)." <br>
 It is important to note that it is not necessary to use a template (you can also change it), you can use
 arranged method "w. Write ()" or others. For example, it is possible to display data on the page in JSON format, for example:
 ```
-newRouter.Get("/home", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
+newRouter.Get("/home", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
     values := map[string]string{"key1": "val1"}
-    err = manager.RenderJson(values, w)
-    if err != nil {
-        panic(err)
-    }
-}
+	if err := manager.Render().RenderJson(values, w); err != nil {
+		panic(err)
+	}
+	return func() {}
+})
 ```
 Every website requires CSS and JavaScript in addition to HTML. You can add it with the following code:
 ```
@@ -81,10 +87,10 @@ This code assumes that all files will be located in the static directory. In HTM
 It is important to note that the path must always start with the character ``/``.<br>
 So, now that you have the basic handler, you need to start the server as follows.
 ```
-_server := server.NewServer(":8000", newRouter)
-err = _server.Start()
-if err != nil {
-    panic(err)
+serv := server.NewServer(":8000", newRouter)
+err = serv.Start()
+if err != nil && !errors.Is(http.ErrServerClosed, err) {
+	panic(err)
 }
 ```
 This code means that the server will be running on the local host and will be on port 8000. To display pages
@@ -94,33 +100,35 @@ The full code of the mini-project is given below.
 package main
 
 import (
-    "github.com/uwine4850/foozy/pkg/interfaces"
-    "github.com/uwine4850/foozy/pkg/router"
-    "github.com/uwine4850/foozy/pkg/server"
-    "github.com/uwine4850/foozy/pkg/tmlengine"
-    "net/http"
+	"errors"
+	"net/http"
+
+	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/router"
+	"github.com/uwine4850/foozy/pkg/router/manager"
+	"github.com/uwine4850/foozy/pkg/router/tmlengine"
+	"github.com/uwine4850/foozy/pkg/server"
 )
 
 func main() {
-    newTmplEngine, err := tmlengine.NewTemplateEngine()
-    if err != nil {
-        panic(err)
-    }
-    newManager := router.NewManager(newTmplEngine)
-    newRouter := router.NewRouter(newManager)
-    newRouter.Get("/home", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
-        manager.SetTemplatePath("templates/home.html")
-        err := manager.RenderTemplate(w, r)
-        if err != nil {
+	render, err := tmlengine.NewRender()
+	if err != nil {
+		panic(err)
+	}
+	newManager := manager.NewManager(render)
+	newRouter := router.NewRouter(newManager)
+    newRouter.Get("/home", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) 
+    func() {
+        manager.Render().SetTemplatePath("templates/home.html")
+        if err := manager.Render().RenderTemplate(w, r); err != nil {
             panic(err)
         }
+        return func() {}
     })
-    newRouter.GetMux().Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-    
-    _server := server.NewServer(":8000", newRouter)
-    err = _server.Start()
-    if err != nil {
-        panic(err)
-    }
+	serv := server.NewServer(":8000", newRouter)
+	err = serv.Start()
+	if err != nil && !errors.Is(http.ErrServerClosed, err) {
+		panic(err)
+	}
 }
 ```

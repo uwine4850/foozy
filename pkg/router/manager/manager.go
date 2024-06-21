@@ -23,6 +23,10 @@ func (m *Manager) SetRender(render interfaces.IRender) {
 	m.render = render
 }
 
+func (m *Manager) WS() interfaces.IManagerWebsocket {
+	return m.managerWebsocket
+}
+
 func (m *Manager) SetWS(ws interfaces.IManagerWebsocket) {
 	if !typeopr.IsPointer(ws) {
 		panic(typeopr.ErrValueNotPointer{Value: "ws"})
@@ -30,8 +34,11 @@ func (m *Manager) SetWS(ws interfaces.IManagerWebsocket) {
 	m.managerWebsocket = ws
 }
 
-func (m *Manager) WS() interfaces.IManagerWebsocket {
-	return m.managerWebsocket
+func (m *Manager) SetOneTimeData(manager interfaces.IManagerOneTimeData) {
+	if !typeopr.IsPointer(manager) {
+		panic(typeopr.ErrValueNotPointer{Value: "manager"})
+	}
+	m.managerData = manager
 }
 
 func (m *Manager) OneTimeData() interfaces.IManagerOneTimeData {
@@ -47,13 +54,6 @@ func (m *Manager) SetConfig(cnf interfaces.IManagerConfig) {
 
 func (m *Manager) Config() interfaces.IManagerConfig {
 	return m.managerConf
-}
-
-func (m *Manager) SetOneTimeData(manager interfaces.IManagerOneTimeData) {
-	if !typeopr.IsPointer(manager) {
-		panic(typeopr.ErrValueNotPointer{Value: "manager"})
-	}
-	m.managerData = manager
 }
 
 func NewManager(render interfaces.IRender) *Manager {

@@ -1,0 +1,59 @@
+## Database package
+This package is required for convenient use of the database. This package does not depend on others and they do not depend on it, therefore 
+it is possible to use this if necessary.<br>
+The database consists of several important interfaces:
+* IDatabase - connection and disconnection from the database. You can also use this interface to access 
+request interfaces.
+* ISyncQueries - an interface for sending synchronous requests to the database.
+* IAsyncQueries - an interface for sending asynchronous requests to the database.
+
+You can see more about interaction with the database in these [tests](https://github.com/uwine4850/foozy/tree/master/tests/dbtest).
+
+## IDatabase
+__Connect__
+```
+Connect() error
+```
+Database connection. Initializes the ISyncQueries and IAsyncQueries interfaces.<br>
+__IMPORTANT:__ After you finish working with the database, you need to disconnect from it using the ``Close`` method.
+
+```
+Ping() error
+```
+Checking the connection to the database.
+
+__Close__
+```
+Close() error
+```
+Disconnecting from the database.
+
+__SetSyncQueries__
+```
+SetSyncQueries(q interfaces.ISyncQueries)
+```
+Establishes the synchronous query interface for accessing them from IDatabase.
+
+__SetAsyncQueries__
+```
+SetAsyncQueries(q interfaces.IAsyncQueries)
+```
+Establishes an asynchronous query interface for accessing them from IDatabase.
+
+__SyncQ__
+```
+SyncQ() interfaces.ISyncQueries
+```
+Access to synchronous requests.
+
+__AsyncQ__
+```
+AsyncQ() interfaces.IAsyncQueries
+```
+Access to asynchronous requests.
+
+__DatabaseName__
+```
+DatabaseName() string
+```
+Returns the name of the database.
