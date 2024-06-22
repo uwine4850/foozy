@@ -14,7 +14,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/manager"
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
 	"github.com/uwine4850/foozy/pkg/router/tmlengine"
-	fserer "github.com/uwine4850/foozy/pkg/server"
+	"github.com/uwine4850/foozy/pkg/server"
 	"github.com/uwine4850/foozy/pkg/utils/fstring"
 )
 
@@ -67,15 +67,18 @@ func TestMain(m *testing.M) {
 	newRouter.Post("/multipart-form", multipartForm)
 	newRouter.Post("/save-file", saveFile)
 	newRouter.Post("/fill", fill)
-	server := fserer.NewServer(":8020", newRouter)
+	serv := server.NewServer(":8020", newRouter)
 	go func() {
-		err = server.Start()
+		err = serv.Start()
 		if err != nil && !errors.Is(http.ErrServerClosed, err) {
 			panic(err)
 		}
 	}()
+	if err := server.WaitStartServer(":8020", 5); err != nil {
+		panic(err)
+	}
 	exitCode := m.Run()
-	err = server.Stop()
+	err = serv.Stop()
 	if err != nil {
 		panic(err)
 	}

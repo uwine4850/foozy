@@ -15,7 +15,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/form"
 	"github.com/uwine4850/foozy/pkg/router/manager"
 	"github.com/uwine4850/foozy/pkg/router/tmlengine"
-	fserer "github.com/uwine4850/foozy/pkg/server"
+	"github.com/uwine4850/foozy/pkg/server"
 )
 
 type SessionData struct {
@@ -88,15 +88,18 @@ func TestMain(m *testing.M) {
 		w.Write([]byte(strconv.FormatBool(ok)))
 		return func() {}
 	})
-	server := fserer.NewServer(":8030", newRouter)
+	serv := server.NewServer(":8030", newRouter)
 	go func() {
-		err = server.Start()
+		err = serv.Start()
 		if err != nil && !errors.Is(http.ErrServerClosed, err) {
 			panic(err)
 		}
 	}()
+	if err := server.WaitStartServer(":8030", 5); err != nil {
+		panic(err)
+	}
 	exitCode := m.Run()
-	err = server.Stop()
+	err = serv.Stop()
 	if err != nil {
 		panic(err)
 	}

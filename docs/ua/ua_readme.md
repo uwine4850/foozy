@@ -13,11 +13,11 @@ __foozy__ — це легкий та гнучкий веб-фреймворк. �
   * [manager](https://github.com/uwine4850/foozy/blob/master/docs/ua/router/manager/manager.md) — пакет для управління обробниками.
   * [websocket](https://github.com/uwine4850/foozy/blob/master/docs/ua/router/websocket.md) — пакет для взаємодії з вебсокетами.
   * [form](https://github.com/uwine4850/foozy/blob/master/docs/ua/router/form/form.md) — робота з HTML формами.
-	* [fill_struct](https://github.com/uwine4850/foozy/blob/master/docs/ua/router/form/form.md) — різноманітні маніпуляції з даними форми.
+	* [fill_struct](https://github.com/uwine4850/foozy/blob/master/docs/ua/router/form/fill_struct.md) — різноманітні маніпуляції з даними форми.
   * [middlewares](https://github.com/uwine4850/foozy/blob/master/docs/ua/router/middlewares/middlewares.md) — модуль для створення проміжного ПО.
   * [object](https://github.com/uwine4850/foozy/blob/master/docs/ua/router/object/object.md) — пакет для більш простого відображення шаблонів.
-  * [mic](https://github.com/uwine4850/foozy/blob/master/docs/router/mic/ua/router/mic/mic.md) - пакет відповідає за функціональність мікросервісів.
-  * [tmlengine](https://github.com/uwine4850/foozy/blob/master/docs/router/tmlengine/ua/tmlengine.md) — шаблонізатор проекту. Використовується бібліотека pongo2.
+  * [mic](https://github.com/uwine4850/foozy/blob/master/docs/ua/router/mic/mic.md) - пакет відповідає за функціональність мікросервісів.
+  * [tmlengine](https://github.com/uwine4850/foozy/blob/master/docs/ua/router/tmlengine/tmlengine.md) — шаблонізатор проекту. Використовується бібліотека pongo2.
 * [server](https://github.com/uwine4850/foozy/blob/master/docs/ua/server/server.md) — надбудова над http.Server для простішого використання та роботи з модулем router.
   * [livereload](https://github.com/uwine4850/foozy/blob/master/docs/ua/server/livereload/livereload.md) — модуль, який можна використати для перезавантаження проекта після оновлення файлів.
 * [utils](https://github.com/uwine4850/foozy/blob/master/docs/ua/utils/utils.md) — загальний допоміжний функціонал, наприклад, генерація CSRF токена.

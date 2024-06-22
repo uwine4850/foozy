@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router"
@@ -31,16 +30,18 @@ func TestMain(m *testing.M) {
 	newRouter.Get("/server-logging", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		return func() { router.ServerError(w, "Logging test", manager.Config()) }
 	})
-	server := server.NewServer(":8040", newRouter)
+	serv := server.NewServer(":8040", newRouter)
 	go func() {
-		err := server.Start()
+		err := serv.Start()
 		if err != nil && !errors.Is(http.ErrServerClosed, err) {
 			panic(err)
 		}
-		time.Sleep(500 * time.Millisecond)
 	}()
+	if err := server.WaitStartServer(":8040", 5); err != nil {
+		panic(err)
+	}
 	exitCode := m.Run()
-	err := server.Stop()
+	err := serv.Stop()
 	if err != nil {
 		panic(err)
 	}

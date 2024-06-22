@@ -15,11 +15,11 @@ Modules that the framework contains: <br>
   * [manager](https://github.com/uwine4850/foozy/blob/master/docs/en/router/manager/manager.md) — a package for managing processors.
   * [websocket](https://github.com/uwine4850/foozy/blob/master/docs/en/router/websocket.md) — a package for interaction with websockets.
   * [form](https://github.com/uwine4850/foozy/blob/master/docs/en/router/form/form.md) — working with HTML forms.
-	* [fill_struct](https://github.com/uwine4850/foozy/blob/master/docs/en/router/form/form.md) — various manipulations with form data.
+	* [fill_struct](https://github.com/uwine4850/foozy/blob/master/docs/en/router/form/fill_struct.md) — various manipulations with form data.
   * [middlewares](https://github.com/uwine4850/foozy/blob/master/docs/en/router/middlewares/middlewares.md) — a module for creating middleware.
   * [object](https://github.com/uwine4850/foozy/blob/master/docs/en/router/object/object.md) — a package for simpler display of templates.
-  * [mic](https://github.com/uwine4850/foozy/blob/master/docs/router/mic/en/router/mic/mic.md) — package is responsible for the functionality of microservices.
-  * [tmlengine](https://github.com/uwine4850/foozy/blob/master/docs/router/tmlengine/en/tmlengine.md) — project templater. The pongo2 library is used.
+  * [mic](https://github.com/uwine4850/foozy/blob/master/docs/en/router/mic.md) — package is responsible for the functionality of microservices.
+  * [tmlengine](https://github.com/uwine4850/foozy/blob/master/docs/en/router/tmlengine/tmlengine.md) — project templater. The pongo2 library is used.
 * [server](https://github.com/uwine4850/foozy/blob/master/docs/en/server/server.md) — add-on to http.Server for easier use and work with the router module.
   * [livereload](https://github.com/uwine4850/foozy/blob/master/docs/en/server/livereload/livereload.md) — a module that can be used to restart the project after updating the files.
 * [utils](https://github.com/uwine4850/foozy/blob/master/docs/en/utils/utils.md) — general auxiliary functionality, for example, CSRF token generation.

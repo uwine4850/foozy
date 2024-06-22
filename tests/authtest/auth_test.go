@@ -106,15 +106,18 @@ func TestMain(m *testing.M) {
 		}
 		return func() {}
 	})
-	server := server.NewServer(":8060", newRouter)
+	serv := server.NewServer(":8060", newRouter)
 	go func() {
-		err = server.Start()
+		err = serv.Start()
 		if err != nil && !errors.Is(http.ErrServerClosed, err) {
 			panic(err)
 		}
 	}()
+	if err := server.WaitStartServer(":8060", 5); err != nil {
+		panic(err)
+	}
 	exitCode := m.Run()
-	err = server.Stop()
+	err = serv.Stop()
 	if err != nil {
 		panic(err)
 	}

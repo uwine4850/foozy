@@ -28,16 +28,18 @@ func TestMain(m *testing.M) {
 	newRouter.Get("/redirect", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		return func() { w.Write([]byte("is redirect page")) }
 	})
-	server := server.NewServer(":8050", newRouter)
+	serv := server.NewServer(":8050", newRouter)
 	go func() {
-		err := server.Start()
+		err := serv.Start()
 		if err != nil && !errors.Is(http.ErrServerClosed, err) {
 			panic(err)
 		}
-		time.Sleep(500 * time.Millisecond)
 	}()
+	if err := server.WaitStartServer(":8050", 5); err != nil {
+		panic(err)
+	}
 	exitCode := m.Run()
-	err := server.Stop()
+	err := serv.Stop()
 	if err != nil {
 		panic(err)
 	}

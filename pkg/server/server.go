@@ -2,12 +2,14 @@ package server
 
 import (
 	"fmt"
-	"github.com/uwine4850/foozy/pkg/router"
-	"google.golang.org/grpc"
 	"log"
 	"net"
 	"net/http"
 	"sync"
+	"time"
+
+	"github.com/uwine4850/foozy/pkg/router"
+	"google.golang.org/grpc"
 )
 
 type Server struct {
@@ -88,4 +90,33 @@ func FoozyAndMic(fserver *Server, micServer *MicServer, onError func(err error))
 		}
 	}()
 	wg.Wait()
+}
+
+type ErrResponseTimedOut struct {
+	Address string
+}
+
+func (e ErrResponseTimedOut) Error() string {
+	return fmt.Sprintf("the response timed out, address: %s", e.Address)
+}
+
+// WaitStartServer waits for the server to start at the selected address for the specified amount of time.
+// If the connection did not appear during this time, it returns an error.
+// IMPORTANT: Either the server or this function must be run in a goroutine, otherwise it may not work.
+func WaitStartServer(addr string, waitTimeSec int) error {
+	var outErr error
+	for i := 0; i < waitTimeSec; i++ {
+		time.Sleep(1 * time.Second)
+		conn, err := net.DialTimeout("tcp", addr, 1*time.Second)
+		if conn != nil {
+			conn.Close()
+		}
+		if err != nil {
+			outErr = ErrResponseTimedOut{addr}
+		} else {
+			outErr = nil
+			break
+		}
+	}
+	return outErr
 }
