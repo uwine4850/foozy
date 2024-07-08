@@ -186,13 +186,7 @@ func FrmValueToOrderedForm(frm IFormGetEnctypeData) *OrderedForm {
 	multipartForm := frm.GetMultipartForm()
 	if multipartForm != nil {
 		for name, value := range multipartForm.Value {
-			var orderedValue interface{}
-			if value[0] == "" {
-				orderedValue = []string(nil)
-			} else {
-				orderedValue = value
-			}
-			orderedForm.Add(name, orderedValue)
+			orderedForm.Add(name, value)
 		}
 		for name, value := range multipartForm.File {
 			var files []FormFile
@@ -233,6 +227,9 @@ func FieldsNotEmpty(fillableStruct *FillableFormStruct, fieldsName []string) err
 		if ok {
 			val := fillValue.FieldByName(fieldsName[i])
 			if val.IsNil() {
+				return fmt.Errorf("field %s is empty", fieldsName[i])
+			}
+			if val.Len() != 0 && val.Type().Elem().Kind() == reflect.String && fslice.AllStringItemsEmpty(val.Interface().([]string)) {
 				return fmt.Errorf("field %s is empty", fieldsName[i])
 			}
 		}

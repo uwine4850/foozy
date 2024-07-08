@@ -9,3 +9,12 @@ func SliceContains[T comparable](slice []T, item T) bool {
 	}
 	return false
 }
+
+func AllStringItemsEmpty(slice []string) bool {
+	for i := 0; i < len(slice); i++ {
+		if slice[i] != "" {
+			return false
+		}
+	}
+	return true
+}
