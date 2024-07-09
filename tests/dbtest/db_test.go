@@ -188,6 +188,36 @@ func TestSyncInsert(t *testing.T) {
 	}
 }
 
+type InsertStruct struct {
+	Col1 string  `db:"col1"`
+	Col2 string  `db:"col2"`
+	Col3 float32 `db:"col3"`
+}
+
+func TestSyncInsertWithStruct(t *testing.T) {
+	insertStruct := InsertStruct{
+		Col1: "ins1",
+		Col2: "2023-10-21",
+		Col3: 123,
+	}
+	insertStrcutValue, err := dbutils.InsertValueFromStruct(&insertStruct)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(insertStrcutValue)
+	_, err = db.SyncQ().Insert("dbtest", insertStrcutValue)
+	if err != nil {
+		panic(err)
+	}
+	res, err := db.SyncQ().Query("SELECT * FROM dbtest WHERE col1 = 'ins1'")
+	if err != nil {
+		panic(err)
+	}
+	if res == nil {
+		t.Errorf("The Insert command failed.")
+	}
+}
+
 func TestSyncCount(t *testing.T) {
 	count, err := db.SyncQ().Count([]string{"*"}, "dbtest", dbutils.WHOutput{}, 0)
 	if err != nil {

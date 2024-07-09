@@ -50,7 +50,9 @@ func TestMain(m *testing.M) {
 	}
 	defer mddlDb.Close()
 	mddl := middlewares.NewMiddleware()
-	mddl.HandlerMddl(0, builtin_mddl.Auth("/login", mddlDb))
+	mddl.HandlerMddl(0, builtin_mddl.Auth("/login", mddlDb, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+		middlewares.SetMddlError(err, manager.OneTimeData())
+	}))
 
 	newRouter.SetTemplateEngine(&tmlengine.TemplateEngine{})
 	newRouter.Get("/register", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {

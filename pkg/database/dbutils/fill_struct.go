@@ -2,7 +2,6 @@ package dbutils
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"reflect"
 
@@ -92,7 +91,7 @@ func FillMapFromDb(dbRes map[string]interface{}, fill *map[string]string) error 
 		if reflect.TypeOf(value).Kind() == reflect.Slice {
 			v, ok := value.([]uint8)
 			if !ok {
-				return errors.New(fmt.Sprintf("%s field conversion error", key))
+				return fmt.Errorf("%s field conversion error", key)
 			}
 			_val = v
 		} else {
@@ -115,12 +114,12 @@ func FillReflectValueFromDb(dbRes map[string]interface{}, fill *reflect.Value) e
 		fieldName := t.Field(i).Name
 		var _val []byte
 		if _, ok := dbRes[tagName]; !ok {
-			return errors.New(fmt.Sprintf("The %s field was not found in the table.", tagName))
+			return fmt.Errorf("the %s field was not found in the table", tagName)
 		}
 		if reflect.TypeOf(dbRes[tagName]).Kind() == reflect.Slice {
 			v, ok := dbRes[tagName].([]uint8)
 			if !ok {
-				return errors.New(fmt.Sprintf("%s field conversion error", tagName))
+				return fmt.Errorf("%s field conversion error", tagName)
 			}
 			_val = v
 		} else {
