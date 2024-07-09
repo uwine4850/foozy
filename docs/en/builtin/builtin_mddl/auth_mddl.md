@@ -2,7 +2,7 @@
 
 __Auth__
 ```
-Auth(loginUrl string, db *database.Database) middlewares.MddlFunc
+Auth(loginUrl string, db *database.Database, onErr OnError) middlewares.MddlFunc
 ```
 Auth is used to determine when to change the encoding of the AUTH cookie.
 When keys are changed, the change date is set. If the date does not match, then you need to change the coding.

@@ -13,15 +13,17 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
 )
 
+type OnError func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error)
+
 // Auth is used to determine when to change the AUTH cookie encoding.
 // When keys are changed, a change date is set. If the date does not match, then you need to change the encoding.
 // It is important to note that only previous keys are saved; accordingly, it is impossible to update the encoding
 // if two or more key iterations have passed, because the old keys are no longer known.
-func Auth(loginUrl string, db *database.Database) middlewares.MddlFunc {
+func Auth(loginUrl string, db *database.Database, onErr OnError) middlewares.MddlFunc {
 	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
 		pattern, ok := manager.OneTimeData().GetUserContext(namelib.URL_PATTERN)
 		if !ok {
-			middlewares.SetMddlError(ErrUrlPatternNotExist{}, manager.OneTimeData())
+			onErr(w, r, manager, ErrUrlPatternNotExist{})
 			return
 		}
 		if pattern == loginUrl {
@@ -30,7 +32,7 @@ func Auth(loginUrl string, db *database.Database) middlewares.MddlFunc {
 		k := manager.Config().Get32BytesKey()
 		var auth_date time.Time
 		if err := cookies.ReadSecureNoHMACCookieData([]byte(k.StaticKey()), r, namelib.AUTH_DATE_COOKIE, &auth_date); err != nil {
-			middlewares.SetMddlError(err, manager.OneTimeData())
+			onErr(w, r, manager, err)
 			return
 		}
 		d1 := manager.Config().Get32BytesKey().Date().Format("02.01.2006 15:04:05")
@@ -38,18 +40,18 @@ func Auth(loginUrl string, db *database.Database) middlewares.MddlFunc {
 		if d1 != d2 {
 			cc := database.NewConnectControl()
 			if err := cc.OpenUnnamedConnection(db); err != nil {
-				middlewares.SetMddlError(err, manager.OneTimeData())
+				onErr(w, r, manager, err)
 				return
 			}
 			defer func() {
 				if err := cc.CloseAllUnnamedConnection(); err != nil {
-					middlewares.SetMddlError(err, manager.OneTimeData())
+					onErr(w, r, manager, err)
 					return
 				}
 			}()
 			_auth := auth.NewAuth(db, w, manager)
 			if err := _auth.UpdateAuthCookie([]byte(k.OldHashKey()), []byte(k.OldBlockKey()), r); err != nil {
-				middlewares.SetMddlError(err, manager.OneTimeData())
+				onErr(w, r, manager, err)
 				return
 			}
 			middlewares.SkipNextPageAndRedirect(manager.OneTimeData(), w, r, r.URL.Path)
