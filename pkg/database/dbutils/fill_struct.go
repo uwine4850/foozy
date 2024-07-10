@@ -113,8 +113,14 @@ func FillReflectValueFromDb(dbRes map[string]interface{}, fill *reflect.Value) e
 		tagName := t.Field(i).Tag.Get("db")
 		fieldName := t.Field(i).Name
 		var _val []byte
+		if tagName == "" {
+			continue
+		}
 		if _, ok := dbRes[tagName]; !ok {
 			return fmt.Errorf("the %s field was not found in the table", tagName)
+		}
+		if dbRes[tagName] == nil {
+			continue
 		}
 		if reflect.TypeOf(dbRes[tagName]).Kind() == reflect.Slice {
 			v, ok := dbRes[tagName].([]uint8)

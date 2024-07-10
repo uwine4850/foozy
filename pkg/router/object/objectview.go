@@ -35,27 +35,28 @@ type ObjView struct {
 	TableName  string
 	FillStruct interface{}
 	Slug       string
-
-	context map[string]interface{}
 }
 
 func (v *ObjView) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
 	return true, func() {}
 }
 
-func (v *ObjView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) map[string]interface{} {
-	return map[string]interface{}{}
+func (v *ObjView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) ObjectContext {
+	return ObjectContext{}
 }
 
-func (v *ObjView) GetContext() map[string]interface{} {
-	return v.context
-}
-
-func (v *ObjView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (map[string]interface{}, error) {
+func (v *ObjView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
 	err := v.DB.Connect()
 	if err != nil {
 		return nil, err
 	}
+	defer func() {
+		err = v.DB.Close()
+		if err != nil {
+			v.OnError(w, r, manager, err)
+		}
+	}()
+
 	slugValue, ok := manager.OneTimeData().GetSlugParams(v.Slug)
 	if !ok {
 		return nil, ErrNoSlug{v.Slug}
@@ -73,13 +74,7 @@ func (v *ObjView) Object(w http.ResponseWriter, r *http.Request, manager interfa
 	if err != nil {
 		return nil, err
 	}
-	v.context = map[string]interface{}{v.Name: value.Interface()}
-	// CLOSE DB
-	err = v.DB.Close()
-	if err != nil {
-		return nil, err
-	}
-	return v.context, nil
+	return ObjectContext{v.Name: value.Interface()}, nil
 }
 
 func (v *ObjView) fillObject(object map[string]interface{}) (*reflect.Value, error) {
@@ -95,5 +90,5 @@ func (v *ObjView) fillObject(object map[string]interface{}) (*reflect.Value, err
 }
 
 func (v *ObjView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
-	panic("OnError is not implement")
+	panic("OnError is not implement. Please implement this method in your structure.")
 }

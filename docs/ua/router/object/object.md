@@ -12,12 +12,12 @@ __type IView interface__
 
 Інтерфейс, який повинен реалізовувати кожен View.
 
-* _Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (map[string]interface{}, error)_ - метод 
+* _Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error)_ - метод 
 звертається до бази даних та записує їх у контекст шаблонізатора.<br>
-* _GetContext() map[string]interface{}_ - повертає контекст який буде встановлений у шаблонізатор.<br>
-* _Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) map[string]interface{}_ - метод який 
+* _Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) ObjectContext_ - метод який 
 потрібно перевизначити у користувацькій структурі. Важливим моментом є те, що метод __Object__ записує дані у контекст
-перед виконанням цього метода, тому для отримання об'єкта із бази даних можна використати метод __GetContext__.<br>
+перед виконанням цього метода, тому для отримання даних які встановлені у Object потрібно використати метод 
+manager.OneTimeData().GetUserContext(namelib.OBJECT_CONTEXT).<br>
 * _Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()_ - для використання метода 
 його потрібно перевизначити. З домомогою цього метода можна визначити права доступу для адреси. У випадку блокування доступу
 потрібно повернути false та фунцію яку потрібно виконати.<br>
@@ -32,9 +32,9 @@ type ProfileView struct {
     object.ObjView
 }
 
-func (v *ProfileView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) map[string]interface{} {
+func (v *ProfileView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) ObjectContext {
     fmt.Println(v.GetContext())
-    return map[string]interface{}{"id": 50000}
+    return ObjectContext{"id": 50000}
 }
 
 func Init() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -69,8 +69,8 @@ type ProfileMulView struct {
     object.MultipleObjectView
 }
 
-func (v *ProfileMulView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) map[string]interface{} {
-    return map[string]interface{}{}
+func (v *ProfileMulView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) ObjectContext {
+    return ObjectContext{}
 }
 
 func Init() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -82,17 +82,17 @@ func Init() func(w http.ResponseWriter, r *http.Request, manager interfaces.IMan
                 DB: db,
                 MultipleObjects: []object.MultipleObject{
                     {
-                        "profile",
-                        "auth",
-                        "id",
-                        "id",
-                        User{},
+                        Name:       "profile",
+                        TaleName:   "auth",
+                        SlugName:   "id",
+                        SlugField:  "id",
+                        FillStruct: User{},
                     },
                     {
                         Name:       "tee",
                         TaleName:   "tee",
                         SlugName:   "tee",
-                        AIField:    "id",
+                        SlugField:    "id",
                         FillStruct: Tee{},
                     },
                 },
@@ -112,7 +112,7 @@ __MultipleObject__
 _Name_ - назва з допомогою якого можна звернутись до запусу із бази даних.<br>
 _TaleName_ - назва таблиці.<br>
 _SlugName_ - назва slug для отримання його значення.<br>
-_AIField_ - назва колонки по якій потрібно шукати значення у таблиці з допомогою slug.
+_SlugField_ - назва колонки по якій потрібно шукати значення у таблиці з допомогою slug.
 _FillStruct_ - структура яка описує таблицю.<br>
 
 ## type AllView struct
@@ -123,8 +123,8 @@ type ProjectView struct {
     object.AllView
 }
 
-func (v *ProjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) map[string]interface{} {
-    return map[string]interface{}{}
+func (v *ProjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) ObjectContext {
+    return ObjectContext{}
 }
 
 func Init() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {

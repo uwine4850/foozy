@@ -12,12 +12,12 @@ __type IView interface__
 
 The interface that each View must implement.
 
-* _Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (map[string]interface{}, error)_ - method 
+* _Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error)_ - method 
 accesses the database and writes them to the templating context.<br>
-* _GetContext() map[string]interface{}_ - returns the context that will be installed in the templating tool.<br>
-* _Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) map[string]interface{}_ - method that
-needs to be overridden in the user structure. An important point is that the __Object__ method writes data to the context
-before executing this method, so you can use the __GetContext__ method to get an object from the database.<br>
+* _Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) ObjectContext_ - method that
+needs to be overridden in the user structure. The important point is that the __Object__ method writes data to the context
+before executing this method, so you need to use the method to get the data that is set in Object 
+manager.OneTimeData().GetUserContext(namelib.OBJECT_CONTEXT).<br>
 * _Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()_ - to use the method, 
 it must be overridden. Using this method, you can define access rights for an address. In case of access blocking you 
 need to return false and the function to be executed.<br>
@@ -32,9 +32,9 @@ type ProfileView struct {
     object.ObjView
 }
 
-func (v *ProfileView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) map[string]interface{} {
+func (v *ProfileView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) ObjectContext {
     fmt.Println(v.GetContext())
-    return map[string]interface{}{"id": 50000}
+    return ObjectContext{"id": 50000}
 }
 
 func Init() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -69,8 +69,8 @@ type ProfileMulView struct {
     object.MultipleObjectView
 }
 
-func (v *ProfileMulView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) map[string]interface{} {
-    return map[string]interface{}{}
+func (v *ProfileMulView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) ObjectContext {
+    return ObjectContext{}
 }
 
 func Init() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -82,17 +82,17 @@ func Init() func(w http.ResponseWriter, r *http.Request, manager interfaces.IMan
                 DB: db,
                 MultipleObjects: []object.MultipleObject{
                     {
-                        "profile",
-                        "auth",
-                        "id",
-                        "id",
-                        User{},
+                        Name:       "profile",
+                        TaleName:   "auth",
+                        SlugName:   "id",
+                        SlugField:  "id",
+                        FillStruct: User{},
                     },
                     {
                         Name:       "tee",
                         TaleName:   "tee",
                         SlugName:   "tee",
-                        AIField:    "id",
+                        SlugField:    "id",
                         FillStruct: Tee{},
                     },
                 },
@@ -112,7 +112,7 @@ A structure that represents data about a specific record in the database.
 _Name_ - the name by which you can refer to the launch from the database.<br>
 _TaleName_ - table name<br>
 _SlugName_ - the name of the slug to get its value.<br>
-_AIField_ - the name of the column by which you want to search for values in the table using slug.
+_SlugField_ - the name of the column by which you want to search for values in the table using slug.
 _FillStruct_ - a structure that describes a table.<br>
 
 ## type AllView struct
@@ -123,8 +123,8 @@ type ProjectView struct {
     object.AllView
 }
 
-func (v *ProjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) map[string]interface{} {
-    return map[string]interface{}{}
+func (v *ProjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) ObjectContext {
+    return ObjectContext{}
 }
 
 func Init() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {

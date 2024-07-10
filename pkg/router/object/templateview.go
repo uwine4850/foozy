@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/utils/fmap"
 )
 
@@ -20,8 +21,10 @@ func (v *TemplateView) Call(w http.ResponseWriter, r *http.Request, manager inte
 	if err != nil {
 		return func() { v.View.OnError(w, r, manager, err) }
 	}
+	manager.OneTimeData().SetUserContext(namelib.OBJECT_CONTEXT, objectContext)
 	_context := v.View.Context(w, r, manager)
-	fmap.MergeMap(&objectContext, _context)
+	fmap.MergeMap((*map[string]interface{})(&objectContext), _context)
+	manager.OneTimeData().SetUserContext(namelib.OBJECT_CONTEXT, objectContext)
 	permissions, f := v.View.Permissions(w, r, manager)
 	if !permissions {
 		return func() { f() }
