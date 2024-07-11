@@ -24,12 +24,16 @@ type MultipleObjectView struct {
 	MultipleObjects []MultipleObject
 }
 
+func (v *MultipleObjectView) GetDB() *database.Database {
+	return v.DB
+}
+
 func (v *MultipleObjectView) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
 	return true, func() {}
 }
 
-func (v *MultipleObjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) ObjectContext {
-	return ObjectContext{}
+func (v *MultipleObjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
+	return ObjectContext{}, nil
 }
 
 func (v *MultipleObjectView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
@@ -38,12 +42,6 @@ func (v *MultipleObjectView) Object(w http.ResponseWriter, r *http.Request, mana
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		err = v.DB.Close()
-		if err != nil {
-			v.OnError(w, r, manager, err)
-		}
-	}()
 
 	for i := 0; i < len(v.MultipleObjects); i++ {
 		slugValue, ok := manager.OneTimeData().GetSlugParams(v.MultipleObjects[i].SlugName)

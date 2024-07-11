@@ -1,7 +1,6 @@
 package object
 
 import (
-	"fmt"
 	"net/http"
 	"reflect"
 
@@ -9,21 +8,6 @@ import (
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 )
-
-type ErrNoSlug struct {
-	SlugName string
-}
-
-func (e ErrNoSlug) Error() string {
-	return fmt.Sprintf("slug parameter %s not found", e.SlugName)
-}
-
-type ErrNoData struct {
-}
-
-func (e ErrNoData) Error() string {
-	return "no data to display was found"
-}
 
 // ObjView displays only the HTML page only with a specific row from the database.
 // Needs to be used with slug parameter URL path, specify the name of the parameter in the Slug parameter.
@@ -37,12 +21,16 @@ type ObjView struct {
 	Slug       string
 }
 
+func (v *ObjView) GetDB() *database.Database {
+	return v.DB
+}
+
 func (v *ObjView) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
 	return true, func() {}
 }
 
-func (v *ObjView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) ObjectContext {
-	return ObjectContext{}
+func (v *ObjView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
+	return ObjectContext{}, nil
 }
 
 func (v *ObjView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
@@ -50,12 +38,6 @@ func (v *ObjView) Object(w http.ResponseWriter, r *http.Request, manager interfa
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		err = v.DB.Close()
-		if err != nil {
-			v.OnError(w, r, manager, err)
-		}
-	}()
 
 	slugValue, ok := manager.OneTimeData().GetSlugParams(v.Slug)
 	if !ok {

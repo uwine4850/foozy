@@ -14,10 +14,11 @@ __type IView interface__
 
 * _Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error)_ - метод 
 звертається до бази даних та записує їх у контекст шаблонізатора.<br>
-* _Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) ObjectContext_ - метод який 
+* _Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error)_ - метод який 
 потрібно перевизначити у користувацькій структурі. Важливим моментом є те, що метод __Object__ записує дані у контекст
 перед виконанням цього метода, тому для отримання даних які встановлені у Object потрібно використати метод 
-manager.OneTimeData().GetUserContext(namelib.OBJECT_CONTEXT).<br>
+manager.OneTimeData().GetUserContext(namelib.OBJECT_CONTEXT). У цьому методі також доступне активне підключення до бази даних,
+його можна отримати методо GetDB().<br>
 * _Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()_ - для використання метода 
 його потрібно перевизначити. З домомогою цього метода можна визначити права доступу для адреси. У випадку блокування доступу
 потрібно повернути false та фунцію яку потрібно виконати.<br>
@@ -32,9 +33,9 @@ type ProfileView struct {
     object.ObjView
 }
 
-func (v *ProfileView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) ObjectContext {
+func (v *ProfileView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
     fmt.Println(v.GetContext())
-    return ObjectContext{"id": 50000}
+    return ObjectContext{"id": 50000}, nil
 }
 
 func Init() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -69,8 +70,8 @@ type ProfileMulView struct {
     object.MultipleObjectView
 }
 
-func (v *ProfileMulView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) ObjectContext {
-    return ObjectContext{}
+func (v *ProfileMulView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
+    return ObjectContext{}, nil
 }
 
 func Init() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -123,8 +124,8 @@ type ProjectView struct {
     object.AllView
 }
 
-func (v *ProjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) ObjectContext {
-    return ObjectContext{}
+func (v *ProjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
+    return ObjectContext{}, nil
 }
 
 func Init() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {

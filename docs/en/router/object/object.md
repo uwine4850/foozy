@@ -17,7 +17,8 @@ accesses the database and writes them to the templating context.<br>
 * _Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) ObjectContext_ - method that
 needs to be overridden in the user structure. The important point is that the __Object__ method writes data to the context
 before executing this method, so you need to use the method to get the data that is set in Object 
-manager.OneTimeData().GetUserContext(namelib.OBJECT_CONTEXT).<br>
+manager.OneTimeData().GetUserContext(namelib.OBJECT_CONTEXT). An active database connection is also available in this method,
+it can be obtained using the GetDB() method.<br>
 * _Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()_ - to use the method, 
 it must be overridden. Using this method, you can define access rights for an address. In case of access blocking you 
 need to return false and the function to be executed.<br>
@@ -32,9 +33,9 @@ type ProfileView struct {
     object.ObjView
 }
 
-func (v *ProfileView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) ObjectContext {
+func (v *ProfileView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
     fmt.Println(v.GetContext())
-    return ObjectContext{"id": 50000}
+    return ObjectContext{"id": 50000}, nil
 }
 
 func Init() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -69,8 +70,8 @@ type ProfileMulView struct {
     object.MultipleObjectView
 }
 
-func (v *ProfileMulView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) ObjectContext {
-    return ObjectContext{}
+func (v *ProfileMulView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
+    return ObjectContext{}, nil
 }
 
 func Init() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -123,8 +124,8 @@ type ProjectView struct {
     object.AllView
 }
 
-func (v *ProjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) ObjectContext {
-    return ObjectContext{}
+func (v *ProjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
+    return ObjectContext{}, nil
 }
 
 func Init() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {

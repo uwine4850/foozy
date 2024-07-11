@@ -18,12 +18,16 @@ type AllView struct {
 	FillStruct interface{}
 }
 
+func (v *AllView) GetDB() *database.Database {
+	return v.DB
+}
+
 func (v *AllView) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
 	return true, func() {}
 }
 
-func (v *AllView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) ObjectContext {
-	return ObjectContext{}
+func (v *AllView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
+	return ObjectContext{}, nil
 }
 
 // Object sets a slice of rows from the database.
@@ -32,12 +36,6 @@ func (v *AllView) Object(w http.ResponseWriter, r *http.Request, manager interfa
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		err = v.DB.Close()
-		if err != nil {
-			v.OnError(w, r, manager, err)
-		}
-	}()
 
 	objects, err := v.DB.SyncQ().Select([]string{"*"}, v.TableName, dbutils.WHOutput{}, 0)
 	if err != nil {

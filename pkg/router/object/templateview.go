@@ -17,12 +17,21 @@ func (v *TemplateView) Call(w http.ResponseWriter, r *http.Request, manager inte
 	if v.View == nil {
 		panic("the ITemplateView field must not be nil")
 	}
+	defer func() {
+		err := v.View.GetDB().Close()
+		if err != nil {
+			v.View.OnError(w, r, manager, err)
+		}
+	}()
 	objectContext, err := v.View.Object(w, r, manager)
 	if err != nil {
 		return func() { v.View.OnError(w, r, manager, err) }
 	}
 	manager.OneTimeData().SetUserContext(namelib.OBJECT_CONTEXT, objectContext)
-	_context := v.View.Context(w, r, manager)
+	_context, err := v.View.Context(w, r, manager)
+	if err != nil {
+		return func() { v.View.OnError(w, r, manager, err) }
+	}
 	fmap.MergeMap((*map[string]interface{})(&objectContext), _context)
 	manager.OneTimeData().SetUserContext(namelib.OBJECT_CONTEXT, objectContext)
 	permissions, f := v.View.Permissions(w, r, manager)

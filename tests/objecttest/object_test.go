@@ -110,13 +110,13 @@ func (v *TObjectView) OnError(w http.ResponseWriter, r *http.Request, manager in
 	panic(err)
 }
 
-func (v *TObjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) object.ObjectContext {
+func (v *TObjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
 	_objectContext, _ := manager.OneTimeData().GetUserContext(namelib.OBJECT_CONTEXT)
 	objectContext := _objectContext.(object.ObjectContext)
 	if _, ok := objectContext["object"]; !ok {
 		panic("the context has object data")
 	}
-	return map[string]interface{}{"TEST": "OK"}
+	return map[string]interface{}{"TEST": "OK"}, nil
 }
 
 func TObjectViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -161,7 +161,7 @@ func (v *TObjectMultipleView) OnError(w http.ResponseWriter, r *http.Request, ma
 	panic(err)
 }
 
-func (v *TObjectMultipleView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) object.ObjectContext {
+func (v *TObjectMultipleView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
 	_objectContext, _ := manager.OneTimeData().GetUserContext(namelib.OBJECT_CONTEXT)
 	objectContext := _objectContext.(object.ObjectContext)
 	if _, ok := objectContext["object"]; !ok {
@@ -170,7 +170,7 @@ func (v *TObjectMultipleView) Context(w http.ResponseWriter, r *http.Request, ma
 	if _, ok := objectContext["object1"]; !ok {
 		panic("the context has object data")
 	}
-	return object.ObjectContext{"TEST": "OK"}
+	return object.ObjectContext{"TEST": "OK"}, nil
 }
 
 func TObjectMultipleViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -227,13 +227,13 @@ func (v *TObjectAllView) OnError(w http.ResponseWriter, r *http.Request, manager
 	panic(err)
 }
 
-func (v *TObjectAllView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) object.ObjectContext {
+func (v *TObjectAllView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
 	_objectContext, _ := manager.OneTimeData().GetUserContext(namelib.OBJECT_CONTEXT)
 	objectContext := _objectContext.(object.ObjectContext)
 	if _, ok := objectContext["all_object"]; !ok {
 		panic("the context has object data")
 	}
-	return object.ObjectContext{"TEST": "OK"}
+	return object.ObjectContext{"TEST": "OK"}, nil
 }
 
 func TObjectAllViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
