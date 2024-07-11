@@ -88,6 +88,9 @@ func TestMain(m *testing.M) {
 		w.Write([]byte(strconv.FormatBool(ok)))
 		return func() {}
 	})
+	newRouter.Get("/cookie", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+		return func() { cookies.SetStandartCookie(w, "cookie", "value", "/", 0) }
+	})
 	serv := server.NewServer(":8030", newRouter)
 	go func() {
 		err = serv.Start()

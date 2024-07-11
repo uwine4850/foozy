@@ -62,3 +62,15 @@ func ReadSecureNoHMACCookieData(key []byte, r *http.Request, name string, readVa
 	}
 	return nil
 }
+
+func SetStandartCookie(w http.ResponseWriter, name string, value string, path string, maxAge int) {
+	cookie := &http.Cookie{
+		Name:     name,
+		Value:    value,
+		Path:     path,
+		MaxAge:   maxAge,
+		HttpOnly: true,
+		Secure:   true,
+	}
+	http.SetCookie(w, cookie)
+}
