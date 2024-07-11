@@ -108,7 +108,7 @@ func randomiseTheFileName(pathToDir string, fileName string) string {
 
 // SaveFile Saves the file in the specified directory.
 // If the file name is already found, uses the randomiseTheFileName function to randomise the file name.
-func SaveFile(w http.ResponseWriter, fileHeader *multipart.FileHeader, pathToDir string, buildPath *string, manager interfaces.IManagerConfig) error {
+func SaveFile(w http.ResponseWriter, fileHeader *multipart.FileHeader, pathToDir string, buildPath *string, manager interfaces.IManager) error {
 	file, err := fileHeader.Open()
 	if err != nil {
 		return err
@@ -139,7 +139,7 @@ func SaveFile(w http.ResponseWriter, fileHeader *multipart.FileHeader, pathToDir
 }
 
 // ReplaceFile Changes the specified file to a new file.
-func ReplaceFile(pathToFile string, w http.ResponseWriter, fileHeader *multipart.FileHeader, pathToDir string, buildPath *string, manager interfaces.IManagerConfig) error {
+func ReplaceFile(pathToFile string, w http.ResponseWriter, fileHeader *multipart.FileHeader, pathToDir string, buildPath *string, manager interfaces.IManager) error {
 	err := os.Remove(pathToFile)
 	if err != nil {
 		return err

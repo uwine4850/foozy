@@ -65,11 +65,13 @@ func (rt *Router) getHandleFunc(pattern string, method string, ws interfaces.IWe
 		rt.printLog(request)
 
 		if err := manager.CreateAndSetNewManagerData(rt.manager); err != nil {
-			ServerError(writer, err.Error(), rt.manager.Config())
+			ServerError(writer, err.Error(), rt.manager)
+			return
 		}
 		if rt.manager.Render() != nil {
 			if err := tmlengine.CreateAndSetNewRenderInstance(rt.manager); err != nil {
-				ServerError(writer, err.Error(), rt.manager.Config())
+				ServerError(writer, err.Error(), rt.manager)
+				return
 			}
 		}
 		rt.manager.OneTimeData().SetUserContext(namelib.URL_PATTERN, pattern)
@@ -88,7 +90,7 @@ func (rt *Router) getHandleFunc(pattern string, method string, ws interfaces.IWe
 		}
 		// Run middlewares.
 		if skip, err := rt.runMddl(writer, request); err != nil {
-			ServerError(writer, err.Error(), rt.manager.Config())
+			ServerError(writer, err.Error(), rt.manager)
 			return
 		} else {
 			if skip {

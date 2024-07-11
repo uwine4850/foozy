@@ -18,7 +18,7 @@ func GenerateAndSetCsrf(w http.ResponseWriter, r *http.Request, manager interfac
 	if err != nil || csrfCookie.Value == "" {
 		csrfToken, err := GenerateCsrfToken()
 		if err != nil {
-			router.ServerError(w, err.Error(), manager.Config())
+			router.ServerError(w, err.Error(), manager)
 			return
 		}
 		cookie := &http.Cookie{

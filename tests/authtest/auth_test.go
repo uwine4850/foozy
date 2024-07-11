@@ -59,19 +59,19 @@ func TestMain(m *testing.M) {
 		db := database.NewDatabase(dbArgs)
 		cc := database.NewConnectControl()
 		if err := cc.OpenUnnamedConnection(db); err != nil {
-			return func() { router.ServerError(w, err.Error(), manager.Config()) }
+			return func() { router.ServerError(w, err.Error(), manager) }
 		}
 		defer func() {
 			if err := cc.CloseAllUnnamedConnection(); err != nil {
-				router.ServerError(w, err.Error(), manager.Config())
+				router.ServerError(w, err.Error(), manager)
 			}
 		}()
 		if err := auth.CreateAuthTable(db); err != nil {
-			return func() { router.ServerError(w, err.Error(), manager.Config()) }
+			return func() { router.ServerError(w, err.Error(), manager) }
 		}
 		au := auth.NewAuth(db, w, manager)
 		if err := au.RegisterUser("test", "111111"); err != nil {
-			return func() { router.ServerError(w, err.Error(), manager.Config()) }
+			return func() { router.ServerError(w, err.Error(), manager) }
 		}
 		return func() {}
 	})
@@ -79,16 +79,16 @@ func TestMain(m *testing.M) {
 		db := database.NewDatabase(dbArgs)
 		cc := database.NewConnectControl()
 		if err := cc.OpenUnnamedConnection(db); err != nil {
-			return func() { router.ServerError(w, err.Error(), manager.Config()) }
+			return func() { router.ServerError(w, err.Error(), manager) }
 		}
 		defer func() {
 			if err := cc.CloseAllUnnamedConnection(); err != nil {
-				router.ServerError(w, err.Error(), manager.Config())
+				router.ServerError(w, err.Error(), manager)
 			}
 		}()
 		au := auth.NewAuth(db, w, manager)
 		if _, err := au.LoginUser("test", "111111"); err != nil {
-			return func() { router.ServerError(w, err.Error(), manager.Config()) }
+			return func() { router.ServerError(w, err.Error(), manager) }
 		}
 		return func() {}
 	})
@@ -96,7 +96,7 @@ func TestMain(m *testing.M) {
 		k := manager.Config().Get32BytesKey()
 		var a auth.AuthCookie
 		if err := cookies.ReadSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), r, namelib.AUTH_COOKIE, &a); err != nil {
-			return func() { router.ServerError(w, err.Error(), manager.Config()) }
+			return func() { router.ServerError(w, err.Error(), manager) }
 		}
 		return func() {}
 	})
@@ -104,7 +104,7 @@ func TestMain(m *testing.M) {
 		k := manager.Config().Get32BytesKey()
 		var a auth.AuthCookie
 		if err := cookies.ReadSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), r, namelib.AUTH_COOKIE, &a); err != nil {
-			return func() { router.ServerError(w, err.Error(), manager.Config()) }
+			return func() { router.ServerError(w, err.Error(), manager) }
 		}
 		return func() {}
 	})

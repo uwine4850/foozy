@@ -119,7 +119,7 @@ func saveFile(w http.ResponseWriter, r *http.Request, manager interfaces.IManage
 		return func() { w.Write([]byte(err.Error())) }
 	}
 	var path string
-	err = form.SaveFile(w, header, "./saved_files", &path, manager.Config())
+	err = form.SaveFile(w, header, "./saved_files", &path, manager)
 	if err != nil {
 		return func() { w.Write([]byte(err.Error())) }
 	}

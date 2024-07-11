@@ -22,13 +22,13 @@ func TestMain(m *testing.M) {
 	newRouter := router.NewRouter(mngr)
 	newRouter.SetTemplateEngine(&tmlengine.TemplateEngine{})
 	newRouter.Get("/server-err", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		return func() { router.ServerError(w, "error", manager.Config()) }
+		return func() { router.ServerError(w, "error", manager) }
 	})
 	newRouter.Get("/server-forbidden", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		return func() { router.ServerForbidden(w, manager.Config()) }
+		return func() { router.ServerForbidden(w, manager) }
 	})
 	newRouter.Get("/server-logging", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		return func() { router.ServerError(w, "Logging test", manager.Config()) }
+		return func() { router.ServerError(w, "Logging test", manager) }
 	})
 	serv := server.NewServer(":8040", newRouter)
 	go func() {

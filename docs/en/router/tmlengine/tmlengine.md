@@ -35,7 +35,7 @@ Mandatory method. Sets ``*http.Request`` to the templater.
 ### Standard global variables are created in the framework
 Global variables that are added using the framework are described here.
 
-* csrf_token - a global variable that appears only when the parameter named ``csrf_token`` is set in cookies. Come on 
+* csrf_token - a global variable that appears only when the parameter named ``CSRF_TOKEN`` is set in cookies. Come on 
 the variable must be used in the HTML form to validate the CSRF token.
 
 ## Filters
@@ -44,7 +44,7 @@ Brief description of filters created in the framework.
 * unescape - descreens the text.
 * strslice - converts a slice of any type into a string.
 
-### Методи модуля фільтрів
+### Methods of the filter module
 
 __RegisterGlobalFilter__
 ```

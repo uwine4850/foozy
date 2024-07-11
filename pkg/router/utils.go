@@ -31,19 +31,21 @@ func CatchRedirectError(r *http.Request, manager interfaces.IManager) {
 }
 
 // ServerError displaying a 500 error to the user.
-func ServerError(w http.ResponseWriter, error string, manager interfaces.IManagerConfig) {
+func ServerError(w http.ResponseWriter, error string, manager interfaces.IManager) {
+	manager.OneTimeData().SetUserContext(namelib.SERVER_ERROR, error)
 	w.WriteHeader(http.StatusInternalServerError)
-	if manager.IsDebug() {
-		debug.ErrorLoggingIfEnableAndWrite(w, []byte(error), manager)
+	if manager.Config().IsDebug() {
+		debug.ErrorLoggingIfEnableAndWrite(w, []byte(error), manager.Config())
 	} else {
-		debug.ErrorLoggingIfEnableAndWrite(w, []byte("500 Internal server error"), manager)
+		debug.ErrorLoggingIfEnableAndWrite(w, []byte("500 Internal server error"), manager.Config())
 	}
 }
 
 // ServerForbidden displaying a 403 error to the user.
-func ServerForbidden(w http.ResponseWriter, manager interfaces.IManagerConfig) {
+func ServerForbidden(w http.ResponseWriter, manager interfaces.IManager) {
+	manager.OneTimeData().SetUserContext(namelib.SERVER_FORBIDDEN_ERROR, "403 forbidden")
 	w.WriteHeader(http.StatusForbidden)
-	debug.ErrorLoggingIfEnableAndWrite(w, []byte("403 forbidden"), manager)
+	debug.ErrorLoggingIfEnableAndWrite(w, []byte("403 forbidden"), manager.Config())
 }
 
 // SendJson sends json-formatted data to the page.
