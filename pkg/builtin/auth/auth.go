@@ -14,19 +14,12 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type ErrShortUsername struct {
-}
-
-func (receiver ErrShortUsername) Error() string {
-	return "The username must be equal to or longer than 3 characters."
-}
-
 type AuthCookie struct {
 	UID     string
 	KeyDate time.Time
 }
 
-type User struct {
+type AuthItem struct {
 	Id       string `db:"id"`
 	Username string `db:"username"`
 }
@@ -82,8 +75,8 @@ func (a *Auth) RegisterUser(username string, password string) error {
 // LoginUser check if the password and login are the same.
 // Creates a cookie entry.
 // Adds a USER variable to the user context, which contains user data from the auth table.
-func (a *Auth) LoginUser(username string, password string) (*User, error) {
-	userDB, err := a.UserExist(username)
+func (a *Auth) LoginUser(username string, password string) (*AuthItem, error) {
+	userDB, err := a.UserByUsername(username)
 	if err != nil {
 		return nil, err
 	}
@@ -94,14 +87,14 @@ func (a *Auth) LoginUser(username string, password string) (*User, error) {
 	if err != nil {
 		return nil, err
 	}
-	var user User
-	if err := dbutils.FillStructFromDb(userDB, &user); err != nil {
+	var authItem AuthItem
+	if err := dbutils.FillStructFromDb(userDB, &authItem); err != nil {
 		return nil, err
 	}
-	if err := a.addUserCookie(user.Id); err != nil {
+	if err := a.addUserCookie(authItem.Id); err != nil {
 		return nil, err
 	}
-	return &user, nil
+	return &authItem, nil
 }
 
 // Update Auth Cookie updates the cookie encoding.
@@ -142,7 +135,7 @@ func (a *Auth) addUserCookie(uid string) error {
 
 // ChangePassword changes the current user password.
 func (a *Auth) ChangePassword(username string, oldPassword string, newPassword string) error {
-	user, err := a.UserExist(username)
+	user, err := a.UserByUsername(username)
 	if err != nil {
 		return err
 	}
@@ -167,9 +160,22 @@ func (a *Auth) ChangePassword(username string, oldPassword string, newPassword s
 	return nil
 }
 
-// UserExist checks if the user is in the database.
-func (a *Auth) UserExist(username string) (map[string]interface{}, error) {
+// UserByUsername checks if the user is in the database.
+// If it is found, it returns information about it.
+func (a *Auth) UserByUsername(username string) (map[string]interface{}, error) {
 	user, err := a.database.SyncQ().Select([]string{"*"}, a.tableName, dbutils.WHEquals(map[string]interface{}{"username": username}, "AND"), 1)
+	if err != nil {
+		return nil, err
+	}
+	if len(user) == 0 {
+		return nil, nil
+	}
+	return user[0], nil
+}
+
+// UserByID searches for a user by ID and returns it.
+func (a *Auth) UserByID(id any) (map[string]interface{}, error) {
+	user, err := a.database.SyncQ().Select([]string{"*"}, a.tableName, dbutils.WHEquals(map[string]interface{}{"id": id}, "AND"), 1)
 	if err != nil {
 		return nil, err
 	}

@@ -36,11 +36,12 @@ func TestMain(m *testing.M) {
 	if err := _db.Connect(); err != nil {
 		panic(err)
 	}
-	_, err := _db.SyncQ().Query(fmt.Sprintf("DELETE FROM %s", namelib.AUTH_TABLE))
+	_, err := _db.SyncQ().Query(fmt.Sprintf("TRUNCATE TABLE %s", namelib.AUTH_TABLE))
 	if err != nil {
 		panic(err)
 	}
-	_db.Close()
+	defer _db.Close()
+
 	mng.Config().Generate32BytesKeys()
 	mng.Config().Debug(true)
 
@@ -56,20 +57,10 @@ func TestMain(m *testing.M) {
 
 	newRouter.SetTemplateEngine(&tmlengine.TemplateEngine{})
 	newRouter.Get("/register", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		db := database.NewDatabase(dbArgs)
-		cc := database.NewConnectControl()
-		if err := cc.OpenUnnamedConnection(db); err != nil {
+		if err := auth.CreateAuthTable(_db); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager) }
 		}
-		defer func() {
-			if err := cc.CloseAllUnnamedConnection(); err != nil {
-				router.ServerError(w, err.Error(), manager)
-			}
-		}()
-		if err := auth.CreateAuthTable(db); err != nil {
-			return func() { router.ServerError(w, err.Error(), manager) }
-		}
-		au := auth.NewAuth(db, w, manager)
+		au := auth.NewAuth(_db, w, manager)
 		if err := au.RegisterUser("test", "111111"); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager) }
 		}
@@ -107,6 +98,22 @@ func TestMain(m *testing.M) {
 			return func() { router.ServerError(w, err.Error(), manager) }
 		}
 		return func() {}
+	})
+	newRouter.Get("/user-by-id", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+		_auth := auth.NewAuth(_db, w, manager)
+		user, err := _auth.UserByID(1)
+		if err != nil {
+			panic(err)
+		}
+		if len(user) != 0 {
+			id := user["id"]
+			if id.(int64) == 1 {
+				return func() { w.Write([]byte("OK")) }
+			} else {
+				return func() { w.Write([]byte("!OK")) }
+			}
+		}
+		return func() { w.Write([]byte("!OK")) }
 	})
 	serv := server.NewServer(":8060", newRouter)
 	go func() {
@@ -220,6 +227,24 @@ func TestUpdKeys(t *testing.T) {
 	}
 	if string(body) != "" {
 		t.Errorf("Error during update key: %s", string(body))
+	}
+	err = get.Body.Close()
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestUserByID(t *testing.T) {
+	get, err := http.Get("http://localhost:8060/user-by-id")
+	if err != nil {
+		t.Error(err)
+	}
+	body, err := io.ReadAll(get.Body)
+	if err != nil {
+		t.Error(err)
+	}
+	if string(body) != "OK" {
+		t.Errorf("Error getting user by ID.")
 	}
 	err = get.Body.Close()
 	if err != nil {

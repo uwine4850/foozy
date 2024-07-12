@@ -52,11 +52,17 @@ ChangePassword(username string, oldPassword string, newPassword string) error
 ```
 To change your password, you must enter your username, old password, and new password.
 
-__UserExist__
+__UserByUsername__
 ```
-UserExist(username string) (map[string]interface{}, error)
+UserByUsername(username string) (map[string]interface{}, error)
 ```
 Checks if the user exists in the database. If it exists, returns its data.
+
+__UserById__
+```
+UserById(id any) (map[string]interface{}, error)
+```
+Searches for a user by ID. If it exists, returns its data.
 
 ## Global functions for the auth package
 

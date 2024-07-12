@@ -54,11 +54,17 @@ ChangePassword(username string, oldPassword string, newPassword string) error
 ```
 Для зміни пароля потрібно ввести ім'я користувача, старий пароль та новий пароль.
 
-__UserExist__
+__UserByUsername__
 ```
-UserExist(username string) (map[string]interface{}, error)
+UserByUsername(username string) (map[string]interface{}, error)
 ```
 Перевіряє чи є користувач в базі даних. Якщо він є, повертає його дані.
+
+__UserById__
+```
+UserById(id any) (map[string]interface{}, error)
+```
+Шукає користувача по ID. Якщо він є, повертає його дані.
 
 ## Глобальні функції для пакета auth
 

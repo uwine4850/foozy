@@ -31,3 +31,10 @@ type ErrPasswordsDontMatch struct {
 func (e ErrPasswordsDontMatch) Error() string {
 	return "The passwords don't match."
 }
+
+type ErrShortUsername struct {
+}
+
+func (receiver ErrShortUsername) Error() string {
+	return "The username must be equal to or longer than 3 characters."
+}
