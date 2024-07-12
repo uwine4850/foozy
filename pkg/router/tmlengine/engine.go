@@ -93,7 +93,7 @@ func (e *TemplateEngine) SetRequest(r *http.Request) {
 
 // setCsrfVariable sets the csrf token as a variable for the templating context.
 func (e *TemplateEngine) setCsrfVariable(r *http.Request) error {
-	token, err := r.Cookie(namelib.CSRF_TOKEN_COOKIE)
+	token, err := r.Cookie(namelib.COOKIE_CSRF_TOKEN)
 	data := make(map[string]interface{})
 	if err != nil && !errors.Is(err, http.ErrNoCookie) {
 		return err
@@ -102,7 +102,7 @@ func (e *TemplateEngine) setCsrfVariable(r *http.Request) error {
 		e.SetContext(data)
 		return nil
 	}
-	data[namelib.CSRF_TOKEN_COOKIE] = fmt.Sprintf("<input name=\"%s\" type=\"hidden\" value=\"%s\">", namelib.CSRF_TOKEN_COOKIE, token.Value)
+	data[namelib.COOKIE_CSRF_TOKEN] = fmt.Sprintf("<input name=\"%s\" type=\"hidden\" value=\"%s\">", namelib.COOKIE_CSRF_TOKEN, token.Value)
 	e.SetContext(data)
 	return nil
 }

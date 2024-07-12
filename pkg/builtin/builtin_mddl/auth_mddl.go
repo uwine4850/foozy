@@ -31,7 +31,7 @@ func Auth(loginUrl string, db *database.Database, onErr OnError) middlewares.Mdd
 		}
 		k := manager.Config().Get32BytesKey()
 		var auth_date time.Time
-		if err := cookies.ReadSecureNoHMACCookieData([]byte(k.StaticKey()), r, namelib.AUTH_DATE_COOKIE, &auth_date); err != nil {
+		if err := cookies.ReadSecureNoHMACCookieData([]byte(k.StaticKey()), r, namelib.COOKIE_AUTH_DATE, &auth_date); err != nil {
 			onErr(w, r, manager, err)
 			return
 		}

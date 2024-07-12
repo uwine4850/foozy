@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -52,6 +53,9 @@ func (q *SyncQueries) SetDB(db *sql.DB) {
 }
 
 func (q *SyncQueries) Select(rows []string, tableName string, where dbutils.WHOutput, limit int) ([]map[string]interface{}, error) {
+	if len(rows) == 0 {
+		return nil, errors.New("the rows argument cannot be empty")
+	}
 	var whereStr string
 	if where.QueryStr != "" {
 		whereStr = " WHERE " + where.QueryStr

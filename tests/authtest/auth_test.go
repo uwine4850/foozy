@@ -95,7 +95,7 @@ func TestMain(m *testing.M) {
 	newRouter.Get("/uid", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		k := manager.Config().Get32BytesKey()
 		var a auth.AuthCookie
-		if err := cookies.ReadSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), r, namelib.AUTH_COOKIE, &a); err != nil {
+		if err := cookies.ReadSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), r, namelib.COOKIE_AUTH, &a); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager) }
 		}
 		return func() {}
@@ -103,7 +103,7 @@ func TestMain(m *testing.M) {
 	newRouter.Get("/upd-keys", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		k := manager.Config().Get32BytesKey()
 		var a auth.AuthCookie
-		if err := cookies.ReadSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), r, namelib.AUTH_COOKIE, &a); err != nil {
+		if err := cookies.ReadSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), r, namelib.COOKIE_AUTH, &a); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager) }
 		}
 		return func() {}

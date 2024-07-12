@@ -109,7 +109,7 @@ func (a *Auth) LoginUser(username string, password string) (*User, error) {
 // with which they were encoded. Next, the function itself will take new keys from ManagerConf.
 func (a *Auth) UpdateAuthCookie(hashKey []byte, blockKey []byte, r *http.Request) error {
 	var authCookie AuthCookie
-	if err := cookies.ReadSecureCookieData(hashKey, blockKey, r, namelib.AUTH_COOKIE, &authCookie); err != nil {
+	if err := cookies.ReadSecureCookieData(hashKey, blockKey, r, namelib.COOKIE_AUTH, &authCookie); err != nil {
 		return err
 	}
 	if err := a.addUserCookie(authCookie.UID); err != nil {
@@ -121,7 +121,7 @@ func (a *Auth) UpdateAuthCookie(hashKey []byte, blockKey []byte, r *http.Request
 func (a *Auth) addUserCookie(uid string) error {
 	k := a.manager.Config().Get32BytesKey()
 	if err := cookies.CreateSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), a.w, &http.Cookie{
-		Name:     namelib.AUTH_COOKIE,
+		Name:     namelib.COOKIE_AUTH,
 		Path:     "/",
 		HttpOnly: true,
 		Secure:   true,
@@ -130,7 +130,7 @@ func (a *Auth) addUserCookie(uid string) error {
 	}
 	authDate := a.manager.Config().Get32BytesKey().Date()
 	if err := cookies.CreateSecureNoHMACCookieData([]byte(k.StaticKey()), a.w, &http.Cookie{
-		Name:     namelib.AUTH_DATE_COOKIE,
+		Name:     namelib.COOKIE_AUTH_DATE,
 		Path:     "/",
 		HttpOnly: true,
 		Secure:   true,

@@ -80,11 +80,11 @@ func (f *Form) Files(key string) ([]*multipart.FileHeader, bool) {
 // ValidateCsrfToken checks the validity of the csrf token. If no errors are detected, the token is valid.
 // It is desirable to use this method only after Parse() method.
 func (f *Form) ValidateCsrfToken() error {
-	csrfToken := f.Value(namelib.CSRF_TOKEN_COOKIE)
+	csrfToken := f.Value(namelib.COOKIE_CSRF_TOKEN)
 	if csrfToken == "" {
 		return ErrCsrfTokenNotFound{}
 	}
-	cookie, err := f.request.Cookie(namelib.CSRF_TOKEN_COOKIE)
+	cookie, err := f.request.Cookie(namelib.COOKIE_CSRF_TOKEN)
 	if err != nil {
 		return err
 	}
