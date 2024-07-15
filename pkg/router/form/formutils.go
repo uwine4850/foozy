@@ -303,8 +303,5 @@ func CheckExtension(fillForm *FillableFormStruct) error {
 
 func checkFileExtension(file *FormFile, extension []string) bool {
 	ext := filepath.Ext(file.Header.Filename)
-	if fslice.SliceContains(extension, ext) {
-		return true
-	}
-	return false
+	return fslice.SliceContains(extension, ext)
 }

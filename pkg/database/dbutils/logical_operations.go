@@ -4,12 +4,15 @@ import (
 	"fmt"
 )
 
+type WHValue map[string]interface{}
+type WHSliceValue map[string][]interface{}
+
 type WHOutput struct {
 	QueryStr  string
 	QueryArgs []interface{}
 }
 
-func WHEquals(v map[string]interface{}, conjunction string) WHOutput {
+func WHEquals(v WHValue, conjunction string) WHOutput {
 	var queryArgs []interface{}
 	var queryStr string
 	i := -1
@@ -28,7 +31,7 @@ func WHEquals(v map[string]interface{}, conjunction string) WHOutput {
 	}
 }
 
-func WHNotEquals(v map[string]interface{}, conjunction string) WHOutput {
+func WHNotEquals(v WHValue, conjunction string) WHOutput {
 	var queryArgs []interface{}
 	var queryStr string
 	i := -1
@@ -47,7 +50,7 @@ func WHNotEquals(v map[string]interface{}, conjunction string) WHOutput {
 	}
 }
 
-func WHInSlice(v map[string][]interface{}, conjunction string) WHOutput {
+func WHInSlice(v WHSliceValue, conjunction string) WHOutput {
 	var queryStr string
 	var queryArgs []interface{}
 	i := -1
@@ -74,7 +77,7 @@ func WHInSlice(v map[string][]interface{}, conjunction string) WHOutput {
 	}
 }
 
-func WHNotInSlice(v map[string][]interface{}, conjunction string) WHOutput {
+func WHNotInSlice(v WHSliceValue, conjunction string) WHOutput {
 	var queryStr string
 	var queryArgs []interface{}
 	i := -1
