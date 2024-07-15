@@ -100,8 +100,7 @@ func TestMain(m *testing.M) {
 		return func() {}
 	})
 	newRouter.Get("/user-by-id", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		_auth := auth.NewAuth(_db, w, manager)
-		user, err := _auth.UserByID(1)
+		user, err := auth.UserByID(_db, 1)
 		if err != nil {
 			panic(err)
 		}
