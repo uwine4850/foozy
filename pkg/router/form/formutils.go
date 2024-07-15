@@ -17,7 +17,7 @@ import (
 // user to decide whether to use FillableFormStruct.
 type FillableFormStruct struct {
 	s            interface{}
-	defaultValue func(name string) string
+	defaultValue func(name string) interface{}
 }
 
 func NewFillableFormStruct(fillStruct interface{}) *FillableFormStruct {
@@ -34,15 +34,15 @@ func (f *FillableFormStruct) GetStruct() interface{} {
 
 // SetDefaultValue sets the function that will be executed when the default value is needed.
 // If it is not set, the default value will be an empty string.
-// func(name string) string - parameter name is the name of the passed key in GetOrDef.
-func (f *FillableFormStruct) SetDefaultValue(val func(name string) string) {
+// func(name string) interface{} - parameter name is the name of the passed key in GetOrDef.
+func (f *FillableFormStruct) SetDefaultValue(val func(name string) interface{}) {
 	f.defaultValue = val
 }
 
 // GetOrDef get slice value or default value if it does not exist.
 // name - name of the structure field. Case-sensitive.
 // index - index of the structure element.
-func (f *FillableFormStruct) GetOrDef(name string, index int) string {
+func (f *FillableFormStruct) GetOrDef(name string, index int) interface{} {
 	value := reflect.ValueOf(f.s).Elem()
 	fieldValue := value.FieldByName(name)
 	if fieldValue.Kind() == reflect.Invalid {
@@ -54,7 +54,7 @@ func (f *FillableFormStruct) GetOrDef(name string, index int) string {
 		}
 		return f.defaultValue(name)
 	}
-	return fieldValue.Index(index).String()
+	return fieldValue.Index(index).Interface()
 }
 
 type FormFile struct {

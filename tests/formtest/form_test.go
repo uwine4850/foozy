@@ -67,6 +67,7 @@ func TestMain(m *testing.M) {
 	newRouter.Post("/multipart-form", multipartForm)
 	newRouter.Post("/save-file", saveFile)
 	newRouter.Post("/fill", fill)
+	newRouter.Post("/fillable-form-struct", fillableFormStruct)
 	serv := server.NewServer(":8020", newRouter)
 	go func() {
 		err = serv.Start()
@@ -162,6 +163,31 @@ func applicationForm(w http.ResponseWriter, r *http.Request, manager interfaces.
 	return func() {}
 }
 
+func fillableFormStruct(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	newForm := form.NewForm(r)
+	err := newForm.Parse()
+	if err != nil {
+		return func() { w.Write([]byte(err.Error())) }
+	}
+	var fill Fill
+	fillableForm := form.NewFillableFormStruct(&fill)
+
+	err = form.FillStructFromForm(newForm, fillableForm, []string{"isNil"})
+	if err != nil {
+		return func() { w.Write([]byte(err.Error())) }
+	}
+	if fillableForm.GetOrDef("Field1", 0).(string) != "v1" {
+		return func() { w.Write([]byte("GetOrDef error")) }
+	}
+	if fillableForm.GetOrDef("File", 0).(form.FormFile).Header.Filename != "x.png" {
+		return func() { w.Write([]byte("GetOrDef error")) }
+	}
+	if fillableForm.GetOrDef("NilField", 0).(string) != "" {
+		return func() { w.Write([]byte("GetOrDef error")) }
+	}
+	return func() {}
+}
+
 func TestApplicationForm(t *testing.T) {
 	resp, err := form.SendApplicationForm("http://localhost:8020/application-form", map[string]string{"f1": "v1", "f2": "v2"})
 	if err != nil {
@@ -225,5 +251,20 @@ func TestFillStructFromForm(t *testing.T) {
 	err = multipartForm.Body.Close()
 	if err != nil {
 		panic(err)
+	}
+}
+
+func TestFillableFormStruct(t *testing.T) {
+	multipartForm, err := form.SendMultipartForm("http://localhost:8020/fillable-form-struct", map[string]string{"f1": "v1"}, map[string][]string{"file": {"x.png"}})
+	if err != nil {
+		t.Error(err)
+	}
+	defer multipartForm.Body.Close()
+	responseBody, err := io.ReadAll(multipartForm.Body)
+	if err != nil {
+		t.Error(err)
+	}
+	if string(responseBody) != "" {
+		t.Errorf(string(responseBody))
 	}
 }

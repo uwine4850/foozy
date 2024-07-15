@@ -8,8 +8,8 @@ __type FillableFormStruct struct__
 Структура, яку потрібно заповнити, передається вказівником.
 
 * _GetStruct() interface{}_ - Повертає заповнену структуру.<br>
-* _SetDefaultValue(val func(name string) string)_ - встановлює стандартну функцію.<br>
-* _GetOrDef(name string, index int) string_ - повертає значення структури або стандартну функцію якщо значення структури відсутнє.<br>
+* _SetDefaultValue(val func(name string) interface{})_ - встановлює стандартну функцію.<br>
+* _GetOrDef(name string, index int) interface_ - повертає значення структури або стандартну функцію якщо значення структури відсутнє.<br>
 
 __FillStructFromForm__
 ```

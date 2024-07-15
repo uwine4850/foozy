@@ -8,8 +8,8 @@ The FillableFormStruct structure is intended for more convenient access to the f
 The structure to be filled is passed as a pointer.
 
 * _GetStruct() interface{}_ - returns the filled structure.<br>
-* _SetDefaultValue(val func(name string) string)_ - sets the standard function.<br>
-* _GetOrDef(name string, index int) string_ - returns the structure value or a standard function if there is no structure value.<br>
+* _SetDefaultValue(val func(name string) interface{})_ - sets the standard function.<br>
+* _GetOrDef(name string, index int) interface{}_ - returns the structure value or a standard function if there is no structure value.<br>
 
 __FillStructFromForm__
 ```
