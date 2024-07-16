@@ -274,3 +274,57 @@ func TestIncrement(t *testing.T) {
 		panic(err)
 	}
 }
+
+func TestSyncCommitTransaction(t *testing.T) {
+	db.BeginTransaction()
+	_, err := db.SyncQ().Insert("dbtest", map[string]interface{}{"col1": "textComm", "col2": "2023-11-21", "col3": 10.24})
+	if err != nil {
+		panic(err)
+	}
+	_, err = db.SyncQ().Insert("dbtest", map[string]interface{}{"col1": "textComm1", "col2": "2023-11-21", "col3": 10.24})
+	if err != nil {
+		panic(err)
+	}
+	if err := db.CommitTransaction(); err != nil {
+		panic(err)
+	}
+
+	res, err := db.SyncQ().Query("SELECT * FROM dbtest WHERE col1 = 'textComm'")
+	if err != nil {
+		panic(err)
+	}
+	res1, err := db.SyncQ().Query("SELECT * FROM dbtest WHERE col1 = 'textComm1'")
+	if err != nil {
+		panic(err)
+	}
+	if res == nil || res1 == nil {
+		t.Errorf("The commit transaction failed.")
+	}
+}
+
+func TestSyncRollbackTransaction(t *testing.T) {
+	db.BeginTransaction()
+	_, err := db.SyncQ().Insert("dbtest", map[string]interface{}{"col1": "textBack", "col2": "2023-11-21", "col3": 10.24})
+	if err != nil {
+		panic(err)
+	}
+	_, err = db.SyncQ().Insert("dbtest", map[string]interface{}{"col1": "textBack1", "col2": "2023-11-21", "col3": 10.24})
+	if err != nil {
+		panic(err)
+	}
+	if err := db.RollBackTransaction(); err != nil {
+		panic(err)
+	}
+
+	res, err := db.SyncQ().Query("SELECT * FROM dbtest WHERE col1 = 'textBack'")
+	if err != nil {
+		panic(err)
+	}
+	res1, err := db.SyncQ().Query("SELECT * FROM dbtest WHERE col1 = 'textBack1'")
+	if err != nil {
+		panic(err)
+	}
+	if res != nil || res1 != nil {
+		t.Errorf("The rollback transaction failed.")
+	}
+}

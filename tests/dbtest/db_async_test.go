@@ -2,8 +2,9 @@ package dbtest
 
 import (
 	"fmt"
-	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	"testing"
+
+	"github.com/uwine4850/foozy/pkg/database/dbutils"
 )
 
 func TestAsyncSelect(t *testing.T) {
@@ -177,5 +178,75 @@ func TestAsyncUpdate(t *testing.T) {
 	}
 	if res1.Res == nil {
 		t.Errorf("The row has not been updated.")
+	}
+}
+
+func TestAsyncCommitTransaction(t *testing.T) {
+	db.BeginTransaction()
+	db.AsyncQ().AsyncInsert("res", "db_async_test", map[string]interface{}{"col1": "textComm", "col2": "2023-11-21", "col3": 10.24})
+	db.AsyncQ().Wait()
+	res, _ := db.AsyncQ().LoadAsyncRes("res")
+	if res.Error != nil {
+		t.Error(res.Error)
+	}
+	db.AsyncQ().AsyncInsert("res1", "db_async_test", map[string]interface{}{"col1": "textComm1", "col2": "2023-11-21", "col3": 10.24})
+	db.AsyncQ().Wait()
+	res1, _ := db.AsyncQ().LoadAsyncRes("res1")
+	if res1.Error != nil {
+		t.Error(res1.Error)
+	}
+	if err := db.CommitTransaction(); err != nil {
+		panic(err)
+	}
+
+	db.AsyncQ().AsyncQuery("s", "SELECT * FROM db_async_test WHERE col1 = 'textComm'")
+	db.AsyncQ().AsyncQuery("s1", "SELECT * FROM db_async_test WHERE col1 = 'textComm1'")
+	db.AsyncQ().Wait()
+
+	s, _ := db.AsyncQ().LoadAsyncRes("s")
+	if s.Error != nil {
+		t.Error(s.Error)
+	}
+	s1, _ := db.AsyncQ().LoadAsyncRes("s1")
+	if s1.Error != nil {
+		t.Error(s1.Error)
+	}
+	if s.Res == nil || s1.Res == nil {
+		t.Errorf("The async commit transaction failed.")
+	}
+}
+
+func TestAsyncRollbackTransaction(t *testing.T) {
+	db.BeginTransaction()
+	db.AsyncQ().AsyncInsert("res", "db_async_test", map[string]interface{}{"col1": "textBack", "col2": "2023-11-21", "col3": 10.24})
+	db.AsyncQ().Wait()
+	res, _ := db.AsyncQ().LoadAsyncRes("res")
+	if res.Error != nil {
+		t.Error(res.Error)
+	}
+	db.AsyncQ().AsyncInsert("res1", "db_async_test", map[string]interface{}{"col1": "textBack1", "col2": "2023-11-21", "col3": 10.24})
+	db.AsyncQ().Wait()
+	res1, _ := db.AsyncQ().LoadAsyncRes("res1")
+	if res1.Error != nil {
+		t.Error(res1.Error)
+	}
+	if err := db.RollBackTransaction(); err != nil {
+		panic(err)
+	}
+
+	db.AsyncQ().AsyncQuery("s", "SELECT * FROM db_async_test WHERE col1 = 'textBack'")
+	db.AsyncQ().AsyncQuery("s1", "SELECT * FROM db_async_test WHERE col1 = 'textBack1'")
+	db.AsyncQ().Wait()
+
+	s, _ := db.AsyncQ().LoadAsyncRes("s")
+	if s.Error != nil {
+		t.Error(s.Error)
+	}
+	s1, _ := db.AsyncQ().LoadAsyncRes("s1")
+	if s1.Error != nil {
+		t.Error(s1.Error)
+	}
+	if s.Res != nil || s1.Res != nil {
+		t.Errorf("The sync commit transaction failed.")
 	}
 }

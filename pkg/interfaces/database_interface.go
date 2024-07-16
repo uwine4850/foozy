@@ -1,13 +1,17 @@
 package interfaces
 
 import (
-	"database/sql"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 )
 
+// IDbQuery an interface represents any object that can query a database.
+type IDbQuery interface {
+	Query(query string, args ...any) ([]map[string]interface{}, error)
+}
+
 type ISyncQueries interface {
 	QB() IUserQueryBuild
-	SetDB(db *sql.DB)
+	SetDB(db IDbQuery)
 	Query(query string, args ...any) ([]map[string]interface{}, error)
 	Insert(tableName string, params map[string]interface{}) ([]map[string]interface{}, error)
 	Select(rows []string, tableName string, where dbutils.WHOutput, limit int) ([]map[string]interface{}, error)

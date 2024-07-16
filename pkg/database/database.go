@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 )
 
@@ -14,13 +15,6 @@ type DbArgs struct {
 	Host         string
 	Port         string
 	DatabaseName string
-}
-
-type ErrConnectionNotOpen struct {
-}
-
-func (receiver ErrConnectionNotOpen) Error() string {
-	return "The connection is not open."
 }
 
 // Database structure for accessing the database.
@@ -33,6 +27,7 @@ type Database struct {
 	port     string
 	database string
 	db       *sql.DB
+	tx       *sql.Tx
 	syncQ    interfaces.ISyncQueries
 	asyncQ   interfaces.IAsyncQueries
 }
@@ -59,7 +54,7 @@ func (d *Database) Connect() error {
 	}
 	d.db = db
 
-	d.syncQ.SetDB(db)
+	d.syncQ.SetDB(&DbQuery{DB: db})
 	d.asyncQ.SetSyncQueries(d.syncQ)
 	return nil
 }
@@ -81,6 +76,49 @@ func (d *Database) Close() error {
 	if err != nil {
 		return err
 	}
+	if d.tx != nil {
+		if err := d.tx.Rollback(); err != nil {
+			return nil
+		}
+		d.tx = nil
+	}
+	return nil
+}
+
+// BeginTransaction begins executing a transaction.
+// Changes the executable object for database queries, so all queries that run under this method will use *sql.Tx.
+func (d *Database) BeginTransaction() {
+	tx, err := d.db.Begin()
+	if err != nil {
+		panic(err)
+	}
+	d.syncQ.SetDB(&DbTxQuery{Tx: tx})
+	d.asyncQ.SetSyncQueries(d.syncQ)
+	d.tx = tx
+}
+
+// CommitTransaction records changes in the database.
+// This method ends the transaction and changes the executable query object from *sql.Tx to *sql.DB.
+// Therefore, all the following queries are executed using *sql.DB.
+func (d *Database) CommitTransaction() error {
+	if err := d.tx.Commit(); err != nil {
+		return err
+	}
+	d.tx = nil
+	d.syncQ.SetDB(&DbQuery{DB: d.db})
+	d.asyncQ.SetSyncQueries(d.syncQ)
+	return nil
+}
+
+// RollBackTransaction rolls back changes made by commands AFTER CALLING BeginTransaction().
+// This method ends the transaction and changes the executable query object from *sql.Tx to *sql.DB.
+func (d *Database) RollBackTransaction() error {
+	if err := d.tx.Rollback(); err != nil {
+		return err
+	}
+	d.tx = nil
+	d.syncQ.SetDB(&DbQuery{DB: d.db})
+	d.asyncQ.SetSyncQueries(d.syncQ)
 	return nil
 }
 
@@ -107,4 +145,65 @@ func (d *Database) AsyncQ() interfaces.IAsyncQueries {
 // DatabaseName Getting the database name.
 func (d *Database) DatabaseName() string {
 	return d.database
+}
+
+type DbQuery struct {
+	DB *sql.DB
+}
+
+func (d *DbQuery) Query(query string, args ...any) ([]map[string]interface{}, error) {
+	sqlRows, err := d.DB.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := scanRows(sqlRows)
+	if err != nil {
+		return nil, err
+	}
+
+	err = sqlRows.Close()
+	if err != nil {
+		return nil, err
+	}
+	return rows, nil
+}
+
+type DbTxQuery struct {
+	Tx *sql.Tx
+}
+
+func (d *DbTxQuery) Query(query string, args ...any) ([]map[string]interface{}, error) {
+	sqlRows, err := d.Tx.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := scanRows(sqlRows)
+	if err != nil {
+		return nil, err
+	}
+
+	err = sqlRows.Close()
+	if err != nil {
+		return nil, err
+	}
+	return rows, nil
+}
+
+func scanRows(sqlRows *sql.Rows) ([]map[string]interface{}, error) {
+	var rows []map[string]interface{}
+	if err := dbutils.ScanRows(sqlRows, func(row map[string]interface{}) {
+		rows = append(rows, row)
+	}); err != nil {
+		return nil, err
+	}
+	return rows, nil
+}
+
+type ErrConnectionNotOpen struct {
+}
+
+func (receiver ErrConnectionNotOpen) Error() string {
+	return "The connection is not open."
 }

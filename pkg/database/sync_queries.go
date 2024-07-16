@@ -1,7 +1,6 @@
 package database
 
 import (
-	"database/sql"
 	"errors"
 	"fmt"
 	"strconv"
@@ -12,7 +11,7 @@ import (
 )
 
 type SyncQueries struct {
-	db *sql.DB
+	db interfaces.IDbQuery
 	qb interfaces.IQueryBuild
 }
 
@@ -30,25 +29,10 @@ func (q *SyncQueries) QB() interfaces.IUserQueryBuild {
 // The map key is the column names. The key values are the current column and string data in the interface{} format,
 // which can be converted to the desired type.
 func (q *SyncQueries) Query(query string, args ...any) ([]map[string]interface{}, error) {
-	_query, err := q.db.Query(query, args...)
-	if err != nil {
-		return nil, err
-	}
-	var rows []map[string]interface{}
-	if err := dbutils.ScanRows(_query, func(row map[string]interface{}) {
-		rows = append(rows, row)
-	}); err != nil {
-		return nil, err
-	}
-
-	err = _query.Close()
-	if err != nil {
-		return nil, err
-	}
-	return rows, nil
+	return q.db.Query(query, args...)
 }
 
-func (q *SyncQueries) SetDB(db *sql.DB) {
+func (q *SyncQueries) SetDB(db interfaces.IDbQuery) {
 	q.db = db
 }
 

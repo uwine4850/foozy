@@ -17,10 +17,33 @@ Connect() error
 Database connection. Initializes the ISyncQueries and IAsyncQueries interfaces.<br>
 __IMPORTANT:__ After you finish working with the database, you need to disconnect from it using the ``Close`` method.
 
+__Ping__
 ```
 Ping() error
 ```
 Checking the connection to the database.
+
+__BeginTransaction__
+```
+BeginTransaction()
+```
+Transaction execution begins.
+Changes the executable object for database queries, so all queries executed by this method will use *sql.Tx.
+
+__CommitTransaction__
+```
+CommitTransaction() failed.
+```
+Writes changes to the database.
+This method ends the transaction and changes the execution of the object query from *sql.Tx to *sql.DB.
+Therefore, all subsequent queries are applied using *sql.DB.
+
+__RollBackTransaction__
+```
+RollBackTransaction() error
+```
+Returns changes made by commands AFTER `BeginTransaction()` is called.
+This method ends the transaction and changes the executing query object from *sql.Tx to *sql.DB.
 
 __Close__
 ```
