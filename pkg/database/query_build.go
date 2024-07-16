@@ -116,24 +116,13 @@ func (qb *QueryBuild) Delete(tableName string) interfaces.IUserQueryBuild {
 }
 
 // Update database query.
-func (qb *QueryBuild) Update(tableName string, params map[string]interface{}) interfaces.IUserQueryBuild {
+func (qb *QueryBuild) Update(tableName string, params map[string]any) interfaces.IUserQueryBuild {
 	if qb.primaryCommand != "" {
 		panic(fmt.Sprintf("you cannot use an %s command while already using a %s command.", "UPDATE",
 			qb.primaryCommand))
 	}
 	qb.primaryCommand = "UPDATE"
-	var strVal string
-	var args []interface{}
-	i := 0
-	for col, value := range params {
-		args = append(args, value)
-		if i == len(params)-1 {
-			strVal += fmt.Sprintf("%s = ?", col)
-		} else {
-			strVal += fmt.Sprintf("%s = ?, ", col)
-		}
-		i++
-	}
+	strVal, args := dbutils.ParseMapAsEquals(&params)
 	qb.updateVal.TableName = tableName
 	qb.updateVal.StrVal = strVal
 	qb.updateVal.Args = args

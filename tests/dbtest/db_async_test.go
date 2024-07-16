@@ -158,11 +158,8 @@ func TestAsyncDelete(t *testing.T) {
 }
 
 func TestAsyncUpdate(t *testing.T) {
-	db.AsyncQ().AsyncUpdate("s", "db_async_test", []dbutils.DbEquals{
-		{Name: "col1", Value: "upd1"},
-		{Name: "col2", Value: "2023-10-15"},
-		{Name: "col3", Value: 1.1},
-	}, dbutils.WHEquals(map[string]interface{}{"col1": "test2"}, "AND"))
+	db.AsyncQ().AsyncUpdate("s", "db_async_test", map[string]any{"col1": "upd1", "col2": "2023-10-15", "col3": 1.1},
+		dbutils.WHEquals(map[string]interface{}{"col1": "test2"}, "AND"))
 	db.AsyncQ().Wait()
 	res, _ := db.AsyncQ().LoadAsyncRes("s")
 	if res.Error != nil {

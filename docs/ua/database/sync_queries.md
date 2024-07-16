@@ -26,7 +26,7 @@ dbutils.DbEquals де ключ це стовпець, а значення це �
 
 __Insert__
 ```
-Insert(tableName string, params map[string]interface{}) ([]map[string]interface{}, error)
+Insert(tableName string, params map[string]any) ([]map[string]interface{}, error)
 ```
 Виконує sql запит INSERT. Параметр ``params`` це дані для вставки, а саме ключ дорівнює стовпцю, а інтерфейс дорівнює його значенню.
 
@@ -39,7 +39,7 @@ Delete(tableName string, where []dbutils.DbEquals) ([]map[string]interface{}, er
 
 __Update__
 ```
-Update(tableName string, params []dbutils.DbEquals, where []dbutils.DbEquals) ([]map[string]interface{}, error)
+Update(tableName string, params map[string]any, where []dbutils.DbEquals) ([]map[string]interface{}, error)
 ```
-Виконує sql запит UPDATE. Параметр ``params`` це масив структур dbutils.DbEquals де ключ це стовпець, а значення це нове
-значення цього стовпця. Параметр ``where`` це масив структур dbutils.DbEquals який відповідає за умову.
+Виконує sql запит UPDATE. Параметр ``params`` це дані для оновлення, де ключ дорівнює назві стовпця, а значення map це нове значення 
+вибраного стовпця. 

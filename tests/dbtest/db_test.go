@@ -249,11 +249,8 @@ func TestSyncDelete(t *testing.T) {
 }
 
 func TestSyncUpdate(t *testing.T) {
-	_, err := db.SyncQ().Update("dbtest", []dbutils.DbEquals{
-		{Name: "col1", Value: "upd1"},
-		{Name: "col2", Value: "2023-10-15"},
-		{Name: "col3", Value: 1.1},
-	}, dbutils.WHEquals(map[string]interface{}{"col1": "test2"}, "AND"))
+	_, err := db.SyncQ().Update("dbtest", map[string]any{"col1": "upd1", "col2": "2023-10-15", "col3": 1.1},
+		dbutils.WHEquals(map[string]interface{}{"col1": "test2"}, "AND"))
 	if err != nil {
 		t.Error(err)
 	}

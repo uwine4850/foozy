@@ -24,7 +24,7 @@ Executes sql SELECT query. The ``rows`` parameter is the columns that will be di
 
 __Insert__
 ```
-Insert(tableName string, params map[string]interface{}) ([]map[string]interface{}, error)
+Insert(tableName string, params map[string]any) ([]map[string]interface{}, error)
 ```
 Executes sql INSERT query. The ``params`` parameter is the data to insert, namely the key is equal to the column and the interface is equal to its value.
 
@@ -37,7 +37,8 @@ the value of this column. That is, the method removes all columns that fit the w
 
 __Update__
 ```
-Update(tableName string, params []dbutils.DbEquals, where []dbutils.DbEquals) ([]map[string]interface{}, error)
+Update(tableName string, params map[string]any, where []dbutils.DbEquals) ([]map[string]interface{}, error)
 ```
-Executes an UPDATE sql query. The parameter ``params`` is an array of dbutils.DbEquals structures where key is column and value is new
-the value of this column. The ``where`` parameter is an array of dbutils.DbEquals structures that is responsible for the condition.
+Executes an UPDATE sql query. The ``params`` parameter is the data to update, where the key is equal to the column name and the map value 
+is the new value of the selected column. The ``where`` parameter is an array of dbutils.DbEquals structures that is responsible for the 
+condition.

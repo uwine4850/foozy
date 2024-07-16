@@ -90,6 +90,22 @@ func ParseEquals(equals []DbEquals, conjunction string) (string, []interface{}) 
 	return w, values
 }
 
+func ParseMapAsEquals(params *map[string]interface{}) (string, []interface{}) {
+	var paramsString string
+	args := []interface{}{}
+	i := 0
+	for name, value := range *params {
+		if i == len(*params)-1 {
+			paramsString += fmt.Sprintf("%s = ?", name)
+		} else {
+			paramsString += fmt.Sprintf("%s = ?, ", name)
+		}
+		args = append(args, value)
+		i++
+	}
+	return paramsString, args
+}
+
 // ParseString processing text values from a database.
 func ParseString(value interface{}) string {
 	if value == nil {

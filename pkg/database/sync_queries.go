@@ -52,7 +52,7 @@ func (q *SyncQueries) Select(rows []string, tableName string, where dbutils.WHOu
 	return q.Query(queryStr, where.QueryArgs...)
 }
 
-func (q *SyncQueries) Insert(tableName string, params map[string]interface{}) ([]map[string]interface{}, error) {
+func (q *SyncQueries) Insert(tableName string, params map[string]any) ([]map[string]interface{}, error) {
 	keys, vals := dbutils.ParseParams(params)
 	queryStr := fmt.Sprintf("INSERT INTO `%s` ( %s ) VALUES ( %s )",
 		tableName, strings.Join(keys, ", "), dbutils.RepeatValues(len(vals), ","))
@@ -68,8 +68,8 @@ func (q *SyncQueries) Delete(tableName string, where dbutils.WHOutput) ([]map[st
 	return q.Query(queryStr, where.QueryArgs...)
 }
 
-func (q *SyncQueries) Update(tableName string, params []dbutils.DbEquals, where dbutils.WHOutput) ([]map[string]interface{}, error) {
-	equalsStr, paramValues := dbutils.ParseEquals(params, ",")
+func (q *SyncQueries) Update(tableName string, params map[string]any, where dbutils.WHOutput) ([]map[string]interface{}, error) {
+	equalsStr, paramValues := dbutils.ParseMapAsEquals(&params)
 	var whereStr string
 	if where.QueryStr != "" {
 		whereStr = " WHERE " + where.QueryStr

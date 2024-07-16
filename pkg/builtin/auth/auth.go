@@ -153,7 +153,7 @@ func (a *Auth) ChangePassword(username string, oldPassword string, newPassword s
 	if err != nil {
 		return err
 	}
-	_, err = a.database.SyncQ().Update(a.tableName, []dbutils.DbEquals{{Name: "password", Value: password}}, dbutils.WHEquals(map[string]interface{}{"username": username}, "AND"))
+	_, err = a.database.SyncQ().Update(a.tableName, map[string]any{"password": password}, dbutils.WHEquals(map[string]interface{}{"username": username}, "AND"))
 	if err != nil {
 		return err
 	}

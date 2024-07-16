@@ -47,7 +47,7 @@ func (q *AsyncQueries) AsyncSelect(key string, rows []string, tableName string, 
 	}()
 }
 
-func (q *AsyncQueries) AsyncInsert(key string, tableName string, params map[string]interface{}) {
+func (q *AsyncQueries) AsyncInsert(key string, tableName string, params map[string]any) {
 	q.wg.Add(1)
 	go func() {
 		defer q.wg.Done()
@@ -56,7 +56,7 @@ func (q *AsyncQueries) AsyncInsert(key string, tableName string, params map[stri
 	}()
 }
 
-func (q *AsyncQueries) AsyncUpdate(key string, tableName string, params []dbutils.DbEquals, where dbutils.WHOutput) {
+func (q *AsyncQueries) AsyncUpdate(key string, tableName string, params map[string]interface{}, where dbutils.WHOutput) {
 	q.wg.Add(1)
 	go func() {
 		defer q.wg.Done()
