@@ -144,3 +144,53 @@ func Init() func(w http.ResponseWriter, r *http.Request, manager interfaces.IMan
     return view.Call
 }
 ```
+
+## type FormView struct
+Даний об'єкт трохи відрізняється від інших об'єктів. Відмінність полягає в тому, що головне призначення цього 
+об'єкту - прочитати та обробити дані форми. Форма обробляється у методі __Object__ і потім передається у контекст.
+Отримати значення у методі `Context` можна як завжди з допомогою `manager.OneTimeData().GetUserContext(namelib.OBJECT_CONTEXT)`.
+Також при потребі можна відобразити HTML стрінку, але це не обов'язково. Щоб не відображати сторінку потрібно викликати 
+метод `object.TemplateView.SkipRender()`.
+Для перенаправлення на іншу сторінку можна викликати `http.Redirect` прямо у методі `Context`.
+
+```
+type ObjectForm struct {
+	Text []string        `form:"text"`
+	File []form.FormFile `form:"file"`
+}
+
+type MyFormView struct {
+	object.FormView
+}
+
+func (v *MyFormView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
+	context, _ := manager.OneTimeData().GetUserContext(namelib.OBJECT_CONTEXT)
+	filledForm := context.(object.ObjectContext)[namelib.OBJECT_CONTEXT_FORM].(ObjectForm)
+	if filledForm.Text[0] != "field" {
+		v.OnError(w, r, manager, errors.New("FormView unexpected text field value"))
+	}
+	if filledForm.File[0].Header.Filename != "x.png" {
+		v.OnError(w, r, manager, errors.New("FormView unexpected file field value"))
+	}
+	return object.ObjectContext{}, nil
+}
+
+func (v *MyFormView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+	panic(err)
+}
+
+func MyFormViewHNDL() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	tv := object.TemplateView{
+		TemplatePath: "",
+		View: &MyFormView{
+			object.FormView{
+				FormStruct:       ObjectForm{},
+				NotNilFormFields: []string{"Text", "File"},
+				NilIfNotExist:    []string{},
+			},
+		},
+	}
+	tv.SkipRender()
+	return tv.Call
+}
+```

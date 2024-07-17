@@ -11,6 +11,11 @@ import (
 type TemplateView struct {
 	TemplatePath string
 	View         IView
+	isSkipRender bool
+}
+
+func (v *TemplateView) SkipRender() {
+	v.isSkipRender = true
 }
 
 func (v *TemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -18,7 +23,7 @@ func (v *TemplateView) Call(w http.ResponseWriter, r *http.Request, manager inte
 		panic("the ITemplateView field must not be nil")
 	}
 	defer func() {
-		err := v.View.GetDB().Close()
+		err := v.View.CloseDb()
 		if err != nil {
 			v.View.OnError(w, r, manager, err)
 		}
@@ -34,6 +39,11 @@ func (v *TemplateView) Call(w http.ResponseWriter, r *http.Request, manager inte
 	}
 	fmap.MergeMap((*map[string]interface{})(&objectContext), _context)
 	manager.OneTimeData().SetUserContext(namelib.OBJECT_CONTEXT, objectContext)
+
+	if v.isSkipRender {
+		return func() {}
+	}
+
 	permissions, f := v.View.Permissions(w, r, manager)
 	if !permissions {
 		return func() { f() }

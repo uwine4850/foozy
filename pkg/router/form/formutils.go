@@ -215,13 +215,22 @@ func (e ErrArgumentNotPointer) Error() string {
 
 // FieldsNotEmpty checks the specified fields of the structure for emptiness.
 // fieldsName - slice with exact names of STRUCTURE fields that should not be empty.
+// Optimized to work even if the FillableFormStruct contains a structure with type *reflect.Value.
 func FieldsNotEmpty(fillableStruct *FillableFormStruct, fieldsName []string) error {
 	fillStruct := fillableStruct.GetStruct()
-	if reflect.TypeOf(fillStruct).Kind() != reflect.Pointer {
+	if typeopr.IsPointer(fieldsName) {
 		return ErrArgumentNotPointer{"fillStruct"}
 	}
-	fillValue := reflect.ValueOf(fillStruct).Elem()
-	fillType := reflect.TypeOf(fillStruct).Elem()
+	var fillValue reflect.Value
+	var fillType reflect.Type
+	if reflect.TypeOf(fillStruct) == reflect.TypeOf(&reflect.Value{}) {
+		fv := fillStruct.(*reflect.Value)
+		fillValue = reflect.Indirect(*fv)
+		fillType = fillValue.Type()
+	} else {
+		fillValue = reflect.ValueOf(fillStruct).Elem()
+		fillType = reflect.TypeOf(fillStruct).Elem()
+	}
 	for i := 0; i < len(fieldsName); i++ {
 		_, ok := fillType.FieldByName(fieldsName[i])
 		if ok {
@@ -304,4 +313,48 @@ func CheckExtension(fillForm *FillableFormStruct) error {
 func checkFileExtension(file *FormFile, extension []string) bool {
 	ext := filepath.Ext(file.Header.Filename)
 	return fslice.SliceContains(extension, ext)
+}
+
+// FillReflectValueFromForm fills the structure with data from the form.
+// It works and does everything the same as the FillStructFromForm function.
+// The only difference is that this function accepts data in *reflect.Value format.
+func FillReflectValueFromForm(frm *Form, fillValue *reflect.Value, nilIfNotExist []string) error {
+	orderedForm := FrmValueToOrderedForm(frm)
+	fillType := fillValue.Type()
+	for i := 0; i < fillType.NumField(); i++ {
+		typeField := fillType.Field(i)
+		valueField := fillValue.Field(i)
+
+		tag := typeField.Tag.Get("form")
+		if tag == "" {
+			continue
+		}
+		orderedFormValue, ok := orderedForm.GetByName(tag)
+		if !ok {
+			// Skips loop iteration if the field is not found, but it must be as nil.
+			if nilIfNotExist != nil && fslice.SliceContains(nilIfNotExist, tag) {
+				continue
+			} else {
+				return ErrFormConvertFieldNotFound{tag}
+			}
+		}
+		formValue := orderedFormValue.Value
+
+		if reflect.DeepEqual(typeField.Type, reflect.TypeOf([]FormFile{})) && reflect.TypeOf(formValue) == reflect.TypeOf([]FormFile{}) {
+			formType, _ := formValue.([]FormFile)
+			if !ok {
+				return typeopr.ErrConvertType{Type1: reflect.TypeOf(formValue).String(), Type2: "[]FormFile"}
+			}
+			valueField.Set(reflect.ValueOf(formType))
+		}
+		// Set string
+		if typeField.Type.Kind() == reflect.Slice && typeField.Type.Elem().Kind() == reflect.String {
+			formType, ok := formValue.([]string)
+			if !ok {
+				return typeopr.ErrConvertType{Type1: reflect.TypeOf(formValue).String(), Type2: "string"}
+			}
+			valueField.Set(reflect.ValueOf(formType))
+		}
+	}
+	return nil
 }

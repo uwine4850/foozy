@@ -11,23 +11,20 @@ import (
 
 // AllView displays HTML page by passing all data from the selected table to it.
 type AllView struct {
-	IView
+	BaseView
 	Name       string
 	DB         *database.Database
 	TableName  string
 	FillStruct interface{}
 }
 
-func (v *AllView) GetDB() *database.Database {
-	return v.DB
-}
-
-func (v *AllView) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
-	return true, func() {}
-}
-
-func (v *AllView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
-	return ObjectContext{}, nil
+func (v *AllView) CloseDb() error {
+	if v.DB != nil {
+		if err := v.DB.Close(); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // Object sets a slice of rows from the database.
@@ -63,8 +60,4 @@ func (v *AllView) fillObjects(objects []map[string]interface{}) ([]interface{}, 
 		objectsStruct = append(objectsStruct, value.Interface())
 	}
 	return objectsStruct, nil
-}
-
-func (v *AllView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
-	panic("OnError is not implement. Please implement this method in your structure.")
 }

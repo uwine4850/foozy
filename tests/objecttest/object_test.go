@@ -11,6 +11,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router"
+	"github.com/uwine4850/foozy/pkg/router/form"
 	"github.com/uwine4850/foozy/pkg/router/manager"
 	"github.com/uwine4850/foozy/pkg/router/object"
 	"github.com/uwine4850/foozy/pkg/router/tmlengine"
@@ -38,6 +39,7 @@ func TestMain(m *testing.M) {
 	newRouter.Get("/object-view/<id>", TObjectViewHNDL(db))
 	newRouter.Get("/object-mul-view/<id>/<id1>", TObjectMultipleViewHNDL(db))
 	newRouter.Get("/object-all-view", TObjectAllViewHNDL(db))
+	newRouter.Post("/object-form-view", MyFormViewHNDL())
 
 	serv := server.NewServer(":8030", newRouter)
 	go func() {
@@ -266,5 +268,60 @@ func TestObjectAllView(t *testing.T) {
 	err = get.Body.Close()
 	if err != nil {
 		t.Error(err)
+	}
+}
+
+type ObjectForm struct {
+	Text []string        `form:"text"`
+	File []form.FormFile `form:"file"`
+}
+
+type MyFormView struct {
+	object.FormView
+}
+
+func (v *MyFormView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
+	context, _ := manager.OneTimeData().GetUserContext(namelib.OBJECT_CONTEXT)
+	filledForm := context.(object.ObjectContext)[namelib.OBJECT_CONTEXT_FORM].(ObjectForm)
+	if filledForm.Text[0] != "field" {
+		v.OnError(w, r, manager, errors.New("FormView unexpected text field value"))
+	}
+	if filledForm.File[0].Header.Filename != "x.png" {
+		v.OnError(w, r, manager, errors.New("FormView unexpected file field value"))
+	}
+	return object.ObjectContext{}, nil
+}
+
+func (v *MyFormView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+	panic(err)
+}
+
+func MyFormViewHNDL() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	tv := object.TemplateView{
+		TemplatePath: "",
+		View: &MyFormView{
+			object.FormView{
+				FormStruct:       ObjectForm{},
+				NotNilFormFields: []string{"Text", "File"},
+				NilIfNotExist:    []string{},
+			},
+		},
+	}
+	tv.SkipRender()
+	return tv.Call
+}
+
+func TestFillableFormStruct(t *testing.T) {
+	multipartForm, err := form.SendMultipartForm("http://localhost:8030/object-form-view", map[string]string{"text": "field"}, map[string][]string{"file": {"x.png"}})
+	if err != nil {
+		t.Error(err)
+	}
+	defer multipartForm.Body.Close()
+	responseBody, err := io.ReadAll(multipartForm.Body)
+	if err != nil {
+		t.Error(err)
+	}
+	if string(responseBody) != "" {
+		t.Errorf(string(responseBody))
 	}
 }

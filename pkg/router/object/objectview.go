@@ -12,7 +12,7 @@ import (
 // ObjView displays only the HTML page only with a specific row from the database.
 // Needs to be used with slug parameter URL path, specify the name of the parameter in the Slug parameter.
 type ObjView struct {
-	IView
+	BaseView
 
 	Name       string
 	DB         *database.Database
@@ -21,16 +21,13 @@ type ObjView struct {
 	Slug       string
 }
 
-func (v *ObjView) GetDB() *database.Database {
-	return v.DB
-}
-
-func (v *ObjView) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
-	return true, func() {}
-}
-
-func (v *ObjView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
-	return ObjectContext{}, nil
+func (v *ObjView) CloseDb() error {
+	if v.DB != nil {
+		if err := v.DB.Close(); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (v *ObjView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
@@ -69,8 +66,4 @@ func (v *ObjView) fillObject(object map[string]interface{}) (*reflect.Value, err
 		return nil, err
 	}
 	return &value, nil
-}
-
-func (v *ObjView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
-	panic("OnError is not implement. Please implement this method in your structure.")
 }

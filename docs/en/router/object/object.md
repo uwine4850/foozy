@@ -144,3 +144,53 @@ func Init() func(w http.ResponseWriter, r *http.Request, manager interfaces.IMan
     return view.Call
 }
 ```
+
+## type FormView struct
+This object is slightly different from other objects. The difference is that the main purpose of this 
+object - read and process form data. The form is processed in the __Object__ method and then passed to the context.
+You can get the value in the `Context` method as usual using `manager.OneTimeData().GetUserContext(namelib.OBJECT_CONTEXT)`.
+Also, if necessary, you can display the HTML page, but this is not necessary. In order not to display the page, you need to call it 
+`object.TemplateView.SkipRender()` method.
+To redirect to another page, you can call `http.Redirect` directly in the `Context` method.
+
+```
+type ObjectForm struct {
+	Text []string        `form:"text"`
+	File []form.FormFile `form:"file"`
+}
+
+type MyFormView struct {
+	object.FormView
+}
+
+func (v *MyFormView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
+	context, _ := manager.OneTimeData().GetUserContext(namelib.OBJECT_CONTEXT)
+	filledForm := context.(object.ObjectContext)[namelib.OBJECT_CONTEXT_FORM].(ObjectForm)
+	if filledForm.Text[0] != "field" {
+		v.OnError(w, r, manager, errors.New("FormView unexpected text field value"))
+	}
+	if filledForm.File[0].Header.Filename != "x.png" {
+		v.OnError(w, r, manager, errors.New("FormView unexpected file field value"))
+	}
+	return object.ObjectContext{}, nil
+}
+
+func (v *MyFormView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+	panic(err)
+}
+
+func MyFormViewHNDL() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	tv := object.TemplateView{
+		TemplatePath: "",
+		View: &MyFormView{
+			object.FormView{
+				FormStruct:       ObjectForm{},
+				NotNilFormFields: []string{"Text", "File"},
+				NilIfNotExist:    []string{},
+			},
+		},
+	}
+	tv.SkipRender()
+	return tv.Call
+}
+```

@@ -41,6 +41,7 @@ __FieldsNotEmpty__
 FieldsNotEmpty(fillableStruct *FillableFormStruct, fieldsName []string) error
 ```
 Перевіряє чи не порожні вибрані поля структури.
+Оптимізовано для роботи, навіть якщо FillableFormStruct містить структуру з типом *reflect.Value.
 
 __FieldsName__
 ```
@@ -54,3 +55,11 @@ CheckExtension(fillForm *FillableFormStruct) error
 ```
 Перевіряє чи розширення файлів форми відповідає очікуваними. Для правильної роботи потрібно додати до кожного поля типу 
 FormFile тег *ext* і розширення які очікуються. Наприклад, `ext:".jpeg, .png"`.
+
+__FillReflectValueFromForm__
+```
+FillReflectValueFromForm(frm *Form, fillValue *reflect.Value, nilIfNotExist []string) error
+```
+Заповнює структуру даними з форми.
+Функція працює і робить все так само, як функція `FillStructFromForm`.
+Єдина відмінність полягає в тому, що ця функція приймає дані у форматі `*reflect.Value`.

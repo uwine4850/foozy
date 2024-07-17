@@ -18,22 +18,19 @@ type MultipleObject struct {
 }
 
 type MultipleObjectView struct {
-	IView
+	BaseView
 
 	DB              *database.Database
 	MultipleObjects []MultipleObject
 }
 
-func (v *MultipleObjectView) GetDB() *database.Database {
-	return v.DB
-}
-
-func (v *MultipleObjectView) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
-	return true, func() {}
-}
-
-func (v *MultipleObjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
-	return ObjectContext{}, nil
+func (v *MultipleObjectView) CloseDb() error {
+	if v.DB != nil {
+		if err := v.DB.Close(); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (v *MultipleObjectView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
@@ -76,8 +73,4 @@ func (v *MultipleObjectView) fillObject(object map[string]interface{}, fillStruc
 		return nil, err
 	}
 	return &value, nil
-}
-
-func (v *MultipleObjectView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
-	panic("OnError is not implement. Please implement this method in your structure.")
 }
