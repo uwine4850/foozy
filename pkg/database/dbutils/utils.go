@@ -63,6 +63,10 @@ func ScanRows(rows *sql.Rows, fn func(row map[string]interface{})) error {
 	return nil
 }
 
+// ParseParams turns the map parameters into two slices:
+// Name of the keys.
+// Key data.
+// It is important to note that the sequence number of the key coincides with the number of its value and vice versa.
 func ParseParams(params map[string]interface{}) ([]string, []interface{}) {
 	var values []interface{}
 	var keys []string
@@ -90,6 +94,9 @@ func ParseEquals(equals []DbEquals, conjunction string) (string, []interface{}) 
 	return w, values
 }
 
+// ParseMapAsEquals turns the map into equals values ​​for sql.
+// A string is part of a query string, for example <key = ?, val = ?>.
+// The slice represents the data that will be inserted in order instead of <?>.
 func ParseMapAsEquals(params *map[string]interface{}) (string, []interface{}) {
 	var paramsString string
 	args := []interface{}{}
@@ -176,16 +183,16 @@ func ParseFloat(value interface{}) (float64, error) {
 	return v, nil
 }
 
-// InsertValueFromStruct сreates a map from a structure that can be used to insert data into a table.
+// ParamsValueFromStruct creates a map from a structure that describes the table.
 // To work correctly, you need a completed structure, and the required fields must have the `db:"<column name>"` tag.
-func InsertValueFromStruct(structure interface{}) (map[string]interface{}, error) {
+func ParamsValueFromStruct(structure interface{}) (map[string]any, error) {
 	if !typeopr.IsPointer(structure) {
 		return nil, typeopr.ErrValueNotPointer{Value: "structure"}
 	}
 	if !typeopr.PtrIsStruct(structure) {
 		return nil, typeopr.ErrParameterNotStruct{Param: "structure"}
 	}
-	outputInsertMap := make(map[string]interface{})
+	outputParamsMap := make(map[string]any)
 
 	typeof := reflect.TypeOf(structure).Elem()
 	valueof := reflect.ValueOf(structure).Elem()
@@ -195,7 +202,7 @@ func InsertValueFromStruct(structure interface{}) (map[string]interface{}, error
 		if dbColName == "" {
 			continue
 		}
-		outputInsertMap[dbColName] = fieldValue.Interface()
+		outputParamsMap[dbColName] = fieldValue.Interface()
 	}
-	return outputInsertMap, nil
+	return outputParamsMap, nil
 }

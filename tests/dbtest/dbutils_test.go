@@ -9,12 +9,14 @@ import (
 )
 
 func TestParseString(t *testing.T) {
+	clearDbTest()
+	createDbTest()
 	res, err := db.SyncQ().Query("SELECT * FROM dbtest")
 	if err != nil {
 		panic(err)
 	}
 	p := dbutils.ParseString(res[0]["col1"])
-	if p != "upd1" {
+	if p != "test1" {
 		t.Errorf("The result of the method is not the same as expected.")
 	}
 }
@@ -34,6 +36,8 @@ func TestParseInt(t *testing.T) {
 }
 
 func TestParseDateTime(t *testing.T) {
+	clearDbTest()
+	createDbTest()
 	res, err := db.SyncQ().Query("SELECT * FROM dbtest")
 	if err != nil {
 		panic(err)
@@ -42,12 +46,14 @@ func TestParseDateTime(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	if time.String() == "2023-10-15" {
+	if time.String() == "2023-11-15" {
 		t.Errorf("Error executing dbutils.ParseDateTime method.")
 	}
 }
 
 func TestParseFloat(t *testing.T) {
+	clearDbTest()
+	createDbTest()
 	res, err := db.SyncQ().Query("SELECT * FROM dbtest")
 	if err != nil {
 		panic(err)
@@ -56,7 +62,7 @@ func TestParseFloat(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	if float != 1.1 {
+	if float != 111.22 {
 		t.Errorf("Execution error of dbutils.ParseFloat method.")
 	}
 }
@@ -107,9 +113,9 @@ type Fill struct {
 func TestFillStructFromDb(t *testing.T) {
 	var f Fill
 	expected := Fill{
-		Col1: "upd1",
-		Col2: "2023-10-15",
-		Col3: "1.1",
+		Col1: "test1",
+		Col2: "2023-11-15",
+		Col3: "111.22",
 	}
 	res, err := db.SyncQ().Query("SELECT * FROM dbtest")
 	if err != nil {

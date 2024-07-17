@@ -94,3 +94,10 @@ FillReflectValueFromDb(dbRes map[string]interface{}, fill *reflect.Value) error
 ```
 Заповнює структуру тип якої *reflect.Value. Тобто, метод заповнює дані із бази даних у структуру, яка стрворена з допомогою 
 пакету reflect.
+
+__ParamsValueFromStruct__
+```
+ParamsValueFromStruct(structure interface{}) (map[string]any, error)
+```
+Створює карту зі структури, яка описує таблицю.
+Для правильної роботи вам потрібна завершена структура, а обов’язкові поля мають мати тег `db:"<назва стовпця>"`.

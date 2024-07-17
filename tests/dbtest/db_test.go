@@ -69,6 +69,12 @@ func TestMain(m *testing.M) {
 	os.Exit(exitCode)
 }
 
+type DbTestTable struct {
+	Col1 string  `db:"col1"`
+	Col2 string  `db:"col2"`
+	Col3 float32 `db:"col3"`
+}
+
 func TestConnect(t *testing.T) {
 	err := db.Connect()
 	if err != nil {
@@ -175,6 +181,8 @@ func TestSyncSelectNotInSlice(t *testing.T) {
 }
 
 func TestSyncInsert(t *testing.T) {
+	clearDbTest()
+	createDbTest()
 	_, err := db.SyncQ().Insert("dbtest", map[string]interface{}{"col1": "text3", "col2": "2023-10-20", "col3": 10.22})
 	if err != nil {
 		panic(err)
@@ -188,23 +196,18 @@ func TestSyncInsert(t *testing.T) {
 	}
 }
 
-type InsertStruct struct {
-	Col1 string  `db:"col1"`
-	Col2 string  `db:"col2"`
-	Col3 float32 `db:"col3"`
-}
-
 func TestSyncInsertWithStruct(t *testing.T) {
-	insertStruct := InsertStruct{
+	clearDbTest()
+	createDbTest()
+	insertStruct := DbTestTable{
 		Col1: "ins1",
 		Col2: "2023-10-21",
 		Col3: 123,
 	}
-	insertStrcutValue, err := dbutils.InsertValueFromStruct(&insertStruct)
+	insertStrcutValue, err := dbutils.ParamsValueFromStruct(&insertStruct)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(insertStrcutValue)
 	_, err = db.SyncQ().Insert("dbtest", insertStrcutValue)
 	if err != nil {
 		panic(err)
@@ -219,6 +222,8 @@ func TestSyncInsertWithStruct(t *testing.T) {
 }
 
 func TestSyncCount(t *testing.T) {
+	clearDbTest()
+	createDbTest()
 	count, err := db.SyncQ().Count([]string{"*"}, "dbtest", dbutils.WHOutput{}, 0)
 	if err != nil {
 		t.Error(err)
@@ -233,6 +238,8 @@ func TestSyncCount(t *testing.T) {
 }
 
 func TestSyncDelete(t *testing.T) {
+	clearDbTest()
+	createDbTest()
 	_, err := db.SyncQ().Delete("dbtest", dbutils.WHEquals(map[string]interface{}{
 		"col1": "test1",
 	}, "AND"))
@@ -249,6 +256,8 @@ func TestSyncDelete(t *testing.T) {
 }
 
 func TestSyncUpdate(t *testing.T) {
+	clearDbTest()
+	createDbTest()
 	_, err := db.SyncQ().Update("dbtest", map[string]any{"col1": "upd1", "col2": "2023-10-15", "col3": 1.1},
 		dbutils.WHEquals(map[string]interface{}{"col1": "test2"}, "AND"))
 	if err != nil {
@@ -265,7 +274,36 @@ func TestSyncUpdate(t *testing.T) {
 	}
 }
 
+func TestSyncUpdateWithStruct(t *testing.T) {
+	clearDbTest()
+	createDbTest()
+	updateStruct := DbTestTable{
+		Col1: "updStruct",
+		Col2: "2023-10-16",
+		Col3: 123,
+	}
+	params, err := dbutils.ParamsValueFromStruct(&updateStruct)
+	if err != nil {
+		panic(err)
+	}
+	_, err = db.SyncQ().Update("dbtest", params, dbutils.WHEquals(dbutils.WHValue{"col1": "test1"}, "AND"))
+	if err != nil {
+		t.Error(err)
+	}
+	res, err := db.SyncQ().Select([]string{"*"}, "dbtest", dbutils.WHEquals(map[string]interface{}{
+		"col1": "updStruct", "col2": "2023-10-16",
+	}, "AND"), 0)
+	if err != nil {
+		t.Error(err)
+	}
+	if res == nil {
+		t.Errorf("The field could not be updated using the structure.")
+	}
+}
+
 func TestIncrement(t *testing.T) {
+	clearDbTest()
+	createDbTest()
 	_, err := db.SyncQ().Increment("col4", "dbtest", dbutils.WHOutput{})
 	if err != nil {
 		panic(err)
@@ -273,6 +311,8 @@ func TestIncrement(t *testing.T) {
 }
 
 func TestSyncCommitTransaction(t *testing.T) {
+	clearDbTest()
+	createDbTest()
 	db.BeginTransaction()
 	_, err := db.SyncQ().Insert("dbtest", map[string]interface{}{"col1": "textComm", "col2": "2023-11-21", "col3": 10.24})
 	if err != nil {
@@ -300,6 +340,8 @@ func TestSyncCommitTransaction(t *testing.T) {
 }
 
 func TestSyncRollbackTransaction(t *testing.T) {
+	clearDbTest()
+	createDbTest()
 	db.BeginTransaction()
 	_, err := db.SyncQ().Insert("dbtest", map[string]interface{}{"col1": "textBack", "col2": "2023-11-21", "col3": 10.24})
 	if err != nil {

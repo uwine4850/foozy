@@ -93,3 +93,10 @@ __FillReflectValueFromDb__
 FillReflectValueFromDb(dbRes map[string]interface{}, fill *reflect.Value) error
 ```
 Fills a structure whose type is *reflect.Value. That is, the method fills the data from the database into the structure, which is created with the help package reflect.
+
+__ParamsValueFromStruct__
+```
+ParamsValueFromStruct(structure interface{}) (map[string]any, error)
+```
+Creates a map with a structure that describes a table.
+You need a completed structure to work correctly, and required fields must have the `db:"<column name>"` tag.
