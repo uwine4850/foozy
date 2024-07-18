@@ -7,6 +7,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/namelib"
 )
 
 type MultipleObject struct {
@@ -39,6 +40,7 @@ func (v *MultipleObjectView) Object(w http.ResponseWriter, r *http.Request, mana
 	if err != nil {
 		return nil, err
 	}
+	manager.OneTimeData().SetUserContext(namelib.OBJECT_DB, v.DB)
 
 	for i := 0; i < len(v.MultipleObjects); i++ {
 		slugValue, ok := manager.OneTimeData().GetSlugParams(v.MultipleObjects[i].SlugName)

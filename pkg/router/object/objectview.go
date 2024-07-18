@@ -7,6 +7,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/namelib"
 )
 
 // ObjView displays only the HTML page only with a specific row from the database.
@@ -35,6 +36,7 @@ func (v *ObjView) Object(w http.ResponseWriter, r *http.Request, manager interfa
 	if err != nil {
 		return nil, err
 	}
+	manager.OneTimeData().SetUserContext(namelib.OBJECT_DB, v.DB)
 
 	slugValue, ok := manager.OneTimeData().GetSlugParams(v.Slug)
 	if !ok {

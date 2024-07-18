@@ -7,6 +7,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/namelib"
 )
 
 // AllView displays HTML page by passing all data from the selected table to it.
@@ -33,6 +34,7 @@ func (v *AllView) Object(w http.ResponseWriter, r *http.Request, manager interfa
 	if err != nil {
 		return nil, err
 	}
+	manager.OneTimeData().SetUserContext(namelib.OBJECT_DB, v.DB)
 
 	objects, err := v.DB.SyncQ().Select([]string{"*"}, v.TableName, dbutils.WHOutput{}, 0)
 	if err != nil {
