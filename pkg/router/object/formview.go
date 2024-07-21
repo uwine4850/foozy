@@ -1,6 +1,7 @@
 package object
 
 import (
+	"errors"
 	"net/http"
 	"reflect"
 
@@ -54,5 +55,19 @@ func (v *FormView) Object(w http.ResponseWriter, r *http.Request, manager interf
 		return nil, err
 	}
 
-	return ObjectContext{namelib.OBJECT_CONTEXT_FORM: fillForm.Interface()}, nil
+	resultForm := fillForm.Interface()
+	return ObjectContext{namelib.OBJECT_CONTEXT_FORM: &resultForm}, nil
+}
+
+// FormInterface retrieves the form interface itself from the interface pointer.
+func (v *FormView) FormInterface(manager interfaces.IManagerOneTimeData) (interface{}, error) {
+	context, ok := manager.GetUserContext(namelib.OBJECT_CONTEXT)
+	if !ok {
+		return nil, errors.New("the ObjectContext not found")
+	}
+	objectContext, ok := context.(ObjectContext)
+	if !ok {
+		return nil, errors.New("the ObjectContext type assertion error")
+	}
+	return reflect.Indirect(reflect.ValueOf(objectContext[namelib.OBJECT_CONTEXT_FORM])).Interface(), nil
 }

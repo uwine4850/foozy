@@ -156,6 +156,14 @@ To redirect to another page, you can call `http.Redirect` directly in the `Conte
 It is important to note that the `NotNilFormFields` parameter is universal. If you pass the sign "*" to it as the first element, all fields
 structures will be checked for emptiness. If you specify more structure fields after this sign, they will be excluded
 from checking for emptiness. You can also simply pass the fields to be checked without the "*" sign.
+
+__FormInterface__
+```
+FormInterface(manager interfaces.IManagerOneTimeData) (interface{}, error)
+```
+Returns the completed form in interface format.
+
+Example of use:
 ```
 type ObjectForm struct {
 	Text []string        `form:"text"`
@@ -167,13 +175,16 @@ type MyFormView struct {
 }
 
 func (v *MyFormView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
-	context, _ := manager.OneTimeData().GetUserContext(namelib.OBJECT_CONTEXT)
-	filledForm := context.(object.ObjectContext)[namelib.OBJECT_CONTEXT_FORM].(ObjectForm)
+	filledFormInterface, err := v.FormInterface(manager.OneTimeData())
+	if err != nil {
+		return nil, err
+	}
+	filledForm := filledFormInterface.(ObjectForm)
 	if filledForm.Text[0] != "field" {
-		v.OnError(w, r, manager, errors.New("FormView unexpected text field value"))
+		return nil, errors.New("FormView unexpected text field value")
 	}
 	if filledForm.File[0].Header.Filename != "x.png" {
-		v.OnError(w, r, manager, errors.New("FormView unexpected file field value"))
+		return nil, errors.New("FormView unexpected file field value")
 	}
 	return object.ObjectContext{}, nil
 }

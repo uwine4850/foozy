@@ -281,13 +281,16 @@ type MyFormView struct {
 }
 
 func (v *MyFormView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
-	context, _ := manager.OneTimeData().GetUserContext(namelib.OBJECT_CONTEXT)
-	filledForm := context.(object.ObjectContext)[namelib.OBJECT_CONTEXT_FORM].(ObjectForm)
+	filledFormInterface, err := v.FormInterface(manager.OneTimeData())
+	if err != nil {
+		return nil, err
+	}
+	filledForm := filledFormInterface.(ObjectForm)
 	if filledForm.Text[0] != "field" {
-		v.OnError(w, r, manager, errors.New("FormView unexpected text field value"))
+		return nil, errors.New("FormView unexpected text field value")
 	}
 	if filledForm.File[0].Header.Filename != "x.png" {
-		v.OnError(w, r, manager, errors.New("FormView unexpected file field value"))
+		return nil, errors.New("FormView unexpected file field value")
 	}
 	return object.ObjectContext{}, nil
 }

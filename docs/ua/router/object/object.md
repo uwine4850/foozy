@@ -156,6 +156,14 @@ func Init() func(w http.ResponseWriter, r *http.Request, manager interfaces.IMan
 Важливо зауважити, що параметр `NotNilFormFields` універсальний. Якщо у нього передати першим елементом знак "*", усі поля
 структури будуть перевірятися на пустоту. Якщо після цього знаку вказати ще поля структури, вони будуть будуть виключені
 з перевірки на пустоту. Також можна просто передавати поля які потрібно перевірити без знаку "*".
+
+__FormInterface__
+```
+FormInterface(manager interfaces.IManagerOneTimeData) (interface{}, error)
+```
+Повертає заповнену форму у форматі інтерфейсу.
+
+Приклад використання:
 ```
 type ObjectForm struct {
 	Text []string        `form:"text"`
@@ -167,13 +175,16 @@ type MyFormView struct {
 }
 
 func (v *MyFormView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
-	context, _ := manager.OneTimeData().GetUserContext(namelib.OBJECT_CONTEXT)
-	filledForm := context.(object.ObjectContext)[namelib.OBJECT_CONTEXT_FORM].(ObjectForm)
+	filledFormInterface, err := v.FormInterface(manager.OneTimeData())
+	if err != nil {
+		return nil, err
+	}
+	filledForm := filledFormInterface.(ObjectForm)
 	if filledForm.Text[0] != "field" {
-		v.OnError(w, r, manager, errors.New("FormView unexpected text field value"))
+		return nil, errors.New("FormView unexpected text field value")
 	}
 	if filledForm.File[0].Header.Filename != "x.png" {
-		v.OnError(w, r, manager, errors.New("FormView unexpected file field value"))
+		return nil, errors.New("FormView unexpected file field value")
 	}
 	return object.ObjectContext{}, nil
 }
