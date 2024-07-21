@@ -302,7 +302,7 @@ func MyFormViewHNDL() func(w http.ResponseWriter, r *http.Request, manager inter
 		View: &MyFormView{
 			object.FormView{
 				FormStruct:       ObjectForm{},
-				NotNilFormFields: []string{"Text", "File"},
+				NotNilFormFields: []string{"*"},
 				NilIfNotExist:    []string{},
 			},
 		},
@@ -311,7 +311,7 @@ func MyFormViewHNDL() func(w http.ResponseWriter, r *http.Request, manager inter
 	return tv.Call
 }
 
-func TestFillableFormStruct(t *testing.T) {
+func TestMyFormView(t *testing.T) {
 	multipartForm, err := form.SendMultipartForm("http://localhost:8030/object-form-view", map[string]string{"text": "field"}, map[string][]string{"file": {"x.png"}})
 	if err != nil {
 		t.Error(err)

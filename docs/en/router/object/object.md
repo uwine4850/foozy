@@ -153,6 +153,9 @@ Also, if necessary, you can display the HTML page, but this is not necessary. In
 `object.TemplateView.SkipRender()` method.
 To redirect to another page, you can call `http.Redirect` directly in the `Context` method.
 
+It is important to note that the `NotNilFormFields` parameter is universal. If you pass the sign "*" to it as the first element, all fields
+structures will be checked for emptiness. If you specify more structure fields after this sign, they will be excluded
+from checking for emptiness. You can also simply pass the fields to be checked without the "*" sign.
 ```
 type ObjectForm struct {
 	Text []string        `form:"text"`

@@ -223,11 +223,13 @@ func FieldsNotEmpty(fillableStruct *FillableFormStruct, fieldsName []string) err
 	}
 	var fillValue reflect.Value
 	var fillType reflect.Type
+	// If fillStruct is reflect.Value.
 	if reflect.TypeOf(fillStruct) == reflect.TypeOf(&reflect.Value{}) {
 		fv := fillStruct.(*reflect.Value)
 		fillValue = reflect.Indirect(*fv)
 		fillType = fillValue.Type()
 	} else {
+		// If fillStruct is default struct.
 		fillValue = reflect.ValueOf(fillStruct).Elem()
 		fillType = reflect.TypeOf(fillStruct).Elem()
 	}
@@ -248,17 +250,27 @@ func FieldsNotEmpty(fillableStruct *FillableFormStruct, fieldsName []string) err
 
 // FieldsName returns a list of field names of the filled structure.
 func FieldsName(fillForm *FillableFormStruct, exclude []string) ([]string, error) {
-	_form := fillForm.GetStruct()
-	if !typeopr.IsPointer(_form) {
+	fillStruct := fillForm.GetStruct()
+	if !typeopr.IsPointer(fillStruct) {
 		return nil, typeopr.ErrValueNotPointer{Value: "fillForm"}
 	}
-	if !typeopr.PtrIsStruct(_form) {
+	if !typeopr.PtrIsStruct(fillStruct) {
 		return nil, typeopr.ErrParameterNotStruct{Param: "fillForm"}
 	}
-	t := reflect.TypeOf(_form).Elem()
+
+	var fillType reflect.Type
+	// If fillStruct is reflect.Value.
+	if reflect.TypeOf(fillStruct) == reflect.TypeOf(&reflect.Value{}) {
+		fv := fillStruct.(*reflect.Value)
+		fillType = reflect.Indirect(*fv).Type()
+	} else {
+		// If fillStruct is default struct.
+		fillType = reflect.TypeOf(fillStruct).Elem()
+	}
+
 	var names []string
-	for i := 0; i < t.NumField(); i++ {
-		field := t.Field(i)
+	for i := 0; i < fillType.NumField(); i++ {
+		field := fillType.Field(i)
 		if exclude != nil && fslice.SliceContains(exclude, field.Name) {
 			continue
 		}

@@ -153,6 +153,9 @@ func Init() func(w http.ResponseWriter, r *http.Request, manager interfaces.IMan
 метод `object.TemplateView.SkipRender()`.
 Для перенаправлення на іншу сторінку можна викликати `http.Redirect` прямо у методі `Context`.
 
+Важливо зауважити, що параметр `NotNilFormFields` універсальний. Якщо у нього передати першим елементом знак "*", усі поля
+структури будуть перевірятися на пустоту. Якщо після цього знаку вказати ще поля структури, вони будуть будуть виключені
+з перевірки на пустоту. Також можна просто передавати поля які потрібно перевірити без знаку "*".
 ```
 type ObjectForm struct {
 	Text []string        `form:"text"`
@@ -185,7 +188,7 @@ func MyFormViewHNDL() func(w http.ResponseWriter, r *http.Request, manager inter
 		View: &MyFormView{
 			object.FormView{
 				FormStruct:       ObjectForm{},
-				NotNilFormFields: []string{"Text", "File"},
+				NotNilFormFields: []string{"*"},
 				NilIfNotExist:    []string{},
 			},
 		},
