@@ -32,11 +32,24 @@ func (v *FormView) Object(w http.ResponseWriter, r *http.Request, manager interf
 	if err := form.FillReflectValueFromForm(frm, &fillForm, v.NilIfNotExist); err != nil {
 		return nil, err
 	}
-
-	// If the first character of the slice is "*", then you need to select the entire field of the structure.
-	// If there are more elements after the "*" sign, then they need to be excluded.
-	// When the "*" sign is missing, process according to the standard algorithm.
 	fillableForm := form.NewFillableFormStruct(&fillForm)
+
+	if err := v.checkEmpty(fillableForm); err != nil {
+		return nil, err
+	}
+
+	if err := form.CheckExtension(fillableForm); err != nil {
+		return nil, err
+	}
+
+	resultForm := fillForm.Interface()
+	return ObjectContext{namelib.OBJECT_CONTEXT_FORM: &resultForm}, nil
+}
+
+// If the first character of the slice is "*", then you need to select the entire field of the structure.
+// If there are more elements after the "*" sign, then they need to be excluded.
+// When the "*" sign is missing, process according to the standard algorithm.
+func (v *FormView) checkEmpty(fillableForm *form.FillableFormStruct) error {
 	var notNilFields []string
 	if len(v.NotNilFormFields) >= 1 && v.NotNilFormFields[0] == "*" {
 		excludeFields := []string{}
@@ -45,18 +58,16 @@ func (v *FormView) Object(w http.ResponseWriter, r *http.Request, manager interf
 		}
 		fields, err := form.FieldsName(fillableForm, excludeFields)
 		if err != nil {
-			return nil, err
+			return err
 		}
 		notNilFields = fields
 	} else {
 		notNilFields = v.NotNilFormFields
 	}
 	if err := form.FieldsNotEmpty(fillableForm, notNilFields); err != nil {
-		return nil, err
+		return err
 	}
-
-	resultForm := fillForm.Interface()
-	return ObjectContext{namelib.OBJECT_CONTEXT_FORM: &resultForm}, nil
+	return nil
 }
 
 // FormInterface retrieves the form interface itself from the interface pointer.

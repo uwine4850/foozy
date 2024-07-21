@@ -54,7 +54,7 @@ __CheckExtension__
 CheckExtension(fillForm *FillableFormStruct) error
 ```
 Checks if the extension of the form files is as expected. To work correctly, you need to add a type to each field 
-FormFile tag *ext* and expected extensions. For example, `ext:".jpeg, .png"`.
+FormFile tag *ext* and expected extensions. For example, `ext:".jpeg .png"`.
 
 __FillReflectValueFromForm__
 ```

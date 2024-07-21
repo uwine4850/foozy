@@ -213,14 +213,8 @@ func (e ErrArgumentNotPointer) Error() string {
 	return fmt.Sprintf("argument %s is not a pointer", e.Name)
 }
 
-// FieldsNotEmpty checks the specified fields of the structure for emptiness.
-// fieldsName - slice with exact names of STRUCTURE fields that should not be empty.
-// Optimized to work even if the FillableFormStruct contains a structure with type *reflect.Value.
-func FieldsNotEmpty(fillableStruct *FillableFormStruct, fieldsName []string) error {
+func getStructElemFromFillableStruct(fillableStruct *FillableFormStruct) (reflect.Type, reflect.Value) {
 	fillStruct := fillableStruct.GetStruct()
-	if typeopr.IsPointer(fieldsName) {
-		return ErrArgumentNotPointer{"fillStruct"}
-	}
 	var fillValue reflect.Value
 	var fillType reflect.Type
 	// If fillStruct is reflect.Value.
@@ -233,6 +227,22 @@ func FieldsNotEmpty(fillableStruct *FillableFormStruct, fieldsName []string) err
 		fillValue = reflect.ValueOf(fillStruct).Elem()
 		fillType = reflect.TypeOf(fillStruct).Elem()
 	}
+	return fillType, fillValue
+}
+
+// FieldsNotEmpty checks the specified fields of the structure for emptiness.
+// fieldsName - slice with exact names of STRUCTURE fields that should not be empty.
+// Optimized to work even if the FillableFormStruct contains a structure with type *reflect.Value.
+func FieldsNotEmpty(fillableStruct *FillableFormStruct, fieldsName []string) error {
+	fillStruct := fillableStruct.GetStruct()
+	if !typeopr.IsPointer(fillStruct) {
+		return typeopr.ErrValueNotPointer{Value: "fillableStruct"}
+	}
+	if !typeopr.PtrIsStruct(fillStruct) {
+		return typeopr.ErrParameterNotStruct{Param: "fillableStruct"}
+	}
+
+	fillType, fillValue := getStructElemFromFillableStruct(fillableStruct)
 	for i := 0; i < len(fieldsName); i++ {
 		_, ok := fillType.FieldByName(fieldsName[i])
 		if ok {
@@ -249,25 +259,16 @@ func FieldsNotEmpty(fillableStruct *FillableFormStruct, fieldsName []string) err
 }
 
 // FieldsName returns a list of field names of the filled structure.
-func FieldsName(fillForm *FillableFormStruct, exclude []string) ([]string, error) {
-	fillStruct := fillForm.GetStruct()
+func FieldsName(fillableStruct *FillableFormStruct, exclude []string) ([]string, error) {
+	fillStruct := fillableStruct.GetStruct()
 	if !typeopr.IsPointer(fillStruct) {
-		return nil, typeopr.ErrValueNotPointer{Value: "fillForm"}
+		return nil, typeopr.ErrValueNotPointer{Value: "fillableStruct"}
 	}
 	if !typeopr.PtrIsStruct(fillStruct) {
-		return nil, typeopr.ErrParameterNotStruct{Param: "fillForm"}
+		return nil, typeopr.ErrParameterNotStruct{Param: "fillableStruct"}
 	}
 
-	var fillType reflect.Type
-	// If fillStruct is reflect.Value.
-	if reflect.TypeOf(fillStruct) == reflect.TypeOf(&reflect.Value{}) {
-		fv := fillStruct.(*reflect.Value)
-		fillType = reflect.Indirect(*fv).Type()
-	} else {
-		// If fillStruct is default struct.
-		fillType = reflect.TypeOf(fillStruct).Elem()
-	}
-
+	fillType, _ := getStructElemFromFillableStruct(fillableStruct)
 	var names []string
 	for i := 0; i < fillType.NumField(); i++ {
 		field := fillType.Field(i)
@@ -290,41 +291,36 @@ func (e ErrExtensionNotMatch) Error() string {
 // CheckExtension Check if the file resolution matches the expected one. Can only be used with a structure already
 // filled out in the form.
 // To work, you need to add an ext tag with the necessary extensions (if there are many, separated by commas).
-// For example, ext:".jpg, .jpeg, .png".
-func CheckExtension(fillForm *FillableFormStruct) error {
-	_form := fillForm.GetStruct()
-	if !typeopr.IsPointer(_form) {
-		return typeopr.ErrValueNotPointer{Value: "fill"}
+// For example, ext:".jpg .jpeg .png".
+func CheckExtension(fillableStruct *FillableFormStruct) error {
+	fillStruct := fillableStruct.GetStruct()
+	if !typeopr.IsPointer(fillStruct) {
+		return typeopr.ErrValueNotPointer{Value: "fillableStruct"}
 	}
-	if !typeopr.PtrIsStruct(_form) {
-		return typeopr.ErrParameterNotStruct{Param: "fill"}
+	if !typeopr.PtrIsStruct(fillStruct) {
+		return typeopr.ErrParameterNotStruct{Param: "fillableStruct"}
 	}
-	t := reflect.TypeOf(_form).Elem()
-	v := reflect.ValueOf(_form).Elem()
-	for i := 0; i < t.NumField(); i++ {
-		tag := t.Field(i).Tag.Get("ext")
+
+	fillType, fillValue := getStructElemFromFillableStruct(fillableStruct)
+
+	for i := 0; i < fillType.NumField(); i++ {
+		tag := fillType.Field(i).Tag.Get("ext")
 		if tag == "" {
 			continue
 		}
-		field := t.Field(i)
+		field := fillType.Field(i)
 		if field.Type.Elem() != reflect.TypeOf(FormFile{}) {
 			panic("the ext tag can only be added to fields whose type is form.FormFile")
 		}
-		extension := strings.Split(strings.ReplaceAll(tag, " ", ""), ",")
-		files := v.Field(i).Interface().([]FormFile)
+		extension := strings.Split(tag, " ")
+		files := fillValue.Field(i).Interface().([]FormFile)
 		for i := 0; i < len(files); i++ {
-			checkExtension := checkFileExtension(&files[i], extension)
-			if !checkExtension {
+			if !fslice.SliceContains(extension, filepath.Ext(files[i].Header.Filename)) {
 				return ErrExtensionNotMatch{Field: field.Name}
 			}
 		}
 	}
 	return nil
-}
-
-func checkFileExtension(file *FormFile, extension []string) bool {
-	ext := filepath.Ext(file.Header.Filename)
-	return fslice.SliceContains(extension, ext)
 }
 
 // FillReflectValueFromForm fills the structure with data from the form.

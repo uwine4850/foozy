@@ -273,7 +273,7 @@ func TestObjectAllView(t *testing.T) {
 
 type ObjectForm struct {
 	Text []string        `form:"text"`
-	File []form.FormFile `form:"file"`
+	File []form.FormFile `form:"file" ext:".jpg .png"`
 }
 
 type MyFormView struct {
