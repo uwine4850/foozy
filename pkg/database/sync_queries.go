@@ -32,6 +32,10 @@ func (q *SyncQueries) Query(query string, args ...any) ([]map[string]interface{}
 	return q.db.Query(query, args...)
 }
 
+func (q *SyncQueries) Exec(query string, args ...any) (map[string]interface{}, error) {
+	return q.db.Exec(query, args...)
+}
+
 func (q *SyncQueries) SetDB(db interfaces.IDbQuery) {
 	q.db = db
 }
@@ -52,23 +56,23 @@ func (q *SyncQueries) Select(rows []string, tableName string, where dbutils.WHOu
 	return q.Query(queryStr, where.QueryArgs...)
 }
 
-func (q *SyncQueries) Insert(tableName string, params map[string]any) ([]map[string]interface{}, error) {
+func (q *SyncQueries) Insert(tableName string, params map[string]any) (map[string]interface{}, error) {
 	keys, vals := dbutils.ParseParams(params)
 	queryStr := fmt.Sprintf("INSERT INTO `%s` ( %s ) VALUES ( %s )",
 		tableName, strings.Join(keys, ", "), dbutils.RepeatValues(len(vals), ","))
-	return q.Query(queryStr, vals...)
+	return q.Exec(queryStr, vals...)
 }
 
-func (q *SyncQueries) Delete(tableName string, where dbutils.WHOutput) ([]map[string]interface{}, error) {
+func (q *SyncQueries) Delete(tableName string, where dbutils.WHOutput) (map[string]interface{}, error) {
 	var whereStr string
 	if where.QueryStr != "" {
 		whereStr = " WHERE " + where.QueryStr
 	}
 	queryStr := fmt.Sprintf("DELETE FROM %s %s", tableName, whereStr)
-	return q.Query(queryStr, where.QueryArgs...)
+	return q.Exec(queryStr, where.QueryArgs...)
 }
 
-func (q *SyncQueries) Update(tableName string, params map[string]any, where dbutils.WHOutput) ([]map[string]interface{}, error) {
+func (q *SyncQueries) Update(tableName string, params map[string]any, where dbutils.WHOutput) (map[string]interface{}, error) {
 	equalsStr, paramValues := dbutils.ParseMapAsEquals(&params)
 	var whereStr string
 	if where.QueryStr != "" {
@@ -77,7 +81,7 @@ func (q *SyncQueries) Update(tableName string, params map[string]any, where dbut
 	queryStr := fmt.Sprintf("UPDATE `%s` SET %s %s ",
 		tableName, equalsStr, whereStr)
 	args := append(paramValues, where.QueryArgs...)
-	return q.Query(queryStr, args...)
+	return q.Exec(queryStr, args...)
 }
 
 // Count returns the number of records under the condition.
@@ -95,11 +99,11 @@ func (q *SyncQueries) Count(rows []string, tableName string, where dbutils.WHOut
 }
 
 // Increment does an increment of a field of type INT.
-func (q *SyncQueries) Increment(fieldName string, tableName string, where dbutils.WHOutput) ([]map[string]interface{}, error) {
+func (q *SyncQueries) Increment(fieldName string, tableName string, where dbutils.WHOutput) (map[string]interface{}, error) {
 	var whereStr string
 	if where.QueryStr != "" {
 		whereStr = " WHERE " + where.QueryStr
 	}
 	queryStr := fmt.Sprintf("UPDATE `%s` SET `%s`= `%s`+ 1 %s ", tableName, fieldName, fieldName, whereStr)
-	return q.Query(queryStr, where.QueryArgs...)
+	return q.Exec(queryStr, where.QueryArgs...)
 }

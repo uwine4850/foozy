@@ -52,7 +52,7 @@ func (q *AsyncQueries) AsyncInsert(key string, tableName string, params map[stri
 	go func() {
 		defer q.wg.Done()
 		_res, err := q.syncQ.Insert(tableName, params)
-		q.setAsyncRes(key, _res, err)
+		q.setAsyncRes(key, []map[string]interface{}{_res}, err)
 	}()
 }
 
@@ -61,7 +61,7 @@ func (q *AsyncQueries) AsyncUpdate(key string, tableName string, params map[stri
 	go func() {
 		defer q.wg.Done()
 		_res, err := q.syncQ.Update(tableName, params, where)
-		q.setAsyncRes(key, _res, err)
+		q.setAsyncRes(key, []map[string]interface{}{_res}, err)
 	}()
 }
 
@@ -70,7 +70,7 @@ func (q *AsyncQueries) AsyncDelete(key string, tableName string, where dbutils.W
 	go func() {
 		defer q.wg.Done()
 		_res, err := q.syncQ.Delete(tableName, where)
-		q.setAsyncRes(key, _res, err)
+		q.setAsyncRes(key, []map[string]interface{}{_res}, err)
 	}()
 }
 
@@ -88,7 +88,7 @@ func (q *AsyncQueries) AsyncIncrement(key string, fieldName string, tableName st
 	go func() {
 		defer q.wg.Done()
 		_res, err := q.syncQ.Increment(fieldName, tableName, where)
-		q.setAsyncRes(key, _res, err)
+		q.setAsyncRes(key, []map[string]interface{}{_res}, err)
 	}()
 }
 

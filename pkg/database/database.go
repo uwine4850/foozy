@@ -156,7 +156,6 @@ func (d *DbQuery) Query(query string, args ...any) ([]map[string]interface{}, er
 	if err != nil {
 		return nil, err
 	}
-
 	rows, err := scanRows(sqlRows)
 	if err != nil {
 		return nil, err
@@ -167,6 +166,23 @@ func (d *DbQuery) Query(query string, args ...any) ([]map[string]interface{}, er
 		return nil, err
 	}
 	return rows, nil
+}
+
+func (d *DbQuery) Exec(query string, args ...any) (map[string]interface{}, error) {
+	result, err := d.DB.Exec(query, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+	rowsId, err := result.RowsAffected()
+	if err != nil {
+		return nil, err
+	}
+	return map[string]interface{}{"id": &id, "rows": &rowsId}, nil
 }
 
 type DbTxQuery struct {
@@ -189,6 +205,23 @@ func (d *DbTxQuery) Query(query string, args ...any) ([]map[string]interface{}, 
 		return nil, err
 	}
 	return rows, nil
+}
+
+func (d *DbTxQuery) Exec(query string, args ...any) (map[string]interface{}, error) {
+	result, err := d.Tx.Exec(query, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+	rowsId, err := result.RowsAffected()
+	if err != nil {
+		return nil, err
+	}
+	return map[string]interface{}{"id": &id, "rows": &rowsId}, nil
 }
 
 func scanRows(sqlRows *sql.Rows) ([]map[string]interface{}, error) {
