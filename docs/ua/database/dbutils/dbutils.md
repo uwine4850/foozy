@@ -97,7 +97,7 @@ FillReflectValueFromDb(dbRes map[string]interface{}, fill *reflect.Value) error
 
 __ParamsValueFromStruct__
 ```
-ParamsValueFromStruct(structure interface{}) (map[string]any, error)
+ParamsValueFromStruct(structure interface{}, nilIfEmpty []string) (map[string]any, error)
 ```
 Створює карту зі структури, яка описує таблицю.
 Для правильної роботи вам потрібна завершена структура, а обов’язкові поля мають мати тег `db:"<назва стовпця>"`.

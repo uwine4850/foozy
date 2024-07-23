@@ -201,10 +201,10 @@ func TestSyncInsertWithStruct(t *testing.T) {
 	createDbTest()
 	insertStruct := DbTestTable{
 		Col1: "ins1",
-		Col2: "2023-10-21",
+		Col2: "",
 		Col3: 123,
 	}
-	insertStrcutValue, err := dbutils.ParamsValueFromStruct(&insertStruct)
+	insertStrcutValue, err := dbutils.ParamsValueFromStruct(&insertStruct, []string{"col2"})
 	if err != nil {
 		panic(err)
 	}
@@ -282,7 +282,7 @@ func TestSyncUpdateWithStruct(t *testing.T) {
 		Col2: "2023-10-16",
 		Col3: 123,
 	}
-	params, err := dbutils.ParamsValueFromStruct(&updateStruct)
+	params, err := dbutils.ParamsValueFromStruct(&updateStruct, []string{})
 	if err != nil {
 		panic(err)
 	}

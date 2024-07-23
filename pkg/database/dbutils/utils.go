@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/uwine4850/foozy/pkg/typeopr"
+	"github.com/uwine4850/foozy/pkg/utils/fslice"
 )
 
 // AsyncQueryData a structure that represents the result of executing an asynchronous database query.
@@ -185,7 +186,7 @@ func ParseFloat(value interface{}) (float64, error) {
 
 // ParamsValueFromStruct creates a map from a structure that describes the table.
 // To work correctly, you need a completed structure, and the required fields must have the `db:"<column name>"` tag.
-func ParamsValueFromStruct(structure interface{}) (map[string]any, error) {
+func ParamsValueFromStruct(structure interface{}, nilIfEmpty []string) (map[string]any, error) {
 	if !typeopr.IsPointer(structure) {
 		return nil, typeopr.ErrValueNotPointer{Value: "structure"}
 	}
@@ -202,7 +203,11 @@ func ParamsValueFromStruct(structure interface{}) (map[string]any, error) {
 		if dbColName == "" {
 			continue
 		}
-		outputParamsMap[dbColName] = fieldValue.Interface()
+		if fslice.SliceContains(nilIfEmpty, dbColName) && fieldValue.IsZero() {
+			outputParamsMap[dbColName] = nil
+		} else {
+			outputParamsMap[dbColName] = fieldValue.Interface()
+		}
 	}
 	return outputParamsMap, nil
 }

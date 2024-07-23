@@ -96,7 +96,7 @@ Fills a structure whose type is *reflect.Value. That is, the method fills the da
 
 __ParamsValueFromStruct__
 ```
-ParamsValueFromStruct(structure interface{}) (map[string]any, error)
+ParamsValueFromStruct(structure interface{}, nilIfEmpty []string) (map[string]any, error)
 ```
 Creates a map with a structure that describes a table.
 You need a completed structure to work correctly, and required fields must have the `db:"<column name>"` tag.
