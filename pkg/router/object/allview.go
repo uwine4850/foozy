@@ -8,6 +8,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
+	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
 // AllView displays HTML page by passing all data from the selected table to it.
@@ -51,6 +52,9 @@ func (v *AllView) Object(w http.ResponseWriter, r *http.Request, manager interfa
 func (v *AllView) fillObjects(objects []map[string]interface{}) ([]interface{}, error) {
 	if v.FillStruct == nil {
 		panic("the FillStruct field must not be nil")
+	}
+	if typeopr.IsPointer(v.FillStruct) {
+		return nil, typeopr.ErrValueIsPointer{Value: "FillStruct"}
 	}
 	var objectsStruct []interface{}
 	for i := 0; i < len(objects); i++ {

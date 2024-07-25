@@ -8,6 +8,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
+	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
 // ObjView displays only the HTML page only with a specific row from the database.
@@ -32,6 +33,9 @@ func (v *ObjView) CloseDb() error {
 }
 
 func (v *ObjView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
+	if typeopr.IsPointer(v.FillStruct) {
+		return nil, typeopr.ErrValueIsPointer{Value: "FillStruct"}
+	}
 	err := v.DB.Connect()
 	if err != nil {
 		return nil, err

@@ -21,7 +21,7 @@ type FormView struct {
 
 func (v *FormView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
 	if typeopr.IsPointer(v.FormStruct) {
-		panic("the FormStruct parameter must not be a pointer")
+		return nil, typeopr.ErrValueIsPointer{Value: "FormStruct"}
 	}
 	frm := form.NewForm(r)
 	if err := frm.Parse(); err != nil {

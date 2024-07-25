@@ -21,6 +21,14 @@ func (e ErrValueNotPointer) Error() string {
 	return fmt.Sprintf("%s value is not a pointer", e.Value)
 }
 
+type ErrValueIsPointer struct {
+	Value string
+}
+
+func (e ErrValueIsPointer) Error() string {
+	return fmt.Sprintf("%s value is a pointer", e.Value)
+}
+
 type ErrParameterNotStruct struct {
 	Param string
 }

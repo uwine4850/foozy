@@ -8,6 +8,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
+	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
 type MultipleObject struct {
@@ -43,6 +44,9 @@ func (v *MultipleObjectView) Object(w http.ResponseWriter, r *http.Request, mana
 	manager.OneTimeData().SetUserContext(namelib.OBJECT_DB, v.DB)
 
 	for i := 0; i < len(v.MultipleObjects); i++ {
+		if typeopr.IsPointer(v.MultipleObjects[i].FillStruct) {
+			return nil, typeopr.ErrValueIsPointer{Value: "FillStruct"}
+		}
 		slugValue, ok := manager.OneTimeData().GetSlugParams(v.MultipleObjects[i].SlugName)
 		if !ok {
 			return nil, ErrNoSlug{v.MultipleObjects[i].SlugName}
