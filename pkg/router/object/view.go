@@ -1,10 +1,12 @@
 package object
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/namelib"
 )
 
 type ObjectContext map[string]interface{}
@@ -42,6 +44,18 @@ func (v *BaseView) Permissions(w http.ResponseWriter, r *http.Request, manager i
 
 func (v *BaseView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
 	panic("OnError is not implement. Please implement this method in your structure.")
+}
+
+// GetObjectContext retrieves the ObjectContext from the manager.
+// It is important to understand that this method can only be used when the IView.Object method has completed running,
+// for example in IView.Context.
+func GetObjectContext(manager interfaces.IManager) (ObjectContext, error) {
+	objectInterface, ok := manager.OneTimeData().GetUserContext(namelib.OBJECT_CONTEXT)
+	if !ok {
+		return nil, errors.New("unable to get object context")
+	}
+	object := objectInterface.(ObjectContext)
+	return object, nil
 }
 
 type ErrNoSlug struct {

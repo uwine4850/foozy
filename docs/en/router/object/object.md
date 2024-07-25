@@ -25,6 +25,14 @@ need to return false and the function to be executed.<br>
 * _OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error)_ - the method needs to be overridden.
 This method will be executed when an error occurs during the internal execution of the algorithms.<br>
 
+__GetObjectContext__
+```
+GetObjectContext(manager interfaces.IManager) (ObjectContext, error)
+```
+Returns from the ObjectContext manager.
+It is important to understand that this method can only be used when the IView.Object method has completed its work, 
+for example, IView.Context.
+
 ## type ObjView struct
 
 Detailed view of a specific record from the database. Example of use:

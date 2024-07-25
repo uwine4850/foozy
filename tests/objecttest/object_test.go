@@ -113,8 +113,10 @@ func (v *TObjectView) OnError(w http.ResponseWriter, r *http.Request, manager in
 }
 
 func (v *TObjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
-	_objectContext, _ := manager.OneTimeData().GetUserContext(namelib.OBJECT_CONTEXT)
-	objectContext := _objectContext.(object.ObjectContext)
+	objectContext, err := object.GetObjectContext(manager)
+	if err != nil {
+		panic(err)
+	}
 	if _, ok := objectContext["object"]; !ok {
 		panic("the context has object data")
 	}

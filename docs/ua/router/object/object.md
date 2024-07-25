@@ -25,6 +25,13 @@ manager.OneTimeData().GetUserContext(namelib.OBJECT_CONTEXT). У цьому ме
 * _OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error)_ - метод потрібно перевизначити. 
 Даний метод буде виконаний коли під час внутрішнього виконання алгоритмів виникне помилка.<br>
 
+__GetObjectContext__
+```
+GetObjectContext(manager interfaces.IManager) (ObjectContext, error)
+```
+Повертає з менеджера ObjectContext.
+Важливо розуміти, що цей метод може бути використаний тільки коли метод IView.Object завершив роботу, наприклад, IView.Context.
+
 ## type ObjView struct
 
 Детальний перегляд конкретного запису із бази даних. Приклад використання:
