@@ -47,6 +47,7 @@ type QueryBuild struct {
 	deleteVal      deleteValues
 	updateVal      updateValues
 	incrementVal   incrementValues
+	countVal       string
 	primaryCommand string
 	queryStr       string
 	queryArgs      []interface{}
@@ -192,6 +193,7 @@ func (qb *QueryBuild) Count() interfaces.IUserQueryBuild {
 		panic("the COUNT command can only be used with the SELECT command")
 	}
 	qb.selectVal.Cols = "COUNT(" + qb.selectVal.Cols + ")"
+	qb.countVal = qb.selectVal.Cols
 	return qb
 }
 
@@ -226,6 +228,21 @@ func (qb *QueryBuild) Ex() ([]map[string]interface{}, error) {
 		qb.asyncQ.AsyncQuery(qb.keyForAsyncQ, queryStr, args...)
 		return nil, nil
 	} else {
-		return qb.syncQ.Query(queryStr, args...)
+		res, err := qb.syncQ.Query(queryStr, args...)
+		if err != nil {
+			return nil, err
+		}
+		if qb.countVal != "" {
+			return parseCount(res, qb.countVal)
+		} else {
+			return res, nil
+		}
 	}
+}
+
+func parseCount(res []map[string]interface{}, countVal string) ([]map[string]interface{}, error) {
+	if err := dbutils.DatabaseResultNotEmpty(res); err != nil {
+		return nil, err
+	}
+	return []map[string]interface{}{{"count": res[0][countVal]}}, nil
 }

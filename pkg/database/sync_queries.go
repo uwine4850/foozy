@@ -95,7 +95,14 @@ func (q *SyncQueries) Count(rows []string, tableName string, where dbutils.WHOut
 		limitStr = "LIMIT " + strconv.Itoa(limit)
 	}
 	queryStr := fmt.Sprintf("SELECT COUNT(%s) FROM %s %s %s", strings.Join(rows, ", "), tableName, whereStr, limitStr)
-	return q.Query(queryStr, where.QueryArgs...)
+	res, err := q.Query(queryStr, where.QueryArgs...)
+	if err != nil {
+		return nil, err
+	}
+	if err := dbutils.DatabaseResultNotEmpty(res); err != nil {
+		return nil, err
+	}
+	return []map[string]interface{}{{"count": res[0][fmt.Sprintf("COUNT(%s)", strings.Join(rows, ", "))]}}, nil
 }
 
 // Increment does an increment of a field of type INT.

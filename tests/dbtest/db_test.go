@@ -93,6 +93,10 @@ func TestConnectErrorAndClose(t *testing.T) {
 			t.Errorf("The connection is open.")
 		}
 	}
+	err = db.Connect()
+	if err != nil {
+		t.Error(err)
+	}
 }
 
 func TestSyncQuery(t *testing.T) {
@@ -226,7 +230,7 @@ func TestSyncCount(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	parseInt, err := dbutils.ParseInt(count[0]["COUNT(*)"])
+	parseInt, err := dbutils.ParseInt(count[0]["count"])
 	if err != nil {
 		t.Error(err)
 	}
