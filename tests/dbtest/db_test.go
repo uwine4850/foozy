@@ -96,7 +96,6 @@ func TestConnectErrorAndClose(t *testing.T) {
 }
 
 func TestSyncQuery(t *testing.T) {
-	db.Connect()
 	query, err := db.SyncQ().Query("SELECT `col1`, `col2`, `col3` FROM `dbtest` LIMIT 1")
 	if err != nil {
 		t.Error(err)
@@ -108,7 +107,6 @@ func TestSyncQuery(t *testing.T) {
 }
 
 func TestSyncSelect(t *testing.T) {
-	db.Connect()
 	res1, err := db.SyncQ().Select([]string{"col1", "col2", "col3"}, "dbtest", dbutils.WHOutput{}, 0)
 	if err != nil {
 		panic(err)
@@ -365,5 +363,29 @@ func TestSyncRollbackTransaction(t *testing.T) {
 	}
 	if res != nil || res1 != nil {
 		t.Errorf("The rollback transaction failed.")
+	}
+}
+
+func TestFUNCDatabaseResultIsEmpty_NotRaise(t *testing.T) {
+	clearDbTest()
+	createDbTest()
+	res, err := db.SyncQ().Query("SELECT * FROM dbtest WHERE col1='test1'")
+	if err != nil {
+		t.Error(err)
+	}
+	if err := dbutils.DatabaseResultNotEmpty(res); err != nil {
+		t.Error(err)
+	}
+}
+
+func TestFUNCDatabaseResultIsEmpty_Raise(t *testing.T) {
+	clearDbTest()
+	createDbTest()
+	res, err := db.SyncQ().Query("SELECT * FROM dbtest WHERE col1='fff'")
+	if err != nil {
+		t.Error(err)
+	}
+	if err := dbutils.DatabaseResultNotEmpty(res); !errors.Is(err, dbutils.ErrDatabaseResultIsEmpty{}) {
+		t.Error("error ErrDatabaseResultIsEmpty not raised")
 	}
 }

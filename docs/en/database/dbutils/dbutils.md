@@ -100,3 +100,9 @@ ParamsValueFromStruct(structure interface{}, nilIfEmpty []string) (map[string]an
 ```
 Creates a map with a structure that describes a table.
 You need a completed structure to work correctly, and required fields must have the `db:"<column name>"` tag.
+
+__DatabaseResultNotEmpty__
+```
+DatabaseResultNotEmpty(res []map[string]interface{}) error
+```
+Перевірка, чи результат виведення з бази даних порожній.

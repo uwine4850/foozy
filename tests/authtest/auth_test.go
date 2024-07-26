@@ -67,17 +67,7 @@ func TestMain(m *testing.M) {
 		return func() {}
 	})
 	newRouter.Get("/login", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		db := database.NewDatabase(dbArgs)
-		cc := database.NewConnectControl()
-		if err := cc.OpenUnnamedConnection(db); err != nil {
-			return func() { router.ServerError(w, err.Error(), manager) }
-		}
-		defer func() {
-			if err := cc.CloseAllUnnamedConnection(); err != nil {
-				router.ServerError(w, err.Error(), manager)
-			}
-		}()
-		au := auth.NewAuth(db, w, manager)
+		au := auth.NewAuth(_db, w, manager)
 		if _, err := au.LoginUser("test", "111111"); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager) }
 		}

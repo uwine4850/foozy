@@ -101,3 +101,9 @@ ParamsValueFromStruct(structure interface{}, nilIfEmpty []string) (map[string]an
 ```
 Створює карту зі структури, яка описує таблицю.
 Для правильної роботи вам потрібна завершена структура, а обов’язкові поля мають мати тег `db:"<назва стовпця>"`.
+
+__DatabaseResultNotEmpty__
+```
+DatabaseResultNotEmpty(res []map[string]interface{}) error
+```
+Check if output from database is empty.

@@ -211,3 +211,17 @@ func ParamsValueFromStruct(structure interface{}, nilIfEmpty []string) (map[stri
 	}
 	return outputParamsMap, nil
 }
+
+// DatabaseResultNotEmpty checking whether the output result from the database is empty.
+func DatabaseResultNotEmpty(res []map[string]interface{}) error {
+	if len(res) < 1 {
+		return ErrDatabaseResultIsEmpty{}
+	}
+	return nil
+}
+
+type ErrDatabaseResultIsEmpty struct{}
+
+func (e ErrDatabaseResultIsEmpty) Error() string {
+	return "database result is empty"
+}
