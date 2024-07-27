@@ -74,11 +74,12 @@ type ManagerConf struct {
 	printLog         bool
 	errorLogging     bool
 	errorLoggingPath string
+	skipLoggingLevel int
 	key              Key
 }
 
 func NewManagerConf() *ManagerConf {
-	return &ManagerConf{}
+	return &ManagerConf{skipLoggingLevel: -1}
 }
 
 func (m *ManagerConf) Debug(enable bool) {
@@ -111,6 +112,14 @@ func (m *ManagerConf) ErrorLoggingFile(path string) {
 
 func (m *ManagerConf) GetErrorLoggingFile() string {
 	return m.errorLoggingPath
+}
+
+func (m *ManagerConf) SkipLiggingLevel(skip int) {
+	m.skipLoggingLevel = skip
+}
+
+func (m *ManagerConf) LoggingLevel() int {
+	return m.skipLoggingLevel
 }
 
 func (m *ManagerConf) Generate32BytesKeys() {

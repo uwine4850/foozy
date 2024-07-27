@@ -132,7 +132,7 @@ func TestAsyncCount(t *testing.T) {
 	if res.Error != nil {
 		t.Error(res.Error)
 	}
-	parseInt, err := dbutils.ParseInt(res.Res[0]["COUNT(*)"])
+	parseInt, err := dbutils.ParseInt(res.Res[0]["count"])
 	if err != nil {
 		t.Error(err)
 	}

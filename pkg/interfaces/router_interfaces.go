@@ -38,6 +38,8 @@ type IManagerConfig interface {
 	IsErrorLogging() bool
 	ErrorLoggingFile(path string)
 	GetErrorLoggingFile() string
+	SkipLiggingLevel(skip int)
+	LoggingLevel() int
 	Generate32BytesKeys()
 	Get32BytesKey() IKey
 }

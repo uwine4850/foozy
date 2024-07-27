@@ -29,7 +29,12 @@ func LogError(message string, manager interfaces.IManagerConfig) {
 	ilog := log.New(f, "", log.LstdFlags)
 	ilog.SetFlags(log.LstdFlags)
 
-	_, file, line, ok := runtime.Caller(1)
+	skipLevel := manager.LoggingLevel()
+	if skipLevel == -1 {
+		skipLevel = 3
+	}
+
+	_, file, line, ok := runtime.Caller(skipLevel)
 	if !ok {
 		ilog.Println("Could not retrieve caller information")
 		return

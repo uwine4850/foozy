@@ -108,6 +108,7 @@ func TestServerForbidden(t *testing.T) {
 func TestLogging(t *testing.T) {
 	mngr.Config().ErrorLogging(true)
 	mngr.Config().Debug(true)
+	mngr.Config().SkipLiggingLevel(3)
 	get, err := http.Get("http://localhost:8040/server-logging")
 	if err != nil {
 		t.Error(err)
