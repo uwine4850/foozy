@@ -14,7 +14,7 @@ import (
 // GenerateAndSetCsrf A middleware designed to generate a CSRF token. The token is set as a cookie value.
 // To use it you need to run the method in a synchronous or asynchronous handler.
 func GenerateAndSetCsrf(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
-	csrfCookie, err := r.Cookie(namelib.COOKIE_CSRF_TOKEN)
+	csrfCookie, err := r.Cookie(namelib.ROUTER.COOKIE_CSRF_TOKEN)
 	if err != nil || csrfCookie.Value == "" {
 		csrfToken, err := GenerateCsrfToken()
 		if err != nil {
@@ -22,7 +22,7 @@ func GenerateAndSetCsrf(w http.ResponseWriter, r *http.Request, manager interfac
 			return
 		}
 		cookie := &http.Cookie{
-			Name:     namelib.COOKIE_CSRF_TOKEN,
+			Name:     namelib.ROUTER.COOKIE_CSRF_TOKEN,
 			Value:    csrfToken,
 			MaxAge:   1800,
 			HttpOnly: true,
@@ -30,8 +30,8 @@ func GenerateAndSetCsrf(w http.ResponseWriter, r *http.Request, manager interfac
 			Path:     "/",
 		}
 		http.SetCookie(w, cookie)
-		manager.Render().SetContext(map[string]interface{}{namelib.COOKIE_CSRF_TOKEN: fmt.Sprintf("<input name=\"%s\" type=\"hidden\" value=\"%s\">",
-			namelib.COOKIE_CSRF_TOKEN, csrfToken)})
+		manager.Render().SetContext(map[string]interface{}{namelib.ROUTER.COOKIE_CSRF_TOKEN: fmt.Sprintf("<input name=\"%s\" type=\"hidden\" value=\"%s\">",
+			namelib.ROUTER.COOKIE_CSRF_TOKEN, csrfToken)})
 	}
 }
 

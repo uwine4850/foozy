@@ -14,7 +14,7 @@ import (
 // RedirectError redirect to the page and provide error information for it.
 func RedirectError(w http.ResponseWriter, r *http.Request, path string, _err string, manager interfaces.IManager) {
 	uval := url.Values{}
-	uval.Add(namelib.REDIRECT_ERROR, _err)
+	uval.Add(namelib.ROUTER.REDIRECT_ERROR, _err)
 	newUrl := fmt.Sprintf("%s?%s", path, uval.Encode())
 	http.Redirect(w, r, newUrl, http.StatusFound)
 	debug.ErrorLogginIfEnable(_err, manager.Config())
@@ -24,15 +24,15 @@ func RedirectError(w http.ResponseWriter, r *http.Request, path string, _err str
 // In the template you can get an error using the error variable.
 func CatchRedirectError(r *http.Request, manager interfaces.IManager) {
 	q := r.URL.Query()
-	redirectError := q.Get(namelib.REDIRECT_ERROR)
+	redirectError := q.Get(namelib.ROUTER.REDIRECT_ERROR)
 	if redirectError != "" {
-		manager.Render().SetContext(map[string]interface{}{namelib.REDIRECT_ERROR: redirectError})
+		manager.Render().SetContext(map[string]interface{}{namelib.ROUTER.REDIRECT_ERROR: redirectError})
 	}
 }
 
 // ServerError displaying a 500 error to the user.
 func ServerError(w http.ResponseWriter, error string, manager interfaces.IManager) {
-	manager.OneTimeData().SetUserContext(namelib.SERVER_ERROR, error)
+	manager.OneTimeData().SetUserContext(namelib.ROUTER.SERVER_ERROR, error)
 	w.WriteHeader(http.StatusInternalServerError)
 	if manager.Config().IsDebug() {
 		debug.ErrorLoggingIfEnableAndWrite(w, []byte(error), manager.Config())
@@ -43,7 +43,7 @@ func ServerError(w http.ResponseWriter, error string, manager interfaces.IManage
 
 // ServerForbidden displaying a 403 error to the user.
 func ServerForbidden(w http.ResponseWriter, manager interfaces.IManager) {
-	manager.OneTimeData().SetUserContext(namelib.SERVER_FORBIDDEN_ERROR, "403 forbidden")
+	manager.OneTimeData().SetUserContext(namelib.ROUTER.SERVER_FORBIDDEN_ERROR, "403 forbidden")
 	w.WriteHeader(http.StatusForbidden)
 	debug.ErrorLoggingIfEnableAndWrite(w, []byte("403 forbidden"), manager.Config())
 }

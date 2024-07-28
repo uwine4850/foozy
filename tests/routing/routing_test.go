@@ -84,7 +84,7 @@ func TestMain(m *testing.M) {
 	})
 	newRouter.Get("/catch-redirect-error", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		router.CatchRedirectError(r, manager)
-		_, ok := manager.Render().GetContext()[namelib.REDIRECT_ERROR]
+		_, ok := manager.Render().GetContext()[namelib.ROUTER.REDIRECT_ERROR]
 		w.Write([]byte(strconv.FormatBool(ok)))
 		return func() {}
 	})

@@ -21,7 +21,7 @@ type OnError func(w http.ResponseWriter, r *http.Request, manager interfaces.IMa
 // if two or more key iterations have passed, because the old keys are no longer known.
 func Auth(loginUrl string, db *database.Database, onErr OnError) middlewares.MddlFunc {
 	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
-		pattern, ok := manager.OneTimeData().GetUserContext(namelib.URL_PATTERN)
+		pattern, ok := manager.OneTimeData().GetUserContext(namelib.ROUTER.URL_PATTERN)
 		if !ok {
 			onErr(w, r, manager, ErrUrlPatternNotExist{})
 			return
@@ -31,7 +31,7 @@ func Auth(loginUrl string, db *database.Database, onErr OnError) middlewares.Mdd
 		}
 		k := manager.Config().Get32BytesKey()
 		var auth_date time.Time
-		if err := cookies.ReadSecureNoHMACCookieData([]byte(k.StaticKey()), r, namelib.COOKIE_AUTH_DATE, &auth_date); err != nil {
+		if err := cookies.ReadSecureNoHMACCookieData([]byte(k.StaticKey()), r, namelib.AUTH.COOKIE_AUTH_DATE, &auth_date); err != nil {
 			onErr(w, r, manager, err)
 			return
 		}
@@ -63,5 +63,5 @@ type ErrUrlPatternNotExist struct {
 }
 
 func (e ErrUrlPatternNotExist) Error() string {
-	return fmt.Sprintf("Data behind the %s key was not found.", namelib.URL_PATTERN)
+	return fmt.Sprintf("Data behind the %s key was not found.", namelib.ROUTER.URL_PATTERN)
 }

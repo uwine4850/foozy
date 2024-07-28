@@ -35,7 +35,7 @@ func (v *AllView) Object(w http.ResponseWriter, r *http.Request, manager interfa
 	if err != nil {
 		return nil, err
 	}
-	manager.OneTimeData().SetUserContext(namelib.OBJECT_DB, v.DB)
+	manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_DB, v.DB)
 
 	objects, err := v.DB.SyncQ().Select([]string{"*"}, v.TableName, dbutils.WHOutput{}, 0)
 	if err != nil {

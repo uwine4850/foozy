@@ -40,7 +40,7 @@ func (v *ObjView) Object(w http.ResponseWriter, r *http.Request, manager interfa
 	if err != nil {
 		return nil, err
 	}
-	manager.OneTimeData().SetUserContext(namelib.OBJECT_DB, v.DB)
+	manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_DB, v.DB)
 
 	slugValue, ok := manager.OneTimeData().GetSlugParams(v.Slug)
 	if !ok {

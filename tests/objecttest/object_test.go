@@ -166,7 +166,7 @@ func (v *TObjectMultipleView) OnError(w http.ResponseWriter, r *http.Request, ma
 }
 
 func (v *TObjectMultipleView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
-	_objectContext, _ := manager.OneTimeData().GetUserContext(namelib.OBJECT_CONTEXT)
+	_objectContext, _ := manager.OneTimeData().GetUserContext(namelib.OBJECT.OBJECT_CONTEXT)
 	objectContext := _objectContext.(object.ObjectContext)
 	if _, ok := objectContext["object"]; !ok {
 		panic("the context has object data")
@@ -232,7 +232,7 @@ func (v *TObjectAllView) OnError(w http.ResponseWriter, r *http.Request, manager
 }
 
 func (v *TObjectAllView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
-	_objectContext, _ := manager.OneTimeData().GetUserContext(namelib.OBJECT_CONTEXT)
+	_objectContext, _ := manager.OneTimeData().GetUserContext(namelib.OBJECT.OBJECT_CONTEXT)
 	objectContext := _objectContext.(object.ObjectContext)
 	if _, ok := objectContext["all_object"]; !ok {
 		panic("the context has object data")

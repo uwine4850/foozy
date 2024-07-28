@@ -32,13 +32,13 @@ func (v *TemplateView) Call(w http.ResponseWriter, r *http.Request, manager inte
 	if err != nil {
 		return func() { v.View.OnError(w, r, manager, err) }
 	}
-	manager.OneTimeData().SetUserContext(namelib.OBJECT_CONTEXT, objectContext)
+	manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_CONTEXT, objectContext)
 	_context, err := v.View.Context(w, r, manager)
 	if err != nil {
 		return func() { v.View.OnError(w, r, manager, err) }
 	}
 	fmap.MergeMap((*map[string]interface{})(&objectContext), _context)
-	manager.OneTimeData().SetUserContext(namelib.OBJECT_CONTEXT, objectContext)
+	manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_CONTEXT, objectContext)
 
 	if v.isSkipRender {
 		return func() {}

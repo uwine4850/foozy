@@ -36,7 +36,7 @@ func TestMain(m *testing.M) {
 	if err := _db.Connect(); err != nil {
 		panic(err)
 	}
-	_, err := _db.SyncQ().Query(fmt.Sprintf("TRUNCATE TABLE %s", namelib.AUTH_TABLE))
+	_, err := _db.SyncQ().Query(fmt.Sprintf("TRUNCATE TABLE %s", namelib.AUTH.AUTH_TABLE))
 	if err != nil {
 		panic(err)
 	}
@@ -76,7 +76,7 @@ func TestMain(m *testing.M) {
 	newRouter.Get("/uid", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		k := manager.Config().Get32BytesKey()
 		var a auth.AuthCookie
-		if err := cookies.ReadSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), r, namelib.COOKIE_AUTH, &a); err != nil {
+		if err := cookies.ReadSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), r, namelib.AUTH.COOKIE_AUTH, &a); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager) }
 		}
 		return func() {}
@@ -84,7 +84,7 @@ func TestMain(m *testing.M) {
 	newRouter.Get("/upd-keys", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		k := manager.Config().Get32BytesKey()
 		var a auth.AuthCookie
-		if err := cookies.ReadSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), r, namelib.COOKIE_AUTH, &a); err != nil {
+		if err := cookies.ReadSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), r, namelib.AUTH.COOKIE_AUTH, &a); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager) }
 		}
 		return func() {}

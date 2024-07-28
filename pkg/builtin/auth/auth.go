@@ -38,7 +38,7 @@ func NewAuth(database *database.Database, w http.ResponseWriter, manager interfa
 	if !typeopr.IsPointer(manager) {
 		panic("The manager must be passed by pointer.")
 	}
-	return &Auth{database, namelib.AUTH_TABLE, w, manager}
+	return &Auth{database, namelib.AUTH.AUTH_TABLE, w, manager}
 }
 
 // RegisterUser registers the user in the database.
@@ -102,7 +102,7 @@ func (a *Auth) LoginUser(username string, password string) (*AuthItem, error) {
 // with which they were encoded. Next, the function itself will take new keys from ManagerConf.
 func (a *Auth) UpdateAuthCookie(hashKey []byte, blockKey []byte, r *http.Request) error {
 	var authCookie AuthCookie
-	if err := cookies.ReadSecureCookieData(hashKey, blockKey, r, namelib.COOKIE_AUTH, &authCookie); err != nil {
+	if err := cookies.ReadSecureCookieData(hashKey, blockKey, r, namelib.AUTH.COOKIE_AUTH, &authCookie); err != nil {
 		return err
 	}
 	if err := a.addUserCookie(authCookie.UID); err != nil {
@@ -114,7 +114,7 @@ func (a *Auth) UpdateAuthCookie(hashKey []byte, blockKey []byte, r *http.Request
 func (a *Auth) addUserCookie(uid string) error {
 	k := a.manager.Config().Get32BytesKey()
 	if err := cookies.CreateSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), a.w, &http.Cookie{
-		Name:     namelib.COOKIE_AUTH,
+		Name:     namelib.AUTH.COOKIE_AUTH,
 		Path:     "/",
 		HttpOnly: true,
 		Secure:   true,
@@ -123,7 +123,7 @@ func (a *Auth) addUserCookie(uid string) error {
 	}
 	authDate := a.manager.Config().Get32BytesKey().Date()
 	if err := cookies.CreateSecureNoHMACCookieData([]byte(k.StaticKey()), a.w, &http.Cookie{
-		Name:     namelib.COOKIE_AUTH_DATE,
+		Name:     namelib.AUTH.COOKIE_AUTH_DATE,
 		Path:     "/",
 		HttpOnly: true,
 		Secure:   true,
@@ -163,7 +163,7 @@ func (a *Auth) ChangePassword(username string, oldPassword string, newPassword s
 // UserByUsername checks if the user is in the database.
 // If it is found, it returns information about it.
 func UserByUsername(db *database.Database, username string) (map[string]interface{}, error) {
-	user, err := db.SyncQ().Select([]string{"*"}, namelib.AUTH_TABLE, dbutils.WHEquals(map[string]interface{}{"username": username}, "AND"), 1)
+	user, err := db.SyncQ().Select([]string{"*"}, namelib.AUTH.AUTH_TABLE, dbutils.WHEquals(map[string]interface{}{"username": username}, "AND"), 1)
 	if err != nil {
 		return nil, err
 	}
@@ -175,7 +175,7 @@ func UserByUsername(db *database.Database, username string) (map[string]interfac
 
 // UserByID searches for a user by ID and returns it.
 func UserByID(db *database.Database, id any) (map[string]interface{}, error) {
-	user, err := db.SyncQ().Select([]string{"*"}, namelib.AUTH_TABLE, dbutils.WHEquals(map[string]interface{}{"id": id}, "AND"), 1)
+	user, err := db.SyncQ().Select([]string{"*"}, namelib.AUTH.AUTH_TABLE, dbutils.WHEquals(map[string]interface{}{"id": id}, "AND"), 1)
 	if err != nil {
 		return nil, err
 	}
@@ -190,7 +190,7 @@ func CreateAuthTable(database *database.Database) error {
 	sql := fmt.Sprintf("CREATE TABLE IF NOT EXISTS `%s`.`%s` "+
 		"(`id` INT NOT NULL AUTO_INCREMENT , "+
 		"`username` VARCHAR(200) NOT NULL , "+
-		"`password` TEXT NOT NULL , PRIMARY KEY (`id`))", database.DatabaseName(), namelib.AUTH_TABLE)
+		"`password` TEXT NOT NULL , PRIMARY KEY (`id`))", database.DatabaseName(), namelib.AUTH.AUTH_TABLE)
 	_, err := database.SyncQ().Query(sql)
 	if err != nil {
 		return err

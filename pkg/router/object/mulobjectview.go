@@ -41,7 +41,7 @@ func (v *MultipleObjectView) Object(w http.ResponseWriter, r *http.Request, mana
 	if err != nil {
 		return nil, err
 	}
-	manager.OneTimeData().SetUserContext(namelib.OBJECT_DB, v.DB)
+	manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_DB, v.DB)
 
 	for i := 0; i < len(v.MultipleObjects); i++ {
 		if typeopr.IsPointer(v.MultipleObjects[i].FillStruct) {

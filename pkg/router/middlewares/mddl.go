@@ -71,12 +71,12 @@ func (m *Middleware) WaitAsyncMddl() {
 
 // SetMddlError sets an error that occurred in the middleware.
 func SetMddlError(mddlErr error, manager interfaces.IManagerOneTimeData) {
-	manager.SetUserContext(namelib.MDDL_ERROR, mddlErr)
+	manager.SetUserContext(namelib.ROUTER.MDDL_ERROR, mddlErr)
 }
 
 // GetMddlError get error from middleware. Used in router and in pair with SetMddlError.
 func GetMddlError(manager interfaces.IManagerOneTimeData) (error, error) {
-	mddlErr, ok := manager.GetUserContext(namelib.MDDL_ERROR)
+	mddlErr, ok := manager.GetUserContext(namelib.ROUTER.MDDL_ERROR)
 	if ok {
 		err, ok := mddlErr.(error)
 		if !ok {
@@ -89,13 +89,13 @@ func GetMddlError(manager interfaces.IManagerOneTimeData) (error, error) {
 
 // SkipNextPage sends a command to the router to skip rendering the next page.
 func SkipNextPage(manager interfaces.IManagerOneTimeData) {
-	manager.SetUserContext(namelib.SKIP_NEXT_PAGE, true)
+	manager.SetUserContext(namelib.ROUTER.SKIP_NEXT_PAGE, true)
 }
 
 // IsSkipNextPage checks if the page rendering should be skipped.
 // The function is built into the router.
 func IsSkipNextPage(manager interfaces.IManagerOneTimeData) bool {
-	_, ok := manager.GetUserContext(namelib.SKIP_NEXT_PAGE)
+	_, ok := manager.GetUserContext(namelib.ROUTER.SKIP_NEXT_PAGE)
 	return ok
 }
 
