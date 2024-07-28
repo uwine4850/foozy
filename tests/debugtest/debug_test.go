@@ -18,7 +18,7 @@ import (
 var mngr = manager.NewManager(nil)
 
 func TestMain(m *testing.M) {
-	mngr.Config().ErrorLoggingFile("test.log")
+	mngr.Config().DebugConfig().ErrorLoggingFile("test.log")
 	newRouter := router.NewRouter(mngr)
 	newRouter.SetTemplateEngine(&tmlengine.TemplateEngine{})
 	newRouter.Get("/server-err", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -49,7 +49,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestServerErrorDebTrue(t *testing.T) {
-	mngr.Config().Debug(true)
+	mngr.Config().DebugConfig().Debug(true)
 	get, err := http.Get("http://localhost:8040/server-err")
 	if err != nil {
 		t.Error(err)
@@ -68,7 +68,7 @@ func TestServerErrorDebTrue(t *testing.T) {
 }
 
 func TestServerErrorDebFalse(t *testing.T) {
-	mngr.Config().Debug(false)
+	mngr.Config().DebugConfig().Debug(false)
 	get, err := http.Get("http://localhost:8040/server-err")
 	if err != nil {
 		t.Error(err)
@@ -87,7 +87,7 @@ func TestServerErrorDebFalse(t *testing.T) {
 }
 
 func TestServerForbidden(t *testing.T) {
-	mngr.Config().Debug(false)
+	mngr.Config().DebugConfig().Debug(false)
 	get, err := http.Get("http://localhost:8040/server-forbidden")
 	if err != nil {
 		t.Error(err)
@@ -106,9 +106,9 @@ func TestServerForbidden(t *testing.T) {
 }
 
 func TestLogging(t *testing.T) {
-	mngr.Config().ErrorLogging(true)
-	mngr.Config().Debug(true)
-	mngr.Config().SkipLiggingLevel(3)
+	mngr.Config().DebugConfig().ErrorLogging(true)
+	mngr.Config().DebugConfig().Debug(true)
+	mngr.Config().DebugConfig().SkipLoggingLevel(3)
 	get, err := http.Get("http://localhost:8040/server-logging")
 	if err != nil {
 		t.Error(err)
@@ -122,5 +122,5 @@ func TestLogging(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	mngr.Config().ErrorLogging(false)
+	mngr.Config().DebugConfig().ErrorLogging(false)
 }

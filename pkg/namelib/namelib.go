@@ -12,10 +12,6 @@ var AUTH = AuthNames{
 	COOKIE_AUTH_DATE: "AUTH_DATE",
 }
 
-// AUTH_TABLE string = "auth"
-// COOKIE_AUTH string = "AUTH"
-// COOKIE_AUTH_DATE string = "AUTH_DATE"
-
 type RouterNames struct {
 	URL_PATTERN            string
 	COOKIE_CSRF_TOKEN      string
@@ -36,15 +32,6 @@ var ROUTER = RouterNames{
 	SERVER_FORBIDDEN_ERROR: "SERVER_ERROR",
 }
 
-// // Router
-// const URL_PATTERN string = "URL_PATTERN"
-// const COOKIE_CSRF_TOKEN string = "CSRF_TOKEN"
-// const MDDL_ERROR string = "MDDL_ERROR"
-// const SKIP_NEXT_PAGE string = "SKIP_NEXT_PAGE"
-// const REDIRECT_ERROR string = "REDIRECT_ERROR"
-// const SERVER_ERROR string = "SERVER_ERROR"
-// const SERVER_FORBIDDEN_ERROR string = "SERVER_ERROR"
-
 type ObjectNames struct {
 	OBJECT_CONTEXT      string
 	OBJECT_CONTEXT_FORM string
@@ -56,8 +43,3 @@ var OBJECT = ObjectNames{
 	OBJECT_CONTEXT_FORM: "OBJECT_CONTEXT_FORM",
 	OBJECT_DB:           "OBJECT_DB",
 }
-
-// Object
-// const OBJECT_CONTEXT string = "OBJECT_CONTEXT"
-// const OBJECT_CONTEXT_FORM string = "OBJECT_CONTEXT_FORM"
-// const OBJECT_DB = "OBJECT_DB"

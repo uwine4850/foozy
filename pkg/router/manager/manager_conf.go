@@ -60,6 +60,14 @@ func (k *Key) GenerateBytesKeys(length int) {
 	k.date = time.Now()
 }
 
+func (k *Key) Generate32BytesKeys() {
+	k.GenerateBytesKeys(32)
+}
+
+func (k *Key) Get32BytesKey() interfaces.IKey {
+	return k
+}
+
 func (k *Key) generateKeys(length int) []byte {
 	var seededRand *rand.Rand = rand.New(rand.NewSource(time.Now().UnixNano()))
 	b := make([]byte, length)
@@ -69,25 +77,61 @@ func (k *Key) generateKeys(length int) []byte {
 	return b
 }
 
-type ManagerConf struct {
+type DebugConfig struct {
 	debug            bool
-	printLog         bool
 	errorLogging     bool
 	errorLoggingPath string
 	skipLoggingLevel int
-	key              Key
+}
+
+func (d *DebugConfig) Debug(enable bool) {
+	d.debug = enable
+}
+
+func (d *DebugConfig) IsDebug() bool {
+	return d.debug
+}
+
+func (d *DebugConfig) ErrorLogging(enable bool) {
+	d.errorLogging = enable
+}
+
+func (d *DebugConfig) IsErrorLogging() bool {
+	return d.errorLogging
+}
+
+func (d *DebugConfig) ErrorLoggingFile(path string) {
+	d.errorLoggingPath = path
+}
+
+func (d *DebugConfig) GetErrorLoggingFile() string {
+	return d.errorLoggingPath
+}
+
+func (d *DebugConfig) SkipLoggingLevel(skip int) {
+	d.skipLoggingLevel = skip
+}
+
+func (d *DebugConfig) LoggingLevel() int {
+	return d.skipLoggingLevel
+}
+
+type ManagerConf struct {
+	debugConfig *DebugConfig
+	printLog    bool
+	key         Key
 }
 
 func NewManagerConf() *ManagerConf {
-	return &ManagerConf{skipLoggingLevel: -1}
+	return &ManagerConf{
+		debugConfig: &DebugConfig{
+			skipLoggingLevel: -1,
+		},
+	}
 }
 
-func (m *ManagerConf) Debug(enable bool) {
-	m.debug = enable
-}
-
-func (m *ManagerConf) IsDebug() bool {
-	return m.debug
+func (m *ManagerConf) DebugConfig() interfaces.IManagerDebugConfig {
+	return m.debugConfig
 }
 
 func (m *ManagerConf) PrintLog(enable bool) {
@@ -98,34 +142,6 @@ func (m *ManagerConf) IsPrintLog() bool {
 	return m.printLog
 }
 
-func (m *ManagerConf) ErrorLogging(enable bool) {
-	m.errorLogging = enable
-}
-
-func (m *ManagerConf) IsErrorLogging() bool {
-	return m.errorLogging
-}
-
-func (m *ManagerConf) ErrorLoggingFile(path string) {
-	m.errorLoggingPath = path
-}
-
-func (m *ManagerConf) GetErrorLoggingFile() string {
-	return m.errorLoggingPath
-}
-
-func (m *ManagerConf) SkipLiggingLevel(skip int) {
-	m.skipLoggingLevel = skip
-}
-
-func (m *ManagerConf) LoggingLevel() int {
-	return m.skipLoggingLevel
-}
-
-func (m *ManagerConf) Generate32BytesKeys() {
-	m.key.GenerateBytesKeys(32)
-}
-
-func (m *ManagerConf) Get32BytesKey() interfaces.IKey {
+func (m *ManagerConf) Key() interfaces.IKey {
 	return &m.key
 }

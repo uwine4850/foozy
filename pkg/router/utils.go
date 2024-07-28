@@ -34,7 +34,7 @@ func CatchRedirectError(r *http.Request, manager interfaces.IManager) {
 func ServerError(w http.ResponseWriter, error string, manager interfaces.IManager) {
 	manager.OneTimeData().SetUserContext(namelib.ROUTER.SERVER_ERROR, error)
 	w.WriteHeader(http.StatusInternalServerError)
-	if manager.Config().IsDebug() {
+	if manager.Config().DebugConfig().IsDebug() {
 		debug.ErrorLoggingIfEnableAndWrite(w, []byte(error), manager.Config())
 	} else {
 		debug.ErrorLoggingIfEnableAndWrite(w, []byte("500 Internal server error"), manager.Config())

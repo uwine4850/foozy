@@ -11,10 +11,10 @@ import (
 )
 
 func LogError(message string, manager interfaces.IManagerConfig) {
-	if manager.GetErrorLoggingFile() == "" {
+	if manager.DebugConfig().GetErrorLoggingFile() == "" {
 		panic("Unable to create log file. File path not set")
 	}
-	f, err := os.OpenFile(manager.GetErrorLoggingFile(), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	f, err := os.OpenFile(manager.DebugConfig().GetErrorLoggingFile(), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		fmt.Println("LogError: ", err.Error())
 		return
@@ -29,7 +29,7 @@ func LogError(message string, manager interfaces.IManagerConfig) {
 	ilog := log.New(f, "", log.LstdFlags)
 	ilog.SetFlags(log.LstdFlags)
 
-	skipLevel := manager.LoggingLevel()
+	skipLevel := manager.DebugConfig().LoggingLevel()
 	if skipLevel == -1 {
 		skipLevel = 3
 	}
@@ -46,17 +46,17 @@ func ErrorLoggingIfEnableAndWrite(w http.ResponseWriter, text []byte, manager in
 	_, err := w.Write(text)
 	if err != nil {
 		fmt.Println("LoggingIfEnableAndWrite: ", err.Error())
-		if manager.IsErrorLogging() {
+		if manager.DebugConfig().IsErrorLogging() {
 			LogError(err.Error(), manager)
 		}
 	}
-	if manager.IsErrorLogging() {
+	if manager.DebugConfig().IsErrorLogging() {
 		LogError(string(text), manager)
 	}
 }
 
 func ErrorLogginIfEnable(message string, manager interfaces.IManagerConfig) {
-	if manager.IsErrorLogging() {
+	if manager.DebugConfig().IsErrorLogging() {
 		LogError(message, manager)
 	}
 }

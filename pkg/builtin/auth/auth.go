@@ -112,16 +112,16 @@ func (a *Auth) UpdateAuthCookie(hashKey []byte, blockKey []byte, r *http.Request
 }
 
 func (a *Auth) addUserCookie(uid string) error {
-	k := a.manager.Config().Get32BytesKey()
+	k := a.manager.Config().Key().Get32BytesKey()
 	if err := cookies.CreateSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), a.w, &http.Cookie{
 		Name:     namelib.AUTH.COOKIE_AUTH,
 		Path:     "/",
 		HttpOnly: true,
 		Secure:   true,
-	}, &AuthCookie{UID: uid, KeyDate: a.manager.Config().Get32BytesKey().Date()}); err != nil {
+	}, &AuthCookie{UID: uid, KeyDate: a.manager.Config().Key().Get32BytesKey().Date()}); err != nil {
 		return err
 	}
-	authDate := a.manager.Config().Get32BytesKey().Date()
+	authDate := a.manager.Config().Key().Get32BytesKey().Date()
 	if err := cookies.CreateSecureNoHMACCookieData([]byte(k.StaticKey()), a.w, &http.Cookie{
 		Name:     namelib.AUTH.COOKIE_AUTH_DATE,
 		Path:     "/",

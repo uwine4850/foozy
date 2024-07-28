@@ -20,7 +20,7 @@ var mng = manager.NewManager(nil)
 var newRouter = router.NewRouter(mng)
 
 func TestMain(m *testing.M) {
-	mng.Config().Debug(true)
+	mng.Config().DebugConfig().Debug(true)
 	newRouter.SetTemplateEngine(&tmlengine.TemplateEngine{})
 	newRouter.Get("/mddl", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		return func() { w.Write([]byte("OK")) }

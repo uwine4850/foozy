@@ -27,21 +27,26 @@ type IKey interface {
 	StaticKey() string
 	Date() time.Time
 	GenerateBytesKeys(length int)
+	Generate32BytesKeys()
+	Get32BytesKey() IKey
 }
 
-type IManagerConfig interface {
+type IManagerDebugConfig interface {
 	Debug(enable bool)
 	IsDebug() bool
-	PrintLog(enable bool)
-	IsPrintLog() bool
 	ErrorLogging(enable bool)
 	IsErrorLogging() bool
 	ErrorLoggingFile(path string)
 	GetErrorLoggingFile() string
-	SkipLiggingLevel(skip int)
+	SkipLoggingLevel(skip int)
 	LoggingLevel() int
-	Generate32BytesKeys()
-	Get32BytesKey() IKey
+}
+
+type IManagerConfig interface {
+	DebugConfig() IManagerDebugConfig
+	PrintLog(enable bool)
+	IsPrintLog() bool
+	Key() IKey
 }
 
 type IManagerOneTimeData interface {

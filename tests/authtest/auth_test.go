@@ -42,8 +42,8 @@ func TestMain(m *testing.M) {
 	}
 	defer _db.Close()
 
-	mng.Config().Generate32BytesKeys()
-	mng.Config().Debug(true)
+	mng.Config().Key().Generate32BytesKeys()
+	mng.Config().DebugConfig().Debug(true)
 
 	mddlDb := database.NewDatabase(dbArgs)
 	if err := mddlDb.Connect(); err != nil {
@@ -74,7 +74,7 @@ func TestMain(m *testing.M) {
 		return func() {}
 	})
 	newRouter.Get("/uid", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		k := manager.Config().Get32BytesKey()
+		k := manager.Config().Key().Get32BytesKey()
 		var a auth.AuthCookie
 		if err := cookies.ReadSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), r, namelib.AUTH.COOKIE_AUTH, &a); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager) }
@@ -82,7 +82,7 @@ func TestMain(m *testing.M) {
 		return func() {}
 	})
 	newRouter.Get("/upd-keys", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		k := manager.Config().Get32BytesKey()
+		k := manager.Config().Key().Get32BytesKey()
 		var a auth.AuthCookie
 		if err := cookies.ReadSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), r, namelib.AUTH.COOKIE_AUTH, &a); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager) }
@@ -192,7 +192,7 @@ func TestReadUID(t *testing.T) {
 }
 
 func TestUpdKeys(t *testing.T) {
-	k := mng.Config().Get32BytesKey()
+	k := mng.Config().Key().Get32BytesKey()
 	hashKey := k.HashKey()
 	blockKey := k.BlockKey()
 	gf := globalflow.NewGlobalFlow(1)

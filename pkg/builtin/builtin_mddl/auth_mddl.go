@@ -29,13 +29,13 @@ func Auth(loginUrl string, db *database.Database, onErr OnError) middlewares.Mdd
 		if pattern == loginUrl {
 			return
 		}
-		k := manager.Config().Get32BytesKey()
+		k := manager.Config().Key().Get32BytesKey()
 		var auth_date time.Time
 		if err := cookies.ReadSecureNoHMACCookieData([]byte(k.StaticKey()), r, namelib.AUTH.COOKIE_AUTH_DATE, &auth_date); err != nil {
 			onErr(w, r, manager, err)
 			return
 		}
-		d1 := manager.Config().Get32BytesKey().Date().Format("02.01.2006 15:04:05")
+		d1 := manager.Config().Key().Get32BytesKey().Date().Format("02.01.2006 15:04:05")
 		d2 := auth_date.Format("02.01.2006 15:04:05")
 		if d1 != d2 {
 			cc := database.NewConnectControl()
