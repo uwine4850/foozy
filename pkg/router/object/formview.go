@@ -17,6 +17,7 @@ type FormView struct {
 	FormStruct       interface{}
 	NotNilFormFields []string
 	NilIfNotExist    []string
+	ValidateCSRF     bool
 }
 
 func (v *FormView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
@@ -26,6 +27,11 @@ func (v *FormView) Object(w http.ResponseWriter, r *http.Request, manager interf
 	frm := form.NewForm(r)
 	if err := frm.Parse(); err != nil {
 		return nil, err
+	}
+	if v.ValidateCSRF {
+		if err := frm.ValidateCsrfToken(); err != nil {
+			return nil, err
+		}
 	}
 
 	fillForm := reflect.New(reflect.TypeOf(v.FormStruct)).Elem()

@@ -164,6 +164,8 @@ func Init() func(w http.ResponseWriter, r *http.Request, manager interfaces.IMan
 структури будуть перевірятися на пустоту. Якщо після цього знаку вказати ще поля структури, вони будуть будуть виключені
 з перевірки на пустоту. Також можна просто передавати поля які потрібно перевірити без знаку "*".
 
+Якщо параметр `ValidateCSRF` дорівнює `true` - буде відбуватися перевірка CSRF токена.
+
 __FormInterface__
 ```
 FormInterface(manager interfaces.IManagerOneTimeData) (interface{}, error)

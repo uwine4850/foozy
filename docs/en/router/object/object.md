@@ -165,6 +165,8 @@ It is important to note that the `NotNilFormFields` parameter is universal. If y
 structures will be checked for emptiness. If you specify more structure fields after this sign, they will be excluded
 from checking for emptiness. You can also simply pass the fields to be checked without the "*" sign.
 
+If the `ValidateCSRF` parameter is `true`, the CSRF token will be checked.
+
 __FormInterface__
 ```
 FormInterface(manager interfaces.IManagerOneTimeData) (interface{}, error)
