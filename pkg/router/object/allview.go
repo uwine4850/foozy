@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/uwine4850/foozy/pkg/database"
+	"github.com/uwine4850/foozy/pkg/database/dbmapper"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
@@ -59,7 +60,7 @@ func (v *AllView) fillObjects(objects []map[string]interface{}) ([]interface{}, 
 	var objectsStruct []interface{}
 	for i := 0; i < len(objects); i++ {
 		value := reflect.New(reflect.TypeOf(v.FillStruct)).Elem()
-		err := dbutils.FillReflectValueFromDb(objects[i], &value)
+		err := dbmapper.FillReflectValueFromDb(objects[i], &value)
 		if err != nil {
 			return nil, err
 		}

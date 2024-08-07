@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/uwine4850/foozy/pkg/database"
+	"github.com/uwine4850/foozy/pkg/database/dbmapper"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 )
 
@@ -206,7 +207,7 @@ func TestSyncInsertWithStruct(t *testing.T) {
 		Col2: "",
 		Col3: 123,
 	}
-	insertStrcutValue, err := dbutils.ParamsValueFromStruct(&insertStruct, []string{"col2"})
+	insertStrcutValue, err := dbmapper.ParamsValueFromStruct(&insertStruct, []string{"col2"})
 	if err != nil {
 		panic(err)
 	}
@@ -284,7 +285,7 @@ func TestSyncUpdateWithStruct(t *testing.T) {
 		Col2: "2023-10-16",
 		Col3: 123,
 	}
-	params, err := dbutils.ParamsValueFromStruct(&updateStruct, []string{})
+	params, err := dbmapper.ParamsValueFromStruct(&updateStruct, []string{})
 	if err != nil {
 		panic(err)
 	}

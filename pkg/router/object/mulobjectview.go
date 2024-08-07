@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/uwine4850/foozy/pkg/database"
+	"github.com/uwine4850/foozy/pkg/database/dbmapper"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
@@ -74,7 +75,7 @@ func (v *MultipleObjectView) fillObject(object map[string]interface{}, fillStruc
 		panic("the FillStruct field must not be nil")
 	}
 	value := reflect.New(reflect.TypeOf(fillStruct)).Elem()
-	err := dbutils.FillReflectValueFromDb(object, &value)
+	err := dbmapper.FillReflectValueFromDb(object, &value)
 	if err != nil {
 		return nil, err
 	}

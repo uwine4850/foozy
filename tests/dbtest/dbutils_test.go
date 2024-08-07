@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/uwine4850/foozy/pkg/database/dbmapper"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	"github.com/uwine4850/foozy/pkg/utils/fslice"
 )
@@ -121,7 +122,7 @@ func TestFillStructFromDb(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	err = dbutils.FillStructFromDb(res[0], &f)
+	err = dbmapper.FillStructFromDb(res[0], &f)
 	if err != nil {
 		t.Error(err)
 	}

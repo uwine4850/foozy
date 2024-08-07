@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/uwine4850/foozy/pkg/database"
+	"github.com/uwine4850/foozy/pkg/database/dbmapper"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
@@ -88,7 +89,7 @@ func (a *Auth) LoginUser(username string, password string) (*AuthItem, error) {
 		return nil, err
 	}
 	var authItem AuthItem
-	if err := dbutils.FillStructFromDb(userDB, &authItem); err != nil {
+	if err := dbmapper.FillStructFromDb(userDB, &authItem); err != nil {
 		return nil, err
 	}
 	if err := a.addUserCookie(authItem.Id); err != nil {
