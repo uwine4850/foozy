@@ -19,6 +19,10 @@ import (
 	"github.com/uwine4850/foozy/pkg/utils/fstring"
 )
 
+type FormFile struct {
+	Header *multipart.FileHeader
+}
+
 type Form struct {
 	multipartForm      *multipart.Form
 	applicationForm    netUrl.Values

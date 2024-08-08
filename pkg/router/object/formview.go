@@ -8,6 +8,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router/form"
+	"github.com/uwine4850/foozy/pkg/router/form/formmapper"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
@@ -35,16 +36,15 @@ func (v *FormView) Object(w http.ResponseWriter, r *http.Request, manager interf
 	}
 
 	fillForm := reflect.New(reflect.TypeOf(v.FormStruct)).Elem()
-	if err := form.FillReflectValueFromForm(frm, &fillForm, v.NilIfNotExist); err != nil {
-		return nil, err
-	}
-	fillableForm := form.NewFillableFormStruct(&fillForm)
-
-	if err := v.checkEmpty(fillableForm); err != nil {
+	if err := formmapper.FillReflectValueFromForm(frm, &fillForm, v.NilIfNotExist); err != nil {
 		return nil, err
 	}
 
-	if err := form.CheckExtension(fillableForm); err != nil {
+	if err := v.checkEmpty(&fillForm); err != nil {
+		return nil, err
+	}
+
+	if err := formmapper.CheckExtension(&fillForm); err != nil {
 		return nil, err
 	}
 
@@ -55,14 +55,14 @@ func (v *FormView) Object(w http.ResponseWriter, r *http.Request, manager interf
 // If the first character of the slice is "*", then you need to select the entire field of the structure.
 // If there are more elements after the "*" sign, then they need to be excluded.
 // When the "*" sign is missing, process according to the standard algorithm.
-func (v *FormView) checkEmpty(fillableForm *form.FillableFormStruct) error {
+func (v *FormView) checkEmpty(fillForm interface{}) error {
 	var notNilFields []string
 	if len(v.NotNilFormFields) >= 1 && v.NotNilFormFields[0] == "*" {
 		excludeFields := []string{}
 		if len(v.NotNilFormFields) >= 2 {
 			excludeFields = v.NotNilFormFields[1:]
 		}
-		fields, err := form.FieldsName(fillableForm, excludeFields)
+		fields, err := formmapper.FieldsName(fillForm, excludeFields)
 		if err != nil {
 			return err
 		}
@@ -70,7 +70,7 @@ func (v *FormView) checkEmpty(fillableForm *form.FillableFormStruct) error {
 	} else {
 		notNilFields = v.NotNilFormFields
 	}
-	if err := form.FieldsNotEmpty(fillableForm, notNilFields); err != nil {
+	if err := formmapper.FieldsNotEmpty(fillForm, notNilFields); err != nil {
 		return err
 	}
 	return nil

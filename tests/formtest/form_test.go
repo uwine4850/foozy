@@ -11,6 +11,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	router2 "github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/form"
+	"github.com/uwine4850/foozy/pkg/router/form/formmapper"
 	"github.com/uwine4850/foozy/pkg/router/manager"
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
 	"github.com/uwine4850/foozy/pkg/router/tmlengine"
@@ -22,7 +23,7 @@ type Fill struct {
 	NilField []string `form:"isNil"`
 	Str      string
 	Field1   []string        `form:"f1"`
-	File     []form.FormFile `form:"file"`
+	File     []form.FormFile `form:"file" empty:""`
 }
 
 func removeAllFilesInDirectory(dirPath string) error {
@@ -93,7 +94,7 @@ func fill(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) f
 		return func() { w.Write([]byte(err.Error())) }
 	}
 	var f Fill
-	err = form.FillStructFromForm(newForm, form.NewFillableFormStruct(&f), []string{"isNil"})
+	err = formmapper.FillStructFromForm(newForm, &f, []string{"isNil"})
 	if err != nil {
 		return func() { w.Write([]byte(err.Error())) }
 	}
@@ -170,20 +171,19 @@ func fillableFormStruct(w http.ResponseWriter, r *http.Request, manager interfac
 		return func() { w.Write([]byte(err.Error())) }
 	}
 	var fill Fill
-	fillableForm := form.NewFillableFormStruct(&fill)
 
-	err = form.FillStructFromForm(newForm, fillableForm, []string{"isNil"})
+	err = formmapper.FillStructFromForm(newForm, &fill, []string{"isNil"})
 	if err != nil {
 		return func() { w.Write([]byte(err.Error())) }
 	}
-	if fillableForm.GetOrDef("Field1", 0).(string) != "v1" {
-		return func() { w.Write([]byte("GetOrDef error")) }
+	if fill.Field1[0] != "v1" {
+		return func() { w.Write([]byte("get Field1 error")) }
 	}
-	if fillableForm.GetOrDef("File", 0).(form.FormFile).Header.Filename != "x.png" {
-		return func() { w.Write([]byte("GetOrDef error")) }
+	if fill.File[0].Header.Filename != "x.png" {
+		return func() { w.Write([]byte("get File error")) }
 	}
-	if fillableForm.GetOrDef("NilField", 0).(string) != "" {
-		return func() { w.Write([]byte("GetOrDef error")) }
+	if fill.NilField != nil {
+		return func() { w.Write([]byte("get NilField error")) }
 	}
 	return func() {}
 }
