@@ -138,13 +138,13 @@ func validateDbTag(tag string, dbRes *map[string]interface{}) (bool, error) {
 	if _, ok := (*dbRes)[tag]; !ok {
 		return false, ErrDbResFieldNotFound{Field: tag}
 	}
-	if (*dbRes)[tag] == nil {
-		return false, nil
-	}
 	return true, nil
 }
 
 func dbValueConversionToByte(value interface{}) ([]byte, error) {
+	if value == nil {
+		return nil, nil
+	}
 	var val []byte
 	if reflect.TypeOf(value).Kind() == reflect.Slice {
 		v, ok := value.([]uint8)

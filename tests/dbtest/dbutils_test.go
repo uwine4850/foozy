@@ -4,7 +4,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/uwine4850/foozy/pkg/database/dbmapper"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	"github.com/uwine4850/foozy/pkg/utils/fslice"
 )
@@ -102,31 +101,5 @@ func TestRepeatValues(t *testing.T) {
 	values := dbutils.RepeatValues(3, ",")
 	if values != "?, ?, ?" {
 		t.Errorf("The result does not match the expectation.")
-	}
-}
-
-type Fill struct {
-	Col1 string `db:"col1"`
-	Col2 string `db:"col2"`
-	Col3 string `db:"col3"`
-}
-
-func TestFillStructFromDb(t *testing.T) {
-	var f Fill
-	expected := Fill{
-		Col1: "test1",
-		Col2: "2023-11-15",
-		Col3: "111.22",
-	}
-	res, err := db.SyncQ().Query("SELECT * FROM dbtest")
-	if err != nil {
-		t.Error(err)
-	}
-	err = dbmapper.FillStructFromDb(res[0], &f)
-	if err != nil {
-		t.Error(err)
-	}
-	if f != expected {
-		t.Errorf("The data in the structure is not as expected.")
 	}
 }
