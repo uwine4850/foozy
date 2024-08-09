@@ -15,14 +15,14 @@ type IFormGetEnctypeData interface {
 // OrderedForm Values can be displayed either by field name or all fields at once.
 type OrderedForm struct {
 	itemCount int
-	names     map[string]int
+	names     map[string][]int
 	values    []OrderedFormValue
 }
 
 func NewOrderedForm() *OrderedForm {
 	o := &OrderedForm{}
 	o.itemCount = 0
-	o.names = make(map[string]int)
+	o.names = make(map[string][]int)
 	return o
 }
 
@@ -33,16 +33,20 @@ func (f *OrderedForm) Add(name string, value interface{}) {
 		Value: value,
 	})
 	f.itemCount++
-	f.names[name] = f.itemCount
+	f.names[name] = append(f.names[name], f.itemCount)
 }
 
 // GetByName getting a field by name.
-func (f *OrderedForm) GetByName(name string) (OrderedFormValue, bool) {
+func (f *OrderedForm) GetByName(name string) ([]OrderedFormValue, bool) {
 	getIndex, ok := f.names[name]
 	if !ok {
-		return OrderedFormValue{}, ok
+		return nil, ok
 	}
-	return f.values[getIndex-1], true
+	res := []OrderedFormValue{}
+	for i := 0; i < len(getIndex); i++ {
+		res = append(res, f.values[getIndex[i]-1])
+	}
+	return res, true
 }
 
 // GetAll getting all fields.

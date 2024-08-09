@@ -41,7 +41,6 @@ func FillStructFromForm(frm *form.Form, fillStruct interface{}, nilIfNotExist []
 			return err
 		}
 		orderedFormValue, ok := orderedForm.GetByName(tag)
-		formValue := orderedFormValue.Value
 		if !ok {
 			if nilIfNotExist != nil && fslice.SliceContains(nilIfNotExist, tag) {
 				continue
@@ -49,20 +48,21 @@ func FillStructFromForm(frm *form.Form, fillStruct interface{}, nilIfNotExist []
 				return form.ErrFormConvertFieldNotFound{Field: tag}
 			}
 		}
-
-		//Be sure to first check the setting of the string value.
-		// This happens because a field without a file loaded is considered a string.
-		// Therefore, an empty []FormFile field will be of type []string.
-		// If the field is suitable for a string, then you need to skip the iteration to avoid false positives when processing files.
-		ok, err = setFormString(field, formValue, value, field.Tag.Get("empty"))
-		if err != nil {
-			return err
-		}
-		if ok {
-			continue
-		}
-		if err := setFormFile(field, formValue, value, field.Tag.Get("empty")); err != nil {
-			return err
+		for i := 0; i < len(orderedFormValue); i++ {
+			//Be sure to first check the setting of the string value.
+			// This happens because a field without a file loaded is considered a string.
+			// Therefore, an empty []FormFile field will be of type []string.
+			// If the field is suitable for a string, then you need to skip the iteration to avoid false positives when processing files.
+			ok, err = setFormString(field, orderedFormValue[i].Value, value, field.Tag.Get("empty"))
+			if err != nil {
+				return err
+			}
+			if ok {
+				continue
+			}
+			if err := setFormFile(field, orderedFormValue[i].Value, value, field.Tag.Get("empty")); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -90,21 +90,21 @@ func FillReflectValueFromForm(frm *form.Form, fillValue *reflect.Value, nilIfNot
 				return form.ErrFormConvertFieldNotFound{Field: tag}
 			}
 		}
-		formValue := orderedFormValue.Value
-
-		//Be sure to first check the setting of the string value.
-		// This happens because a field without a file loaded is considered a string.
-		// Therefore, an empty []FormFile field will be of type []string.
-		// If the field is suitable for a string, then you need to skip the iteration to avoid false positives when processing files.
-		ok, err := setFormString(field, formValue, value, field.Tag.Get("empty"))
-		if err != nil {
-			return err
-		}
-		if ok {
-			continue
-		}
-		if err := setFormFile(field, formValue, value, field.Tag.Get("empty")); err != nil {
-			return err
+		for i := 0; i < len(orderedFormValue); i++ {
+			//Be sure to first check the setting of the string value.
+			// This happens because a field without a file loaded is considered a string.
+			// Therefore, an empty []FormFile field will be of type []string.
+			// If the field is suitable for a string, then you need to skip the iteration to avoid false positives when processing files.
+			ok, err := setFormString(field, orderedFormValue[i].Value, value, field.Tag.Get("empty"))
+			if err != nil {
+				return err
+			}
+			if ok {
+				continue
+			}
+			if err := setFormFile(field, orderedFormValue[i].Value, value, field.Tag.Get("empty")); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -230,7 +230,7 @@ func setFormFile(field reflect.StructField, formValue interface{}, value reflect
 		if emptyTag != "" {
 			for i := 0; i < reflect.ValueOf(formValue).Len(); i++ {
 				if reflect.ValueOf(formValue).Index(i).IsZero() {
-					if err := emptyOperationsFile(emptyTag, field.Name, i); err != nil {
+					if err := emptyOperationsFile(emptyTag, field.Name); err != nil {
 						return err
 					}
 				}
@@ -268,20 +268,20 @@ func emptyOperations(emptyTagValue string, fieldName string, value *string, inde
 	}
 	switch emptyTagValue {
 	case "-err":
-		return fmt.Errorf("the %s field value at index %s is empty", fieldName, strconv.Itoa(index))
+		return ErrEmptyFieldIndex{Name: fieldName, Index: strconv.Itoa(index)}
 	default:
 		*value = emptyTagValue
 	}
 	return nil
 }
 
-func emptyOperationsFile(emptyTagValue string, fieldName string, index int) error {
+func emptyOperationsFile(emptyTagValue string, fieldName string) error {
 	if emptyTagValue == "" {
 		return nil
 	}
 	switch emptyTagValue {
 	case "-err":
-		return fmt.Errorf("the %s field value at index %s is empty", fieldName, strconv.Itoa(index))
+		return ErrEmptyFieldIndex{Name: fieldName, Index: "unkown"}
 	default:
 		return fmt.Errorf("the FormFile field does not support a default value")
 	}
@@ -293,4 +293,13 @@ type ErrExtensionNotMatch struct {
 
 func (e ErrExtensionNotMatch) Error() string {
 	return fmt.Sprintf("The extension of the %s field does not match what is expected.", e.Field)
+}
+
+type ErrEmptyFieldIndex struct {
+	Name  string
+	Index string
+}
+
+func (e ErrEmptyFieldIndex) Error() string {
+	return fmt.Sprintf("the %s field value at index %s is empty", e.Name, e.Index)
 }
