@@ -156,10 +156,12 @@ func ReplaceFile(pathToFile string, w http.ResponseWriter, fileHeader *multipart
 }
 
 // SendApplicationForm sends a form of type application/x-www-form-urlencoded to the specified address.
-func SendApplicationForm(url string, values map[string]string) (*http.Response, error) {
+func SendApplicationForm(url string, values map[string][]string) (*http.Response, error) {
 	formData := netUrl.Values{}
 	for name, value := range values {
-		formData.Set(name, value)
+		for i := 0; i < len(value); i++ {
+			formData.Add(name, value[i])
+		}
 	}
 	response, err := http.Post(url, "application/x-www-form-urlencoded", bytes.NewBufferString(formData.Encode()))
 	if err != nil {
@@ -170,11 +172,21 @@ func SendApplicationForm(url string, values map[string]string) (*http.Response, 
 
 // SendMultipartForm sends a form of type multipart/form-data to the specified address.
 // The files argument accepts form field names and a slice with file paths.
-func SendMultipartForm(url string, values map[string]string, files map[string][]string) (*http.Response, error) {
+func SendMultipartForm(url string, values map[string][]string, files map[string][]string) (*http.Response, error) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	for name, value := range files {
 		for i := 0; i < len(value); i++ {
+			if value[i] == "" {
+				fileWriter, err := writer.CreateFormFile(name, "")
+				if err != nil {
+					return nil, err
+				}
+				if _, err := io.Copy(fileWriter, bytes.NewReader(nil)); err != nil {
+					return nil, err
+				}
+				continue
+			}
 			file, err := os.Open(value[i])
 			if err != nil {
 				return nil, err
@@ -190,7 +202,9 @@ func SendMultipartForm(url string, values map[string]string, files map[string][]
 		}
 	}
 	for name, value := range values {
-		writer.WriteField(name, value)
+		for i := 0; i < len(value); i++ {
+			writer.WriteField(name, value[i])
+		}
 	}
 	writer.Close()
 	response, err := http.Post(url, writer.FormDataContentType(), body)

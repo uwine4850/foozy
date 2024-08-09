@@ -189,7 +189,7 @@ func fillableFormStruct(w http.ResponseWriter, r *http.Request, manager interfac
 }
 
 func TestApplicationForm(t *testing.T) {
-	resp, err := form.SendApplicationForm("http://localhost:8020/application-form", map[string]string{"f1": "v1", "f2": "v2"})
+	resp, err := form.SendApplicationForm("http://localhost:8020/application-form", map[string][]string{"f1": {"v1"}, "f2": {"v2"}})
 	if err != nil {
 		t.Error(err)
 	}
@@ -207,7 +207,7 @@ func TestApplicationForm(t *testing.T) {
 }
 
 func TestMultipartForm(t *testing.T) {
-	multipartForm, err := form.SendMultipartForm("http://localhost:8020/multipart-form", map[string]string{"f1": "v1"}, map[string][]string{"file": {"x.png"}})
+	multipartForm, err := form.SendMultipartForm("http://localhost:8020/multipart-form", map[string][]string{"f1": {"v1"}}, map[string][]string{"file": {"x.png"}})
 	if err != nil {
 		t.Error(err)
 	}
@@ -222,7 +222,7 @@ func TestMultipartForm(t *testing.T) {
 }
 
 func TestSaveFile(t *testing.T) {
-	sendMultipartForm, err := form.SendMultipartForm("http://localhost:8020/save-file", map[string]string{}, map[string][]string{"file": {"x.png"}})
+	sendMultipartForm, err := form.SendMultipartForm("http://localhost:8020/save-file", map[string][]string{}, map[string][]string{"file": {"x.png"}})
 	if err != nil {
 		t.Error(err)
 	}
@@ -237,7 +237,7 @@ func TestSaveFile(t *testing.T) {
 }
 
 func TestFillStructFromForm(t *testing.T) {
-	multipartForm, err := form.SendMultipartForm("http://localhost:8020/fill", map[string]string{"f1": "v1"}, map[string][]string{"file": {"x.png"}})
+	multipartForm, err := form.SendMultipartForm("http://localhost:8020/fill", map[string][]string{"f1": {"v1"}}, map[string][]string{"file": {"x.png"}})
 	if err != nil {
 		t.Error(err)
 	}
@@ -255,7 +255,7 @@ func TestFillStructFromForm(t *testing.T) {
 }
 
 func TestFillableFormStruct(t *testing.T) {
-	multipartForm, err := form.SendMultipartForm("http://localhost:8020/fillable-form-struct", map[string]string{"f1": "v1"}, map[string][]string{"file": {"x.png"}})
+	multipartForm, err := form.SendMultipartForm("http://localhost:8020/fillable-form-struct", map[string][]string{"f1": {"v1"}}, map[string][]string{"file": {"x.png"}})
 	if err != nil {
 		t.Error(err)
 	}
