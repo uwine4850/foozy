@@ -11,7 +11,6 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	router2 "github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/form"
-	"github.com/uwine4850/foozy/pkg/router/form/formmapper"
 	"github.com/uwine4850/foozy/pkg/router/manager"
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
 	"github.com/uwine4850/foozy/pkg/router/tmlengine"
@@ -67,16 +66,14 @@ func TestMain(m *testing.M) {
 	newRouter.Post("/application-form", applicationForm)
 	newRouter.Post("/multipart-form", multipartForm)
 	newRouter.Post("/save-file", saveFile)
-	newRouter.Post("/fill", fill)
-	newRouter.Post("/fillable-form-struct", fillableFormStruct)
-	serv := server.NewServer(":8020", newRouter)
+	serv := server.NewServer(":8021", newRouter)
 	go func() {
 		err = serv.Start()
 		if err != nil && !errors.Is(http.ErrServerClosed, err) {
 			panic(err)
 		}
 	}()
-	if err := server.WaitStartServer(":8020", 5); err != nil {
+	if err := server.WaitStartServer(":8021", 5); err != nil {
 		panic(err)
 	}
 	exitCode := m.Run()
@@ -85,29 +82,6 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 	os.Exit(exitCode)
-}
-
-func fill(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-	newForm := form.NewForm(r)
-	err := newForm.Parse()
-	if err != nil {
-		return func() { w.Write([]byte(err.Error())) }
-	}
-	var f Fill
-	err = formmapper.FillStructFromForm(newForm, &f, []string{"isNil"})
-	if err != nil {
-		return func() { w.Write([]byte(err.Error())) }
-	}
-	if f.NilField != nil {
-		return func() { w.Write([]byte("The NilField must be nil.")) }
-	}
-	if f.Field1 == nil {
-		return func() { w.Write([]byte("The Field1 field must be populated.")) }
-	}
-	if f.File == nil {
-		return func() { w.Write([]byte("The File field must be populated.")) }
-	}
-	return func() {}
 }
 
 func saveFile(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -164,32 +138,8 @@ func applicationForm(w http.ResponseWriter, r *http.Request, manager interfaces.
 	return func() {}
 }
 
-func fillableFormStruct(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-	newForm := form.NewForm(r)
-	err := newForm.Parse()
-	if err != nil {
-		return func() { w.Write([]byte(err.Error())) }
-	}
-	var fill Fill
-
-	err = formmapper.FillStructFromForm(newForm, &fill, []string{"isNil"})
-	if err != nil {
-		return func() { w.Write([]byte(err.Error())) }
-	}
-	if fill.Field1[0] != "v1" {
-		return func() { w.Write([]byte("get Field1 error")) }
-	}
-	if fill.File[0].Header.Filename != "x.png" {
-		return func() { w.Write([]byte("get File error")) }
-	}
-	if fill.NilField != nil {
-		return func() { w.Write([]byte("get NilField error")) }
-	}
-	return func() {}
-}
-
 func TestApplicationForm(t *testing.T) {
-	resp, err := form.SendApplicationForm("http://localhost:8020/application-form", map[string][]string{"f1": {"v1"}, "f2": {"v2"}})
+	resp, err := form.SendApplicationForm("http://localhost:8021/application-form", map[string][]string{"f1": {"v1"}, "f2": {"v2"}})
 	if err != nil {
 		t.Error(err)
 	}
@@ -207,7 +157,7 @@ func TestApplicationForm(t *testing.T) {
 }
 
 func TestMultipartForm(t *testing.T) {
-	multipartForm, err := form.SendMultipartForm("http://localhost:8020/multipart-form", map[string][]string{"f1": {"v1"}}, map[string][]string{"file": {"x.png"}})
+	multipartForm, err := form.SendMultipartForm("http://localhost:8021/multipart-form", map[string][]string{"f1": {"v1"}}, map[string][]string{"file": {"x.png"}})
 	if err != nil {
 		t.Error(err)
 	}
@@ -222,45 +172,12 @@ func TestMultipartForm(t *testing.T) {
 }
 
 func TestSaveFile(t *testing.T) {
-	sendMultipartForm, err := form.SendMultipartForm("http://localhost:8020/save-file", map[string][]string{}, map[string][]string{"file": {"x.png"}})
+	sendMultipartForm, err := form.SendMultipartForm("http://localhost:8021/save-file", map[string][]string{}, map[string][]string{"file": {"x.png"}})
 	if err != nil {
 		t.Error(err)
 	}
 	defer sendMultipartForm.Body.Close()
 	responseBody, err := io.ReadAll(sendMultipartForm.Body)
-	if err != nil {
-		t.Error(err)
-	}
-	if string(responseBody) != "" {
-		t.Errorf(string(responseBody))
-	}
-}
-
-func TestFillStructFromForm(t *testing.T) {
-	multipartForm, err := form.SendMultipartForm("http://localhost:8020/fill", map[string][]string{"f1": {"v1"}}, map[string][]string{"file": {"x.png"}})
-	if err != nil {
-		t.Error(err)
-	}
-	responseBody, err := io.ReadAll(multipartForm.Body)
-	if err != nil {
-		t.Error(err)
-	}
-	if string(responseBody) != "" {
-		t.Errorf(string(responseBody))
-	}
-	err = multipartForm.Body.Close()
-	if err != nil {
-		panic(err)
-	}
-}
-
-func TestFillableFormStruct(t *testing.T) {
-	multipartForm, err := form.SendMultipartForm("http://localhost:8020/fillable-form-struct", map[string][]string{"f1": {"v1"}}, map[string][]string{"file": {"x.png"}})
-	if err != nil {
-		t.Error(err)
-	}
-	defer multipartForm.Body.Close()
-	responseBody, err := io.ReadAll(multipartForm.Body)
 	if err != nil {
 		t.Error(err)
 	}

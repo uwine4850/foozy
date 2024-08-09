@@ -164,7 +164,7 @@ func TestPageMultipleSlug(t *testing.T) {
 }
 
 func TestPost(t *testing.T) {
-	resp, err := form.SendApplicationForm("http://localhost:8030/post/12", map[string]string{})
+	resp, err := form.SendApplicationForm("http://localhost:8030/post/12", map[string][]string{})
 	if err != nil {
 		t.Error(err)
 	}
