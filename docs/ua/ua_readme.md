@@ -6,6 +6,7 @@ __foozy__ — це легкий та гнучкий веб-фреймворк. �
 * [builtin](https://github.com/uwine4850/foozy/blob/master/docs/ua/builtin/builtin.md) — вбудований готовий функціонал, наприклад, аутентифікація. Використовувати не обов'язково.
 * [database](https://github.com/uwine4850/foozy/blob/master/docs/ua/database/database.md) — інтерфейс для роботи з базою даних mysql.
   * [dbutils](https://github.com/uwine4850/foozy/blob/master/docs/ua/database/dbutils/dbutils.md) — допоміжний функціонал для використання пакету database.
+  * [dbmapper](https://github.com/uwine4850/foozy/blob/master/docs/ua/database/dbmapper/dbmapper.md) — записує дані у вибраний об'єкт.
   * [sync_queres](https://github.com/uwine4850/foozy/blob/master/docs/ua/database/sync_queries.md) — синхроні запити до бази даних.
   * [async_queres](https://github.com/uwine4850/foozy/blob/master/docs/ua/database/async_queries.md) — асинхроні запити до бази даних.
 * [interfaces](https://github.com/uwine4850/foozy/blob/master/docs/ua/interfaces/interfaces.md) — усі golang інтерфейси які використовуються у проекті.

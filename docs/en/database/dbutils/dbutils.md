@@ -74,33 +74,6 @@ ParseFloat(value interface{}) (float64, error)
 ```
 Converts the value from the query result to a comma-separated number.
 
-__FillStructFromDb__
-```
-FillStructFromDb(dbRes map[string]interface{}, fill interface{}) error
-```
-Fills the structure with data from the database.
-Each variable of the placeholder structure must have a "db" tag, which is responsible for the name of the column in
-database, for example `db: "name"`.
-
-__FillMapFromDb__
-```
-FillMapFromDb(dbRes map[string]interface{}, fill *map[string]string) error
-```
-Fills the map with data from the database.
-
-__FillReflectValueFromDb__
-```
-FillReflectValueFromDb(dbRes map[string]interface{}, fill *reflect.Value) error
-```
-Fills a structure whose type is *reflect.Value. That is, the method fills the data from the database into the structure, which is created with the help package reflect.
-
-__ParamsValueFromStruct__
-```
-ParamsValueFromStruct(structure interface{}, nilIfEmpty []string) (map[string]any, error)
-```
-Creates a map with a structure that describes a table.
-You need a completed structure to work correctly, and required fields must have the `db:"<column name>"` tag.
-
 __DatabaseResultNotEmpty__
 ```
 DatabaseResultNotEmpty(res []map[string]interface{}) error

@@ -17,10 +17,6 @@ func NewMapper(databaseResult []map[string]interface{}, output interface{}) Mapp
 	return Mapper{DatabaseResult: databaseResult, Output: output}
 }
 
-func (m *Mapper) SetOutput(output interface{}) {
-	m.Output = output
-}
-
 func (m *Mapper) Fill() error {
 	outType, err := m.outputType()
 	if err != nil {

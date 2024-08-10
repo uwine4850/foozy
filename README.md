@@ -8,6 +8,7 @@ Modules that the framework contains: <br>
 * [builtin](https://github.com/uwine4850/foozy/blob/master/docs/en/builtin/builtin.md) — built-in ready-made functionality, for example, authentication. It is not necessary to use.
 * [database](https://github.com/uwine4850/foozy/blob/master/docs/en/database/database.md) — an interface for working with the mysql database.
   * [dbutils](https://github.com/uwine4850/foozy/blob/master/docs/en/database/dbutils/dbutils.md) — auxiliary functionality for using the database package.
+  * [dbmapper](https://github.com/uwine4850/foozy/blob/master/docs/en/database/dbmapper/dbmapper.md) — writes data to the selected object.
   * [sync_queres](https://github.com/uwine4850/foozy/blob/master/docs/en/database/sync_queries.md) — synchronous requests to the database.
   * [async_queres](https://github.com/uwine4850/foozy/blob/master/docs/en/database/async_queries.md) — asynchronous requests to the database.
 * [interfaces](https://github.com/uwine4850/foozy/blob/master/docs/en/interfaces/interfaces.md) — all golang interfaces used in the project.
