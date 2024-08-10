@@ -16,7 +16,7 @@ Modules that the framework contains: <br>
   * [manager](https://github.com/uwine4850/foozy/blob/master/docs/en/router/manager/manager.md) — a package for managing processors.
   * [websocket](https://github.com/uwine4850/foozy/blob/master/docs/en/router/websocket.md) — a package for interaction with websockets.
   * [form](https://github.com/uwine4850/foozy/blob/master/docs/en/router/form/form.md) — working with HTML forms.
-	* [fill_struct](https://github.com/uwine4850/foozy/blob/master/docs/en/router/form/fill_struct.md) — various manipulations with form data.
+	* [formmapper](https://github.com/uwine4850/foozy/blob/master/docs/en/router/form/formmapper/formmapper.md) — various manipulations with form data.
   * [middlewares](https://github.com/uwine4850/foozy/blob/master/docs/en/router/middlewares/middlewares.md) — a module for creating middleware.
   * [object](https://github.com/uwine4850/foozy/blob/master/docs/en/router/object/object.md) — a package for simpler display of templates.
   * [mic](https://github.com/uwine4850/foozy/blob/master/docs/en/router/mic/mic.md) — package is responsible for the functionality of microservices.

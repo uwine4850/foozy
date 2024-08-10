@@ -14,7 +14,7 @@ __foozy__ — це легкий та гнучкий веб-фреймворк. �
   * [manager](https://github.com/uwine4850/foozy/blob/master/docs/ua/router/manager/manager.md) — пакет для управління обробниками.
   * [websocket](https://github.com/uwine4850/foozy/blob/master/docs/ua/router/websocket.md) — пакет для взаємодії з вебсокетами.
   * [form](https://github.com/uwine4850/foozy/blob/master/docs/ua/router/form/form.md) — робота з HTML формами.
-	* [fill_struct](https://github.com/uwine4850/foozy/blob/master/docs/ua/router/form/fill_struct.md) — різноманітні маніпуляції з даними форми.
+	* [formmapper](https://github.com/uwine4850/foozy/blob/master/docs/ua/router/form/formmapper/formmapper.md) — різноманітні маніпуляції з даними форми.
   * [middlewares](https://github.com/uwine4850/foozy/blob/master/docs/ua/router/middlewares/middlewares.md) — модуль для створення проміжного ПО.
   * [object](https://github.com/uwine4850/foozy/blob/master/docs/ua/router/object/object.md) — пакет для більш простого відображення шаблонів.
   * [mic](https://github.com/uwine4850/foozy/blob/master/docs/ua/router/mic/mic.md) - пакет відповідає за функціональність мікросервісів.

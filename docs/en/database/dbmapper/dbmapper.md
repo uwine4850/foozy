@@ -40,7 +40,7 @@ Fill() error
 ```
 Fills in the data.
 
-### Інші функції пакету.
+### Other features of the package.
 
 __FillStructFromDb__
 ```
