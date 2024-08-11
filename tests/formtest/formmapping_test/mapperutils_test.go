@@ -9,6 +9,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router/form"
 	"github.com/uwine4850/foozy/pkg/router/form/formmapper"
+	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
 type Fill struct {
@@ -25,7 +26,7 @@ func fill(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) f
 		return func() { w.Write([]byte(err.Error())) }
 	}
 	var f Fill
-	err = formmapper.FillStructFromForm(newForm, &f, []string{"isNil"})
+	err = formmapper.FillStructFromForm(newForm, typeopr.Ptr{}.New(&f), []string{"isNil"})
 	if err != nil {
 		return func() { w.Write([]byte(err.Error())) }
 	}

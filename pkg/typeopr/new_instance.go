@@ -3,12 +3,12 @@ package typeopr
 import (
 	"reflect"
 
-	"github.com/uwine4850/foozy/pkg/interfaces/intrnew"
+	"github.com/uwine4850/foozy/pkg/interfaces/itypeopr"
 )
 
 // CreateNewInstance сreates a new instance of a structure. The structure must implement the interface interfaces.INewInstance.
 // The <new> argument takes a pointer to the structure that will contain the new instance.
-func CreateNewInstance(ins intrnew.INewInstance, new interface{}) error {
+func CreateNewInstance(ins itypeopr.INewInstance, new interface{}) error {
 	if !IsPointer(new) {
 		panic(ErrValueNotPointer{Value: "new"})
 	}
@@ -19,7 +19,7 @@ func CreateNewInstance(ins intrnew.INewInstance, new interface{}) error {
 		typeIns = reflect.TypeOf(ins)
 	}
 
-	reflectIns := reflect.New(typeIns).Interface().(intrnew.INewInstance)
+	reflectIns := reflect.New(typeIns).Interface().(itypeopr.INewInstance)
 	newIns, err := reflectIns.New()
 	if err != nil {
 		return err

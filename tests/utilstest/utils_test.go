@@ -3,12 +3,12 @@ package utilstest
 import (
 	"testing"
 
-	"github.com/uwine4850/foozy/pkg/interfaces/intrnew"
+	"github.com/uwine4850/foozy/pkg/interfaces/itypeopr"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
 type ITStruct interface {
-	intrnew.INewInstance
+	itypeopr.INewInstance
 	Method()
 }
 

@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/interfaces/itypeopr"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router/form"
 	"github.com/uwine4850/foozy/pkg/router/form/formmapper"
@@ -22,9 +23,6 @@ type FormView struct {
 }
 
 func (v *FormView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
-	if typeopr.IsPointer(v.FormStruct) {
-		return nil, typeopr.ErrValueIsPointer{Value: "FormStruct"}
-	}
 	frm := form.NewForm(r)
 	if err := frm.Parse(); err != nil {
 		return nil, err
@@ -40,11 +38,11 @@ func (v *FormView) Object(w http.ResponseWriter, r *http.Request, manager interf
 		return nil, err
 	}
 
-	if err := v.checkEmpty(&fillForm); err != nil {
+	if err := v.checkEmpty(typeopr.Ptr{}.New(&fillForm)); err != nil {
 		return nil, err
 	}
 
-	if err := formmapper.CheckExtension(&fillForm); err != nil {
+	if err := formmapper.CheckExtension(typeopr.Ptr{}.New(&fillForm)); err != nil {
 		return nil, err
 	}
 
@@ -55,7 +53,7 @@ func (v *FormView) Object(w http.ResponseWriter, r *http.Request, manager interf
 // If the first character of the slice is "*", then you need to select the entire field of the structure.
 // If there are more elements after the "*" sign, then they need to be excluded.
 // When the "*" sign is missing, process according to the standard algorithm.
-func (v *FormView) checkEmpty(fillForm interface{}) error {
+func (v *FormView) checkEmpty(fillForm itypeopr.IPtr) error {
 	var notNilFields []string
 	if len(v.NotNilFormFields) >= 1 && v.NotNilFormFields[0] == "*" {
 		excludeFields := []string{}

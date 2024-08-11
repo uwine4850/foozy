@@ -10,6 +10,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router/form"
 	"github.com/uwine4850/foozy/pkg/router/form/formmapper"
+	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
 type TestMapping struct {
@@ -23,7 +24,7 @@ func mpDefaultStruct(w http.ResponseWriter, r *http.Request, manager interfaces.
 		panic(err)
 	}
 	var testMapping TestMapping
-	mapper := formmapper.NewMapper(frm, &testMapping, []string{})
+	mapper := formmapper.NewMapper(frm, typeopr.Ptr{}.New(&testMapping), []string{})
 	if err := mapper.Fill(); err != nil {
 		panic(err)
 	}
@@ -35,10 +36,7 @@ func mpDefaultStruct(w http.ResponseWriter, r *http.Request, manager interfaces.
 	}
 	var testMappingValue TestMapping
 	value := reflect.ValueOf(&testMappingValue).Elem()
-	valueMapper := formmapper.NewMapper(frm, &value, []string{})
-	if err := mapper.Fill(); err != nil {
-		panic(err)
-	}
+	valueMapper := formmapper.NewMapper(frm, typeopr.Ptr{}.New(&value), []string{})
 	if err := valueMapper.Fill(); err != nil {
 		panic(err)
 	}
@@ -75,7 +73,7 @@ func mpEmptyString0Err(w http.ResponseWriter, r *http.Request, manager interface
 		panic(err)
 	}
 	var testMapping TestMapping
-	mapper := formmapper.NewMapper(frm, &testMapping, []string{})
+	mapper := formmapper.NewMapper(frm, typeopr.Ptr{}.New(&testMapping), []string{})
 	err := mapper.Fill()
 	if !errors.Is(err, formmapper.ErrEmptyFieldIndex{Name: "Text", Index: "0"}) {
 		return func() {
@@ -84,7 +82,7 @@ func mpEmptyString0Err(w http.ResponseWriter, r *http.Request, manager interface
 	}
 	var testMappingValue TestMapping
 	value := reflect.ValueOf(&testMappingValue).Elem()
-	valueMapper := formmapper.NewMapper(frm, &value, []string{})
+	valueMapper := formmapper.NewMapper(frm, typeopr.Ptr{}.New(&value), []string{})
 	err = valueMapper.Fill()
 	if !errors.Is(err, formmapper.ErrEmptyFieldIndex{Name: "Text", Index: "0"}) {
 		return func() {
@@ -118,7 +116,7 @@ func mpEmptyString1Err(w http.ResponseWriter, r *http.Request, manager interface
 		panic(err)
 	}
 	var testMapping TestMapping
-	mapper := formmapper.NewMapper(frm, &testMapping, []string{})
+	mapper := formmapper.NewMapper(frm, typeopr.Ptr{}.New(&testMapping), []string{})
 	err := mapper.Fill()
 	if !errors.Is(err, formmapper.ErrEmptyFieldIndex{Name: "Text", Index: "1"}) {
 		return func() {
@@ -127,7 +125,7 @@ func mpEmptyString1Err(w http.ResponseWriter, r *http.Request, manager interface
 	}
 	var testMappingValue TestMapping
 	value := reflect.ValueOf(&testMappingValue).Elem()
-	valueMapper := formmapper.NewMapper(frm, &value, []string{})
+	valueMapper := formmapper.NewMapper(frm, typeopr.Ptr{}.New(&value), []string{})
 	err = valueMapper.Fill()
 	if !errors.Is(err, formmapper.ErrEmptyFieldIndex{Name: "Text", Index: "1"}) {
 		return func() {
@@ -161,7 +159,7 @@ func mpEmptyFileErr(w http.ResponseWriter, r *http.Request, manager interfaces.I
 		panic(err)
 	}
 	var testMapping TestMapping
-	mapper := formmapper.NewMapper(frm, &testMapping, []string{})
+	mapper := formmapper.NewMapper(frm, typeopr.Ptr{}.New(&testMapping), []string{})
 	err := mapper.Fill()
 	if !errors.Is(err, formmapper.ErrEmptyFieldIndex{Name: "File", Index: "unkown"}) {
 		return func() {
@@ -170,7 +168,7 @@ func mpEmptyFileErr(w http.ResponseWriter, r *http.Request, manager interfaces.I
 	}
 	var testMappingValue TestMapping
 	value := reflect.ValueOf(&testMappingValue).Elem()
-	valueMapper := formmapper.NewMapper(frm, &value, []string{})
+	valueMapper := formmapper.NewMapper(frm, typeopr.Ptr{}.New(&value), []string{})
 	err = valueMapper.Fill()
 	if !errors.Is(err, formmapper.ErrEmptyFieldIndex{Name: "File", Index: "unkown"}) {
 		return func() {
@@ -208,7 +206,7 @@ func mpEmptyValue(w http.ResponseWriter, r *http.Request, manager interfaces.IMa
 		panic(err)
 	}
 	var testMapping TestMappingEmpty
-	mapper := formmapper.NewMapper(frm, &testMapping, []string{})
+	mapper := formmapper.NewMapper(frm, typeopr.Ptr{}.New(&testMapping), []string{})
 	if err := mapper.Fill(); err != nil {
 		panic(err)
 	}
@@ -221,7 +219,7 @@ func mpEmptyValue(w http.ResponseWriter, r *http.Request, manager interfaces.IMa
 
 	var testMappingValue TestMappingEmpty
 	value := reflect.ValueOf(&testMappingValue).Elem()
-	valueMapper := formmapper.NewMapper(frm, &value, []string{})
+	valueMapper := formmapper.NewMapper(frm, typeopr.Ptr{}.New(&value), []string{})
 	if err := mapper.Fill(); err != nil {
 		panic(err)
 	}

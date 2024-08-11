@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/uwine4850/foozy/pkg/interfaces/itypeopr"
 	"github.com/uwine4850/foozy/pkg/router/form"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 	"github.com/uwine4850/foozy/pkg/utils/fslice"
@@ -18,10 +19,8 @@ import (
 // Structure fields can be of two types only:
 // []FormFile - form files.
 // []string - all other data.
-func FillStructFromForm(frm *form.Form, fillStruct interface{}, nilIfNotExist []string) error {
-	if !typeopr.IsPointer(fillStruct) {
-		return typeopr.ErrValueNotPointer{Value: "fillStruct"}
-	}
+func FillStructFromForm(frm *form.Form, fillPtr itypeopr.IPtr, nilIfNotExist []string) error {
+	fillStruct := fillPtr.Ptr()
 	if !typeopr.PtrIsStruct(fillStruct) {
 		return typeopr.ErrParameterNotStruct{Param: "fillStruct"}
 	}
@@ -114,10 +113,8 @@ func FillReflectValueFromForm(frm *form.Form, fillValue *reflect.Value, nilIfNot
 // filled out in the form.
 // To work, you need to add an ext tag with the necessary extensions (if there are many, separated by commas).
 // For example, ext:".jpg .jpeg .png".
-func CheckExtension(fillStruct interface{}) error {
-	if !typeopr.IsPointer(fillStruct) {
-		return typeopr.ErrValueNotPointer{Value: "fillStruct"}
-	}
+func CheckExtension(fillPtr itypeopr.IPtr) error {
+	fillStruct := fillPtr.Ptr()
 	if !typeopr.PtrIsStruct(fillStruct) {
 		return typeopr.ErrParameterNotStruct{Param: "fillStruct"}
 	}
@@ -145,7 +142,8 @@ func CheckExtension(fillStruct interface{}) error {
 }
 
 // FieldsName returns a list of field names of the filled structure.
-func FieldsName(fillStruct interface{}, exclude []string) ([]string, error) {
+func FieldsName(fillPtr itypeopr.IPtr, exclude []string) ([]string, error) {
+	fillStruct := fillPtr.Ptr()
 	if !typeopr.IsPointer(fillStruct) {
 		return nil, typeopr.ErrValueNotPointer{Value: "fillStruct"}
 	}
@@ -168,7 +166,8 @@ func FieldsName(fillStruct interface{}, exclude []string) ([]string, error) {
 // FieldsNotEmpty checks the specified fields of the structure for emptiness.
 // fieldsName - slice with exact names of STRUCTURE fields that should not be empty.
 // Optimized to work even if the FillableFormStruct contains a structure with type *reflect.Value.
-func FieldsNotEmpty(fillStruct interface{}, fieldsName []string) error {
+func FieldsNotEmpty(fillPtr itypeopr.IPtr, fieldsName []string) error {
+	fillStruct := fillPtr.Ptr()
 	if !typeopr.IsPointer(fillStruct) {
 		return typeopr.ErrValueNotPointer{Value: "fillStruct"}
 	}

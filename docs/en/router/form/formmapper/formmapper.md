@@ -1,7 +1,7 @@
 ## package formmapper
 Fills the structure with data from the form.
 
-You can see how the package works in these [tests](https://github.com/uwine4850/foozy/tree/master/tests/formtest/formmaping_test).
+You can see how the package works in these [tests](https://github.com/uwine4850/foozy/tree/master/tests/formtest/formmapping_test).
 
 ### type Mapper struct
 

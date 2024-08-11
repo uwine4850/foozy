@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"reflect"
+
+	"github.com/uwine4850/foozy/pkg/interfaces/itypeopr"
 )
 
 func IsPointer(a any) bool {
@@ -51,6 +53,22 @@ func AnyToBytes(value interface{}) ([]byte, error) {
 		return nil, fmt.Errorf("unsupported convert type %s", val.Kind().String())
 	}
 	return buf.Bytes(), nil
+}
+
+type Ptr struct {
+	value interface{}
+}
+
+func (p Ptr) New(value interface{}) itypeopr.IPtr {
+	if !IsPointer(value) {
+		panic(ErrValueNotPointer{Value: fmt.Sprintf("Ptr<%s>", reflect.TypeOf(value))})
+	}
+	p.value = value
+	return p
+}
+
+func (p Ptr) Ptr() interface{} {
+	return p.value
 }
 
 type ErrValueNotPointer struct {
