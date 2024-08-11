@@ -5,15 +5,15 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/uwine4850/foozy/pkg/typeopr"
+	"github.com/uwine4850/foozy/pkg/interfaces/itypeopr"
 )
 
 type Mapper struct {
 	DatabaseResult []map[string]interface{}
-	Output         interface{}
+	Output         itypeopr.IPtr
 }
 
-func NewMapper(databaseResult []map[string]interface{}, output interface{}) Mapper {
+func NewMapper(databaseResult []map[string]interface{}, output itypeopr.IPtr) Mapper {
 	return Mapper{DatabaseResult: databaseResult, Output: output}
 }
 
@@ -22,19 +22,19 @@ func (m *Mapper) Fill() error {
 	if err != nil {
 		return err
 	}
-	sliceType := reflect.TypeOf(m.Output).Elem().Elem()
-	newOutputSlice := reflect.MakeSlice(reflect.TypeOf(m.Output).Elem(), 0, len(m.DatabaseResult))
+	sliceType := reflect.TypeOf(m.Output.Ptr()).Elem().Elem()
+	newOutputSlice := reflect.MakeSlice(reflect.TypeOf(m.Output.Ptr()).Elem(), 0, len(m.DatabaseResult))
 	switch outType {
 	case reflect.Struct:
 		if err := m.fillStruct(sliceType, &newOutputSlice); err != nil {
 			return err
 		}
-		reflect.ValueOf(m.Output).Elem().Set(newOutputSlice)
+		reflect.ValueOf(m.Output.Ptr()).Elem().Set(newOutputSlice)
 	case reflect.Map:
 		if err := m.fillMap(sliceType, &newOutputSlice); err != nil {
 			return err
 		}
-		reflect.ValueOf(m.Output).Elem().Set(newOutputSlice)
+		reflect.ValueOf(m.Output.Ptr()).Elem().Set(newOutputSlice)
 	default:
 		return fmt.Errorf("mapping for %s type is not supported", sliceType)
 	}
@@ -42,10 +42,7 @@ func (m *Mapper) Fill() error {
 }
 
 func (m *Mapper) outputType() (reflect.Kind, error) {
-	if !typeopr.IsPointer(m.Output) {
-		return reflect.Invalid, typeopr.ErrValueNotPointer{Value: "Output"}
-	}
-	typeOf := reflect.TypeOf(m.Output).Elem()
+	typeOf := reflect.TypeOf(m.Output.Ptr()).Elem()
 	if typeOf.Kind() != reflect.Slice {
 		return reflect.Invalid, errors.New("field Output must be a slice")
 	} else {

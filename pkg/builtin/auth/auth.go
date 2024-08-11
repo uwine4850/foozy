@@ -89,7 +89,7 @@ func (a *Auth) LoginUser(username string, password string) (*AuthItem, error) {
 		return nil, err
 	}
 	var authItem AuthItem
-	if err := dbmapper.FillStructFromDb(userDB, &authItem); err != nil {
+	if err := dbmapper.FillStructFromDb(userDB, typeopr.Ptr{}.New(&authItem)); err != nil {
 		return nil, err
 	}
 	if err := a.addUserCookie(authItem.Id); err != nil {

@@ -50,13 +50,13 @@ Fill() error
 
 __FillStructFromForm__
 ```
-FillStructFromForm(frm *Form, fillStruct interface{}, nilIfNotExist []string) error
+FillStructFromForm(frm *Form, fillPtr itypeopr.IPtr, nilIfNotExist []string) error
 ```
 Метод, який заповнює структуру даними з форми.
 Структура завжди повинна передаватись як посилання.
 Для коректної роботи необхідно для кожного поля структури вказати тег "form". Наприклад, `form:<ім'я поля форми>`. Також підтримує тег `empty`, який описано вище.
 * frm *Form - екземпляр форми.
-* fillStruct interface{} - посилання на об'єкт, який потрібно заповнити.
+* fillPtr itypeopr.IPtr - посилання на об'єкт, який потрібно заповнити.
 * nilIfNotExist - поля які не знайшлись у формі будуть nil.
 
 __FrmValueToOrderedForm__
@@ -67,20 +67,20 @@ FrmValueToOrderedForm(frm IFormGetEnctypeData) *OrderedForm
 
 __FieldsNotEmpty__
 ```
-FieldsNotEmpty(fillStruct interface{}, fieldsName []string) error
+FieldsNotEmpty(fillPtr itypeopr.IPtr, fieldsName []string) error
 ```
 Перевіряє чи не порожні вибрані поля структури.
 Оптимізовано для роботи, навіть якщо FillableFormStruct містить структуру з типом *reflect.Value.
 
 __FieldsName__
 ```
-FieldsName(fillStruct interface{}, exclude []string) ([]string, error)
+FieldsName(fillPtr itypeopr.IPtr, exclude []string) ([]string, error)
 ```
 Повертає назви полів структури.
 
 __CheckExtension__
 ```
-CheckExtension(fillStruct interface{}) error
+CheckExtension(fillPtr itypeopr.IPtr) error
 ```
 Перевіряє чи розширення файлів форми відповідає очікуваними. Для правильної роботи потрібно додати до кожного поля типу 
 FormFile тег *ext* і розширення які очікуються. Наприклад, `ext:".jpeg .png"`.

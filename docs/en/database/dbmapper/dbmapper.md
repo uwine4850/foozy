@@ -44,7 +44,7 @@ Fills in the data.
 
 __FillStructFromDb__
 ```
-FillStructFromDb(dbRes map[string]interface{}, fill interface{}) error
+FillStructFromDb(dbRes map[string]interface{}, fillPtr itypeopr.IPtr) error
 ```
 Fills the structure with data from the database.
 Each variable of the placeholder structure must have a `db` tag that corresponds to the name of the column in the database, for example `db: "name"`. You can also use the `empty` tag, which is described in more detail above.
@@ -64,7 +64,7 @@ package reflect.
 
 __ParamsValueFromStruct__
 ```
-ParamsValueFromStruct(structure interface{}, nilIfEmpty []string) (map[string]any, error)
+ParamsValueFromStruct(filledStructurePtr itypeopr.IPtr, nilIfEmpty []string) (map[string]any, error)
 ```
 Creates a map from a structure that describes a table.
 You need a completed structure to work correctly, and required fields must have the `db:"<column name>"` tag.

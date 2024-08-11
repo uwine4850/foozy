@@ -44,7 +44,7 @@ Fill() error
 
 __FillStructFromDb__
 ```
-FillStructFromDb(dbRes map[string]interface{}, fill interface{}) error
+FillStructFromDb(dbRes map[string]interface{}, fillPtr itypeopr.IPtr) error
 ```
 Заповнює структуру даними з бази даних.
 Кожна змінна заповнюваної структури повинна мати тег "db", який відповідає за назву 
@@ -66,7 +66,7 @@ FillReflectValueFromDb(dbRes map[string]interface{}, fill *reflect.Value) error
 
 __ParamsValueFromStruct__
 ```
-ParamsValueFromStruct(structure interface{}, nilIfEmpty []string) (map[string]any, error)
+ParamsValueFromStruct(filledStructurePtr itypeopr.IPtr, nilIfEmpty []string) (map[string]any, error)
 ```
 Створює карту зі структури, яка описує таблицю.
 Для правильної роботи вам потрібна завершена структура, а обов’язкові поля мають мати тег `db:"<назва стовпця>"`.

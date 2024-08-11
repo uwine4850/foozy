@@ -8,6 +8,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbmapper"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
+	"github.com/uwine4850/foozy/pkg/typeopr"
 	"github.com/uwine4850/foozy/pkg/utils/fmap"
 )
 
@@ -66,7 +67,7 @@ func TestDbMapperUseStruct(t *testing.T) {
 		t.Error(err)
 	}
 	var dbTestMapper []DbTestMapper
-	mapper := dbmapper.NewMapper(res, &dbTestMapper)
+	mapper := dbmapper.NewMapper(res, typeopr.Ptr{}.New(&dbTestMapper))
 	if err := mapper.Fill(); err != nil {
 		t.Error(err)
 	}
@@ -91,7 +92,7 @@ func TestDbMapperUseMap(t *testing.T) {
 		t.Error(err)
 	}
 	var dbTestMapper = []map[string]string{}
-	mapper := dbmapper.NewMapper(res, &dbTestMapper)
+	mapper := dbmapper.NewMapper(res, typeopr.Ptr{}.New(&dbTestMapper))
 	if err := mapper.Fill(); err != nil {
 		t.Error(err)
 	}
@@ -126,7 +127,7 @@ func TestFillStructFromDb(t *testing.T) {
 		t.Error(err)
 	}
 	var f Fill
-	err = dbmapper.FillStructFromDb(res[0], &f)
+	err = dbmapper.FillStructFromDb(res[0], typeopr.Ptr{}.New(&f))
 	if err != nil {
 		t.Error(err)
 	}

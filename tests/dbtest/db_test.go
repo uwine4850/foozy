@@ -9,6 +9,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbmapper"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
+	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
 var db = database.NewDatabase(dbArgs)
@@ -207,7 +208,7 @@ func TestSyncInsertWithStruct(t *testing.T) {
 		Col2: "",
 		Col3: 123,
 	}
-	insertStrcutValue, err := dbmapper.ParamsValueFromStruct(&insertStruct, []string{"col2"})
+	insertStrcutValue, err := dbmapper.ParamsValueFromStruct(typeopr.Ptr{}.New(&insertStruct), []string{"col2"})
 	if err != nil {
 		panic(err)
 	}
@@ -285,7 +286,7 @@ func TestSyncUpdateWithStruct(t *testing.T) {
 		Col2: "2023-10-16",
 		Col3: 123,
 	}
-	params, err := dbmapper.ParamsValueFromStruct(&updateStruct, []string{})
+	params, err := dbmapper.ParamsValueFromStruct(typeopr.Ptr{}.New(&updateStruct), []string{})
 	if err != nil {
 		panic(err)
 	}
