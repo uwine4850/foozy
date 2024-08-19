@@ -71,6 +71,22 @@ func (p Ptr) Ptr() interface{} {
 	return p.value
 }
 
+// IsImplementInterface determines whether an object uses an interface.
+// Usage example:
+// object := MyObject{}
+// IsImplementInterface(typeopr.Ptr{}.New(&object), (*MyInterface)(nil))
+func IsImplementInterface(objectPtr itypeopr.IPtr, interfaceType interface{}) bool {
+	object := objectPtr.Ptr()
+	var objType reflect.Type
+	if reflect.TypeOf(object).Elem() == reflect.TypeOf(reflect.Value{}) {
+		objType = object.(*reflect.Value).Type()
+	} else {
+		objType = reflect.TypeOf(object)
+	}
+	intrfcType := reflect.TypeOf(interfaceType).Elem()
+	return objType.Implements(intrfcType)
+}
+
 type ErrValueNotPointer struct {
 	Value string
 }

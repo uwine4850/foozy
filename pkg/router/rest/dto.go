@@ -10,6 +10,8 @@ import (
 	"strings"
 
 	"github.com/uwine4850/foozy/pkg/interfaces/irest"
+	"github.com/uwine4850/foozy/pkg/interfaces/itypeopr"
+	"github.com/uwine4850/foozy/pkg/typeopr"
 	"github.com/uwine4850/foozy/pkg/utils/fslice"
 )
 
@@ -54,6 +56,10 @@ func (d *DTO) AllowedMessages(messages []AllowMessage) {
 	d.allowedMessages = messages
 }
 
+func (d *DTO) GetAllowedMessages() []AllowMessage {
+	return d.allowedMessages
+}
+
 // Messages a list of messages that will be used for generation.
 func (d *DTO) Messages(messages map[string]*[]irest.IMessage) {
 	if d.messages != nil {
@@ -93,6 +99,19 @@ func (d *DTO) Generate() error {
 		}
 	}
 	d.isGenerated = true
+	return nil
+}
+
+func (d *DTO) IsSafeMessage(message itypeopr.IPtr) error {
+	_type := reflect.TypeOf(message.Ptr()).Elem()
+	if !typeopr.IsImplementInterface(message, (*irest.IMessage)(nil)) {
+		return fmt.Errorf("%s message does not implement irest.IMessage interface", _type)
+	}
+	typeInfo := strings.Split(_type.String(), ".")
+	msg := AllowMessage{Package: typeInfo[0], Name: typeInfo[1]}
+	if !fslice.SliceContains(d.allowedMessages, msg) {
+		return fmt.Errorf("%s message is unsafe", msg.FullName())
+	}
 	return nil
 }
 
