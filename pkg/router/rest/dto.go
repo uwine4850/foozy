@@ -11,6 +11,7 @@ import (
 
 	"github.com/uwine4850/foozy/pkg/interfaces/irest"
 	"github.com/uwine4850/foozy/pkg/interfaces/itypeopr"
+	"github.com/uwine4850/foozy/pkg/router/form"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 	"github.com/uwine4850/foozy/pkg/utils/fslice"
 )
@@ -163,6 +164,9 @@ func (d *DTO) convertType(goType reflect.Type, messages *[]irest.IMessage, mainM
 		}
 		return fmt.Sprintf("%s[]", cnvType), nil
 	case reflect.Struct:
+		if goType == reflect.TypeOf(form.FormFile{}) {
+			return "File", nil
+		}
 		typeInfo := strings.Split(goType.String(), ".")
 		if !fslice.SliceContains(d.allowedMessages, AllowMessage{Package: typeInfo[0], Name: typeInfo[1]}) {
 			return "", ErrMessageNotAllowed{MessageType: goType.String()}

@@ -10,7 +10,7 @@ func JsonToMessage(jsonData *map[string]interface{}, dto *rest.DTO, output itype
 		return err
 	}
 	if err := FillMessageFromMap(jsonData, output); err != nil {
-		panic(err)
+		return err
 	}
 	return nil
 }
