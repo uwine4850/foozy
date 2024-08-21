@@ -45,38 +45,40 @@ func (m *TypedMapper) fillStruct(OF *OrderedForm) error {
 				return form.ErrFormConvertFieldNotFound{Field: tag}
 			}
 		}
-		if err := m.handleItem(&OFval, &fieldV); err != nil {
+		if err := m.handleItem(&OFval, &fieldV, fieldT.Name, 0, fieldT.Tag.Get("empty")); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (m *TypedMapper) handleItem(val *[]OrderedFormValue, fieldV *reflect.Value) error {
+func (m *TypedMapper) handleItem(val *[]OrderedFormValue, fieldV *reflect.Value, fieldName string, index int, emptyValue string) error {
 	fieldT := fieldV.Type()
 	switch fieldT.Kind() {
 	case reflect.Int:
-		if err := m.parseInt(val, fieldV); err != nil {
+		if err := m.parseInt(val, fieldV, fieldName, index, emptyValue); err != nil {
 			return err
 		}
 	case reflect.Float64:
-		if err := m.parseFloat64(val, fieldV); err != nil {
+		if err := m.parseFloat64(val, fieldV, fieldName, index, emptyValue); err != nil {
 			return err
 		}
 	case reflect.String:
-		m.parseString(val, fieldV)
+		if err := m.parseString(val, fieldV, fieldName, index, emptyValue); err != nil {
+			return err
+		}
 	case reflect.Bool:
-		if err := m.parseBool(val, fieldV); err != nil {
+		if err := m.parseBool(val, fieldV, fieldName, index, emptyValue); err != nil {
 			return err
 		}
 	case reflect.Struct:
 		if fieldT == reflect.TypeOf(form.FormFile{}) {
-			m.parseFile(val, fieldV)
+			m.parseFile(val, fieldV, emptyValue)
 		} else {
 			return fmt.Errorf("conversion to %s type is not supported", fieldT.Kind().String())
 		}
 	case reflect.Slice:
-		if err := m.parseSlice(val, fieldV, fieldT); err != nil {
+		if err := m.parseSlice(val, fieldV, fieldT, fieldName, emptyValue); err != nil {
 			return err
 		}
 	default:
@@ -87,10 +89,14 @@ func (m *TypedMapper) handleItem(val *[]OrderedFormValue, fieldV *reflect.Value)
 	return nil
 }
 
-func (m *TypedMapper) parseInt(val *[]OrderedFormValue, fieldV *reflect.Value) error {
+func (m *TypedMapper) parseInt(val *[]OrderedFormValue, fieldV *reflect.Value, fieldName string, index int, emptyValue string) error {
 	stringSlice := reflect.ValueOf((*val)[0].Value).Interface().([]string)
-	if len(stringSlice) != 0 {
-		intVal, err := strconv.Atoi(stringSlice[0])
+	stringFieldValue, err := m.fieldValue(stringSlice, fieldName, index, emptyValue)
+	if err != nil {
+		return err
+	}
+	if stringFieldValue != "" {
+		intVal, err := strconv.Atoi(stringFieldValue)
 		if err != nil {
 			return err
 		}
@@ -99,10 +105,14 @@ func (m *TypedMapper) parseInt(val *[]OrderedFormValue, fieldV *reflect.Value) e
 	return nil
 }
 
-func (m *TypedMapper) parseFloat64(val *[]OrderedFormValue, fieldV *reflect.Value) error {
+func (m *TypedMapper) parseFloat64(val *[]OrderedFormValue, fieldV *reflect.Value, fieldName string, index int, emptyValue string) error {
 	stringSlice := reflect.ValueOf((*val)[0].Value).Interface().([]string)
-	if len(stringSlice) != 0 {
-		floatVal, err := strconv.ParseFloat(stringSlice[0], 64)
+	stringFieldValue, err := m.fieldValue(stringSlice, fieldName, index, emptyValue)
+	if err != nil {
+		return err
+	}
+	if stringFieldValue != "" {
+		floatVal, err := strconv.ParseFloat(stringFieldValue, 64)
 		if err != nil {
 			return err
 		}
@@ -111,17 +121,24 @@ func (m *TypedMapper) parseFloat64(val *[]OrderedFormValue, fieldV *reflect.Valu
 	return nil
 }
 
-func (m *TypedMapper) parseString(val *[]OrderedFormValue, fieldV *reflect.Value) {
+func (m *TypedMapper) parseString(val *[]OrderedFormValue, fieldV *reflect.Value, fieldName string, index int, emptyValue string) error {
 	stringSlice := reflect.ValueOf((*val)[0].Value).Interface().([]string)
-	if len(stringSlice) != 0 {
-		fieldV.Set(reflect.ValueOf(stringSlice[0]))
+	stringFieldValue, err := m.fieldValue(stringSlice, fieldName, index, emptyValue)
+	if err != nil {
+		return err
 	}
+	fieldV.Set(reflect.ValueOf(stringFieldValue))
+	return nil
 }
 
-func (m *TypedMapper) parseBool(val *[]OrderedFormValue, fieldV *reflect.Value) error {
+func (m *TypedMapper) parseBool(val *[]OrderedFormValue, fieldV *reflect.Value, fieldName string, index int, emptyValue string) error {
 	stringSlice := reflect.ValueOf((*val)[0].Value).Interface().([]string)
-	if len(stringSlice) != 0 {
-		boolVal, err := strconv.ParseBool(stringSlice[0])
+	stringFieldValue, err := m.fieldValue(stringSlice, fieldName, index, emptyValue)
+	if err != nil {
+		return err
+	}
+	if stringFieldValue != "" {
+		boolVal, err := strconv.ParseBool(stringFieldValue)
 		if err != nil {
 			return err
 		}
@@ -130,14 +147,17 @@ func (m *TypedMapper) parseBool(val *[]OrderedFormValue, fieldV *reflect.Value) 
 	return nil
 }
 
-func (m *TypedMapper) parseFile(val *[]OrderedFormValue, fieldV *reflect.Value) {
+func (m *TypedMapper) parseFile(val *[]OrderedFormValue, fieldV *reflect.Value, emptyValue string) {
+	if emptyValue != "" {
+		panic("the field that accepts the file does not support the 'empty' tag")
+	}
 	fileSlice := reflect.ValueOf((*val)[0].Value).Interface().([]form.FormFile)
 	if len(fileSlice) != 0 {
 		fieldV.Set(reflect.ValueOf(fileSlice[0]))
 	}
 }
 
-func (m *TypedMapper) parseSlice(val *[]OrderedFormValue, fieldV *reflect.Value, fieldT reflect.Type) error {
+func (m *TypedMapper) parseSlice(val *[]OrderedFormValue, fieldV *reflect.Value, fieldT reflect.Type, fieldName string, emptyValue string) error {
 	v := reflect.ValueOf((*val)[0].Value)
 	if v.Type() == reflect.TypeOf([]form.FormFile{}) {
 		fileSlice := v.Interface().([]form.FormFile)
@@ -158,7 +178,7 @@ func (m *TypedMapper) parseSlice(val *[]OrderedFormValue, fieldV *reflect.Value,
 			sliceItem := reflect.New(sliceType).Elem()
 			if err := m.handleItem(&[]OrderedFormValue{
 				*newOF,
-			}, &sliceItem); err != nil {
+			}, &sliceItem, fieldName, i, emptyValue); err != nil {
 				return err
 			}
 			newSlice = reflect.Append(newSlice, sliceItem)
@@ -166,4 +186,27 @@ func (m *TypedMapper) parseSlice(val *[]OrderedFormValue, fieldV *reflect.Value,
 		fieldV.Set(newSlice)
 	}
 	return nil
+}
+
+func (m *TypedMapper) fieldValue(stringSlice []string, fieldName string, index int, emptyValue string) (string, error) {
+	var stringFieldValue string
+	if len(stringSlice) != 0 && stringSlice[0] != "" {
+		stringFieldValue = stringSlice[0]
+	} else if emptyValue != "" {
+		val, err := m.parseEmptyValue(fieldName, emptyValue, index)
+		if err != nil {
+			return "", err
+		}
+		stringFieldValue = val
+	}
+	return stringFieldValue, nil
+}
+
+func (m *TypedMapper) parseEmptyValue(fieldName string, emptyValue string, index int) (string, error) {
+	switch emptyValue {
+	case "-err":
+		return "", ErrEmptyFieldIndex{Name: fieldName, Index: strconv.Itoa(index)}
+	default:
+		return emptyValue, nil
+	}
 }
