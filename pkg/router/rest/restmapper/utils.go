@@ -12,9 +12,10 @@ import (
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
+// FillMessageFromMap fills in a message from the card.
+// To work you need to use the 'json' tag.
 func FillMessageFromMap(jsonMap *map[string]interface{}, outputPtr itypeopr.IPtr) error {
 	output := outputPtr.Ptr()
-	// fmt.Println(output)
 	if !typeopr.IsImplementInterface(typeopr.Ptr{}.New(output), (*irest.IMessage)(nil)) {
 		return errors.New("output param must implement the irest.IMessage interface")
 	}
@@ -96,6 +97,7 @@ func fillField(fieldValue *reflect.Value, fieldData interface{}) error {
 	return nil
 }
 
+// JsonStringToMap converts a JSON string into a map.
 func JsonStringToMap(data string, m *map[string]interface{}) error {
 	if err := json.Unmarshal([]byte(data), m); err != nil {
 		return err

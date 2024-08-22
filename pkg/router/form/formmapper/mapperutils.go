@@ -127,13 +127,24 @@ func CheckExtension(fillPtr itypeopr.IPtr) error {
 			continue
 		}
 		field := fillType.Field(i)
-		if field.Type.Elem() != reflect.TypeOf(form.FormFile{}) {
-			panic("the ext tag can only be added to fields whose type is form.FormFile")
-		}
 		extension := strings.Split(tag, " ")
-		files := fillValue.Field(i).Interface().([]form.FormFile)
-		for i := 0; i < len(files); i++ {
-			if !fslice.SliceContains(extension, filepath.Ext(files[i].Header.Filename)) {
+		switch field.Type.Kind() {
+		case reflect.Slice:
+			if field.Type.Elem() != reflect.TypeOf(form.FormFile{}) {
+				panic("the ext tag can only be added to fields whose type is form.FormFile")
+			}
+			files := fillValue.Field(i).Interface().([]form.FormFile)
+			for i := 0; i < len(files); i++ {
+				if !fslice.SliceContains(extension, filepath.Ext(files[i].Header.Filename)) {
+					return ErrExtensionNotMatch{Field: field.Name}
+				}
+			}
+		case reflect.Struct:
+			if field.Type != reflect.TypeOf(form.FormFile{}) {
+				panic("the ext tag can only be added to fields whose type is form.FormFile")
+			}
+			file := fillValue.Field(i).Interface().(form.FormFile)
+			if !fslice.SliceContains(extension, filepath.Ext(file.Header.Filename)) {
 				return ErrExtensionNotMatch{Field: field.Name}
 			}
 		}

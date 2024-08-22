@@ -103,6 +103,8 @@ func (d *DTO) Generate() error {
 	return nil
 }
 
+// IsSafeMessage checks whether the message is safe.
+// A message is safe if it is in allowed messages.
 func (d *DTO) IsSafeMessage(message itypeopr.IPtr) error {
 	_type := reflect.TypeOf(message.Ptr()).Elem()
 	if !typeopr.IsImplementInterface(message, (*irest.IMessage)(nil)) {

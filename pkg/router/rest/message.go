@@ -21,10 +21,14 @@ type AllowMessage struct {
 	Name    string
 }
 
+// FullName outputs the full name of the message.
+// For example: main.Message.
 func (a *AllowMessage) FullName() string {
 	return fmt.Sprintf("%s.%s", a.Package, a.Name)
 }
 
+// DeepCheckSafeMessage checks whether transmitted messages and internal messages are safe.
+// That is, there will be a check of internal structures, in depth to the limit.
 func DeepCheckSafeMessage(dto *DTO, messagePtr itypeopr.IPtr) error {
 	if err := dto.IsSafeMessage(messagePtr); err != nil {
 		return err

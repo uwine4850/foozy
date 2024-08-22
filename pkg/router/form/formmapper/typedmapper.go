@@ -10,6 +10,8 @@ import (
 	"github.com/uwine4850/foozy/pkg/utils/fslice"
 )
 
+// TypedMapper converts form data into typed structure data.
+// To work, you need to use the 'form' tag, which means the names of the form fields.
 type TypedMapper struct {
 	Form                   *form.Form
 	Output                 itypeopr.IPtr
@@ -17,9 +19,13 @@ type TypedMapper struct {
 	NilIfNotExist          []string
 }
 
+// Fill fills the structure with data.
 func (m *TypedMapper) Fill() error {
 	of := FrmValueToOrderedForm(m.Form)
 	if err := m.fillStruct(of); err != nil {
+		return err
+	}
+	if err := CheckExtension(m.Output); err != nil {
 		return err
 	}
 	return nil
