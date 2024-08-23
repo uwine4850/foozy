@@ -31,6 +31,7 @@ func TestMain(m *testing.M) {
 	newRouter.Post("/mp-empty-value", mpEmptyValue)
 	newRouter.Post("/fill", fill)
 	newRouter.Post("/fill-reflect-value", fillReflectValue)
+	newRouter.Post("/mp-typed-struct", mpTypedMapper)
 	serv := server.NewServer(":8020", newRouter)
 	go func() {
 		err = serv.Start()

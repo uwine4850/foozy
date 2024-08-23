@@ -19,6 +19,13 @@ type TypedMapper struct {
 	NilIfNotExist          []string
 }
 
+func NewTypedMapper(frm *form.Form, output itypeopr.IPtr) *TypedMapper {
+	return &TypedMapper{
+		Form:   frm,
+		Output: output,
+	}
+}
+
 // Fill fills the structure with data.
 func (m *TypedMapper) Fill() error {
 	of := FrmValueToOrderedForm(m.Form)

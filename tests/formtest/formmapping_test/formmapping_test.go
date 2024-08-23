@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"reflect"
+	"slices"
 	"testing"
 
 	"github.com/uwine4850/foozy/pkg/interfaces"
@@ -239,6 +240,66 @@ func TestEmptyValue(t *testing.T) {
 	multipartForm, err := form.SendMultipartForm("http://localhost:8020/mp-empty-value",
 		map[string][]string{"text": {"", ""}},
 		map[string][]string{},
+	)
+	if err != nil {
+		t.Error(err)
+	}
+	defer multipartForm.Body.Close()
+	responseBody, err := io.ReadAll(multipartForm.Body)
+	if err != nil {
+		t.Error(err)
+	}
+	if string(responseBody) != "" {
+		t.Errorf(string(responseBody))
+	}
+}
+
+type FillTypedStruct struct {
+	Id    int           `form:"id"`
+	Name  string        `form:"name"`
+	Slice []string      `form:"slice"`
+	IsOk  bool          `form:"is_ok"`
+	File  form.FormFile `form:"file"`
+}
+
+func mpTypedMapper(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	expectData := FillTypedStruct{
+		Id:    1,
+		Name:  "name",
+		Slice: []string{"a1", "a2"},
+		IsOk:  true,
+	}
+	frm := form.NewForm(r)
+	if err := frm.Parse(); err != nil {
+		panic(err)
+	}
+	var out FillTypedStruct
+	mapper := formmapper.NewTypedMapper(frm, typeopr.Ptr{}.New(&out))
+	if err := mapper.Fill(); err != nil {
+		panic(err)
+	}
+	if expectData.Id != out.Id {
+		w.Write([]byte("one of the expected data does not match"))
+	}
+	if expectData.Name != out.Name {
+		w.Write([]byte("one of the expected data does not match"))
+	}
+	if !slices.Equal(expectData.Slice, out.Slice) {
+		w.Write([]byte("one of the expected data does not match"))
+	}
+	if expectData.IsOk != out.IsOk {
+		w.Write([]byte("one of the expected data does not match"))
+	}
+	if out.File.Header.Filename != "x.png" {
+		w.Write([]byte("one of the expected data does not match"))
+	}
+	return func() {}
+}
+
+func TestTypedMapper(t *testing.T) {
+	multipartForm, err := form.SendMultipartForm("http://localhost:8020/mp-typed-struct",
+		map[string][]string{"id": {"1"}, "name": {"name"}, "slice": {"a1", "a2"}, "is_ok": {"true"}},
+		map[string][]string{"file": {"../x.png"}},
 	)
 	if err != nil {
 		t.Error(err)
