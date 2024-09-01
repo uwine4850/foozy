@@ -33,7 +33,6 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 	newRouter := router.NewRouter(manager.NewManager(render))
-	newRouter.SetTemplateEngine(&tmlengine.TemplateEngine{})
 	newRouter.Get("/page", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		return func() { w.Write([]byte("OK")) }
 	})

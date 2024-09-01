@@ -15,71 +15,136 @@ import (
 	"github.com/uwine4850/foozy/pkg/utils/fstring"
 )
 
+type Handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()
+
+// muxRouter represents a single URL handler that can fire method handlers according to those sent by the client.
+type muxRouter struct {
+	Get     Handler
+	Post    Handler
+	Put     Handler
+	Delete  Handler
+	Options Handler
+	Ws      Handler
+}
+
 type Router struct {
-	mux            http.ServeMux
-	request        *http.Request
-	writer         http.ResponseWriter
-	TemplateEngine interfaces.ITemplateEngine
-	manager        interfaces.IManager
-	middleware     interfaces.IMiddleware
+	mux        http.ServeMux
+	routes     map[string]muxRouter
+	manager    interfaces.IManager
+	middleware interfaces.IMiddleware
 }
 
 func NewRouter(manager interfaces.IManager) *Router {
-	return &Router{mux: *http.NewServeMux(), manager: manager}
-}
-
-// Get Processing a GET request. Called only once.
-func (rt *Router) Get(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
-	rt.mux.Handle(splitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "GET", nil, fn))
-}
-
-// Post Processing a POST request. Called only once.
-func (rt *Router) Post(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
-	rt.mux.Handle(splitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "POST", nil, fn))
-}
-
-func (rt *Router) Put(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
-	rt.mux.Handle(splitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "PUT", nil, fn))
-}
-
-func (rt *Router) Delete(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
-	rt.mux.Handle(splitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "DELETE", nil, fn))
-}
-
-// Ws Processing a websocket connection. Used only for communication with the client's websocket.
-func (rt *Router) Ws(pattern string, ws interfaces.IWebsocket, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
-	rt.mux.Handle(splitUrlFromFirstSlug(pattern), rt.getHandleFunc(pattern, "WS", ws, fn))
+	return &Router{mux: *http.NewServeMux(), manager: manager, routes: map[string]muxRouter{}}
 }
 
 func (rt *Router) GetMux() *http.ServeMux {
 	return &rt.mux
 }
 
-// getHandleFunc This method handles each http method call.
-func (rt *Router) getHandleFunc(pattern string, method string, ws interfaces.IWebsocket, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) http.HandlerFunc {
-	return func(writer http.ResponseWriter, request *http.Request) {
-		rt.setWR(writer, request)
-		if !rt.validateMethod(method) {
-			return
-		}
-		rt.printLog(request)
+// RegisterAll registers all route handlers
+func (rt *Router) RegisterAll() {
+	rt.registerAllHandlers()
+}
 
-		if err := manager.CreateAndSetNewManagerData(rt.manager); err != nil {
+func (rt *Router) Get(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
+	_muxRouter := rt.getMuxRouter(pattern)
+	if _muxRouter.Get != nil {
+		panic(fmt.Sprintf("the %s method on the %s path is already mounted", "GET", pattern))
+	}
+	_muxRouter.Get = handler
+	rt.setMuxRouter(pattern, _muxRouter)
+}
+
+func (rt *Router) Post(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
+	_muxRouter := rt.getMuxRouter(pattern)
+	if _muxRouter.Post != nil {
+		panic(fmt.Sprintf("the %s method on the %s path is already mounted", "POST", pattern))
+	}
+	_muxRouter.Post = handler
+	rt.setMuxRouter(pattern, _muxRouter)
+}
+
+func (rt *Router) Put(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
+	_muxRouter := rt.getMuxRouter(pattern)
+	if _muxRouter.Put != nil {
+		panic(fmt.Sprintf("the %s method on the %s path is already mounted", "PUT", pattern))
+	}
+	_muxRouter.Put = handler
+	rt.setMuxRouter(pattern, _muxRouter)
+}
+
+func (rt *Router) Delete(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
+	_muxRouter := rt.getMuxRouter(pattern)
+	if _muxRouter.Delete != nil {
+		panic(fmt.Sprintf("the %s method on the %s path is already mounted", "DELETE", pattern))
+	}
+	_muxRouter.Delete = handler
+	rt.setMuxRouter(pattern, _muxRouter)
+}
+
+func (rt *Router) Options(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
+	_muxRouter := rt.getMuxRouter(pattern)
+	if _muxRouter.Options != nil {
+		panic(fmt.Sprintf("the %s method on the %s path is already mounted", "OPTIONS", pattern))
+	}
+	_muxRouter.Options = handler
+	rt.setMuxRouter(pattern, _muxRouter)
+}
+
+func (rt *Router) Ws(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
+	_muxRouter := rt.getMuxRouter(pattern)
+	if _muxRouter.Ws != nil {
+		panic(fmt.Sprintf("the %s method on the %s path is already mounted", "WS", pattern))
+	}
+	_muxRouter.Ws = handler
+	rt.setMuxRouter(pattern, _muxRouter)
+}
+
+func (rt *Router) SetMiddleware(middleware interfaces.IMiddleware) {
+	rt.middleware = middleware
+}
+
+// getMuxRouter returns a muxRouter structure.
+// If it does not exist, creates and returns it.
+func (rt *Router) getMuxRouter(pattern string) muxRouter {
+	_muxRouter, exists := rt.routes[pattern]
+	if !exists {
+		_muxRouter = muxRouter{}
+	}
+	return _muxRouter
+}
+
+// setMuxRouter set the muxRouter structure in the routes map.
+// Works well in conjunction with the getMuxRouter method.
+func (rt *Router) setMuxRouter(pattern string, _muxRouter muxRouter) {
+	rt.routes[pattern] = _muxRouter
+}
+
+// validateMethod checks whether the method is allowed to be applied on the given URL.
+func (rt *Router) validateMethod(handler Handler, method string, w http.ResponseWriter) bool {
+	if handler == nil {
+		w.Header().Set("Allow", method)
+		http.Error(w, fmt.Sprintf("Method %s Not Allowed", method), http.StatusMethodNotAllowed)
+		return false
+	}
+	return true
+}
+
+// register passed to muxRouter.
+// When navigating to a URL, the handler will look for a function from muxRouter to run that handler.
+// Various services are also started here for the correct operation of the processor.
+func (rt *Router) register(_muxRouter muxRouter, urlPattern string) http.HandlerFunc {
+	return func(writer http.ResponseWriter, request *http.Request) {
+		if err := rt.initManager(); err != nil {
 			ServerError(writer, err.Error(), rt.manager)
 			return
 		}
-		if rt.manager.Render() != nil {
-			if err := tmlengine.CreateAndSetNewRenderInstance(rt.manager); err != nil {
-				ServerError(writer, err.Error(), rt.manager)
-				return
-			}
-		}
-		rt.manager.OneTimeData().SetUserContext(namelib.ROUTER.URL_PATTERN, pattern)
+		rt.manager.OneTimeData().SetUserContext(namelib.ROUTER.URL_PATTERN, urlPattern)
 
-		// Check if the url matches its pattern with possible slug fields.
-		parseUrl := ParseSlugIndex(fstring.SplitUrl(pattern))
+		parseUrl := ParseSlugIndex(fstring.SplitUrl(urlPattern))
 		if request.URL.Path != "/" && len(parseUrl) > 0 {
-			res, params := HandleSlugUrls(parseUrl, fstring.SplitUrl(pattern), fstring.SplitUrl(request.URL.Path))
+			res, params := HandleSlugUrls(parseUrl, fstring.SplitUrl(urlPattern), fstring.SplitUrl(request.URL.Path))
 			if res != request.URL.Path {
 				http.NotFound(writer, request)
 				return
@@ -88,6 +153,7 @@ func (rt *Router) getHandleFunc(pattern string, method string, ws interfaces.IWe
 				rt.manager.OneTimeData().SetSlugParams(params)
 			}
 		}
+
 		// Run middlewares.
 		if skip, err := rt.runMddl(writer, request); err != nil {
 			ServerError(writer, err.Error(), rt.manager)
@@ -97,32 +163,71 @@ func (rt *Router) getHandleFunc(pattern string, method string, ws interfaces.IWe
 				return
 			}
 		}
-		if method == "WS" {
-			rt.manager.WS().SetWebsocket(ws)
+
+		connection := request.Header.Get("Connection")
+		if connection != "" && connection == "Upgrade" {
+			handler := _muxRouter.Ws
+			if !rt.validateMethod(handler, "WS", writer) {
+				return
+			}
+			handler(writer, request, rt.manager)()
+			return
 		}
-		mustCall := fn(writer, request, rt.manager)
-		mustCall()
+		switch request.Method {
+		case http.MethodGet:
+			handler := _muxRouter.Get
+			if !rt.validateMethod(handler, "GET", writer) {
+				return
+			}
+			handler(writer, request, rt.manager)()
+		case http.MethodPost:
+			handler := _muxRouter.Post
+			if !rt.validateMethod(handler, "POST", writer) {
+				return
+			}
+			handler(writer, request, rt.manager)()
+		case http.MethodPut:
+			handler := _muxRouter.Put
+			if !rt.validateMethod(handler, "PUT", writer) {
+				return
+			}
+			handler(writer, request, rt.manager)()
+		case http.MethodDelete:
+			handler := _muxRouter.Delete
+			if !rt.validateMethod(handler, "DELETE", writer) {
+				return
+			}
+			handler(writer, request, rt.manager)()
+		case http.MethodOptions:
+			handler := _muxRouter.Options
+			if !rt.validateMethod(handler, "OPTIONS", writer) {
+				return
+			}
+			handler(writer, request, rt.manager)()
+		}
+		rt.printLog(request)
 	}
 }
 
-// validateMethod Check if the http method matches the expected method.
-func (rt *Router) validateMethod(method string) bool {
-	if method == "WS" {
-		return true
+// initManager initializes a new manager instance.
+// Must be called for each new request.
+func (rt *Router) initManager() error {
+	if err := manager.CreateAndSetNewManagerData(rt.manager); err != nil {
+		return err
 	}
-	if rt.request.Method != method {
-		rt.writer.Header().Set("Allow", method)
-		http.Error(rt.writer, fmt.Sprintf("Method %s Not Allowed", rt.request.Method), http.StatusMethodNotAllowed)
-		return false
+	if rt.manager.Render() != nil {
+		if err := tmlengine.CreateAndSetNewRenderInstance(rt.manager); err != nil {
+			return err
+		}
 	}
-	return true
+	return nil
 }
 
-func (rt *Router) setWR(w http.ResponseWriter, r *http.Request) {
-	rt.writer = w
-	rt.request = r
-}
-
+// runMddl runs the middleware.
+// Conventional middleware is run first because it is more prioritized than asynchronous. They usually
+// perform important logic, which, for example, should be run first.
+// After execution of synchronous middleware, asynchronous ones are executed.
+// Middleware errors and the page rendering skip algorithm are also handled here.
 func (rt *Router) runMddl(w http.ResponseWriter, r *http.Request) (bool, error) {
 	if rt.middleware != nil {
 		// Running synchronous middleware.
@@ -150,20 +255,16 @@ func (rt *Router) runMddl(w http.ResponseWriter, r *http.Request) (bool, error) 
 	return false, nil
 }
 
-// SetTemplateEngine sets the template engine interface.
-func (rt *Router) SetTemplateEngine(engine interfaces.ITemplateEngine) {
-	rt.TemplateEngine = engine
+func (rt *Router) registerAllHandlers() {
+	for pattern, _muxRouter := range rt.routes {
+		rt.mux.Handle(splitUrlFromFirstSlug(pattern), rt.register(_muxRouter, pattern))
+	}
 }
 
 func (rt *Router) printLog(request *http.Request) {
 	if rt.manager.Config().IsPrintLog() {
 		log.Printf("%s %s", request.Method, request.URL.Path)
 	}
-}
-
-// SetMiddleware installs the middleware for the handlers.
-func (rt *Router) SetMiddleware(middleware interfaces.IMiddleware) {
-	rt.middleware = middleware
 }
 
 // ValidateRootUrl Checks if the root url matches the "/" character.

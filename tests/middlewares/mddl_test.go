@@ -12,7 +12,6 @@ import (
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/manager"
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
-	"github.com/uwine4850/foozy/pkg/router/tmlengine"
 	"github.com/uwine4850/foozy/pkg/server"
 )
 
@@ -21,7 +20,6 @@ var newRouter = router.NewRouter(mng)
 
 func TestMain(m *testing.M) {
 	mng.Config().DebugConfig().Debug(true)
-	newRouter.SetTemplateEngine(&tmlengine.TemplateEngine{})
 	newRouter.Get("/mddl", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		return func() { w.Write([]byte("OK")) }
 	})

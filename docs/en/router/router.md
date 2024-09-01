@@ -16,6 +16,9 @@ All handlers have standard parameters:
   is described in more detail [here](https://github.com/uwine4850/foozy/blob/master/docs/en/router/manager/manager.md).
 * Each handler returns ``func()`` - this is a function that is executed after the handler itself is finished.
 
+Multiple method handlers can be applied to a single route. 
+The main thing is that the methods are not repeated, that is, only one Get, Post, Delete, etc.
+
 __Get__
 ```
 Get(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) func()
@@ -31,14 +34,13 @@ compared to the ``Get`` method. But this can be changed with [form handler packa
 
 __Ws__
 ```
-Ws(pattern string, ws interfaces.IWebsocket, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) func()
+Ws(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) func()
 ```
-The handler launches a websocket on the selected path. You can easily connect to this handler using JavaScript.
-The parameter ``interfaces.IWebsocket`` is the interface of the structure that implements interaction with the web socket, here is the standard implementation ``router.NewWebsocket(router.Upgrader)``. Web sockets are written in more detail [here](https://github.com/uwine4850/foozy/blob/master/docs/en/router/websocket.md).<br>
+The handler accepts a websocket via the selected path.  Web sockets are written in more detail [here](https://github.com/uwine4850/foozy/blob/master/docs/en/router/websocket.md).<br>
 An example of echo handler implementation:
 ```
-newRouter.Ws("/ws", router.NewWebsocket(router.Upgrader), func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-	ws := manager.WS().CurrentWebsocket()
+newRouter.Ws("/ws", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	ws := router.NewWebsocket(router.Upgrader)
 	ws.OnConnect(func(w http.ResponseWriter, r *http.Request, conn *websocket.Conn) {
 		fmt.Println("Connect.")
 	})
@@ -75,7 +77,19 @@ Delete(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager i
 ```
 Method for handling Delete requests.
 
-### Інші методи
+__Options__
+```
+Options(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()
+```
+A method for processing Options requests.
+
+### Other methods
+
+__RegisterAll__
+```
+RegisterAll()
+```
+Registers all handlers.
 
 __SetTemplateEngine__
 ```

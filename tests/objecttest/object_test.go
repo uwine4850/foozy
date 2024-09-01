@@ -35,20 +35,19 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 	newRouter := router.NewRouter(manager.NewManager(render))
-	newRouter.SetTemplateEngine(&tmlengine.TemplateEngine{})
 	newRouter.Get("/object-view/<id>", TObjectViewHNDL(db))
 	newRouter.Get("/object-mul-view/<id>/<id1>", TObjectMultipleViewHNDL(db))
 	newRouter.Get("/object-all-view", TObjectAllViewHNDL(db))
 	newRouter.Post("/object-form-view", MyFormViewHNDL())
 
-	serv := server.NewServer(":8030", newRouter)
+	serv := server.NewServer(":8031", newRouter)
 	go func() {
 		err = serv.Start()
 		if err != nil && !errors.Is(http.ErrServerClosed, err) {
 			panic(err)
 		}
 	}()
-	if err := server.WaitStartServer(":8030", 5); err != nil {
+	if err := server.WaitStartServer(":8031", 5); err != nil {
 		panic(err)
 	}
 	exitCode := m.Run()
@@ -140,7 +139,7 @@ func TObjectViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.
 }
 
 func TestObjectView(t *testing.T) {
-	get, err := http.Get("http://localhost:8030/object-view/1")
+	get, err := http.Get("http://localhost:8031/object-view/1")
 	if err != nil {
 		t.Error(err)
 	}
@@ -206,7 +205,7 @@ func TObjectMultipleViewHNDL(db *database.Database) func(w http.ResponseWriter, 
 }
 
 func TestObjectMultipleView(t *testing.T) {
-	get, err := http.Get("http://localhost:8030/object-mul-view/1/1")
+	get, err := http.Get("http://localhost:8031/object-mul-view/1/1")
 	if err != nil {
 		t.Error(err)
 	}
@@ -256,7 +255,7 @@ func TObjectAllViewHNDL(db *database.Database) func(w http.ResponseWriter, r *ht
 }
 
 func TestObjectAllView(t *testing.T) {
-	get, err := http.Get("http://localhost:8030/object-all-view")
+	get, err := http.Get("http://localhost:8031/object-all-view")
 	if err != nil {
 		t.Error(err)
 	}
@@ -317,7 +316,7 @@ func MyFormViewHNDL() func(w http.ResponseWriter, r *http.Request, manager inter
 }
 
 func TestMyFormView(t *testing.T) {
-	multipartForm, err := form.SendMultipartForm("http://localhost:8030/object-form-view", map[string][]string{"text": {"field"}}, map[string][]string{"file": {"x.png"}})
+	multipartForm, err := form.SendMultipartForm("http://localhost:8031/object-form-view", map[string][]string{"text": {"field"}}, map[string][]string{"file": {"x.png"}})
 	if err != nil {
 		t.Error(err)
 	}

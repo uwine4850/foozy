@@ -10,7 +10,6 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/manager"
-	"github.com/uwine4850/foozy/pkg/router/tmlengine"
 	"github.com/uwine4850/foozy/pkg/server"
 	"github.com/uwine4850/foozy/pkg/utils/fstring"
 )
@@ -20,7 +19,6 @@ var mngr = manager.NewManager(nil)
 func TestMain(m *testing.M) {
 	mngr.Config().DebugConfig().ErrorLoggingFile("test.log")
 	newRouter := router.NewRouter(mngr)
-	newRouter.SetTemplateEngine(&tmlengine.TemplateEngine{})
 	newRouter.Get("/server-err", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		return func() { router.ServerError(w, "error", manager) }
 	})

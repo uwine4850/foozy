@@ -19,7 +19,6 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/cookies"
 	"github.com/uwine4850/foozy/pkg/router/manager"
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
-	"github.com/uwine4850/foozy/pkg/router/tmlengine"
 	"github.com/uwine4850/foozy/pkg/server"
 	"github.com/uwine4850/foozy/pkg/server/globalflow"
 )
@@ -55,7 +54,6 @@ func TestMain(m *testing.M) {
 		middlewares.SetMddlError(err, manager.OneTimeData())
 	}))
 
-	newRouter.SetTemplateEngine(&tmlengine.TemplateEngine{})
 	newRouter.Get("/register", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		if err := auth.CreateAuthTable(_db); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager) }

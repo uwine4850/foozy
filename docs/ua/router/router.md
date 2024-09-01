@@ -16,6 +16,9 @@
 детальныше написано [тут](https://github.com/uwine4850/foozy/blob/master/docs/ua/router/manager/manager.md).
 * Кожен обробник повертає ``func()`` - це функція, яка виконується після завершення роботи самого обробника.
 
+Для одного маршруту може бути застосовані декілька обробників методів. 
+Головне щоб методи не повторювались, тобто тільки один Get, Post, Delete і тд.
+
 __Get__
 ```
 Get(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) func()
@@ -31,15 +34,13 @@ Post(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager int
 
 __Ws__
 ```
-Ws(pattern string, ws interfaces.IWebsocket, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) func()
+Ws(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) func()
 ```
-Обробник запускає веб-сокет по вибраному шляху. До цього обробника можна без проблем під'єднатися з допомогою JavaScript.
-Параметр ``interfaces.IWebsocket`` це інтерфейс структури яка реалізує взаємодію з веб-сокетом, ось стандартна реалізація
-``router.NewWebsocket(router.Upgrader)``. Про веб-сокети детальніше написано [тут](https://github.com/uwine4850/foozy/blob/master/docs/ua/router/websocket.md).<br>
+Обробник приймає веб-сокет по вибраному шляху. Про веб-сокети детальніше написано [тут](https://github.com/uwine4850/foozy/blob/master/docs/ua/router/websocket.md).<br>
 Приклад реалізації echo обробника:
 ```
-newRouter.Ws("/ws", router.NewWebsocket(router.Upgrader), func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-	ws := manager.WS().CurrentWebsocket()
+newRouter.Ws("/ws", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	ws := router.NewWebsocket(router.Upgrader)
 	ws.OnConnect(func(w http.ResponseWriter, r *http.Request, conn *websocket.Conn) {
 		fmt.Println("Connect.")
 	})
@@ -76,13 +77,19 @@ Delete(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager i
 ```
 Метод для обробки запита Delete.
 
+__Options__
+```
+Options(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()
+```
+Метод для обробки запита Options.
+
 ### Інші методи
 
-__SetTemplateEngine__
+__RegisterAll__
 ```
-SetTemplateEngine(engine interfaces.ITemplateEngine)
+RegisterAll()
 ```
-Встановлює екземпляр шаблонізатора, який реалізовує інтерфейс ``interfaces.ITemplateEngine``.
+Реєструє всі обробники.
 
 __SetMiddleware__
 ```

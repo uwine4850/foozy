@@ -12,7 +12,6 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/manager"
 	"github.com/uwine4850/foozy/pkg/router/rest"
 	"github.com/uwine4850/foozy/pkg/router/rest/restmapper"
-	"github.com/uwine4850/foozy/pkg/router/tmlengine"
 	"github.com/uwine4850/foozy/pkg/server"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
@@ -29,7 +28,6 @@ func TestMain(m *testing.M) {
 		},
 	})
 	mng.Config().DebugConfig().Debug(true)
-	newRouter.SetTemplateEngine(&tmlengine.TemplateEngine{})
 	newRouter.Get("/json", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		jsonData := JsonData{
 			Id:       1,

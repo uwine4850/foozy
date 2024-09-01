@@ -19,6 +19,7 @@ type Server struct {
 }
 
 func NewServer(addr string, router *router.Router) *Server {
+	router.RegisterAll()
 	s := &Server{router: router, addr: addr}
 	s.serv = &http.Server{
 		Addr:    s.addr,
