@@ -3,9 +3,11 @@
 
 __GenerateAndSetCsrf__
 ```
-GenerateAndSetCsrf(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
+GenerateAndSetCsrf(maxAge int, onError onError) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 ```
-Дана функція це стандартна реалізація middleware.<br>
+Дана функція повертає стандартну реалізацію middleware.<br>
+maxAge - час життя cookie.
+onError - функція, яка буду виконана під час помилки.
 З допомогою цієї функції можна згенерувати та встановити значення csrf_token у параметри cookies. Приклад застосування:
 ```
 mddl := middlewares.NewMiddleware()

@@ -5,7 +5,9 @@ __GenerateAndSetCsrf__
 ```
 GenerateAndSetCsrf(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 ```
-This function is a standard implementation of middleware.<br>
+This function returns a standard middleware implementation.<br>
+maxAge - cookie lifetime.
+onError - a function that will be executed during an error.
 With the help of this function, you can generate and set the csrf_token value in the cookie settings. Application example:
 ```
 mddl := middlewares.NewMiddleware()
