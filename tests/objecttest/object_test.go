@@ -43,7 +43,7 @@ func TestMain(m *testing.M) {
 	serv := server.NewServer(":8031", newRouter)
 	go func() {
 		err = serv.Start()
-		if err != nil && !errors.Is(http.ErrServerClosed, err) {
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			panic(err)
 		}
 	}()
@@ -326,6 +326,6 @@ func TestMyFormView(t *testing.T) {
 		t.Error(err)
 	}
 	if string(responseBody) != "" {
-		t.Errorf(string(responseBody))
+		t.Error(string(responseBody))
 	}
 }

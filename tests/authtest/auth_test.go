@@ -35,11 +35,15 @@ func TestMain(m *testing.M) {
 	if err := _db.Connect(); err != nil {
 		panic(err)
 	}
+	defer _db.Close()
+
+	if err := auth.CreateAuthTable(_db); err != nil {
+		panic(err)
+	}
 	_, err := _db.SyncQ().Query(fmt.Sprintf("TRUNCATE TABLE %s", namelib.AUTH.AUTH_TABLE))
 	if err != nil {
 		panic(err)
 	}
-	defer _db.Close()
 
 	mng.Config().Key().Generate32BytesKeys()
 	mng.Config().DebugConfig().Debug(true)

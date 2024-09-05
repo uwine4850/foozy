@@ -4,13 +4,14 @@ go 1.20
 
 require (
 	github.com/flosch/pongo2 v0.0.0-20200913210552-0d938eb266f3
-	github.com/go-sql-driver/mysql v1.7.1
+	github.com/go-sql-driver/mysql v1.8.1
 	github.com/gorilla/websocket v1.5.0
 	golang.org/x/crypto v0.18.0
 	google.golang.org/grpc v1.62.0
 )
 
 require (
+	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	golang.org/x/net v0.20.0 // indirect
 	golang.org/x/sys v0.16.0 // indirect

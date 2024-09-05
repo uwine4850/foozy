@@ -1,0 +1,19 @@
+CREATE DATABASE IF NOT EXISTS foozy_test;
+
+CREATE TABLE IF NOT EXISTS `foozy_test`.`dbtest`(
+    `id` INT NOT NULL AUTO_INCREMENT ,
+    col1 VARCHAR(500) NOT NULL,
+    col2 DATE NULL,
+    col3 DOUBLE NOT NULL,
+    col4 INT NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+);
+
+CREATE TABLE IF NOT EXISTS `foozy_test`.`db_async_test`(
+    `id` INT NOT NULL AUTO_INCREMENT ,
+    col1 VARCHAR(500) NOT NULL,
+    col2 DATE NULL,
+    col3 DOUBLE NOT NULL,
+    col4 INT NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+);

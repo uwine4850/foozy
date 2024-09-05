@@ -177,6 +177,8 @@ func ParseFloat(value interface{}) (float64, error) {
 	case "float32":
 		_v := value.(float32)
 		v = float64(_v)
+	case "float64":
+		v = value.(float64)
 	}
 	return v, nil
 }

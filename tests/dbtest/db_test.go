@@ -107,7 +107,7 @@ func TestSyncQuery(t *testing.T) {
 		t.Error(err)
 	}
 	s := fmt.Sprintf("%v", query)
-	if s != "[map[col1:[116 101 115 116 49] col2:[50 48 50 51 45 49 49 45 49 53] col3:[49 49 49 46 50 50]]]" {
+	if s != "[map[col1:[116 101 115 116 49] col2:[50 48 50 51 45 49 49 45 49 53] col3:111.22]]" {
 		t.Errorf("The row values in the database of the expected row do not match.")
 	}
 }
@@ -118,8 +118,8 @@ func TestSyncSelect(t *testing.T) {
 		panic(err)
 	}
 	s := fmt.Sprintf("%v", res1)
-	if s != "[map[col1:[116 101 115 116 49] col2:[50 48 50 51 45 49 49 45 49 53] col3:[49 49 49 46 50 50]] "+
-		"map[col1:[116 101 115 116 50] col2:[50 48 50 51 45 49 49 45 50 48] col3:[50 50 50 46 49 49]]]" {
+	if s != "[map[col1:[116 101 115 116 49] col2:[50 48 50 51 45 49 49 45 49 53] col3:111.22] "+
+		"map[col1:[116 101 115 116 50] col2:[50 48 50 51 45 49 49 45 50 48] col3:222.11]]" {
 		t.Errorf("The result of sampling all fields is not the same as expected.")
 	}
 	res2, err := db.SyncQ().Select([]string{"col1", "col2", "col3"}, "dbtest", dbutils.WHOutput{}, 1)
@@ -127,7 +127,7 @@ func TestSyncSelect(t *testing.T) {
 		t.Error(err)
 	}
 	s2 := fmt.Sprintf("%v", res2)
-	if s2 != "[map[col1:[116 101 115 116 49] col2:[50 48 50 51 45 49 49 45 49 53] col3:[49 49 49 46 50 50]]]" {
+	if s2 != "[map[col1:[116 101 115 116 49] col2:[50 48 50 51 45 49 49 45 49 53] col3:111.22]]" {
 		t.Errorf("The result of sampling all fields with a limit does not match the expected result.")
 	}
 }

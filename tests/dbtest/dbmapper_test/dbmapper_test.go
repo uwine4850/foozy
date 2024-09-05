@@ -99,12 +99,11 @@ func TestDbMapperUseMap(t *testing.T) {
 	if len(dbTestMapper) == 0 {
 		t.Error("DbMapper.Output must not be empty")
 	}
-
-	map1 := map[string]string{"col1": "test1", "col2": "2023-11-15", "col3": "111.22", "col4": "", "id": ""}
+	map1 := map[string]string{"col1": "test1", "col2": "2023-11-15", "col3": "111.22", "col4": "0", "id": ""}
 	if !fmap.Compare(&map1, &dbTestMapper[0], []string{"id"}) {
 		t.Error("DbMapper.Output value does not match expected")
 	}
-	map2 := map[string]string{"col1": "test2", "col2": "2023-11-20", "col3": "222.11", "col4": "", "id": ""}
+	map2 := map[string]string{"col1": "test2", "col2": "2023-11-20", "col3": "222.11", "col4": "0", "id": ""}
 	if !fmap.Compare(&map2, &dbTestMapper[1], []string{"id"}) {
 		t.Error("DbMapper.Output value does not match expected")
 	}

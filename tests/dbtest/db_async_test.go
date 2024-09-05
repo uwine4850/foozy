@@ -17,15 +17,15 @@ func TestAsyncSelect(t *testing.T) {
 	if res.Error != nil {
 		t.Error(res.Error)
 	}
-	if s != "[map[col1:[116 101 115 116 49] col2:[50 48 50 51 45 49 49 45 49 53] col3:[49 49 49 46 50 50]] "+
-		"map[col1:[116 101 115 116 50] col2:[50 48 50 51 45 49 49 45 50 48] col3:[50 50 50 46 49 49]]]" {
+	if s != "[map[col1:[116 101 115 116 49] col2:[50 48 50 51 45 49 49 45 49 53] col3:111.22] "+
+		"map[col1:[116 101 115 116 50] col2:[50 48 50 51 45 49 49 45 50 48] col3:222.11]]" {
 		t.Errorf("The result of sampling all fields is not the same as expected.")
 	}
 	s2 := fmt.Sprintf("%v", res1.Res)
 	if res1.Error != nil {
 		t.Error(res1.Error)
 	}
-	if s2 != "[map[col1:[116 101 115 116 49] col2:[50 48 50 51 45 49 49 45 49 53] col3:[49 49 49 46 50 50]]]" {
+	if s2 != "[map[col1:[116 101 115 116 49] col2:[50 48 50 51 45 49 49 45 49 53] col3:111.22]]" {
 		t.Errorf("The result of sampling all fields with a limit does not match the expected result.")
 	}
 }
@@ -38,7 +38,7 @@ func TestAsyncQuery(t *testing.T) {
 		t.Error(res.Error)
 	}
 	s := fmt.Sprintf("%v", res.Res)
-	if s != "[map[col1:[116 101 115 116 49] col2:[50 48 50 51 45 49 49 45 49 53] col3:[49 49 49 46 50 50]]]" {
+	if s != "[map[col1:[116 101 115 116 49] col2:[50 48 50 51 45 49 49 45 49 53] col3:111.22]]" {
 		t.Errorf("The row values in the database of the expected row do not match.")
 	}
 }

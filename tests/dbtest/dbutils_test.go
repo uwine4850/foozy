@@ -1,6 +1,7 @@
 package dbtest
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -26,6 +27,7 @@ func TestParseInt(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println(res)
 	parseInt, err := dbutils.ParseInt(res[0]["id"])
 	if err != nil {
 		panic(err)

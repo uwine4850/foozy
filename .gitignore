@@ -1,4 +1,3 @@
-templates
 static
 project
 mysql
@@ -7,3 +6,5 @@ docker
 main.go
 stress_test
 .vscode
+docker-compose.yml
+Dockerfile.*
