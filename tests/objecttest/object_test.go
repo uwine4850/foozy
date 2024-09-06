@@ -40,7 +40,7 @@ func TestMain(m *testing.M) {
 	newRouter.Get("/object-all-view", TObjectAllViewHNDL(db))
 	newRouter.Post("/object-form-view", MyFormViewHNDL())
 
-	serv := server.NewServer(":8031", newRouter)
+	serv := server.NewServer(":8031", newRouter, nil)
 	go func() {
 		err = serv.Start()
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {

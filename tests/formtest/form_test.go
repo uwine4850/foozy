@@ -65,7 +65,7 @@ func TestMain(m *testing.M) {
 	newRouter.Post("/application-form", applicationForm)
 	newRouter.Post("/multipart-form", multipartForm)
 	newRouter.Post("/save-file", saveFile)
-	serv := server.NewServer(":8021", newRouter)
+	serv := server.NewServer(":8021", newRouter, nil)
 	go func() {
 		err = serv.Start()
 		if err != nil && !errors.Is(http.ErrServerClosed, err) {

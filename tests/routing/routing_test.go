@@ -90,7 +90,7 @@ func TestMain(m *testing.M) {
 	newRouter.Get("/cookie", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		return func() { cookies.SetStandartCookie(w, "cookie", "value", "/", 0) }
 	})
-	serv := server.NewServer(":8030", newRouter)
+	serv := server.NewServer(":8030", newRouter, nil)
 	go func() {
 		err = serv.Start()
 		if err != nil && !errors.Is(http.ErrServerClosed, err) {

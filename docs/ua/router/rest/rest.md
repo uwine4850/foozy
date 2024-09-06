@@ -15,12 +15,12 @@ Data Transfer Object - cтруктура для генерації об'єкті
 Базовий приклад викистання:
 ```
 type TT struct {
-	rest.InmplementDTOMessage
+	rest.ImplementDTOMessage
 	Id string
 }
 
 type Message struct {
-	rest.InmplementDTOMessage
+	rest.ImplementDTOMessage
 	Id   int
 	Tee  TT
 	Tee1 []TT
@@ -64,7 +64,7 @@ Generate()
 ```
 Генерація інтерфейсів typescript із переданих повідомлень.
 
-## type InmplementDTOMessage struct
+## type ImplementDTOMessage struct
 Cтруктура, яка буде вбудована в повідомлення.
 Після вбудовування фреймворк реалізує інтерфейс irest.IMessage.
 

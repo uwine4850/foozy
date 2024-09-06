@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/rs/cors"
 	"github.com/uwine4850/foozy/pkg/router"
 	"google.golang.org/grpc"
 )
@@ -18,12 +19,20 @@ type Server struct {
 	serv   *http.Server
 }
 
-func NewServer(addr string, router *router.Router) *Server {
+// rcors - CORS data, which is set using the cors.Options library at github.com/rs/cors.
+// These settings will be applied to all requests.
+func NewServer(addr string, router *router.Router, rcors *cors.Options) *Server {
 	router.RegisterAll()
 	s := &Server{router: router, addr: addr}
+	var handler http.Handler
+	if rcors != nil {
+		handler = cors.New(*rcors).Handler(s.router.GetMux())
+	} else {
+		handler = s.router.GetMux()
+	}
 	s.serv = &http.Server{
 		Addr:    s.addr,
-		Handler: s.router.GetMux(),
+		Handler: handler,
 	}
 	return s
 }

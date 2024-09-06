@@ -8,12 +8,12 @@ import (
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
-// InmplementDTOMessage structure to be embedded in a message.
+// ImplementDTOMessage structure to be embedded in a message.
 // Once inlined, the framework will implement the irest.IMessage interface.
-type InmplementDTOMessage struct {
+type ImplementDTOMessage struct {
 }
 
-func (m InmplementDTOMessage) IsImplementDTOMessage() {}
+func (m ImplementDTOMessage) IsImplementDTOMessage() {}
 
 // AllowMessage used to transmit packet data and message name in string type.
 type AllowMessage struct {
@@ -39,7 +39,7 @@ func DeepCheckSafeMessage(dto *DTO, messagePtr itypeopr.IPtr) error {
 	for i := 0; i < _type.NumField(); i++ {
 		field := _type.Field(i)
 		v := value.Field(i)
-		if field.Type.Kind() == reflect.Struct && !reflect.DeepEqual(field.Type, reflect.TypeOf(InmplementDTOMessage{})) {
+		if field.Type.Kind() == reflect.Struct && !reflect.DeepEqual(field.Type, reflect.TypeOf(ImplementDTOMessage{})) {
 			if err := DeepCheckSafeMessage(dto, typeopr.Ptr{}.New(v.Addr().Interface())); err != nil {
 				return err
 			}

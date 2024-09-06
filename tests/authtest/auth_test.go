@@ -106,7 +106,7 @@ func TestMain(m *testing.M) {
 		}
 		return func() { w.Write([]byte("!OK")) }
 	})
-	serv := server.NewServer(":8060", newRouter)
+	serv := server.NewServer(":8060", newRouter, nil)
 	go func() {
 		err = serv.Start()
 		if err != nil && !errors.Is(http.ErrServerClosed, err) {

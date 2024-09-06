@@ -42,7 +42,7 @@ func TestMain(m *testing.M) {
 			router.SendJson(jsonData, w)
 		}
 	})
-	serv := server.NewServer(":8070", newRouter)
+	serv := server.NewServer(":8070", newRouter, nil)
 	go func() {
 		err := serv.Start()
 		if err != nil && !errors.Is(http.ErrServerClosed, err) {
@@ -61,7 +61,7 @@ func TestMain(m *testing.M) {
 }
 
 type JsonData struct {
-	rest.InmplementDTOMessage
+	rest.ImplementDTOMessage
 	Id       int                 `json:"Id"`
 	Name     string              `json:"Name"`
 	Slice    []string            `json:"Slice"`

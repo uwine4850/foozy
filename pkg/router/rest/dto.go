@@ -132,7 +132,7 @@ func (d *DTO) getGenMessaages(messages *[]irest.IMessage) ([]genMessage, []Allow
 		var genMsg genMessage
 		genMsg.Name = _type.Name()
 		for i := 0; i < _type.NumField(); i++ {
-			if _type.Field(i).Type == reflect.TypeOf(InmplementDTOMessage{}) {
+			if _type.Field(i).Type == reflect.TypeOf(ImplementDTOMessage{}) {
 				continue
 			}
 			cnvType, err := d.convertType(_type.Field(i).Type, messages, allowMessage)

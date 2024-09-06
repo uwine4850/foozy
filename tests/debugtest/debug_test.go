@@ -28,7 +28,7 @@ func TestMain(m *testing.M) {
 	newRouter.Get("/server-logging", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		return func() { router.ServerError(w, "Logging test", manager) }
 	})
-	serv := server.NewServer(":8040", newRouter)
+	serv := server.NewServer(":8040", newRouter, nil)
 	go func() {
 		err := serv.Start()
 		if err != nil && !errors.Is(http.ErrServerClosed, err) {

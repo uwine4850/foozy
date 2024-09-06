@@ -15,12 +15,12 @@ So, in order to generate REST typescript interfaces, you need to follow the foll
 A basic example of a pull-out:
 ```
 type TT struct {
-	rest.InmplementDTOMessage
+	rest.ImplementDTOMessage
 	Id string
 }
 
 type Message struct {
-	rest.InmplementDTOMessage
+	rest.ImplementDTOMessage
 	Id   int
 	Tee  TT
 	Tee1 []TT
@@ -64,7 +64,7 @@ Generate()
 ```
 Generation of typescript interfaces from passed messages.
 
-## type InmplementDTOMessage struct
+## type ImplementDTOMessage struct
 The structure that will be embedded in the message.
 After embedding, the framework implements the irest.IMessage interface.
 
