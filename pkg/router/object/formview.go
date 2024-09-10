@@ -10,6 +10,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router/form"
 	"github.com/uwine4850/foozy/pkg/router/form/formmapper"
+	"github.com/uwine4850/foozy/pkg/secure"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
@@ -28,7 +29,7 @@ func (v *FormView) Object(w http.ResponseWriter, r *http.Request, manager interf
 		return nil, err
 	}
 	if v.ValidateCSRF {
-		if err := frm.ValidateCsrfToken(); err != nil {
+		if err := secure.ValidateFormCsrfToken(r, frm); err != nil {
 			return nil, err
 		}
 	}

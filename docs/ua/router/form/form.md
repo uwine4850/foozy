@@ -40,22 +40,6 @@ Files(key string) ([]*multipart.FileHeader, bool)
 ```
 Повертає декілька файлів із форми(multiple input).
 
-__ValidateCsrfToken__
-```
-ValidateCsrfToken() error
-```
-Метод який проводить валідацію CSRF token. Для цього форма повинна мати поле із назвою ``csrf_token``, крім того дані cookies
-також повинні мати поле ``csrf_token``.<br>
-Найпростіший спосіб для цього - додати вбудований middleware [csrf](https://github.com/uwine4850/foozy/blob/master/docs/ua/builtin/builtin_mddl/csrf.md) який автоматично буде додавати поле ``csrf_token`` в дані cookies.
-Після цього просто потрібно додати в середину HTML форми змінну ``{{ csrf_token | safe }}`` та запустити даний метод.<br>
-Підключення вбудованого middleware для створення токена буде відбуватись наступним чином:
-```
-mddl := middlewares.NewMiddleware()
-mddl.AsyncHandlerMddl(builtin_mddl.GenerateAndSetCsrf)
-...
-newRouter.SetMiddleware(mddl)
-```
-
 ## Глобальні функції пакета
 
 __SaveFile__

@@ -14,7 +14,6 @@ import (
 	"strings"
 
 	"github.com/uwine4850/foozy/pkg/interfaces"
-	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/utils/fstring"
 )
@@ -79,23 +78,6 @@ func (f *Form) File(key string) (multipart.File, *multipart.FileHeader, error) {
 func (f *Form) Files(key string) ([]*multipart.FileHeader, bool) {
 	fi, ok := f.multipartForm.File[key]
 	return fi, ok
-}
-
-// ValidateCsrfToken checks the validity of the csrf token. If no errors are detected, the token is valid.
-// It is desirable to use this method only after Parse() method.
-func (f *Form) ValidateCsrfToken() error {
-	csrfToken := f.Value(namelib.ROUTER.COOKIE_CSRF_TOKEN)
-	if csrfToken == "" {
-		return ErrCsrfTokenNotFound{}
-	}
-	cookie, err := f.request.Cookie(namelib.ROUTER.COOKIE_CSRF_TOKEN)
-	if err != nil {
-		return err
-	}
-	if cookie.Value != csrfToken {
-		return ErrCsrfTokenDoesNotMatch{}
-	}
-	return nil
 }
 
 // randomiseTheFileName If the file name already exists, randomises it and returns the new file path.
