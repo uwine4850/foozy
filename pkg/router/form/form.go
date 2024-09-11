@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"html/template"
 	"io"
 	"mime/multipart"
@@ -194,4 +195,12 @@ func SendMultipartForm(url string, values map[string][]string, files map[string]
 		return nil, err
 	}
 	return response, nil
+}
+
+type ErrFormConvertFieldNotFound struct {
+	Field string
+}
+
+func (e ErrFormConvertFieldNotFound) Error() string {
+	return fmt.Sprintf("The form field %s was not found.", e.Field)
 }

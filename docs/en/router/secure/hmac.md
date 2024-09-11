@@ -9,6 +9,7 @@ Generates data encrypted using HMAC. A hash key is used for generation
 32 bytes in size and SHA-256 algorithm.
 
 __VerifyHMAC__
+```
 VerifyHMAC(hashKey []byte, data []byte, hmacCode []byte) (bool, error)
 ```
 Performs HMAC verification. To do this, you need to transfer the hash key with which the data was encrypted, the data that is expected and the previously encrypted data.

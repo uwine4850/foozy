@@ -9,6 +9,7 @@ GenerateHMAC(hashKey []byte, data []byte) ([]byte, error)
 розміром 32 байта та алгоритм SHA-256.
 
 __VerifyHMAC__
+```
 VerifyHMAC(hashKey []byte, data []byte, hmacCode []byte) (bool, error)
 ```
 Проводить верифікаю HMAC. Для цього потрібно передати хеш-ключ за допомогою якого шифрувалися дані, дані які очікуються та зашифровані раніше дані.
