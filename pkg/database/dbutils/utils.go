@@ -160,7 +160,30 @@ func ParseDateTime(layout string, value interface{}) (time.Time, error) {
 
 // ParseFloat processing the float data type from the database.
 // It is taken into account that the interface format can be []uint8.
-func ParseFloat(value interface{}) (float64, error) {
+func ParseFloat(value interface{}) (float32, error) {
+	if value == nil {
+		return -1, errors.New("value is nil")
+	}
+	_type := reflect.TypeOf(value).String()
+	var v float32
+	switch _type {
+	case "[]uint8":
+		_uint8 := value.([]uint8)
+		float, err := strconv.ParseFloat(string(_uint8), 32)
+		if err != nil {
+			return 0, err
+		}
+		v = float32(float)
+	case "float32":
+		v = value.(float32)
+	case "float64":
+		v = float32(value.(float64))
+	}
+	return v, nil
+}
+
+// ParseDouble converts the double data type from database to the float64 data type.
+func ParseDouble(value interface{}) (float64, error) {
 	if value == nil {
 		return -1, errors.New("value is nil")
 	}

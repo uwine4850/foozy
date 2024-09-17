@@ -19,6 +19,7 @@ type OnError func(w http.ResponseWriter, r *http.Request, manager interfaces.IMa
 // When keys are changed, a change date is set. If the date does not match, then you need to change the encoding.
 // It is important to note that only previous keys are saved; accordingly, it is impossible to update the encoding
 // if two or more key iterations have passed, because the old keys are no longer known.
+// This middleware should not work on the login page. Therefore, you need to specify the loginUrl correctly.
 func Auth(loginUrl string, db *database.Database, onErr OnError) middlewares.MddlFunc {
 	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
 		pattern, ok := manager.OneTimeData().GetUserContext(namelib.ROUTER.URL_PATTERN)
