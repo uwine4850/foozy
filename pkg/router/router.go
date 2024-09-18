@@ -28,10 +28,11 @@ type muxRouter struct {
 }
 
 type Router struct {
-	mux        http.ServeMux
-	routes     map[string]muxRouter
-	manager    interfaces.IManager
-	middleware interfaces.IMiddleware
+	mux               http.ServeMux
+	routes            map[string]muxRouter
+	manager           interfaces.IManager
+	middleware        interfaces.IMiddleware
+	internalErrorFunc func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error)
 }
 
 func NewRouter(manager interfaces.IManager) *Router {
@@ -105,6 +106,11 @@ func (rt *Router) SetMiddleware(middleware interfaces.IMiddleware) {
 	rt.middleware = middleware
 }
 
+// InternalError sets the function to be used when handling internal errors.
+func (rt *Router) InternalError(fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error)) {
+	rt.internalErrorFunc = fn
+}
+
 // getMuxRouter returns a muxRouter structure.
 // If it does not exist, creates and returns it.
 func (rt *Router) getMuxRouter(pattern string) muxRouter {
@@ -137,7 +143,11 @@ func (rt *Router) validateMethod(handler Handler, method string, w http.Response
 func (rt *Router) register(_muxRouter muxRouter, urlPattern string) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		if err := rt.initManager(); err != nil {
-			ServerError(writer, err.Error(), rt.manager)
+			if rt.internalErrorFunc != nil {
+				rt.internalErrorFunc(writer, request, rt.manager, err)
+			} else {
+				ServerError(writer, err.Error(), rt.manager)
+			}
 			return
 		}
 		rt.manager.OneTimeData().SetUserContext(namelib.ROUTER.URL_PATTERN, urlPattern)
@@ -156,7 +166,11 @@ func (rt *Router) register(_muxRouter muxRouter, urlPattern string) http.Handler
 
 		// Run middlewares.
 		if skip, err := rt.runMddl(writer, request); err != nil {
-			ServerError(writer, err.Error(), rt.manager)
+			if rt.internalErrorFunc != nil {
+				rt.internalErrorFunc(writer, request, rt.manager, err)
+			} else {
+				ServerError(writer, err.Error(), rt.manager)
+			}
 			return
 		} else {
 			if skip {

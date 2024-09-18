@@ -83,6 +83,12 @@ Options(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager 
 ```
 A method for processing Options requests.
 
+__InternalError__
+```
+InternalError(fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error))
+```
+InternalError sets the function to be used when handling internal errors.
+
 ### Other methods
 
 __RegisterAll__
