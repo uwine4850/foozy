@@ -23,6 +23,10 @@ type FormView struct {
 	ValidateCSRF     bool
 }
 
+func (v *FormView) ObjectsName() []string {
+	return []string{namelib.OBJECT.OBJECT_CONTEXT_FORM}
+}
+
 func (v *FormView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
 	frm := form.NewForm(r)
 	if err := frm.Parse(); err != nil {

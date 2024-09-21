@@ -36,6 +36,14 @@ func (v *MultipleObjectView) CloseDb() error {
 	return nil
 }
 
+func (v *MultipleObjectView) ObjectsName() []string {
+	names := []string{}
+	for i := 0; i < len(v.MultipleObjects); i++ {
+		names = append(names, v.MultipleObjects[i].Name)
+	}
+	return names
+}
+
 func (v *MultipleObjectView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
 	context := make(ObjectContext)
 	err := v.DB.Connect()

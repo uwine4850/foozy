@@ -30,6 +30,10 @@ func (v *AllView) CloseDb() error {
 	return nil
 }
 
+func (v *AllView) ObjectsName() []string {
+	return []string{v.Name}
+}
+
 // Object sets a slice of rows from the database.
 func (v *AllView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
 	err := v.DB.Connect()

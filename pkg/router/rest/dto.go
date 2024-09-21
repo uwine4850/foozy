@@ -110,6 +110,10 @@ func (d *DTO) IsSafeMessage(message itypeopr.IPtr) error {
 	if !typeopr.IsImplementInterface(message, (*irest.IMessage)(nil)) {
 		return fmt.Errorf("%s message does not implement irest.IMessage interface", _type)
 	}
+	// If the message type is passed through the irest.IMessage interface.
+	if _type == reflect.TypeOf((*irest.IMessage)(nil)).Elem() {
+		_type = reflect.TypeOf(reflect.ValueOf(message.Ptr()).Elem().Interface())
+	}
 	typeInfo := strings.Split(_type.String(), ".")
 	msg := AllowMessage{Package: typeInfo[0], Name: typeInfo[1]}
 	if !fslice.SliceContains(d.allowedMessages, msg) {

@@ -77,6 +77,10 @@ func (p Ptr) Ptr() interface{} {
 // IsImplementInterface(typeopr.Ptr{}.New(&object), (*MyInterface)(nil))
 func IsImplementInterface(objectPtr itypeopr.IPtr, interfaceType interface{}) bool {
 	object := objectPtr.Ptr()
+	// If the type of data passed directly is the desired interface.
+	if reflect.TypeOf(object) == reflect.TypeOf(interfaceType) {
+		return true
+	}
 	var objType reflect.Type
 	if reflect.TypeOf(object).Elem() == reflect.TypeOf(reflect.Value{}) {
 		objType = object.(*reflect.Value).Type()

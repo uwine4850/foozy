@@ -33,6 +33,10 @@ func (v *ObjView) CloseDb() error {
 	return nil
 }
 
+func (v *ObjView) ObjectsName() []string {
+	return []string{v.Name}
+}
+
 func (v *ObjView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
 	if typeopr.IsPointer(v.FillStruct) {
 		return nil, typeopr.ErrValueIsPointer{Value: "FillStruct"}

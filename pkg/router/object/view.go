@@ -22,6 +22,7 @@ type IView interface {
 	Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error)
 	Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func())
 	OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error)
+	ObjectsName() []string
 }
 
 type BaseView struct{}

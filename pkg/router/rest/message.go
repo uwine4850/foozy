@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/uwine4850/foozy/pkg/interfaces/irest"
 	"github.com/uwine4850/foozy/pkg/interfaces/itypeopr"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
@@ -36,6 +37,11 @@ func DeepCheckSafeMessage(dto *DTO, messagePtr itypeopr.IPtr) error {
 	message := messagePtr.Ptr()
 	_type := reflect.TypeOf(message).Elem()
 	value := reflect.ValueOf(message).Elem()
+	// If the message type is passed through the irest.IMessage interface.
+	if _type == reflect.TypeOf((*irest.IMessage)(nil)).Elem() {
+		_type = reflect.TypeOf(reflect.ValueOf(message).Elem())
+		value = reflect.ValueOf(value.Interface())
+	}
 	for i := 0; i < _type.NumField(); i++ {
 		field := _type.Field(i)
 		v := value.Field(i)

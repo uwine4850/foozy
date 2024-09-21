@@ -117,7 +117,7 @@ func (v *TObjectView) Context(w http.ResponseWriter, r *http.Request, manager in
 		panic(err)
 	}
 	if _, ok := objectContext["object"]; !ok {
-		panic("the context has object data")
+		panic("ObjectContext does not have a key object.")
 	}
 	return map[string]interface{}{"TEST": "OK"}, nil
 }
@@ -168,10 +168,10 @@ func (v *TObjectMultipleView) Context(w http.ResponseWriter, r *http.Request, ma
 	_objectContext, _ := manager.OneTimeData().GetUserContext(namelib.OBJECT.OBJECT_CONTEXT)
 	objectContext := _objectContext.(object.ObjectContext)
 	if _, ok := objectContext["object"]; !ok {
-		panic("the context has object data")
+		panic("ObjectContext does not have a key object.")
 	}
 	if _, ok := objectContext["object1"]; !ok {
-		panic("the context has object data")
+		panic("ObjectContext does not have a key object1.")
 	}
 	return object.ObjectContext{"TEST": "OK"}, nil
 }
@@ -234,7 +234,7 @@ func (v *TObjectAllView) Context(w http.ResponseWriter, r *http.Request, manager
 	_objectContext, _ := manager.OneTimeData().GetUserContext(namelib.OBJECT.OBJECT_CONTEXT)
 	objectContext := _objectContext.(object.ObjectContext)
 	if _, ok := objectContext["all_object"]; !ok {
-		panic("the context has object data")
+		panic("ObjectContext does not have a key all_object.")
 	}
 	return object.ObjectContext{"TEST": "OK"}, nil
 }
