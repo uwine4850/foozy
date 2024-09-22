@@ -2,6 +2,7 @@ package objecttest
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -9,16 +10,51 @@ import (
 
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/interfaces/irest"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/form"
 	"github.com/uwine4850/foozy/pkg/router/manager"
 	"github.com/uwine4850/foozy/pkg/router/object"
+	"github.com/uwine4850/foozy/pkg/router/rest"
 	"github.com/uwine4850/foozy/pkg/router/tmlengine"
 	"github.com/uwine4850/foozy/pkg/server"
 )
 
+type JsonObjectViewMessage struct {
+	rest.ImplementDTOMessage
+	Id   string `json:"Id"`
+	Name string `json:"Name"`
+	FF   string `json:"Ff"`
+	Test int    `json:"Test"`
+}
+
+type JsonFormMessage struct {
+	rest.ImplementDTOMessage
+	Text string `json:"Text"`
+	Test string `json:"Test"`
+}
+
+var dto = rest.NewDTO()
+
 func TestMain(m *testing.M) {
+	dto.AllowedMessages([]rest.AllowMessage{
+		{
+			Package: "objecttest",
+			Name:    "JsonObjectViewMessage",
+		},
+		{
+			Package: "objecttest",
+			Name:    "JsonFormMessage",
+		},
+	})
+	dto.Messages(map[string]*[]irest.IMessage{
+		"s": {
+			JsonObjectViewMessage{},
+			JsonFormMessage{},
+		},
+	})
+
 	db := database.NewDatabase(database.DbArgs{Username: "root", Password: "1111", Host: "localhost", Port: "3408", DatabaseName: "foozy_test"})
 	if err := db.Connect(); err != nil {
 		panic(err)
@@ -39,6 +75,9 @@ func TestMain(m *testing.M) {
 	newRouter.Get("/object-mul-view/<id>/<id1>", TObjectMultipleViewHNDL(db))
 	newRouter.Get("/object-all-view", TObjectAllViewHNDL(db))
 	newRouter.Post("/object-form-view", MyFormViewHNDL())
+	newRouter.Get("/object-json-view/<id>", TJsonObjectViewHNDL(db))
+	newRouter.Get("/object-mul-json-view/<id>/<id1>", TJsonObjectMultipleViewHNDL(db))
+	newRouter.Get("/object-json-all-view", TJsonObjectAllViewHNDL(db))
 
 	serv := server.NewServer(":8031", newRouter, nil)
 	go func() {
@@ -327,5 +366,178 @@ func TestMyFormView(t *testing.T) {
 	}
 	if string(responseBody) != "" {
 		t.Error(string(responseBody))
+	}
+}
+
+type JsonObjectView struct {
+	object.ObjView
+}
+
+func (v *JsonObjectView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+	panic(err)
+}
+
+func (v *JsonObjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
+	objectContext, err := object.GetObjectContext(manager)
+	if err != nil {
+		panic(err)
+	}
+	if _, ok := objectContext["object"]; !ok {
+		panic("ObjectContext does not have a key object.")
+	}
+	return map[string]interface{}{"Test": 1}, nil
+}
+
+func TJsonObjectViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	view := object.JsonObjectTemplateView{
+		View: &TObjectView{
+			object.ObjView{
+				Name:       "object",
+				DB:         db,
+				TableName:  "object_test",
+				FillStruct: TObjectViewDB{},
+				Slug:       "id",
+			},
+		},
+		DTO:     dto,
+		Message: JsonObjectViewMessage{},
+	}
+	return view.Call
+}
+
+func TestJsonObjectView(t *testing.T) {
+	get, err := http.Get("http://localhost:8031/object-json-view/1")
+	if err != nil {
+		t.Error(err)
+	}
+	body, err := io.ReadAll(get.Body)
+	if err != nil {
+		t.Error(err)
+	}
+	if string(body) != `{"Id":"1","Name":"name","Ff":"","Test":0}` {
+		t.Errorf("Error on page retrieval.")
+	}
+	err = get.Body.Close()
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+type TJsonObjectMultipleView struct {
+	object.MultipleObjectView
+}
+
+func (v *TJsonObjectMultipleView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+	panic(err)
+}
+
+func (v *TJsonObjectMultipleView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
+	_objectContext, _ := manager.OneTimeData().GetUserContext(namelib.OBJECT.OBJECT_CONTEXT)
+	objectContext := _objectContext.(object.ObjectContext)
+	if _, ok := objectContext["object"]; !ok {
+		panic("ObjectContext does not have a key object.")
+	}
+	if _, ok := objectContext["object1"]; !ok {
+		panic("ObjectContext does not have a key object1.")
+	}
+	return object.ObjectContext{"Test": "OK"}, nil
+}
+
+func TJsonObjectMultipleViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	view := object.JsonMultipleObjectTemplateView{
+		View: &TObjectMultipleView{
+			object.MultipleObjectView{
+				DB: db,
+				MultipleObjects: []object.MultipleObject{
+					{
+						Name:       "object",
+						TaleName:   "object_test",
+						SlugName:   "id",
+						SlugField:  "id",
+						FillStruct: TObjectViewDB{},
+					},
+					{
+						Name:       "object1",
+						TaleName:   "object_test1",
+						SlugName:   "id1",
+						SlugField:  "id",
+						FillStruct: TObjectViewDB{},
+					},
+				},
+			},
+		},
+		DTO:     dto,
+		Message: JsonObjectViewMessage{},
+	}
+	return view.Call
+}
+
+func TestJsonObjectMultipleView(t *testing.T) {
+	get, err := http.Get("http://localhost:8031/object-mul-json-view/1/1")
+	if err != nil {
+		t.Error(err)
+	}
+	body, err := io.ReadAll(get.Body)
+	if err != nil {
+		t.Error(err)
+	}
+	if string(body) != `[{"Id":"1","Name":"name","Ff":"","Test":0},{"Id":"1","Name":"name1","Ff":"","Test":0}]` {
+		t.Errorf("Error on page retrieval.")
+	}
+	err = get.Body.Close()
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+type TJsonObjectAllView struct {
+	object.AllView
+}
+
+func (v *TJsonObjectAllView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+	panic(err)
+}
+
+func (v *TJsonObjectAllView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
+	_objectContext, _ := manager.OneTimeData().GetUserContext(namelib.OBJECT.OBJECT_CONTEXT)
+	objectContext := _objectContext.(object.ObjectContext)
+	if _, ok := objectContext["all_object"]; !ok {
+		panic("ObjectContext does not have a key all_object.")
+	}
+	return object.ObjectContext{"Test": "OK"}, nil
+}
+
+func TJsonObjectAllViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	view := object.JsonAllTemplateView{
+		View: &TObjectAllView{
+			object.AllView{
+				Name:       "all_object",
+				DB:         db,
+				TableName:  "object_test",
+				FillStruct: TObjectViewDB{},
+			},
+		},
+		DTO:     dto,
+		Message: JsonObjectViewMessage{},
+	}
+	return view.Call
+}
+
+func TestJsonObjectAllView(t *testing.T) {
+	get, err := http.Get("http://localhost:8031/object-json-all-view")
+	if err != nil {
+		t.Error(err)
+	}
+	body, err := io.ReadAll(get.Body)
+	if err != nil {
+		t.Error(err)
+	}
+	fmt.Println(string(body))
+	// if string(body) != "name name0 OK" {
+	// 	t.Errorf("Error on page retrieval.")
+	// }
+	err = get.Body.Close()
+	if err != nil {
+		t.Error(err)
 	}
 }
