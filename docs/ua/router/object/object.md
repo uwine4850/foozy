@@ -1,15 +1,7 @@
-## Form package
+## Object package
 Даний пакет містить в собі функції та інтерфейси для більш зручнішого керування шаблонами.
 
-__type TemplateView struct__
-
-Структура для запуска будь-якого інтерфейсу IView.
-
-* _Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()_ - метод, який запускає виконання 
-обробника http запиту.
-
-__type IView interface__
-
+### type IView interface
 Інтерфейс, який повинен реалізовувати кожен View.
 
 * _Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error)_ - метод 
@@ -24,6 +16,7 @@ manager.OneTimeData().GetUserContext(namelib.OBJECT_CONTEXT). У цьому ме
 потрібно повернути false та фунцію яку потрібно виконати.<br>
 * _OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error)_ - метод потрібно перевизначити. 
 Даний метод буде виконаний коли під час внутрішнього виконання алгоритмів виникне помилка.<br>
+* _ObjectsName() []string_ - повертає назви об'єктів, або одного об'єкта.
 
 __GetObjectContext__
 ```
@@ -32,8 +25,32 @@ GetObjectContext(manager interfaces.IManager) (ObjectContext, error)
 Повертає з менеджера ObjectContext.
 Важливо розуміти, що цей метод може бути використаний тільки коли метод IView.Object завершив роботу, наприклад, IView.Context.
 
-## type ObjView struct
+## Відображення View як HTML.
 
+__type TemplateView struct__
+
+Структура для запуска будь-якого інтерфейсу IView.
+
+* _Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()_ - метод, який запускає виконання 
+обробника http запиту.
+
+## Відображення View як JSON.
+Кожна з цих структур має метод Call, який використовується для її запуску.
+Також, кожна структура відображає дані тільки в форматі JSON.
+Якщо не передавати дані у поле `message` - JSON буде відображатись без валідації DTO та у форматі `TemplateView`.
+
+__type JsonObjectTemplateView struct__<br>
+Структура яка відображає ObjectView.
+
+__type JsonMultipleObjectTemplateView struct__<br>
+Структура яка відображає MultipleObjectView.
+
+__type JsonAllTemplateView struct__<br>
+Структура яка відображає AllView.
+
+## Відображення об'єктів із БД у різних форматах.
+
+### type ObjView struct
 Детальний перегляд конкретного запису із бази даних. Приклад використання:
 ```
 type ProfileView struct {
@@ -68,8 +85,7 @@ _TableName_ - назва таблиці.<br>
 _FillStruct_ - структура яка описує таблицю.<br>
 _Slug_ - slug значення по якому потрібно знайти значення в талиці.<br>
 
-## type MultipleObjectView struct
-
+### type MultipleObjectView struct
 Виконує ті ж самі дії, що і __ObjView__ з однією відмінністю - знаходження записів у базі даних відбувається у декількох 
 таблицях. Приклад використання:
 ```
@@ -111,10 +127,9 @@ func Init() func(w http.ResponseWriter, r *http.Request, manager interfaces.IMan
 }
 ```
 _DB_ - екземпляр бази даних.<br>
-_MultipleObjects_ - екземпляр структури MultipleObjects.<br>
+_MultipleObjects_ - екземпляр структури `MultipleObjects`.<br>
 
-__MultipleObject__
-
+`MultipleObject`<br>
 Структура яка пердставляє дані про конкретний запис у базі даних.
 
 _Name_ - назва з допомогою якого можна звернутись до запусу із бази даних.<br>
@@ -123,8 +138,7 @@ _SlugName_ - назва slug для отримання його значення
 _SlugField_ - назва колонки по якій потрібно шукати значення у таблиці з допомогою slug.
 _FillStruct_ - структура яка описує таблицю.<br>
 
-## type AllView struct
-
+### type AllView struct
 Виводить усі дані із таблиці. Приклад використання:
 ```
 type ProjectView struct {
@@ -152,7 +166,7 @@ func Init() func(w http.ResponseWriter, r *http.Request, manager interfaces.IMan
 }
 ```
 
-## type FormView struct
+### type FormView struct
 Даний об'єкт трохи відрізняється від інших об'єктів. Відмінність полягає в тому, що головне призначення цього 
 об'єкту - прочитати та обробити дані форми. Форма обробляється у методі __Object__ і потім передається у контекст.
 Отримати значення у методі `Context` можна як завжди з допомогою `manager.OneTimeData().GetUserContext(namelib.OBJECT_CONTEXT)`.

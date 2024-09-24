@@ -64,6 +64,8 @@ func (v *TemplateView) Call(w http.ResponseWriter, r *http.Request, manager inte
 	return func() {}
 }
 
+// JsonObjectTemplateView is used to display ObjectView as JSON data.
+// If the Messages field is empty, it renders JSON as a regular TemplateView.
 type JsonObjectTemplateView struct {
 	View    IView
 	DTO     *rest.DTO
@@ -117,6 +119,8 @@ func (v *JsonObjectTemplateView) Call(w http.ResponseWriter, r *http.Request, ma
 	return func() {}
 }
 
+// JsonObjectTemplateView is used to display MultipleObjectView as JSON data.
+// If the Messages field is empty, it renders JSON as a regular TemplateView.
 type JsonMultipleObjectTemplateView struct {
 	View    IView
 	DTO     *rest.DTO
@@ -182,6 +186,8 @@ func (v *JsonMultipleObjectTemplateView) Call(w http.ResponseWriter, r *http.Req
 	return func() {}
 }
 
+// JsonObjectTemplateView is used to display AllView as JSON data.
+// If the Messages field is empty, it renders JSON as a regular TemplateView.
 type JsonAllTemplateView struct {
 	View    IView
 	DTO     *rest.DTO
@@ -252,6 +258,7 @@ func (v *JsonAllTemplateView) Call(w http.ResponseWriter, r *http.Request, manag
 	return func() {}
 }
 
+// contextByNameToObjectContext converts the View context data into an ObjectContext object.
 func contextByNameToObjectContext(contextData interface{}) (ObjectContext, error) {
 	objectBytes, err := json.Marshal(contextData)
 	if err != nil {
@@ -264,6 +271,8 @@ func contextByNameToObjectContext(contextData interface{}) (ObjectContext, error
 	return objectContext, nil
 }
 
+// fillMessage fills the DTO Message with the data passed to the objectContext.
+// It is important to highlight that the messageType argument is used only to obtain the message type; an instance of this type is returned.
 func fillMessage(dto *rest.DTO, objectContext *ObjectContext, messageType irest.IMessage) (irest.IMessage, error) {
 	newMessage := reflect.New(reflect.TypeOf(messageType)).Elem()
 	if err := restmapper.FillMessageFromMap((*map[string]interface{})(objectContext), typeopr.Ptr{}.New(&newMessage)); err != nil {

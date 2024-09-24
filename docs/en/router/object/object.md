@@ -1,15 +1,7 @@
-## Form package
+## Object package
 This package contains features and interfaces for more convenient template management.
 
-__type TemplateView struct__
-
-A structure to launch any IView interface.
-
-* _Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()_ - a method that starts the execution 
-of the http request handler.
-
-__type IView interface__
-
+### type IView interface
 The interface that each View must implement.
 
 * _Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error)_ - method 
@@ -24,6 +16,7 @@ it must be overridden. Using this method, you can define access rights for an ad
 need to return false and the function to be executed.<br>
 * _OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error)_ - the method needs to be overridden.
 This method will be executed when an error occurs during the internal execution of the algorithms.<br>
+* _ObjectsName() []string_ - returns the names of objects, or one object.
 
 __GetObjectContext__
 ```
@@ -33,8 +26,31 @@ Returns from the ObjectContext manager.
 It is important to understand that this method can only be used when the IView.Object method has completed its work, 
 for example, IView.Context.
 
-## type ObjView struct
+## Display View as HTML.
 
+### type TemplateView struct
+A structure to launch any IView interface.
+
+* _Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()_ - a method that starts the execution 
+of the http request handler.
+
+## Відображення View як JSON.
+Each of these structures has a Call method that is used to run it.
+Also, each structure displays data only in JSON format.
+If you do not pass data to the `message` field, the JSON will be displayed without DTO validation and in `TemplateView` format.
+
+__type JsonObjectTemplateView struct__<br>
+A structure that displays an ObjectView.
+
+__type JsonMultipleObjectTemplateView struct__<br>
+A structure that displays an ObjectView. MultipleObjectView.
+
+__type JsonAllTemplateView struct__<br>
+A structure that displays an ObjectView. AllView.
+
+## Display objects from the database in various formats.
+
+### type ObjView struct
 Detailed view of a specific record from the database. Example of use:
 ```
 type ProfileView struct {
@@ -69,8 +85,7 @@ _TableName_ - table name<br>
 _FillStruct_ - a structure that describes a table.<br>
 _Slug_ - the slug value by which you want to find the value in the table.<br>
 
-## type MultipleObjectView struct
-
+### type MultipleObjectView struct
 It performs the same actions as __ObjView__ with one difference - finding records in the database occurs in several
 tables in the database. Example of use:
 ```
@@ -112,10 +127,9 @@ func Init() func(w http.ResponseWriter, r *http.Request, manager interfaces.IMan
 }
 ```
 _DB_ - instance of the database.<br>
-_MultipleObjects_ - instance of the __MultipleObjects__ structure.<br>
+_MultipleObjects_ - instance of the `MultipleObjects` structure.<br>
 
-__MultipleObject__
-
+`MultipleObject`<br>
 A structure that represents data about a specific record in the database.
 
 _Name_ - the name by which you can refer to the launch from the database.<br>
@@ -124,8 +138,7 @@ _SlugName_ - the name of the slug to get its value.<br>
 _SlugField_ - the name of the column by which you want to search for values in the table using slug.
 _FillStruct_ - a structure that describes a table.<br>
 
-## type AllView struct
-
+### type AllView struct
 Displays all data from the table. Example of use:
 ```
 type ProjectView struct {
@@ -153,7 +166,7 @@ func Init() func(w http.ResponseWriter, r *http.Request, manager interfaces.IMan
 }
 ```
 
-## type FormView struct
+### type FormView struct
 This object is slightly different from other objects. The difference is that the main purpose of this 
 object - read and process form data. The form is processed in the __Object__ method and then passed to the context.
 You can get the value in the `Context` method as usual using `manager.OneTimeData().GetUserContext(namelib.OBJECT_CONTEXT)`.
