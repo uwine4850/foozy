@@ -73,47 +73,28 @@ type JsonObjectTemplateView struct {
 }
 
 func (v *JsonObjectTemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-	if v.View == nil {
-		panic("the View field must not be nil")
+	onError, viewObject, viewContext := baseParseView(v.View, w, r, manager)
+	if onError != nil {
+		return onError
 	}
-	defer func() {
-		err := v.View.CloseDb()
-		if err != nil {
-			v.View.OnError(w, r, manager, err)
-		}
-	}()
-	objectContext, err := v.View.Object(w, r, manager)
-	if err != nil {
-		return func() { v.View.OnError(w, r, manager, err) }
-	}
-	manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_CONTEXT, objectContext)
-	_context, err := v.View.Context(w, r, manager)
-	if err != nil {
-		return func() { v.View.OnError(w, r, manager, err) }
-	}
-	permissions, f := v.View.Permissions(w, r, manager)
-	if !permissions {
-		return func() { f() }
-	}
-
 	var filledMessage any
 	if v.Message != nil {
-		// Retrieves objects by their names and adds them to the general _context map.
-		objectContext, err := contextByNameToObjectContext(objectContext[v.View.ObjectsName()[0]])
+		// Retrieves objects by their names and adds them to the general viewContext map.
+		objectContext, err := contextByNameToObjectContext(viewObject[v.View.ObjectsName()[0]])
 		if err != nil {
 			return func() { v.View.OnError(w, r, manager, err) }
 		}
-		fmap.MergeMap((*map[string]interface{})(&_context), objectContext)
-		manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_CONTEXT, _context)
-		_filledMessage, err := fillMessage(v.DTO, &_context, v.Message)
+		fmap.MergeMap((*map[string]interface{})(&viewContext), objectContext)
+		manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_CONTEXT, viewContext)
+		_filledMessage, err := fillMessage(v.DTO, &viewContext, v.Message)
 		if err != nil {
 			return func() { v.View.OnError(w, r, manager, err) }
 		}
 		filledMessage = _filledMessage
 	} else {
-		fmap.MergeMap((*map[string]interface{})(&_context), objectContext)
-		manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_CONTEXT, _context)
-		filledMessage = _context
+		fmap.MergeMap((*map[string]interface{})(&viewContext), viewObject)
+		manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_CONTEXT, viewContext)
+		filledMessage = viewContext
 	}
 	router.SendJson(filledMessage, w)
 	return func() {}
@@ -128,43 +109,25 @@ type JsonMultipleObjectTemplateView struct {
 }
 
 func (v *JsonMultipleObjectTemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-	if v.View == nil {
-		panic("the ITemplateView field must not be nil")
-	}
-	defer func() {
-		err := v.View.CloseDb()
-		if err != nil {
-			v.View.OnError(w, r, manager, err)
-		}
-	}()
-	objectContext, err := v.View.Object(w, r, manager)
-	if err != nil {
-		return func() { v.View.OnError(w, r, manager, err) }
-	}
-	manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_CONTEXT, objectContext)
-	_context, err := v.View.Context(w, r, manager)
-	if err != nil {
-		return func() { v.View.OnError(w, r, manager, err) }
-	}
-	permissions, f := v.View.Permissions(w, r, manager)
-	if !permissions {
-		return func() { f() }
+	onError, viewObject, viewContext := baseParseView(v.View, w, r, manager)
+	if onError != nil {
+		return onError
 	}
 
 	contextSliceMap := []ObjectContext{}
 	var filledMessages []any
 	if v.Message != nil {
-		// Retrieves objects by their names and adds them to the general _context map.
+		// Retrieves objects by their names and adds them to the general viewContext map.
 		for i := 0; i < len(v.View.ObjectsName()); i++ {
-			contextObject, err := contextByNameToObjectContext(objectContext[v.View.ObjectsName()[i]])
+			viewObjectContext, err := contextByNameToObjectContext(viewObject[v.View.ObjectsName()[i]])
 			if err != nil {
 				return func() { v.View.OnError(w, r, manager, err) }
 			}
-			// The contextBuff variable is needed so that the data from _context is assigned separately to each object.
-			// You cannot copy directly to _context, since this data must be static for each object.
+			// The contextBuff variable is needed so that the data from viewContext is assigned separately to each object.
+			// You cannot copy directly to viewContext, since this data must be static for each object.
 			contextBuff := ObjectContext{}
-			fmap.MergeMap((*map[string]interface{})(&contextBuff), _context)
-			fmap.MergeMap((*map[string]interface{})(&contextBuff), contextObject)
+			fmap.MergeMap((*map[string]interface{})(&contextBuff), viewContext)
+			fmap.MergeMap((*map[string]interface{})(&contextBuff), viewObjectContext)
 			contextSliceMap = append(contextSliceMap, contextBuff)
 		}
 		manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_CONTEXT, contextSliceMap)
@@ -177,10 +140,9 @@ func (v *JsonMultipleObjectTemplateView) Call(w http.ResponseWriter, r *http.Req
 		}
 		return func() { router.SendJson(filledMessages, w) }
 	} else {
-		contextBuff := _context
-		fmap.MergeMap((*map[string]interface{})(&contextBuff), objectContext)
-		manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_CONTEXT, contextBuff)
-		contextSliceMap = append(contextSliceMap, contextBuff)
+		fmap.MergeMap((*map[string]interface{})(&viewContext), viewObject)
+		manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_CONTEXT, viewContext)
+		contextSliceMap = append(contextSliceMap, viewContext)
 	}
 	router.SendJson(contextSliceMap[0], w)
 	return func() {}
@@ -195,35 +157,16 @@ type JsonAllTemplateView struct {
 }
 
 func (v *JsonAllTemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-	if v.View == nil {
-		panic("the ITemplateView field must not be nil")
-	}
-	defer func() {
-		err := v.View.CloseDb()
-		if err != nil {
-			v.View.OnError(w, r, manager, err)
-		}
-	}()
-	objectContext, err := v.View.Object(w, r, manager)
-	if err != nil {
-		return func() { v.View.OnError(w, r, manager, err) }
-	}
-	manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_CONTEXT, objectContext)
-	_context, err := v.View.Context(w, r, manager)
-	if err != nil {
-		return func() { v.View.OnError(w, r, manager, err) }
-	}
-	permissions, f := v.View.Permissions(w, r, manager)
-	if !permissions {
-		return func() { f() }
+	onError, viewObject, viewContext := baseParseView(v.View, w, r, manager)
+	if onError != nil {
+		return onError
 	}
 
 	contextSliceMap := []ObjectContext{}
 	var filledMessages []any
 	if v.Message != nil {
-		// Retrieves objects by their names and adds them to the general _context map.
-		objectContextData := objectContext[v.View.ObjectsName()[0]]
-		objectBytes, err := json.Marshal(objectContextData)
+		// Retrieves objects by their names and adds them to the general viewContext map.
+		objectBytes, err := json.Marshal(viewObject[v.View.ObjectsName()[0]])
 		if err != nil {
 			return func() { v.View.OnError(w, r, manager, err) }
 		}
@@ -232,12 +175,12 @@ func (v *JsonAllTemplateView) Call(w http.ResponseWriter, r *http.Request, manag
 			return func() { v.View.OnError(w, r, manager, err) }
 		}
 		// One object has multiple values.
-		// The contextBuff variable is needed so that the data from _context is assigned separately to each object.
-		// You cannot copy directly to _context, since this data must be static for each object.
+		// The contextBuff variable is needed so that the data from viewContext is assigned separately to each object.
+		// You cannot copy directly to viewContext, since this data must be static for each object.
 		for i := 0; i < len(objectContextMap); i++ {
 			contextBuff := ObjectContext{}
 			fmap.MergeMap((*map[string]interface{})(&contextBuff), objectContextMap[i])
-			fmap.MergeMap((*map[string]interface{})(&contextBuff), _context)
+			fmap.MergeMap((*map[string]interface{})(&contextBuff), viewContext)
 			contextSliceMap = append(contextSliceMap, contextBuff)
 		}
 		manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_CONTEXT, contextSliceMap[0])
@@ -250,12 +193,44 @@ func (v *JsonAllTemplateView) Call(w http.ResponseWriter, r *http.Request, manag
 		}
 		return func() { router.SendJson(filledMessages, w) }
 	} else {
-		fmap.MergeMap((*map[string]interface{})(&_context), objectContext)
-		manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_CONTEXT, _context)
-		contextSliceMap = append(contextSliceMap, _context)
+		fmap.MergeMap((*map[string]interface{})(&viewContext), viewObject)
+		manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_CONTEXT, viewContext)
+		contextSliceMap = append(contextSliceMap, viewContext)
 	}
 	router.SendJson(contextSliceMap[0], w)
 	return func() {}
+}
+
+func baseParseView(view IView, w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (onError func(), viewObject ObjectContext, viewContext ObjectContext) {
+	if view == nil {
+		panic("the ITemplateView field must not be nil")
+	}
+	var err error
+	viewObject, err = view.Object(w, r, manager)
+	if err != nil {
+		onError = func() { view.OnError(w, r, manager, err) }
+		return
+	}
+	manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_CONTEXT, viewObject)
+
+	viewContext, err = view.Context(w, r, manager)
+	if err != nil {
+		onError = func() { view.OnError(w, r, manager, err) }
+		return
+	}
+
+	permissions, f := view.Permissions(w, r, manager)
+	if !permissions {
+		onError = func() { f() }
+		return
+	}
+
+	err = view.CloseDb()
+	if err != nil {
+		onError = func() { view.OnError(w, r, manager, err) }
+		return
+	}
+	return
 }
 
 // contextByNameToObjectContext converts the View context data into an ObjectContext object.
