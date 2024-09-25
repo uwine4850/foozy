@@ -2,7 +2,6 @@ package objecttest
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -26,7 +25,7 @@ type JsonObjectViewMessage struct {
 	Id   string `json:"Id"`
 	Name string `json:"Name"`
 	FF   string `json:"Ff"`
-	Test int    `json:"Test"`
+	Test string `json:"Test"`
 }
 
 type JsonFormMessage struct {
@@ -378,19 +377,12 @@ func (v *JsonObjectView) OnError(w http.ResponseWriter, r *http.Request, manager
 }
 
 func (v *JsonObjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
-	objectContext, err := object.GetObjectContext(manager)
-	if err != nil {
-		panic(err)
-	}
-	if _, ok := objectContext["object"]; !ok {
-		panic("ObjectContext does not have a key object.")
-	}
-	return map[string]interface{}{"Test": 1}, nil
+	return map[string]interface{}{"Test": "OK"}, nil
 }
 
 func TJsonObjectViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	view := object.JsonObjectTemplateView{
-		View: &TObjectView{
+		View: &JsonObjectView{
 			object.ObjView{
 				Name:       "object",
 				DB:         db,
@@ -414,7 +406,7 @@ func TestJsonObjectView(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if string(body) != `{"Id":"1","Name":"name","Ff":"","Test":0}` {
+	if string(body) != `{"Id":"1","Name":"name","Ff":"","Test":"OK"}` {
 		t.Errorf("Error on page retrieval.")
 	}
 	err = get.Body.Close()
@@ -432,20 +424,12 @@ func (v *TJsonObjectMultipleView) OnError(w http.ResponseWriter, r *http.Request
 }
 
 func (v *TJsonObjectMultipleView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
-	_objectContext, _ := manager.OneTimeData().GetUserContext(namelib.OBJECT.OBJECT_CONTEXT)
-	objectContext := _objectContext.(object.ObjectContext)
-	if _, ok := objectContext["object"]; !ok {
-		panic("ObjectContext does not have a key object.")
-	}
-	if _, ok := objectContext["object1"]; !ok {
-		panic("ObjectContext does not have a key object1.")
-	}
 	return object.ObjectContext{"Test": "OK"}, nil
 }
 
 func TJsonObjectMultipleViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	view := object.JsonMultipleObjectTemplateView{
-		View: &TObjectMultipleView{
+		View: &TJsonObjectMultipleView{
 			object.MultipleObjectView{
 				DB: db,
 				MultipleObjects: []object.MultipleObject{
@@ -481,7 +465,7 @@ func TestJsonObjectMultipleView(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if string(body) != `[{"Id":"1","Name":"name","Ff":"","Test":0},{"Id":"1","Name":"name1","Ff":"","Test":0}]` {
+	if string(body) != `[{"Id":"1","Name":"name","Ff":"","Test":"OK"},{"Id":"1","Name":"name1","Ff":"","Test":"OK"}]` {
 		t.Errorf("Error on page retrieval.")
 	}
 	err = get.Body.Close()
@@ -499,17 +483,12 @@ func (v *TJsonObjectAllView) OnError(w http.ResponseWriter, r *http.Request, man
 }
 
 func (v *TJsonObjectAllView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
-	_objectContext, _ := manager.OneTimeData().GetUserContext(namelib.OBJECT.OBJECT_CONTEXT)
-	objectContext := _objectContext.(object.ObjectContext)
-	if _, ok := objectContext["all_object"]; !ok {
-		panic("ObjectContext does not have a key all_object.")
-	}
 	return object.ObjectContext{"Test": "OK"}, nil
 }
 
 func TJsonObjectAllViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	view := object.JsonAllTemplateView{
-		View: &TObjectAllView{
+		View: &TJsonObjectAllView{
 			object.AllView{
 				Name:       "all_object",
 				DB:         db,
@@ -532,10 +511,9 @@ func TestJsonObjectAllView(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	fmt.Println(string(body))
-	// if string(body) != "name name0 OK" {
-	// 	t.Errorf("Error on page retrieval.")
-	// }
+	if string(body) != `[{"Id":"1","Name":"name","Ff":"","Test":"OK"},{"Id":"2","Name":"name0","Ff":"","Test":"OK"}]` {
+		t.Errorf("Error on page retrieval.")
+	}
 	err = get.Body.Close()
 	if err != nil {
 		t.Error(err)
