@@ -13,6 +13,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/rest/restmapper"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 	"github.com/uwine4850/foozy/pkg/utils/fmap"
+	"github.com/uwine4850/foozy/pkg/utils/fstruct"
 )
 
 type TemplateView struct {
@@ -205,6 +206,11 @@ func baseParseView(view IView, w http.ResponseWriter, r *http.Request, manager i
 	if view == nil {
 		panic("the ITemplateView field must not be nil")
 	}
+	realView := reflect.ValueOf(getRealView(view))
+	if err := fstruct.CheckNotDefaultFields(typeopr.Ptr{}.New(&realView)); err != nil {
+		onError = func() { view.OnError(w, r, manager, err) }
+		return
+	}
 	var err error
 	viewObject, err = view.Object(w, r, manager)
 	if err != nil {
@@ -231,6 +237,18 @@ func baseParseView(view IView, w http.ResponseWriter, r *http.Request, manager i
 		return
 	}
 	return
+}
+
+func getRealView(wrapperView IView) IView {
+	rViewValue := reflect.ValueOf(wrapperView).Elem()
+	rViewType := reflect.TypeOf(wrapperView).Elem()
+	for i := 0; i < rViewType.NumField(); i++ {
+		fieldValue := rViewValue.Field(i).Addr()
+		if typeopr.IsImplementInterface(typeopr.Ptr{}.New(&fieldValue), (*IView)(nil)) {
+			return fieldValue.Interface().(IView)
+		}
+	}
+	return nil
 }
 
 // contextByNameToObjectContext converts the View context data into an ObjectContext object.

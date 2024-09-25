@@ -75,6 +75,8 @@ func (p Ptr) Ptr() interface{} {
 // Usage example:
 // object := MyObject{}
 // IsImplementInterface(typeopr.Ptr{}.New(&object), (*MyInterface)(nil))
+// If reflect.Value is used, you can use direct passing or passing by pointer, that is,
+// passing a pointer to a pointer. How to transmit this data depends on the situation.
 func IsImplementInterface(objectPtr itypeopr.IPtr, interfaceType interface{}) bool {
 	object := objectPtr.Ptr()
 	// If the type of data passed directly is the desired interface.

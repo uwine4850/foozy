@@ -17,7 +17,7 @@ import (
 type FormView struct {
 	BaseView
 
-	FormStruct       interface{}
+	FormStruct       interface{} `notdef:"true"`
 	NotNilFormFields []string
 	NilIfNotExist    []string
 	ValidateCSRF     bool

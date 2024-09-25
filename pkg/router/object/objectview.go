@@ -17,11 +17,11 @@ import (
 type ObjView struct {
 	BaseView
 
-	Name       string
-	DB         *database.Database
-	TableName  string
-	FillStruct interface{}
-	Slug       string
+	Name       string             `notdef:"true"`
+	DB         *database.Database `notdef:"true"`
+	TableName  string             `notdef:"true"`
+	FillStruct interface{}        `notdef:"true"`
+	Slug       string             `notdef:"true"`
 }
 
 func (v *ObjView) CloseDb() error {

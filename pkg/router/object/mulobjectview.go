@@ -23,8 +23,8 @@ type MultipleObject struct {
 type MultipleObjectView struct {
 	BaseView
 
-	DB              *database.Database
-	MultipleObjects []MultipleObject
+	DB              *database.Database `notdef:"true"`
+	MultipleObjects []MultipleObject   `notdef:"true"`
 }
 
 func (v *MultipleObjectView) CloseDb() error {

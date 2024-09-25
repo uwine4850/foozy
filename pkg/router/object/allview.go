@@ -15,10 +15,10 @@ import (
 // AllView displays HTML page by passing all data from the selected table to it.
 type AllView struct {
 	BaseView
-	Name       string
-	DB         *database.Database
-	TableName  string
-	FillStruct interface{}
+	Name       string             `notdef:"true"`
+	DB         *database.Database `notdef:"true"`
+	TableName  string             `notdef:"true"`
+	FillStruct interface{}        `notdef:"true"`
 }
 
 func (v *AllView) CloseDb() error {
