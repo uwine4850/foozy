@@ -34,7 +34,7 @@ func Join[T any](elems []T, sep string) string {
 		if i == len(elems)-1 {
 			res.WriteString(fmt.Sprintf("%v", elems[i]))
 		} else {
-			res.WriteString(fmt.Sprintf("%v%s ", elems[i], sep))
+			res.WriteString(fmt.Sprintf("%v%s", elems[i], sep))
 		}
 	}
 	return res.String()

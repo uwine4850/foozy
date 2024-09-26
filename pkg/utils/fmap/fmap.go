@@ -16,7 +16,7 @@ func MergeMap[T1 comparable, T2 any](map1 *map[T1]T2, map2 map[T1]T2) {
 // exclude - keys that do not need to be taken into account.
 func Compare[T1 comparable, T2 comparable](map1 *map[T1]T2, map2 *map[T1]T2, exclude []T1) bool {
 	for key, value := range *map1 {
-		if fslice.SliceContains(exclude, key) {
+		if exclude != nil && fslice.SliceContains(exclude, key) {
 			continue
 		}
 		value2, ok := (*map2)[key]
