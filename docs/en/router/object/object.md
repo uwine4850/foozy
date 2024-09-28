@@ -1,5 +1,7 @@
 ## Object package
 This package contains features and interfaces for more convenient template management.
+To start working with an object, you need to create a new structure and embed the selected object into it. It is important to note that it 
+can be built-in only one object.
 
 ### type IView interface
 The interface that each View must implement.

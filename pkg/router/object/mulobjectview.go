@@ -10,14 +10,15 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/typeopr"
+	"github.com/uwine4850/foozy/pkg/utils/fstruct"
 )
 
 type MultipleObject struct {
-	Name       string
-	TaleName   string
-	SlugName   string
-	SlugField  string
-	FillStruct interface{}
+	Name       string      `notdef:"true"`
+	TaleName   string      `notdef:"true"`
+	SlugName   string      `notdef:"true"`
+	SlugField  string      `notdef:"true"`
+	FillStruct interface{} `notdef:"true"`
 }
 
 type MultipleObjectView struct {
@@ -45,6 +46,9 @@ func (v *MultipleObjectView) ObjectsName() []string {
 }
 
 func (v *MultipleObjectView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
+	if err := v.checkMultipleObject(); err != nil {
+		return nil, err
+	}
 	context := make(ObjectContext)
 	err := v.DB.Connect()
 	if err != nil {
@@ -88,4 +92,13 @@ func (v *MultipleObjectView) fillObject(object map[string]interface{}, fillStruc
 		return nil, err
 	}
 	return &value, nil
+}
+
+func (v *MultipleObjectView) checkMultipleObject() error {
+	for i := 0; i < len(v.MultipleObjects); i++ {
+		if err := fstruct.CheckNotDefaultFields(typeopr.Ptr{}.New(&v.MultipleObjects[i])); err != nil {
+			return err
+		}
+	}
+	return nil
 }
