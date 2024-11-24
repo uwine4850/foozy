@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"sync"
 
 	"github.com/flosch/pongo2"
 	"github.com/uwine4850/foozy/pkg/interfaces"
@@ -17,6 +18,7 @@ type TemplateEngine struct {
 	context      map[string]interface{}
 	writer       http.ResponseWriter
 	request      *http.Request
+	mu           sync.Mutex
 }
 
 func NewTemplateEngine() (interfaces.ITemplateEngine, error) {
@@ -72,7 +74,7 @@ func (e *TemplateEngine) Exec() error {
 
 // SetContext sets the variables for the template.
 func (e *TemplateEngine) SetContext(data map[string]interface{}) {
-	fmap.MergeMap(&e.context, data)
+	fmap.MergeMapSync(&e.mu, &e.context, data)
 }
 
 func (e *TemplateEngine) GetContext() map[string]interface{} {

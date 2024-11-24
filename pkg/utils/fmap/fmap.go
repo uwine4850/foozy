@@ -1,12 +1,22 @@
 package fmap
 
 import (
+	"sync"
+
 	"github.com/uwine4850/foozy/pkg/utils/fslice"
 )
 
 // MergeMap merges two maps into one.
 // For example, if you pass Map1 and Map2, Map2 data will be added to Map1.
 func MergeMap[T1 comparable, T2 any](map1 *map[T1]T2, map2 map[T1]T2) {
+	for key, value := range map2 {
+		(*map1)[key] = value
+	}
+}
+
+func MergeMapSync[T1 comparable, T2 any](mu *sync.Mutex, map1 *map[T1]T2, map2 map[T1]T2) {
+	mu.Lock()
+	defer mu.Unlock()
 	for key, value := range map2 {
 		(*map1)[key] = value
 	}

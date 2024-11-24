@@ -1,5 +1,6 @@
 CREATE DATABASE IF NOT EXISTS foozy_test;
 
+
 CREATE TABLE IF NOT EXISTS `foozy_test`.`dbtest`(
     `id` INT NOT NULL AUTO_INCREMENT ,
     col1 VARCHAR(500) NOT NULL,
@@ -16,4 +17,25 @@ CREATE TABLE IF NOT EXISTS `foozy_test`.`db_async_test`(
     col3 DOUBLE NOT NULL,
     col4 INT NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`)
+);
+
+CREATE TABLE IF NOT EXISTS `foozy_test`.`object_test` (
+ `id` INT(11) NOT NULL AUTO_INCREMENT,
+ `name` VARCHAR(200) NOT NULL,
+ `FF` FLOAT DEFAULT NULL,
+ PRIMARY KEY (`id`)
+);
+
+CREATE TABLE IF NOT EXISTS `foozy_test`.`object_test1` (
+ `id` INT(11) NOT NULL AUTO_INCREMENT,
+ `name` VARCHAR(200) NOT NULL,
+ `FF` FLOAT DEFAULT NULL,
+ PRIMARY KEY (`id`)
+);
+
+CREATE TABLE IF NOT EXISTS `foozy_test`.`pprof` (
+ `id` INT(11) NOT NULL AUTO_INCREMENT,
+ `text` VARCHAR(200) NOT NULL,
+ `number` INT DEFAULT 0,
+ PRIMARY KEY (`id`)
 );
