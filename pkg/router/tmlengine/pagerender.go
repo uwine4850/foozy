@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/uwine4850/foozy/pkg/interfaces"
-	"github.com/uwine4850/foozy/pkg/typeopr"
 	"github.com/uwine4850/foozy/pkg/utils/fstring"
 )
 
@@ -96,21 +95,10 @@ func (rn *Render) RenderJson(data interface{}, w http.ResponseWriter) error {
 // CreateAndSetNewRenderInstance creates and sets a new Render instance into the manager.
 func CreateAndSetNewRenderInstance(manager interfaces.IManager) error {
 	render := manager.Render()
-
-	var newRender interfaces.IRender
-	err := typeopr.CreateNewInstance(render, &newRender)
+	newRender, err := render.New()
 	if err != nil {
 		return err
 	}
-	tmplEngine := render.GetTemplateEngine()
-
-	var newTmplEngine interfaces.ITemplateEngine
-	err = typeopr.CreateNewInstance(tmplEngine, &newTmplEngine)
-	if err != nil {
-		return err
-	}
-
-	newRender.SetTemplateEngine(newTmplEngine)
-	manager.SetRender(newRender)
+	manager.SetRender(newRender.(interfaces.IRender))
 	return nil
 }

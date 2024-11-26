@@ -4,7 +4,6 @@ import (
 	"sync"
 
 	"github.com/uwine4850/foozy/pkg/interfaces"
-	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
 type OneTimeData struct {
@@ -50,14 +49,11 @@ func (m *OneTimeData) DelUserContext(key string) {
 
 // CreateAndSetNewManagerData сreates and sets a new OneTimeData instance into the manager.
 func CreateAndSetNewManagerData(manager interfaces.IManager) error {
-	md := manager.OneTimeData()
-
-	var newMD interfaces.IManagerOneTimeData
-	err := typeopr.CreateNewInstance(md, &newMD)
+	otd := manager.OneTimeData()
+	newOtd, err := otd.New()
 	if err != nil {
 		return err
 	}
-
-	manager.SetOneTimeData(newMD)
+	manager.SetOneTimeData(newOtd.(interfaces.IManagerOneTimeData))
 	return nil
 }
