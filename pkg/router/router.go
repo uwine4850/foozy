@@ -177,49 +177,52 @@ func (rt *Router) register(_muxRouter muxRouter, urlPattern string) http.Handler
 				return
 			}
 		}
+		rt.switchRegisterMethods(writer, request, _muxRouter)
+		rt.printLog(request)
+	}
+}
 
-		connection := request.Header.Get("Connection")
-		if connection != "" && connection == "Upgrade" {
-			handler := _muxRouter.Ws
-			if !rt.validateMethod(handler, "WS", writer) {
-				return
-			}
-			handler(writer, request, rt.manager)()
+func (rt *Router) switchRegisterMethods(writer http.ResponseWriter, request *http.Request, _muxRouter muxRouter) {
+	connection := request.Header.Get("Connection")
+	if connection != "" && connection == "Upgrade" {
+		handler := _muxRouter.Ws
+		if !rt.validateMethod(handler, "WS", writer) {
 			return
 		}
-		switch request.Method {
-		case http.MethodGet:
-			handler := _muxRouter.Get
-			if !rt.validateMethod(handler, "GET", writer) {
-				return
-			}
-			handler(writer, request, rt.manager)()
-		case http.MethodPost:
-			handler := _muxRouter.Post
-			if !rt.validateMethod(handler, "POST", writer) {
-				return
-			}
-			handler(writer, request, rt.manager)()
-		case http.MethodPut:
-			handler := _muxRouter.Put
-			if !rt.validateMethod(handler, "PUT", writer) {
-				return
-			}
-			handler(writer, request, rt.manager)()
-		case http.MethodDelete:
-			handler := _muxRouter.Delete
-			if !rt.validateMethod(handler, "DELETE", writer) {
-				return
-			}
-			handler(writer, request, rt.manager)()
-		case http.MethodOptions:
-			handler := _muxRouter.Options
-			if !rt.validateMethod(handler, "OPTIONS", writer) {
-				return
-			}
-			handler(writer, request, rt.manager)()
+		handler(writer, request, rt.manager)()
+		return
+	}
+	switch request.Method {
+	case http.MethodGet:
+		handler := _muxRouter.Get
+		if !rt.validateMethod(handler, "GET", writer) {
+			return
 		}
-		rt.printLog(request)
+		handler(writer, request, rt.manager)()
+	case http.MethodPost:
+		handler := _muxRouter.Post
+		if !rt.validateMethod(handler, "POST", writer) {
+			return
+		}
+		handler(writer, request, rt.manager)()
+	case http.MethodPut:
+		handler := _muxRouter.Put
+		if !rt.validateMethod(handler, "PUT", writer) {
+			return
+		}
+		handler(writer, request, rt.manager)()
+	case http.MethodDelete:
+		handler := _muxRouter.Delete
+		if !rt.validateMethod(handler, "DELETE", writer) {
+			return
+		}
+		handler(writer, request, rt.manager)()
+	case http.MethodOptions:
+		handler := _muxRouter.Options
+		if !rt.validateMethod(handler, "OPTIONS", writer) {
+			return
+		}
+		handler(writer, request, rt.manager)()
 	}
 }
 

@@ -9,7 +9,7 @@ Tests for the router [here](https://github.com/uwine4850/foozy/tree/master/tests
 All handlers have standard parameters:
 * *pattern* - the path to the handler. For example, the path can be "/home" and everyone is like it. The router also
     supports slug parameters, such as "/post/<id>". If you use such a path and go to the address "/post/1" - it will start
-    the required handler in which the __id__ option will be available in the manager like this ``manager.GetSlugParams ("id")``. Such slug
+    the required handler in which the __id__ option will be available in the manager like this ``manager.OneTimeData().GetSlugParams("id")``. Such slug
     parameters can be many, the main thing with different names.
 * *fn func(w http.ResponseWriter, r \*http.Request, manager interfaces.IManager)* - a function that will run when the user
   goes to the desired address. ``w http.ResponseWriter`` and ``*http.Request`` are standard golang structures. About ``interfaces.IManager``
