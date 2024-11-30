@@ -6,10 +6,9 @@ import (
 )
 
 type Manager struct {
-	managerWebsocket interfaces.IManagerWebsocket
-	managerConf      interfaces.IManagerConfig
-	managerData      interfaces.IManagerOneTimeData
-	render           interfaces.IRender
+	managerConf interfaces.IManagerConfig
+	managerData interfaces.IManagerOneTimeData
+	render      interfaces.IRender
 }
 
 func (m *Manager) Render() interfaces.IRender {
@@ -21,17 +20,6 @@ func (m *Manager) SetRender(render interfaces.IRender) {
 		panic(typeopr.ErrValueNotPointer{Value: "render"})
 	}
 	m.render = render
-}
-
-func (m *Manager) WS() interfaces.IManagerWebsocket {
-	return m.managerWebsocket
-}
-
-func (m *Manager) SetWS(ws interfaces.IManagerWebsocket) {
-	if !typeopr.IsPointer(ws) {
-		panic(typeopr.ErrValueNotPointer{Value: "ws"})
-	}
-	m.managerWebsocket = ws
 }
 
 func (m *Manager) SetOneTimeData(manager interfaces.IManagerOneTimeData) {
@@ -58,9 +46,8 @@ func (m *Manager) Config() interfaces.IManagerConfig {
 
 func NewManager(render interfaces.IRender) *Manager {
 	return &Manager{
-		managerConf:      NewManagerConf(),
-		managerData:      NewManagerData(),
-		render:           render,
-		managerWebsocket: NewManagerWebsocket(),
+		managerConf: NewManagerConf(),
+		managerData: NewManagerData(),
+		render:      render,
 	}
 }

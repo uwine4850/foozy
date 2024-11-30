@@ -11,8 +11,6 @@ import (
 type IManager interface {
 	Render() IRender
 	SetRender(render IRender)
-	SetWS(ws IManagerWebsocket)
-	WS() IManagerWebsocket
 	OneTimeData() IManagerOneTimeData
 	SetOneTimeData(manager IManagerOneTimeData)
 	SetConfig(cnf IManagerConfig)
@@ -56,11 +54,6 @@ type IManagerOneTimeData interface {
 	DelUserContext(key string)
 	SetSlugParams(params map[string]string)
 	GetSlugParams(key string) (string, bool)
-}
-
-type IManagerWebsocket interface {
-	CurrentWebsocket() IWebsocket
-	SetWebsocket(websocket IWebsocket)
 }
 
 type IWebsocket interface {
