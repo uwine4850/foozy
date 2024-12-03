@@ -116,32 +116,32 @@ func (d *DebugConfig) LoggingLevel() int {
 	return d.skipLoggingLevel
 }
 
-type ManagerConf struct {
+type ManagerCnf struct {
 	debugConfig *DebugConfig
 	printLog    bool
 	key         Key
 }
 
-func NewManagerConf() *ManagerConf {
-	return &ManagerConf{
+func NewManagerCnf() *ManagerCnf {
+	return &ManagerCnf{
 		debugConfig: &DebugConfig{
 			skipLoggingLevel: -1,
 		},
 	}
 }
 
-func (m *ManagerConf) DebugConfig() interfaces.IManagerDebugConfig {
+func (m *ManagerCnf) DebugConfig() interfaces.IManagerDebugConfig {
 	return m.debugConfig
 }
 
-func (m *ManagerConf) PrintLog(enable bool) {
+func (m *ManagerCnf) PrintLog(enable bool) {
 	m.printLog = enable
 }
 
-func (m *ManagerConf) IsPrintLog() bool {
+func (m *ManagerCnf) IsPrintLog() bool {
 	return m.printLog
 }
 
-func (m *ManagerConf) Key() interfaces.IKey {
+func (m *ManagerCnf) Key() interfaces.IKey {
 	return &m.key
 }

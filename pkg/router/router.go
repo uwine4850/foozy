@@ -15,7 +15,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/utils/fstring"
 )
 
-type Handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()
+type Handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func()
 
 // muxRouter represents a single URL handler that can fire method handlers according to those sent by the client.
 type muxRouter struct {
@@ -31,12 +31,13 @@ type Router struct {
 	mux               http.ServeMux
 	routes            map[string]muxRouter
 	manager           interfaces.IManager
+	managerConfig     interfaces.IManagerConfig
 	middleware        interfaces.IMiddleware
 	internalErrorFunc func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error)
 }
 
-func NewRouter(manager interfaces.IManager) *Router {
-	return &Router{mux: *http.NewServeMux(), manager: manager, routes: map[string]muxRouter{}}
+func NewRouter(manager interfaces.IManager, managerConfig interfaces.IManagerConfig) *Router {
+	return &Router{mux: *http.NewServeMux(), manager: manager, managerConfig: managerConfig, routes: map[string]muxRouter{}}
 }
 
 func (rt *Router) GetMux() *http.ServeMux {
@@ -48,7 +49,7 @@ func (rt *Router) RegisterAll() {
 	rt.registerAllHandlers()
 }
 
-func (rt *Router) Get(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
+func (rt *Router) Get(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func()) {
 	_muxRouter := rt.getMuxRouter(pattern)
 	if _muxRouter.Get != nil {
 		panic(fmt.Sprintf("the %s method on the %s path is already mounted", "GET", pattern))
@@ -57,7 +58,7 @@ func (rt *Router) Get(pattern string, handler func(w http.ResponseWriter, r *htt
 	rt.setMuxRouter(pattern, _muxRouter)
 }
 
-func (rt *Router) Post(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
+func (rt *Router) Post(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func()) {
 	_muxRouter := rt.getMuxRouter(pattern)
 	if _muxRouter.Post != nil {
 		panic(fmt.Sprintf("the %s method on the %s path is already mounted", "POST", pattern))
@@ -66,7 +67,7 @@ func (rt *Router) Post(pattern string, handler func(w http.ResponseWriter, r *ht
 	rt.setMuxRouter(pattern, _muxRouter)
 }
 
-func (rt *Router) Put(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
+func (rt *Router) Put(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func()) {
 	_muxRouter := rt.getMuxRouter(pattern)
 	if _muxRouter.Put != nil {
 		panic(fmt.Sprintf("the %s method on the %s path is already mounted", "PUT", pattern))
@@ -75,7 +76,7 @@ func (rt *Router) Put(pattern string, handler func(w http.ResponseWriter, r *htt
 	rt.setMuxRouter(pattern, _muxRouter)
 }
 
-func (rt *Router) Delete(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
+func (rt *Router) Delete(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func()) {
 	_muxRouter := rt.getMuxRouter(pattern)
 	if _muxRouter.Delete != nil {
 		panic(fmt.Sprintf("the %s method on the %s path is already mounted", "DELETE", pattern))
@@ -84,7 +85,7 @@ func (rt *Router) Delete(pattern string, handler func(w http.ResponseWriter, r *
 	rt.setMuxRouter(pattern, _muxRouter)
 }
 
-func (rt *Router) Options(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
+func (rt *Router) Options(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func()) {
 	_muxRouter := rt.getMuxRouter(pattern)
 	if _muxRouter.Options != nil {
 		panic(fmt.Sprintf("the %s method on the %s path is already mounted", "OPTIONS", pattern))
@@ -93,7 +94,7 @@ func (rt *Router) Options(pattern string, handler func(w http.ResponseWriter, r 
 	rt.setMuxRouter(pattern, _muxRouter)
 }
 
-func (rt *Router) Ws(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
+func (rt *Router) Ws(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func()) {
 	_muxRouter := rt.getMuxRouter(pattern)
 	if _muxRouter.Ws != nil {
 		panic(fmt.Sprintf("the %s method on the %s path is already mounted", "WS", pattern))
@@ -146,7 +147,7 @@ func (rt *Router) register(_muxRouter muxRouter, urlPattern string) http.Handler
 			if rt.internalErrorFunc != nil {
 				rt.internalErrorFunc(writer, request, rt.manager, err)
 			} else {
-				ServerError(writer, err.Error(), rt.manager)
+				ServerError(writer, err.Error(), rt.manager, rt.managerConfig)
 			}
 			return
 		}
@@ -169,7 +170,7 @@ func (rt *Router) register(_muxRouter muxRouter, urlPattern string) http.Handler
 			if rt.internalErrorFunc != nil {
 				rt.internalErrorFunc(writer, request, rt.manager, err)
 			} else {
-				ServerError(writer, err.Error(), rt.manager)
+				ServerError(writer, err.Error(), rt.manager, rt.managerConfig)
 			}
 			return
 		} else {
@@ -189,7 +190,7 @@ func (rt *Router) switchRegisterMethods(writer http.ResponseWriter, request *htt
 		if !rt.validateMethod(handler, "WS", writer) {
 			return
 		}
-		handler(writer, request, rt.manager)()
+		handler(writer, request, rt.manager, rt.managerConfig)()
 		return
 	}
 	switch request.Method {
@@ -198,31 +199,31 @@ func (rt *Router) switchRegisterMethods(writer http.ResponseWriter, request *htt
 		if !rt.validateMethod(handler, "GET", writer) {
 			return
 		}
-		handler(writer, request, rt.manager)()
+		handler(writer, request, rt.manager, rt.managerConfig)()
 	case http.MethodPost:
 		handler := _muxRouter.Post
 		if !rt.validateMethod(handler, "POST", writer) {
 			return
 		}
-		handler(writer, request, rt.manager)()
+		handler(writer, request, rt.manager, rt.managerConfig)()
 	case http.MethodPut:
 		handler := _muxRouter.Put
 		if !rt.validateMethod(handler, "PUT", writer) {
 			return
 		}
-		handler(writer, request, rt.manager)()
+		handler(writer, request, rt.manager, rt.managerConfig)()
 	case http.MethodDelete:
 		handler := _muxRouter.Delete
 		if !rt.validateMethod(handler, "DELETE", writer) {
 			return
 		}
-		handler(writer, request, rt.manager)()
+		handler(writer, request, rt.manager, rt.managerConfig)()
 	case http.MethodOptions:
 		handler := _muxRouter.Options
 		if !rt.validateMethod(handler, "OPTIONS", writer) {
 			return
 		}
-		handler(writer, request, rt.manager)()
+		handler(writer, request, rt.manager, rt.managerConfig)()
 	}
 }
 
@@ -248,12 +249,12 @@ func (rt *Router) initManager() error {
 func (rt *Router) runMddl(w http.ResponseWriter, r *http.Request) (bool, error) {
 	if rt.middleware != nil {
 		// Running synchronous middleware.
-		err := rt.middleware.RunMddl(w, r, rt.manager)
+		err := rt.middleware.RunMddl(w, r, rt.manager, rt.managerConfig)
 		if err != nil {
 			return false, err
 		}
 		// Running asynchronous middleware.
-		rt.middleware.RunAsyncMddl(w, r, rt.manager)
+		rt.middleware.RunAsyncMddl(w, r, rt.manager, rt.managerConfig)
 		// Waiting for all asynchronous middleware to complete.
 		rt.middleware.WaitAsyncMddl()
 		// Handling middleware errors.
@@ -279,7 +280,7 @@ func (rt *Router) registerAllHandlers() {
 }
 
 func (rt *Router) printLog(request *http.Request) {
-	if rt.manager.Config().IsPrintLog() {
+	if rt.managerConfig.IsPrintLog() {
 		log.Printf("%s %s", request.Method, request.URL.Path)
 	}
 }

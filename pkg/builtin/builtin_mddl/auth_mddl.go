@@ -21,7 +21,7 @@ type OnError func(w http.ResponseWriter, r *http.Request, manager interfaces.IMa
 // if two or more key iterations have passed, because the old keys are no longer known.
 // This middleware should not work on the login page. Therefore, you need to specify the loginUrl correctly.
 func Auth(loginUrl string, db *database.Database, onErr OnError) middlewares.MddlFunc {
-	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
+	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) {
 		pattern, ok := manager.OneTimeData().GetUserContext(namelib.ROUTER.URL_PATTERN)
 		if !ok {
 			onErr(w, r, manager, ErrUrlPatternNotExist{})
@@ -30,13 +30,13 @@ func Auth(loginUrl string, db *database.Database, onErr OnError) middlewares.Mdd
 		if pattern == loginUrl {
 			return
 		}
-		k := manager.Config().Key().Get32BytesKey()
+		k := managerConfig.Key().Get32BytesKey()
 		var auth_date time.Time
 		if err := cookies.ReadSecureNoHMACCookieData([]byte(k.StaticKey()), r, namelib.AUTH.COOKIE_AUTH_DATE, &auth_date); err != nil {
 			onErr(w, r, manager, err)
 			return
 		}
-		d1 := manager.Config().Key().Get32BytesKey().Date().Format("02.01.2006 15:04:05")
+		d1 := managerConfig.Key().Get32BytesKey().Date().Format("02.01.2006 15:04:05")
 		d2 := auth_date.Format("02.01.2006 15:04:05")
 		if d1 != d2 {
 			cc := database.NewConnectControl()
@@ -50,7 +50,7 @@ func Auth(loginUrl string, db *database.Database, onErr OnError) middlewares.Mdd
 					return
 				}
 			}()
-			_auth := auth.NewAuth(db, w, manager)
+			_auth := auth.NewAuth(db, w, managerConfig)
 			if err := _auth.UpdateAuthCookie([]byte(k.OldHashKey()), []byte(k.OldBlockKey()), r); err != nil {
 				onErr(w, r, manager, err)
 				return

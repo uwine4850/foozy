@@ -26,7 +26,7 @@ func (v *TemplateView) SkipRender() {
 	v.isSkipRender = true
 }
 
-func (v *TemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func (v *TemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 	if v.View == nil {
 		panic("the ITemplateView field must not be nil")
 	}
@@ -73,7 +73,7 @@ type JsonObjectTemplateView struct {
 	Message irest.IMessage
 }
 
-func (v *JsonObjectTemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func (v *JsonObjectTemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 	onError, viewObject, viewContext := baseParseView(v.View, w, r, manager)
 	if onError != nil {
 		return onError
@@ -109,7 +109,7 @@ type JsonMultipleObjectTemplateView struct {
 	Message irest.IMessage
 }
 
-func (v *JsonMultipleObjectTemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func (v *JsonMultipleObjectTemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 	onError, viewObject, viewContext := baseParseView(v.View, w, r, manager)
 	if onError != nil {
 		return onError
@@ -157,7 +157,7 @@ type JsonAllTemplateView struct {
 	Message irest.IMessage
 }
 
-func (v *JsonAllTemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func (v *JsonAllTemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 	onError, viewObject, viewContext := baseParseView(v.View, w, r, manager)
 	if onError != nil {
 		return onError

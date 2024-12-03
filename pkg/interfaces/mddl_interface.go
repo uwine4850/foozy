@@ -5,9 +5,9 @@ import (
 )
 
 type IMiddleware interface {
-	HandlerMddl(id int, fn func(w http.ResponseWriter, r *http.Request, manager IManager))
-	RunMddl(w http.ResponseWriter, r *http.Request, manager IManager) error
-	AsyncHandlerMddl(fn func(w http.ResponseWriter, r *http.Request, manager IManager))
-	RunAsyncMddl(w http.ResponseWriter, r *http.Request, manager IManager)
+	HandlerMddl(id int, fn func(w http.ResponseWriter, r *http.Request, manager IManager, managerConfig IManagerConfig))
+	RunMddl(w http.ResponseWriter, r *http.Request, manager IManager, managerConfig IManagerConfig) error
+	AsyncHandlerMddl(fn func(w http.ResponseWriter, r *http.Request, manager IManager, managerConfig IManagerConfig))
+	RunAsyncMddl(w http.ResponseWriter, r *http.Request, manager IManager, managerConfig IManagerConfig)
 	WaitAsyncMddl()
 }

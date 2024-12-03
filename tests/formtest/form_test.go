@@ -60,7 +60,8 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
-	newRouter := router2.NewRouter(manager.NewManager(render))
+	managerConfig := manager.NewManagerCnf()
+	newRouter := router2.NewRouter(manager.NewManager(render), managerConfig)
 	newRouter.SetMiddleware(mddl)
 	newRouter.Post("/application-form", applicationForm)
 	newRouter.Post("/multipart-form", multipartForm)
@@ -83,7 +84,7 @@ func TestMain(m *testing.M) {
 	os.Exit(exitCode)
 }
 
-func saveFile(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func saveFile(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 	newForm := form.NewForm(r)
 	err := newForm.Parse()
 	if err != nil {
@@ -94,7 +95,7 @@ func saveFile(w http.ResponseWriter, r *http.Request, manager interfaces.IManage
 		return func() { w.Write([]byte(err.Error())) }
 	}
 	var path string
-	err = form.SaveFile(w, header, "./saved_files", &path, manager)
+	err = form.SaveFile(w, header, "./saved_files", &path, manager, managerConfig)
 	if err != nil {
 		return func() { w.Write([]byte(err.Error())) }
 	}
@@ -104,7 +105,7 @@ func saveFile(w http.ResponseWriter, r *http.Request, manager interfaces.IManage
 	return func() {}
 }
 
-func multipartForm(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func multipartForm(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 	newForm := form.NewForm(r)
 	err := newForm.Parse()
 	if err != nil {
@@ -123,7 +124,7 @@ func multipartForm(w http.ResponseWriter, r *http.Request, manager interfaces.IM
 	return func() {}
 }
 
-func applicationForm(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func applicationForm(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 	newForm := form.NewForm(r)
 	err := newForm.Parse()
 	if err != nil {

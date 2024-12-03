@@ -21,7 +21,7 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
-	newRouter := router.NewRouter(manager.NewManager(render))
+	newRouter := router.NewRouter(manager.NewManager(render), manager.NewManagerCnf())
 	newRouter.SetMiddleware(mddl)
 	newRouter.Post("/mp-default-struct", mpDefaultStruct)
 	newRouter.Post("/mp-empty-string-0-err", mpEmptyString0Err)

@@ -69,7 +69,7 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
-	newRouter := router.NewRouter(manager.NewManager(render))
+	newRouter := router.NewRouter(manager.NewManager(render), manager.NewManagerCnf())
 	newRouter.Get("/object-view/<id>", TObjectViewHNDL(db))
 	newRouter.Get("/object-mul-view/<id>/<id1>", TObjectMultipleViewHNDL(db))
 	newRouter.Get("/object-all-view", TObjectAllViewHNDL(db))
@@ -160,7 +160,7 @@ func (v *TObjectView) Context(w http.ResponseWriter, r *http.Request, manager in
 	return map[string]interface{}{"TEST": "OK"}, nil
 }
 
-func TObjectViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func TObjectViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 	view := object.TemplateView{
 		TemplatePath: "./templates/object_view.html",
 		View: &TObjectView{
@@ -214,7 +214,7 @@ func (v *TObjectMultipleView) Context(w http.ResponseWriter, r *http.Request, ma
 	return object.ObjectContext{"TEST": "OK"}, nil
 }
 
-func TObjectMultipleViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func TObjectMultipleViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 	view := object.TemplateView{
 		TemplatePath: "./templates/object_multiple_view.html",
 		View: &TObjectMultipleView{
@@ -277,7 +277,7 @@ func (v *TObjectAllView) Context(w http.ResponseWriter, r *http.Request, manager
 	return object.ObjectContext{"TEST": "OK"}, nil
 }
 
-func TObjectAllViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func TObjectAllViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 	view := object.TemplateView{
 		TemplatePath: "./templates/object_all_view.html",
 		View: &TObjectAllView{
@@ -338,7 +338,7 @@ func (v *MyFormView) OnError(w http.ResponseWriter, r *http.Request, manager int
 	panic(err)
 }
 
-func MyFormViewHNDL() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func MyFormViewHNDL() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 	tv := object.TemplateView{
 		TemplatePath: "",
 		View: &MyFormView{
@@ -380,7 +380,7 @@ func (v *JsonObjectView) Context(w http.ResponseWriter, r *http.Request, manager
 	return map[string]interface{}{"Test": "OK"}, nil
 }
 
-func TJsonObjectViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func TJsonObjectViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 	view := object.JsonObjectTemplateView{
 		View: &JsonObjectView{
 			object.ObjView{
@@ -427,7 +427,7 @@ func (v *TJsonObjectMultipleView) Context(w http.ResponseWriter, r *http.Request
 	return object.ObjectContext{"Test": "OK"}, nil
 }
 
-func TJsonObjectMultipleViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func TJsonObjectMultipleViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 	view := object.JsonMultipleObjectTemplateView{
 		View: &TJsonObjectMultipleView{
 			object.MultipleObjectView{
@@ -486,7 +486,7 @@ func (v *TJsonObjectAllView) Context(w http.ResponseWriter, r *http.Request, man
 	return object.ObjectContext{"Test": "OK"}, nil
 }
 
-func TJsonObjectAllViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func TJsonObjectAllViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 	view := object.JsonAllTemplateView{
 		View: &TJsonObjectAllView{
 			object.AllView{

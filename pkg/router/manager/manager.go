@@ -6,7 +6,6 @@ import (
 )
 
 type Manager struct {
-	managerConf interfaces.IManagerConfig
 	managerData interfaces.IManagerOneTimeData
 	render      interfaces.IRender
 }
@@ -33,20 +32,8 @@ func (m *Manager) OneTimeData() interfaces.IManagerOneTimeData {
 	return m.managerData
 }
 
-func (m *Manager) SetConfig(cnf interfaces.IManagerConfig) {
-	if !typeopr.IsPointer(cnf) {
-		panic(typeopr.ErrValueNotPointer{Value: "cnf"})
-	}
-	m.managerConf = cnf
-}
-
-func (m *Manager) Config() interfaces.IManagerConfig {
-	return m.managerConf
-}
-
 func NewManager(render interfaces.IRender) *Manager {
 	return &Manager{
-		managerConf: NewManagerConf(),
 		managerData: NewManagerData(),
 		render:      render,
 	}

@@ -13,8 +13,6 @@ type IManager interface {
 	SetRender(render IRender)
 	OneTimeData() IManagerOneTimeData
 	SetOneTimeData(manager IManagerOneTimeData)
-	SetConfig(cnf IManagerConfig)
-	Config() IManagerConfig
 }
 
 type IKey interface {

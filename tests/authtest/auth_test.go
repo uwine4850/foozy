@@ -28,7 +28,8 @@ var dbArgs = database.DbArgs{
 }
 
 var mng = manager.NewManager(nil)
-var newRouter = router.NewRouter(mng)
+var managerConfig = manager.NewManagerCnf()
+var newRouter = router.NewRouter(mng, managerConfig)
 
 func TestMain(m *testing.M) {
 	_db := database.NewDatabase(dbArgs)
@@ -45,8 +46,8 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 
-	mng.Config().Key().Generate32BytesKeys()
-	mng.Config().DebugConfig().Debug(true)
+	managerConfig.Key().Generate32BytesKeys()
+	managerConfig.DebugConfig().Debug(true)
 
 	mddlDb := database.NewDatabase(dbArgs)
 	if err := mddlDb.Connect(); err != nil {
@@ -58,40 +59,40 @@ func TestMain(m *testing.M) {
 		middlewares.SetMddlError(err, manager.OneTimeData())
 	}))
 
-	newRouter.Get("/register", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	newRouter.Get("/register", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 		if err := auth.CreateAuthTable(_db); err != nil {
-			return func() { router.ServerError(w, err.Error(), manager) }
+			return func() { router.ServerError(w, err.Error(), manager, managerConfig) }
 		}
-		au := auth.NewAuth(_db, w, manager)
+		au := auth.NewAuth(_db, w, managerConfig)
 		if err := au.RegisterUser("test", "111111"); err != nil {
-			return func() { router.ServerError(w, err.Error(), manager) }
+			return func() { router.ServerError(w, err.Error(), manager, managerConfig) }
 		}
 		return func() {}
 	})
-	newRouter.Get("/login", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		au := auth.NewAuth(_db, w, manager)
+	newRouter.Get("/login", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
+		au := auth.NewAuth(_db, w, managerConfig)
 		if _, err := au.LoginUser("test", "111111"); err != nil {
-			return func() { router.ServerError(w, err.Error(), manager) }
+			return func() { router.ServerError(w, err.Error(), manager, managerConfig) }
 		}
 		return func() {}
 	})
-	newRouter.Get("/uid", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		k := manager.Config().Key().Get32BytesKey()
+	newRouter.Get("/uid", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
+		k := managerConfig.Key().Get32BytesKey()
 		var a auth.AuthCookie
 		if err := cookies.ReadSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), r, namelib.AUTH.COOKIE_AUTH, &a); err != nil {
-			return func() { router.ServerError(w, err.Error(), manager) }
+			return func() { router.ServerError(w, err.Error(), manager, managerConfig) }
 		}
 		return func() {}
 	})
-	newRouter.Get("/upd-keys", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		k := manager.Config().Key().Get32BytesKey()
+	newRouter.Get("/upd-keys", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
+		k := managerConfig.Key().Get32BytesKey()
 		var a auth.AuthCookie
 		if err := cookies.ReadSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), r, namelib.AUTH.COOKIE_AUTH, &a); err != nil {
-			return func() { router.ServerError(w, err.Error(), manager) }
+			return func() { router.ServerError(w, err.Error(), manager, managerConfig) }
 		}
 		return func() {}
 	})
-	newRouter.Get("/user-by-id", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	newRouter.Get("/user-by-id", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 		user, err := auth.UserByID(_db, 1)
 		if err != nil {
 			panic(err)
@@ -194,12 +195,12 @@ func TestReadUID(t *testing.T) {
 }
 
 func TestUpdKeys(t *testing.T) {
-	k := mng.Config().Key().Get32BytesKey()
+	k := managerConfig.Key().Get32BytesKey()
 	hashKey := k.HashKey()
 	blockKey := k.BlockKey()
 	gf := globalflow.NewGlobalFlow(1)
 	gf.AddNotWaitTask(bglobalflow.KeyUpdater(1))
-	gf.Run(mng)
+	gf.Run(mng, managerConfig)
 	time.Sleep(2 * time.Second)
 	if hashKey == k.HashKey() {
 		t.Errorf("HashKey has not been updated.")

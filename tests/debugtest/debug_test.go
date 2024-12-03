@@ -15,18 +15,19 @@ import (
 )
 
 var mngr = manager.NewManager(nil)
+var managerConfig = manager.NewManagerCnf()
 
 func TestMain(m *testing.M) {
-	mngr.Config().DebugConfig().ErrorLoggingFile("test.log")
-	newRouter := router.NewRouter(mngr)
-	newRouter.Get("/server-err", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		return func() { router.ServerError(w, "error", manager) }
+	managerConfig.DebugConfig().ErrorLoggingFile("test.log")
+	newRouter := router.NewRouter(mngr, managerConfig)
+	newRouter.Get("/server-err", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
+		return func() { router.ServerError(w, "error", manager, managerConfig) }
 	})
-	newRouter.Get("/server-forbidden", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		return func() { router.ServerForbidden(w, manager) }
+	newRouter.Get("/server-forbidden", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
+		return func() { router.ServerForbidden(w, manager, managerConfig) }
 	})
-	newRouter.Get("/server-logging", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		return func() { router.ServerError(w, "Logging test", manager) }
+	newRouter.Get("/server-logging", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
+		return func() { router.ServerError(w, "Logging test", manager, managerConfig) }
 	})
 	serv := server.NewServer(":8040", newRouter, nil)
 	go func() {
@@ -47,7 +48,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestServerErrorDebTrue(t *testing.T) {
-	mngr.Config().DebugConfig().Debug(true)
+	managerConfig.DebugConfig().Debug(true)
 	get, err := http.Get("http://localhost:8040/server-err")
 	if err != nil {
 		t.Error(err)
@@ -66,7 +67,7 @@ func TestServerErrorDebTrue(t *testing.T) {
 }
 
 func TestServerErrorDebFalse(t *testing.T) {
-	mngr.Config().DebugConfig().Debug(false)
+	managerConfig.DebugConfig().Debug(false)
 	get, err := http.Get("http://localhost:8040/server-err")
 	if err != nil {
 		t.Error(err)
@@ -85,7 +86,7 @@ func TestServerErrorDebFalse(t *testing.T) {
 }
 
 func TestServerForbidden(t *testing.T) {
-	mngr.Config().DebugConfig().Debug(false)
+	managerConfig.DebugConfig().Debug(false)
 	get, err := http.Get("http://localhost:8040/server-forbidden")
 	if err != nil {
 		t.Error(err)
@@ -104,9 +105,9 @@ func TestServerForbidden(t *testing.T) {
 }
 
 func TestLogging(t *testing.T) {
-	mngr.Config().DebugConfig().ErrorLogging(true)
-	mngr.Config().DebugConfig().Debug(true)
-	mngr.Config().DebugConfig().SkipLoggingLevel(3)
+	managerConfig.DebugConfig().ErrorLogging(true)
+	managerConfig.DebugConfig().Debug(true)
+	managerConfig.DebugConfig().SkipLoggingLevel(3)
 	get, err := http.Get("http://localhost:8040/server-logging")
 	if err != nil {
 		t.Error(err)
@@ -120,5 +121,5 @@ func TestLogging(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	mngr.Config().DebugConfig().ErrorLogging(false)
+	managerConfig.DebugConfig().ErrorLogging(false)
 }

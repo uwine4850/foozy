@@ -12,12 +12,12 @@ import (
 )
 
 // RedirectError redirect to the page and provide error information for it.
-func RedirectError(w http.ResponseWriter, r *http.Request, path string, _err string, manager interfaces.IManager) {
+func RedirectError(w http.ResponseWriter, r *http.Request, path string, _err string, managerConfig interfaces.IManagerConfig) {
 	uval := url.Values{}
 	uval.Add(namelib.ROUTER.REDIRECT_ERROR, _err)
 	newUrl := fmt.Sprintf("%s?%s", path, uval.Encode())
 	http.Redirect(w, r, newUrl, http.StatusFound)
-	debug.ErrorLogginIfEnable(_err, manager.Config())
+	debug.ErrorLogginIfEnable(_err, managerConfig)
 }
 
 // CatchRedirectError handling by the template engine of an error sent by the CatchRedirectError function.
@@ -31,21 +31,21 @@ func CatchRedirectError(r *http.Request, manager interfaces.IManager) {
 }
 
 // ServerError displaying a 500 error to the user.
-func ServerError(w http.ResponseWriter, error string, manager interfaces.IManager) {
+func ServerError(w http.ResponseWriter, error string, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) {
 	manager.OneTimeData().SetUserContext(namelib.ROUTER.SERVER_ERROR, error)
 	w.WriteHeader(http.StatusInternalServerError)
-	if manager.Config().DebugConfig().IsDebug() {
-		debug.ErrorLoggingIfEnableAndWrite(w, []byte(error), manager.Config())
+	if managerConfig.DebugConfig().IsDebug() {
+		debug.ErrorLoggingIfEnableAndWrite(w, []byte(error), managerConfig)
 	} else {
-		debug.ErrorLoggingIfEnableAndWrite(w, []byte("500 Internal server error"), manager.Config())
+		debug.ErrorLoggingIfEnableAndWrite(w, []byte("500 Internal server error"), managerConfig)
 	}
 }
 
 // ServerForbidden displaying a 403 error to the user.
-func ServerForbidden(w http.ResponseWriter, manager interfaces.IManager) {
+func ServerForbidden(w http.ResponseWriter, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) {
 	manager.OneTimeData().SetUserContext(namelib.ROUTER.SERVER_FORBIDDEN_ERROR, "403 forbidden")
 	w.WriteHeader(http.StatusForbidden)
-	debug.ErrorLoggingIfEnableAndWrite(w, []byte("403 forbidden"), manager.Config())
+	debug.ErrorLoggingIfEnableAndWrite(w, []byte("403 forbidden"), managerConfig)
 }
 
 // SendJson sends json-formatted data to the page.

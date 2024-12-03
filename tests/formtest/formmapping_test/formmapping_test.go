@@ -19,7 +19,7 @@ type TestMapping struct {
 	File []form.FormFile `form:"file" empty:"-err"`
 }
 
-func mpDefaultStruct(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func mpDefaultStruct(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 	frm := form.NewForm(r)
 	if err := frm.Parse(); err != nil {
 		panic(err)
@@ -68,7 +68,7 @@ func TestDefaultForm(t *testing.T) {
 	}
 }
 
-func mpEmptyString0Err(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func mpEmptyString0Err(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 	frm := form.NewForm(r)
 	if err := frm.Parse(); err != nil {
 		panic(err)
@@ -111,7 +111,7 @@ func TestEmptyString0(t *testing.T) {
 	}
 }
 
-func mpEmptyString1Err(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func mpEmptyString1Err(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 	frm := form.NewForm(r)
 	if err := frm.Parse(); err != nil {
 		panic(err)
@@ -154,7 +154,7 @@ func TestEmptyString1(t *testing.T) {
 	}
 }
 
-func mpEmptyFileErr(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func mpEmptyFileErr(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 	frm := form.NewForm(r)
 	if err := frm.Parse(); err != nil {
 		panic(err)
@@ -201,7 +201,7 @@ type TestMappingEmpty struct {
 	Text []string `form:"text" empty:"def"`
 }
 
-func mpEmptyValue(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func mpEmptyValue(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 	frm := form.NewForm(r)
 	if err := frm.Parse(); err != nil {
 		panic(err)
@@ -262,7 +262,7 @@ type FillTypedStruct struct {
 	File  form.FormFile `form:"file"`
 }
 
-func mpTypedMapper(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func mpTypedMapper(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 	expectData := FillTypedStruct{
 		Id:    1,
 		Name:  "name",

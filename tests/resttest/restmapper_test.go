@@ -17,7 +17,8 @@ import (
 )
 
 var mng = manager.NewManager(nil)
-var newRouter = router.NewRouter(mng)
+var managerConfig = manager.NewManagerCnf()
+var newRouter = router.NewRouter(mng, managerConfig)
 var dto = rest.NewDTO()
 
 func TestMain(m *testing.M) {
@@ -27,8 +28,8 @@ func TestMain(m *testing.M) {
 			Package: "resttest",
 		},
 	})
-	mng.Config().DebugConfig().Debug(true)
-	newRouter.Get("/json", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	managerConfig.DebugConfig().Debug(true)
+	newRouter.Get("/json", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 		jsonData := JsonData{
 			Id:       1,
 			Name:     "name",

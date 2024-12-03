@@ -32,18 +32,19 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
-	newRouter := router.NewRouter(manager.NewManager(render))
-	newRouter.Get("/page", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	managerConfig := manager.NewManagerCnf()
+	newRouter := router.NewRouter(manager.NewManager(render), managerConfig)
+	newRouter.Get("/page", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 		return func() { w.Write([]byte("OK")) }
 	})
-	newRouter.Get("/page/<id>", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	newRouter.Get("/page/<id>", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 		id, _ := manager.OneTimeData().GetSlugParams("id")
 		if id == "1" {
 			return func() { w.Write([]byte("OK")) }
 		}
 		return func() {}
 	})
-	newRouter.Get("/page2/<id>/<name>", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	newRouter.Get("/page2/<id>/<name>", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 		id, _ := manager.OneTimeData().GetSlugParams("id")
 		name, _ := manager.OneTimeData().GetSlugParams("name")
 		if id == "1" && name == "name" {
@@ -51,14 +52,14 @@ func TestMain(m *testing.M) {
 		}
 		return func() {}
 	})
-	newRouter.Post("/post/<id>", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	newRouter.Post("/post/<id>", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 		id, _ := manager.OneTimeData().GetSlugParams("id")
 		if id == "12" {
 			return func() { w.Write([]byte("OK")) }
 		}
 		return func() {}
 	})
-	newRouter.Get("/session-create", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	newRouter.Get("/session-create", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 		if err := cookies.CreateSecureCookieData(hashKey, blockKey, w, &http.Cookie{
 			Name:     "session",
 			Path:     "/",
@@ -69,7 +70,7 @@ func TestMain(m *testing.M) {
 		}
 		return func() {}
 	})
-	newRouter.Get("/session-read", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	newRouter.Get("/session-read", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 		var data SessionData
 		if err := cookies.ReadSecureCookieData(hashKey, blockKey, r, "session", &data); err != nil {
 			panic(err)
@@ -77,17 +78,17 @@ func TestMain(m *testing.M) {
 		w.Write([]byte(data.UserID))
 		return func() {}
 	})
-	newRouter.Get("/redirect-error", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		router.RedirectError(w, r, "/catch-redirect-error", "error", manager)
+	newRouter.Get("/redirect-error", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
+		router.RedirectError(w, r, "/catch-redirect-error", "error", managerConfig)
 		return func() {}
 	})
-	newRouter.Get("/catch-redirect-error", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	newRouter.Get("/catch-redirect-error", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 		router.CatchRedirectError(r, manager)
 		_, ok := manager.Render().GetContext()[namelib.ROUTER.REDIRECT_ERROR]
 		w.Write([]byte(strconv.FormatBool(ok)))
 		return func() {}
 	})
-	newRouter.Get("/cookie", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	newRouter.Get("/cookie", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
 		return func() { cookies.SetStandartCookie(w, "cookie", "value", "/", 0) }
 	})
 	serv := server.NewServer(":8030", newRouter, nil)
