@@ -48,12 +48,11 @@ func (m *OneTimeData) DelUserContext(key string) {
 }
 
 // CreateAndSetNewManagerData сreates and sets a new OneTimeData instance into the manager.
-func CreateAndSetNewManagerData(manager interfaces.IManager) error {
+func CreateNewManagerData(manager interfaces.IManager) (interfaces.IManagerOneTimeData, error) {
 	otd := manager.OneTimeData()
 	newOtd, err := otd.New()
 	if err != nil {
-		return err
+		return nil, err
 	}
-	manager.SetOneTimeData(newOtd.(interfaces.IManagerOneTimeData))
-	return nil
+	return newOtd.(interfaces.IManagerOneTimeData), nil
 }

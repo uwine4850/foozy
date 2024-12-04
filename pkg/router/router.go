@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/uwine4850/foozy/pkg/debug"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router/manager"
@@ -14,6 +15,15 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/tmlengine"
 	"github.com/uwine4850/foozy/pkg/utils/fstring"
 )
+
+func internalServerError(w http.ResponseWriter, r *http.Request, managerConfig interfaces.IManagerConfig, err error) {
+	w.WriteHeader(http.StatusInternalServerError)
+	if managerConfig.DebugConfig().IsDebug() {
+		debug.ErrorLoggingIfEnableAndWrite(w, []byte(err.Error()), managerConfig)
+	} else {
+		debug.ErrorLoggingIfEnableAndWrite(w, []byte("500 Internal server error"), managerConfig)
+	}
+}
 
 type Handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func()
 
@@ -27,17 +37,19 @@ type muxRouter struct {
 	Ws      Handler
 }
 
+var managerObject interfaces.IManager = nil
+
 type Router struct {
 	mux               http.ServeMux
 	routes            map[string]muxRouter
-	manager           interfaces.IManager
 	managerConfig     interfaces.IManagerConfig
 	middleware        interfaces.IMiddleware
-	internalErrorFunc func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error)
+	internalErrorFunc func(w http.ResponseWriter, r *http.Request, managerConfig interfaces.IManagerConfig, err error)
 }
 
 func NewRouter(manager interfaces.IManager, managerConfig interfaces.IManagerConfig) *Router {
-	return &Router{mux: *http.NewServeMux(), manager: manager, managerConfig: managerConfig, routes: map[string]muxRouter{}}
+	managerObject = manager
+	return &Router{mux: *http.NewServeMux(), managerConfig: managerConfig, routes: map[string]muxRouter{}, internalErrorFunc: internalServerError}
 }
 
 func (rt *Router) GetMux() *http.ServeMux {
@@ -108,7 +120,7 @@ func (rt *Router) SetMiddleware(middleware interfaces.IMiddleware) {
 }
 
 // InternalError sets the function to be used when handling internal errors.
-func (rt *Router) InternalError(fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error)) {
+func (rt *Router) InternalError(fn func(w http.ResponseWriter, r *http.Request, managerConfig interfaces.IManagerConfig, err error)) {
 	rt.internalErrorFunc = fn
 }
 
@@ -143,15 +155,13 @@ func (rt *Router) validateMethod(handler Handler, method string, w http.Response
 // Various services are also started here for the correct operation of the processor.
 func (rt *Router) register(_muxRouter muxRouter, urlPattern string) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
-		if err := rt.initManager(); err != nil {
-			if rt.internalErrorFunc != nil {
-				rt.internalErrorFunc(writer, request, rt.manager, err)
-			} else {
-				ServerError(writer, err.Error(), rt.manager, rt.managerConfig)
-			}
+		manager, err := rt.initManager()
+		if err != nil {
+			rt.internalErrorFunc(writer, request, rt.managerConfig, err)
 			return
 		}
-		rt.manager.OneTimeData().SetUserContext(namelib.ROUTER.URL_PATTERN, urlPattern)
+
+		manager.OneTimeData().SetUserContext(namelib.ROUTER.URL_PATTERN, urlPattern)
 
 		parseUrl := ParseSlugIndex(fstring.SplitUrl(urlPattern))
 		if request.URL.Path != "/" && len(parseUrl) > 0 {
@@ -161,16 +171,16 @@ func (rt *Router) register(_muxRouter muxRouter, urlPattern string) http.Handler
 				return
 			}
 			if params != nil {
-				rt.manager.OneTimeData().SetSlugParams(params)
+				manager.OneTimeData().SetSlugParams(params)
 			}
 		}
 
 		// Run middlewares.
-		if skip, err := rt.runMddl(writer, request); err != nil {
+		if skip, err := rt.runMddl(writer, request, manager); err != nil {
 			if rt.internalErrorFunc != nil {
-				rt.internalErrorFunc(writer, request, rt.manager, err)
+				rt.internalErrorFunc(writer, request, rt.managerConfig, err)
 			} else {
-				ServerError(writer, err.Error(), rt.manager, rt.managerConfig)
+				ServerError(writer, err.Error(), manager, rt.managerConfig)
 			}
 			return
 		} else {
@@ -178,19 +188,19 @@ func (rt *Router) register(_muxRouter muxRouter, urlPattern string) http.Handler
 				return
 			}
 		}
-		rt.switchRegisterMethods(writer, request, _muxRouter)
+		rt.switchRegisterMethods(writer, request, _muxRouter, manager)
 		rt.printLog(request)
 	}
 }
 
-func (rt *Router) switchRegisterMethods(writer http.ResponseWriter, request *http.Request, _muxRouter muxRouter) {
+func (rt *Router) switchRegisterMethods(writer http.ResponseWriter, request *http.Request, _muxRouter muxRouter, manager interfaces.IManager) {
 	connection := request.Header.Get("Connection")
 	if connection != "" && connection == "Upgrade" {
 		handler := _muxRouter.Ws
 		if !rt.validateMethod(handler, "WS", writer) {
 			return
 		}
-		handler(writer, request, rt.manager, rt.managerConfig)()
+		handler(writer, request, manager, rt.managerConfig)()
 		return
 	}
 	switch request.Method {
@@ -199,46 +209,57 @@ func (rt *Router) switchRegisterMethods(writer http.ResponseWriter, request *htt
 		if !rt.validateMethod(handler, "GET", writer) {
 			return
 		}
-		handler(writer, request, rt.manager, rt.managerConfig)()
+		handler(writer, request, manager, rt.managerConfig)()
 	case http.MethodPost:
 		handler := _muxRouter.Post
 		if !rt.validateMethod(handler, "POST", writer) {
 			return
 		}
-		handler(writer, request, rt.manager, rt.managerConfig)()
+		handler(writer, request, manager, rt.managerConfig)()
 	case http.MethodPut:
 		handler := _muxRouter.Put
 		if !rt.validateMethod(handler, "PUT", writer) {
 			return
 		}
-		handler(writer, request, rt.manager, rt.managerConfig)()
+		handler(writer, request, manager, rt.managerConfig)()
 	case http.MethodDelete:
 		handler := _muxRouter.Delete
 		if !rt.validateMethod(handler, "DELETE", writer) {
 			return
 		}
-		handler(writer, request, rt.manager, rt.managerConfig)()
+		handler(writer, request, manager, rt.managerConfig)()
 	case http.MethodOptions:
 		handler := _muxRouter.Options
 		if !rt.validateMethod(handler, "OPTIONS", writer) {
 			return
 		}
-		handler(writer, request, rt.manager, rt.managerConfig)()
+		handler(writer, request, manager, rt.managerConfig)()
 	}
 }
 
 // initManager initializes a new manager instance.
 // Must be called for each new request.
-func (rt *Router) initManager() error {
-	if err := manager.CreateAndSetNewManagerData(rt.manager); err != nil {
-		return err
+func (rt *Router) initManager() (interfaces.IManager, error) {
+	_newManager, err := managerObject.New()
+	if err != nil {
+		return nil, err
 	}
-	if rt.manager.Render() != nil {
-		if err := tmlengine.CreateAndSetNewRenderInstance(rt.manager); err != nil {
-			return err
+	newManager := _newManager.(interfaces.IManager)
+	// Set OneTimeData.
+	newOTD, err := manager.CreateNewManagerData(managerObject)
+	if err != nil {
+		return nil, err
+	}
+	// Set render.
+	newManager.SetOneTimeData(newOTD)
+	if managerObject.Render() != nil {
+		newRender, err := tmlengine.CreateNewRenderInstance(managerObject)
+		if err != nil {
+			return nil, err
 		}
+		newManager.SetRender(newRender)
 	}
-	return nil
+	return newManager, nil
 }
 
 // runMddl runs the middleware.
@@ -246,19 +267,19 @@ func (rt *Router) initManager() error {
 // perform important logic, which, for example, should be run first.
 // After execution of synchronous middleware, asynchronous ones are executed.
 // Middleware errors and the page rendering skip algorithm are also handled here.
-func (rt *Router) runMddl(w http.ResponseWriter, r *http.Request) (bool, error) {
+func (rt *Router) runMddl(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, error) {
 	if rt.middleware != nil {
 		// Running synchronous middleware.
-		err := rt.middleware.RunMddl(w, r, rt.manager, rt.managerConfig)
+		err := rt.middleware.RunMddl(w, r, manager, rt.managerConfig)
 		if err != nil {
 			return false, err
 		}
 		// Running asynchronous middleware.
-		rt.middleware.RunAsyncMddl(w, r, rt.manager, rt.managerConfig)
+		rt.middleware.RunAsyncMddl(w, r, manager, rt.managerConfig)
 		// Waiting for all asynchronous middleware to complete.
 		rt.middleware.WaitAsyncMddl()
 		// Handling middleware errors.
-		mddlErr, err := middlewares.GetMddlError(rt.manager.OneTimeData())
+		mddlErr, err := middlewares.GetMddlError(manager.OneTimeData())
 		if err != nil {
 			return false, err
 		}
@@ -266,7 +287,7 @@ func (rt *Router) runMddl(w http.ResponseWriter, r *http.Request) (bool, error) 
 			return false, errors.New(mddlErr.Error())
 		}
 		// Checking the skip of the next page. Runs after a more important error check.
-		if middlewares.IsSkipNextPage(rt.manager.OneTimeData()) {
+		if middlewares.IsSkipNextPage(manager.OneTimeData()) {
 			return true, nil
 		}
 	}

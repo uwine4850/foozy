@@ -10,6 +10,10 @@ type Manager struct {
 	render      interfaces.IRender
 }
 
+func (m *Manager) New() (interface{}, error) {
+	return &Manager{}, nil
+}
+
 func (m *Manager) Render() interfaces.IRender {
 	return m.render
 }
