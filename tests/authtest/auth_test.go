@@ -200,7 +200,7 @@ func TestUpdKeys(t *testing.T) {
 	blockKey := k.BlockKey()
 	gf := globalflow.NewGlobalFlow(1)
 	gf.AddNotWaitTask(bglobalflow.KeyUpdater(1))
-	gf.Run(mng, managerConfig)
+	gf.Run(managerConfig)
 	time.Sleep(2 * time.Second)
 	if hashKey == k.HashKey() {
 		t.Errorf("HashKey has not been updated.")
