@@ -48,7 +48,7 @@ func TestMain(m *testing.M) {
 func TestSetGetMddlError(t *testing.T) {
 	mddl := middlewares.NewMiddleware()
 	mddl.HandlerMddl(0, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) {
-		middlewares.SetMddlError(errors.New("mddl error"), manager.OneTimeData())
+		middlewares.SetMddlError(errors.New("mddl error"), manager.OneTimeData(), managerConfig)
 	})
 	newRouter.SetMiddleware(mddl)
 	get, err := http.Get("http://localhost:8050/mddl")

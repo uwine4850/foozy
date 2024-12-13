@@ -3,6 +3,7 @@ package middlewares
 import (
 	"errors"
 	"net/http"
+	"sort"
 	"sync"
 
 	"github.com/uwine4850/foozy/pkg/interfaces"
@@ -49,7 +50,9 @@ func (m *Middleware) RunMddl(w http.ResponseWriter, r *http.Request, manager int
 	if m.mError != nil {
 		return m.mError
 	}
-	for _, handlerFunc := range m.preHandlerMiddlewares {
+	sort.Ints(m.preHandlerId)
+	for i := 0; i < len(m.preHandlerId); i++ {
+		handlerFunc := m.preHandlerMiddlewares[i]
 		handlerFunc(w, r, manager, managerConfig)
 	}
 	return nil
@@ -70,7 +73,7 @@ func (m *Middleware) WaitAsyncMddl() {
 }
 
 // SetMddlError sets an error that occurred in the middleware.
-func SetMddlError(mddlErr error, manager interfaces.IManagerOneTimeData) {
+func SetMddlError(mddlErr error, manager interfaces.IManagerOneTimeData, managerConfig interfaces.IManagerConfig) {
 	manager.SetUserContext(namelib.ROUTER.MDDL_ERROR, mddlErr)
 }
 

@@ -202,5 +202,5 @@ type ErrFormConvertFieldNotFound struct {
 }
 
 func (e ErrFormConvertFieldNotFound) Error() string {
-	return fmt.Sprintf("The form field %s was not found.", e.Field)
+	return fmt.Sprintf("The form field [%s] was not found.", e.Field)
 }
