@@ -31,9 +31,15 @@ type IKey interface {
 type IManagerDebugConfig interface {
 	Debug(enable bool)
 	IsDebug() bool
+	RelativeFilePath(enable bool)
+	IsRelativeFilePath() bool
 	ErrorLogging(enable bool)
-	IsErrorLogging() bool
 	ErrorLoggingFile(path string)
+	IsErrorLogging() bool
+	RequestInfo(enable bool)
+	RequestInfoFile(path string)
+	GetRequestInfoFile() string
+	IsRequestInfo() bool
 	GetErrorLoggingFile() string
 	SkipLoggingLevel(skip int)
 	LoggingLevel() int

@@ -79,8 +79,11 @@ func (k *Key) generateKeys(length int) []byte {
 
 type DebugConfig struct {
 	debug            bool
+	relPath          bool
 	errorLogging     bool
 	errorLoggingPath string
+	requestInfo      bool
+	requestInfoPath  string
 	skipLoggingLevel int
 }
 
@@ -90,6 +93,14 @@ func (d *DebugConfig) Debug(enable bool) {
 
 func (d *DebugConfig) IsDebug() bool {
 	return d.debug
+}
+
+func (d *DebugConfig) RelativeFilePath(enable bool) {
+	d.relPath = enable
+}
+
+func (d *DebugConfig) IsRelativeFilePath() bool {
+	return d.relPath
 }
 
 func (d *DebugConfig) ErrorLogging(enable bool) {
@@ -106,6 +117,22 @@ func (d *DebugConfig) ErrorLoggingFile(path string) {
 
 func (d *DebugConfig) GetErrorLoggingFile() string {
 	return d.errorLoggingPath
+}
+
+func (d *DebugConfig) RequestInfo(enable bool) {
+	d.requestInfo = enable
+}
+
+func (d *DebugConfig) IsRequestInfo() bool {
+	return d.requestInfo
+}
+
+func (d *DebugConfig) RequestInfoFile(path string) {
+	d.requestInfoPath = path
+}
+
+func (d *DebugConfig) GetRequestInfoFile() string {
+	return d.requestInfoPath
 }
 
 func (d *DebugConfig) SkipLoggingLevel(skip int) {

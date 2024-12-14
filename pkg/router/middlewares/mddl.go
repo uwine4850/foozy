@@ -2,10 +2,14 @@ package middlewares
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
+	"os"
 	"sort"
+	"strconv"
 	"sync"
 
+	"github.com/uwine4850/foozy/pkg/debug"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/utils/fslice"
@@ -52,6 +56,7 @@ func (m *Middleware) RunMddl(w http.ResponseWriter, r *http.Request, manager int
 	}
 	sort.Ints(m.preHandlerId)
 	for i := 0; i < len(m.preHandlerId); i++ {
+		debug.RequestLogginIfEnable(debug.P_MIDDLEWARE, fmt.Sprintf("sync middleware with id %s is running", strconv.Itoa(i)), managerConfig)
 		handlerFunc := m.preHandlerMiddlewares[i]
 		handlerFunc(w, r, manager, managerConfig)
 	}
@@ -62,6 +67,7 @@ func (m *Middleware) RunMddl(w http.ResponseWriter, r *http.Request, manager int
 // IMPORTANT: You must run the WaitAsyncMddl method at the selected location to complete correctly.
 func (m *Middleware) RunAsyncMddl(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) {
 	for i := 0; i < len(m.asyncHandlerMiddlewares); i++ {
+		debug.RequestLogginIfEnable(debug.P_MIDDLEWARE, fmt.Sprintf("async middleware with id %s is running", strconv.Itoa(i)), managerConfig)
 		m.wg.Add(1)
 		go m.asyncHandlerMiddlewares[i](w, r, manager, managerConfig)
 	}
@@ -75,6 +81,10 @@ func (m *Middleware) WaitAsyncMddl() {
 // SetMddlError sets an error that occurred in the middleware.
 func SetMddlError(mddlErr error, manager interfaces.IManagerOneTimeData, managerConfig interfaces.IManagerConfig) {
 	manager.SetUserContext(namelib.ROUTER.MDDL_ERROR, mddlErr)
+	if managerConfig.DebugConfig().IsRequestInfo() && managerConfig.DebugConfig().GetRequestInfoFile() == "" {
+		panic("unable to create request info log file. File path not set")
+	}
+	debug.WriteLog(managerConfig.DebugConfig().LoggingLevel()-1, managerConfig.DebugConfig().GetRequestInfoFile(), os.O_APPEND|os.O_CREATE|os.O_WRONLY, debug.P_MIDDLEWARE, fmt.Sprintf("middleware error: %s", mddlErr.Error()), managerConfig)
 }
 
 // GetMddlError get error from middleware. Used in router and in pair with SetMddlError.
@@ -91,8 +101,10 @@ func GetMddlError(manager interfaces.IManagerOneTimeData) (error, error) {
 }
 
 // SkipNextPage sends a command to the router to skip rendering the next page.
-func SkipNextPage(manager interfaces.IManagerOneTimeData) {
+func SkipNextPage(manager interfaces.IManagerOneTimeData, managerConfig interfaces.IManagerConfig) {
 	manager.SetUserContext(namelib.ROUTER.SKIP_NEXT_PAGE, true)
+	urlPattern, _ := manager.GetUserContext(namelib.ROUTER.URL_PATTERN)
+	debug.RequestLogginIfEnable(debug.P_MIDDLEWARE, fmt.Sprintf("skip page at %s", urlPattern), managerConfig)
 }
 
 // IsSkipNextPage checks if the page rendering should be skipped.
@@ -103,7 +115,8 @@ func IsSkipNextPage(manager interfaces.IManagerOneTimeData) bool {
 }
 
 // SkipNextPageAndRedirect skips the page render and redirects to another page.
-func SkipNextPageAndRedirect(manager interfaces.IManagerOneTimeData, w http.ResponseWriter, r *http.Request, path string) {
+func SkipNextPageAndRedirect(manager interfaces.IManagerOneTimeData, managerConfig interfaces.IManagerConfig, w http.ResponseWriter, r *http.Request, path string) {
 	http.Redirect(w, r, path, http.StatusFound)
-	SkipNextPage(manager)
+	SkipNextPage(manager, managerConfig)
+	debug.RequestLogginIfEnable(debug.P_MIDDLEWARE, fmt.Sprintf("redirect to %s", path), managerConfig)
 }

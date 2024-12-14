@@ -5,16 +5,25 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"runtime"
 
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/utils/fstring"
 )
 
-func LogError(message string, manager interfaces.IManagerConfig) {
-	if manager.DebugConfig().GetErrorLoggingFile() == "" {
-		panic("Unable to create log file. File path not set")
-	}
-	f, err := os.OpenFile(manager.DebugConfig().GetErrorLoggingFile(), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+const (
+	P_ERROR           = "ERROR"
+	P_ROUTER          = "ROUTER"
+	P_MIDDLEWARE      = "MIDDLEWARE"
+	P_OBJECT          = "OBJECT"
+	P_REQUEST         = "REQUEST"
+	P_TEMPLATE_ENGINE = "TEMPLATE_ENGINE"
+	P_DATABASE        = "DATABASE"
+)
+
+func WriteLog(skipLevel int, filePath string, flag int, prefix string, message string, managerConfig interfaces.IManagerConfig) {
+	f, err := os.OpenFile(filePath, flag, 0644)
 	if err != nil {
 		fmt.Println("LogError: ", err.Error())
 		return
@@ -26,11 +35,10 @@ func LogError(message string, manager interfaces.IManagerConfig) {
 			return
 		}
 	}(f)
-	ilog := log.New(f, "", log.LstdFlags)
+	ilog := log.New(f, fmt.Sprintf("[%s] ", prefix), log.LstdFlags)
 	ilog.SetFlags(log.LstdFlags)
 
-	skipLevel := manager.DebugConfig().LoggingLevel()
-	if skipLevel == -1 {
+	if skipLevel < 0 {
 		skipLevel = 3
 	}
 
@@ -39,24 +47,73 @@ func LogError(message string, manager interfaces.IManagerConfig) {
 		ilog.Println("Could not retrieve caller information")
 		return
 	}
-	ilog.Printf("%s:%d %s\n", file, line, message)
+	loggingFilePath := file
+	if managerConfig.DebugConfig().IsRelativeFilePath() {
+		wd, err := os.Getwd()
+		if err != nil {
+			ilog.Println("Could not retrieve working directory:", err)
+			return
+		}
+
+		relPath, err := filepath.Rel(wd, file)
+		if err != nil {
+			ilog.Println("Could not calculate relative path:", err)
+			return
+		}
+		loggingFilePath = relPath
+	}
+
+	ilog.Printf("%s:%d %s\n", loggingFilePath, line, message)
 }
 
-func ErrorLoggingIfEnableAndWrite(w http.ResponseWriter, text []byte, manager interfaces.IManagerConfig) {
-	_, err := w.Write(text)
+func LogError(message string, managerConfig interfaces.IManagerConfig) {
+	if managerConfig.DebugConfig().GetErrorLoggingFile() == "" {
+		panic("unable to create log file. File path not set")
+	}
+	WriteLog(managerConfig.DebugConfig().LoggingLevel()+1, managerConfig.DebugConfig().GetErrorLoggingFile(), os.O_APPEND|os.O_CREATE|os.O_WRONLY, "", message, managerConfig)
+}
+
+func ErrorLoggingIfEnableAndWrite(w http.ResponseWriter, errorText string, writeText string, managerConfig interfaces.IManagerConfig) {
+	_, err := w.Write([]byte(writeText))
 	if err != nil {
-		fmt.Println("LoggingIfEnableAndWrite: ", err.Error())
-		if manager.DebugConfig().IsErrorLogging() {
-			LogError(err.Error(), manager)
+		if managerConfig.DebugConfig().IsErrorLogging() {
+			LogError(err.Error(), managerConfig)
 		}
 	}
-	if manager.DebugConfig().IsErrorLogging() {
-		LogError(string(text), manager)
+	if managerConfig.DebugConfig().IsErrorLogging() {
+		LogError(string(errorText), managerConfig)
 	}
 }
 
-func ErrorLogginIfEnable(message string, manager interfaces.IManagerConfig) {
-	if manager.DebugConfig().IsErrorLogging() {
-		LogError(message, manager)
+func ErrorLogginIfEnable(message string, managerConfig interfaces.IManagerConfig) {
+	if managerConfig.DebugConfig().IsErrorLogging() {
+		LogError(message, managerConfig)
+	}
+}
+
+func ClearRequestInfoLogging(managerConfig interfaces.IManagerConfig) error {
+	if managerConfig.DebugConfig().GetRequestInfoFile() != "" && fstring.PathExist(managerConfig.DebugConfig().GetRequestInfoFile()) {
+		f, err := os.OpenFile(managerConfig.DebugConfig().GetRequestInfoFile(), os.O_WRONLY, 0644)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		if err := f.Truncate(0); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func LogRequestInfo(prefix string, message string, managerConfig interfaces.IManagerConfig) {
+	if managerConfig.DebugConfig().GetRequestInfoFile() == "" {
+		panic("unable to create request info log file. File path not set")
+	}
+	WriteLog(managerConfig.DebugConfig().LoggingLevel(), managerConfig.DebugConfig().GetRequestInfoFile(), os.O_APPEND|os.O_CREATE|os.O_WRONLY, prefix, message, managerConfig)
+}
+
+func RequestLogginIfEnable(prefix string, message string, managerConfig interfaces.IManagerConfig) {
+	if managerConfig.DebugConfig().IsRequestInfo() {
+		LogRequestInfo(prefix, message, managerConfig)
 	}
 }

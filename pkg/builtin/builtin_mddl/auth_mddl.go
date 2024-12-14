@@ -55,7 +55,7 @@ func Auth(loginUrl string, db *database.Database, onErr OnError) middlewares.Mdd
 				onErr(w, r, manager, err)
 				return
 			}
-			middlewares.SkipNextPageAndRedirect(manager.OneTimeData(), w, r, r.URL.Path)
+			middlewares.SkipNextPageAndRedirect(manager.OneTimeData(), managerConfig, w, r, r.URL.Path)
 		}
 	}
 }

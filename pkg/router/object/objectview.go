@@ -7,6 +7,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbmapper"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
+	"github.com/uwine4850/foozy/pkg/debug"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/typeopr"
@@ -37,7 +38,8 @@ func (v *ObjView) ObjectsName() []string {
 	return []string{v.Name}
 }
 
-func (v *ObjView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
+func (v *ObjView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) (ObjectContext, error) {
+	debug.LogRequestInfo(debug.P_OBJECT, "run ObjView object", managerConfig)
 	if typeopr.IsPointer(v.FillStruct) {
 		return nil, typeopr.ErrValueIsPointer{Value: "FillStruct"}
 	}
@@ -60,6 +62,7 @@ func (v *ObjView) Object(w http.ResponseWriter, r *http.Request, manager interfa
 	if res == nil {
 		return nil, ErrNoData{}
 	}
+	debug.LogRequestInfo(debug.P_OBJECT, "fill object", managerConfig)
 	value, err := v.fillObject(res[0])
 	if err != nil {
 		return nil, err

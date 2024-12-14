@@ -9,7 +9,7 @@ import (
 type ITemplateEngine interface {
 	itypeopr.INewInstance
 	SetPath(files string)
-	Exec() error
+	Exec(managerConfig IManagerConfig) error
 	SetContext(data map[string]interface{})
 	GetContext() map[string]interface{}
 	SetResponseWriter(w http.ResponseWriter)
@@ -22,7 +22,7 @@ type IRender interface {
 	GetContext() map[string]interface{}
 	SetTemplateEngine(engine ITemplateEngine)
 	GetTemplateEngine() ITemplateEngine
-	RenderTemplate(w http.ResponseWriter, r *http.Request) error
+	RenderTemplate(w http.ResponseWriter, r *http.Request, managerConfig IManagerConfig) error
 	SetTemplatePath(templatePath string)
 	RenderJson(data interface{}, w http.ResponseWriter) error
 }

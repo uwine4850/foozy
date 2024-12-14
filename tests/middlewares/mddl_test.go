@@ -71,7 +71,7 @@ func TestSetGetMddlError(t *testing.T) {
 func TestSkipAndIsSkipNextPage(t *testing.T) {
 	mddl := middlewares.NewMiddleware()
 	mddl.HandlerMddl(0, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) {
-		middlewares.SkipNextPage(manager.OneTimeData())
+		middlewares.SkipNextPage(manager.OneTimeData(), managerConfig)
 	})
 	newRouter.SetMiddleware(mddl)
 	get, err := http.Get("http://localhost:8050/mddl")
@@ -95,7 +95,7 @@ func TestSkipNextPageAndRedirect(t *testing.T) {
 	mddl := middlewares.NewMiddleware()
 	mddl.HandlerMddl(0, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) {
 		if r.URL.Path == "/mddl" {
-			middlewares.SkipNextPageAndRedirect(manager.OneTimeData(), w, r, "/redirect")
+			middlewares.SkipNextPageAndRedirect(manager.OneTimeData(), managerConfig, w, r, "/redirect")
 		}
 	})
 	newRouter.SetMiddleware(mddl)

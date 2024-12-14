@@ -69,7 +69,8 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
-	newRouter := router.NewRouter(manager.NewManager(render), manager.NewManagerCnf())
+	managerConfig := manager.NewManagerCnf()
+	newRouter := router.NewRouter(manager.NewManager(render), managerConfig)
 	newRouter.Get("/object-view/<id>", TObjectViewHNDL(db))
 	newRouter.Get("/object-mul-view/<id>/<id1>", TObjectMultipleViewHNDL(db))
 	newRouter.Get("/object-all-view", TObjectAllViewHNDL(db))
@@ -145,11 +146,11 @@ type TObjectView struct {
 	object.ObjView
 }
 
-func (v *TObjectView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+func (v *TObjectView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig, err error) {
 	panic(err)
 }
 
-func (v *TObjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
+func (v *TObjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) (object.ObjectContext, error) {
 	objectContext, err := object.GetObjectContext(manager)
 	if err != nil {
 		panic(err)
@@ -198,11 +199,11 @@ type TObjectMultipleView struct {
 	object.MultipleObjectView
 }
 
-func (v *TObjectMultipleView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+func (v *TObjectMultipleView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig, err error) {
 	panic(err)
 }
 
-func (v *TObjectMultipleView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
+func (v *TObjectMultipleView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) (object.ObjectContext, error) {
 	_objectContext, _ := manager.OneTimeData().GetUserContext(namelib.OBJECT.OBJECT_CONTEXT)
 	objectContext := _objectContext.(object.ObjectContext)
 	if _, ok := objectContext["object"]; !ok {
@@ -264,11 +265,11 @@ type TObjectAllView struct {
 	object.AllView
 }
 
-func (v *TObjectAllView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+func (v *TObjectAllView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig, err error) {
 	panic(err)
 }
 
-func (v *TObjectAllView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
+func (v *TObjectAllView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) (object.ObjectContext, error) {
 	_objectContext, _ := manager.OneTimeData().GetUserContext(namelib.OBJECT.OBJECT_CONTEXT)
 	objectContext := _objectContext.(object.ObjectContext)
 	if _, ok := objectContext["all_object"]; !ok {
@@ -319,7 +320,7 @@ type MyFormView struct {
 	object.FormView
 }
 
-func (v *MyFormView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
+func (v *MyFormView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) (object.ObjectContext, error) {
 	filledFormInterface, err := v.FormInterface(manager.OneTimeData())
 	if err != nil {
 		return nil, err
@@ -334,7 +335,7 @@ func (v *MyFormView) Context(w http.ResponseWriter, r *http.Request, manager int
 	return object.ObjectContext{}, nil
 }
 
-func (v *MyFormView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+func (v *MyFormView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig, err error) {
 	panic(err)
 }
 
@@ -372,11 +373,11 @@ type JsonObjectView struct {
 	object.ObjView
 }
 
-func (v *JsonObjectView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+func (v *JsonObjectView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig, err error) {
 	panic(err)
 }
 
-func (v *JsonObjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
+func (v *JsonObjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) (object.ObjectContext, error) {
 	return map[string]interface{}{"Test": "OK"}, nil
 }
 
@@ -419,11 +420,11 @@ type TJsonObjectMultipleView struct {
 	object.MultipleObjectView
 }
 
-func (v *TJsonObjectMultipleView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+func (v *TJsonObjectMultipleView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig, err error) {
 	panic(err)
 }
 
-func (v *TJsonObjectMultipleView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
+func (v *TJsonObjectMultipleView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) (object.ObjectContext, error) {
 	return object.ObjectContext{"Test": "OK"}, nil
 }
 
@@ -478,11 +479,11 @@ type TJsonObjectAllView struct {
 	object.AllView
 }
 
-func (v *TJsonObjectAllView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+func (v *TJsonObjectAllView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig, err error) {
 	panic(err)
 }
 
-func (v *TJsonObjectAllView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
+func (v *TJsonObjectAllView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) (object.ObjectContext, error) {
 	return object.ObjectContext{"Test": "OK"}, nil
 }
 

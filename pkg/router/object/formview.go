@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"reflect"
 
+	"github.com/uwine4850/foozy/pkg/debug"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/interfaces/itypeopr"
 	"github.com/uwine4850/foozy/pkg/namelib"
@@ -27,26 +28,29 @@ func (v *FormView) ObjectsName() []string {
 	return []string{namelib.OBJECT.OBJECT_CONTEXT_FORM}
 }
 
-func (v *FormView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
+func (v *FormView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) (ObjectContext, error) {
+	debug.LogRequestInfo(debug.P_OBJECT, "run FormView object", managerConfig)
 	frm := form.NewForm(r)
 	if err := frm.Parse(); err != nil {
 		return nil, err
 	}
 	if v.ValidateCSRF {
+		debug.LogRequestInfo(debug.P_OBJECT, "validate CSRF token", managerConfig)
 		if err := secure.ValidateFormCsrfToken(r, frm); err != nil {
 			return nil, err
 		}
 	}
 
+	debug.LogRequestInfo(debug.P_OBJECT, "fill form", managerConfig)
 	fillForm := reflect.New(reflect.TypeOf(v.FormStruct)).Elem()
 	if err := formmapper.FillReflectValueFromForm(frm, &fillForm, v.NilIfNotExist); err != nil {
 		return nil, err
 	}
-
+	debug.LogRequestInfo(debug.P_OBJECT, "check empty", managerConfig)
 	if err := v.checkEmpty(typeopr.Ptr{}.New(&fillForm)); err != nil {
 		return nil, err
 	}
-
+	debug.LogRequestInfo(debug.P_OBJECT, "check extension", managerConfig)
 	if err := formmapper.CheckExtension(typeopr.Ptr{}.New(&fillForm)); err != nil {
 		return nil, err
 	}

@@ -19,9 +19,9 @@ import (
 func internalServerError(w http.ResponseWriter, r *http.Request, managerConfig interfaces.IManagerConfig, err error) {
 	w.WriteHeader(http.StatusInternalServerError)
 	if managerConfig.DebugConfig().IsDebug() {
-		debug.ErrorLoggingIfEnableAndWrite(w, []byte(err.Error()), managerConfig)
+		debug.ErrorLoggingIfEnableAndWrite(w, err.Error(), err.Error(), managerConfig)
 	} else {
-		debug.ErrorLoggingIfEnableAndWrite(w, []byte("500 Internal server error"), managerConfig)
+		debug.ErrorLoggingIfEnableAndWrite(w, err.Error(), "500 Internal server error", managerConfig)
 	}
 }
 
@@ -155,11 +155,18 @@ func (rt *Router) validateMethod(handler Handler, method string, w http.Response
 // Various services are also started here for the correct operation of the processor.
 func (rt *Router) register(_muxRouter muxRouter, urlPattern string) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
-		manager, err := rt.initManager()
-		if err != nil {
+		if err := debug.ClearRequestInfoLogging(rt.managerConfig); err != nil {
 			rt.internalErrorFunc(writer, request, rt.managerConfig, err)
 			return
 		}
+		debug.RequestLogginIfEnable(debug.P_ROUTER, fmt.Sprintf("request url: %s", request.URL), rt.managerConfig)
+		manager, err := rt.initManager()
+		if err != nil {
+			rt.internalErrorFunc(writer, request, rt.managerConfig, err)
+			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error(), rt.managerConfig)
+			return
+		}
+		debug.RequestLogginIfEnable(debug.P_ROUTER, "manager is initialized", rt.managerConfig)
 
 		manager.OneTimeData().SetUserContext(namelib.ROUTER.URL_PATTERN, urlPattern)
 
@@ -174,13 +181,16 @@ func (rt *Router) register(_muxRouter muxRouter, urlPattern string) http.Handler
 				manager.OneTimeData().SetSlugParams(params)
 			}
 		}
+		debug.RequestLogginIfEnable(debug.P_ROUTER, "slug url is parsed", rt.managerConfig)
 
 		// Run middlewares.
 		if skip, err := rt.runMddl(writer, request, manager); err != nil {
 			if rt.internalErrorFunc != nil {
 				rt.internalErrorFunc(writer, request, rt.managerConfig, err)
+				debug.RequestLogginIfEnable(debug.P_ERROR, err.Error(), rt.managerConfig)
 			} else {
-				ServerError(writer, err.Error(), manager, rt.managerConfig)
+				rt.internalErrorFunc(writer, request, rt.managerConfig, err)
+				debug.RequestLogginIfEnable(debug.P_ERROR, err.Error(), rt.managerConfig)
 			}
 			return
 		} else {
@@ -194,12 +204,15 @@ func (rt *Router) register(_muxRouter muxRouter, urlPattern string) http.Handler
 }
 
 func (rt *Router) switchRegisterMethods(writer http.ResponseWriter, request *http.Request, _muxRouter muxRouter, manager interfaces.IManager) {
+	debug.RequestLogginIfEnable(debug.P_ROUTER, "run switch methods...", rt.managerConfig)
+	debug.RequestLogginIfEnable(debug.P_ROUTER, "validate method", rt.managerConfig)
 	connection := request.Header.Get("Connection")
 	if connection != "" && connection == "Upgrade" {
 		handler := _muxRouter.Ws
 		if !rt.validateMethod(handler, "WS", writer) {
 			return
 		}
+		debug.RequestLogginIfEnable(debug.P_ROUTER, "run WS handler", rt.managerConfig)
 		handler(writer, request, manager, rt.managerConfig)()
 		return
 	}
@@ -209,37 +222,44 @@ func (rt *Router) switchRegisterMethods(writer http.ResponseWriter, request *htt
 		if !rt.validateMethod(handler, "GET", writer) {
 			return
 		}
+		debug.RequestLogginIfEnable(debug.P_ROUTER, "run GET handler", rt.managerConfig)
 		handler(writer, request, manager, rt.managerConfig)()
 	case http.MethodPost:
 		handler := _muxRouter.Post
 		if !rt.validateMethod(handler, "POST", writer) {
 			return
 		}
+		debug.RequestLogginIfEnable(debug.P_ROUTER, "run POST handler", rt.managerConfig)
 		handler(writer, request, manager, rt.managerConfig)()
 	case http.MethodPut:
 		handler := _muxRouter.Put
 		if !rt.validateMethod(handler, "PUT", writer) {
 			return
 		}
+		debug.RequestLogginIfEnable(debug.P_ROUTER, "run PUT handler", rt.managerConfig)
 		handler(writer, request, manager, rt.managerConfig)()
 	case http.MethodDelete:
 		handler := _muxRouter.Delete
 		if !rt.validateMethod(handler, "DELETE", writer) {
 			return
 		}
+		debug.RequestLogginIfEnable(debug.P_ROUTER, "run DELETE handler", rt.managerConfig)
 		handler(writer, request, manager, rt.managerConfig)()
 	case http.MethodOptions:
 		handler := _muxRouter.Options
 		if !rt.validateMethod(handler, "OPTIONS", writer) {
 			return
 		}
+		debug.RequestLogginIfEnable(debug.P_ROUTER, "run OPTIONS handler", rt.managerConfig)
 		handler(writer, request, manager, rt.managerConfig)()
 	}
+	debug.RequestLogginIfEnable(debug.P_ROUTER, "method completed", rt.managerConfig)
 }
 
 // initManager initializes a new manager instance.
 // Must be called for each new request.
 func (rt *Router) initManager() (interfaces.IManager, error) {
+	debug.RequestLogginIfEnable(debug.P_ROUTER, "init manager", rt.managerConfig)
 	_newManager, err := managerObject.New()
 	if err != nil {
 		return nil, err
@@ -269,6 +289,7 @@ func (rt *Router) initManager() (interfaces.IManager, error) {
 // Middleware errors and the page rendering skip algorithm are also handled here.
 func (rt *Router) runMddl(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, error) {
 	if rt.middleware != nil {
+		debug.RequestLogginIfEnable(debug.P_ROUTER, "run middlewares...", rt.managerConfig)
 		// Running synchronous middleware.
 		err := rt.middleware.RunMddl(w, r, manager, rt.managerConfig)
 		if err != nil {
@@ -286,6 +307,7 @@ func (rt *Router) runMddl(w http.ResponseWriter, r *http.Request, manager interf
 		if mddlErr != nil {
 			return false, errors.New(mddlErr.Error())
 		}
+		debug.RequestLogginIfEnable(debug.P_ROUTER, "middlewares are completed", rt.managerConfig)
 		// Checking the skip of the next page. Runs after a more important error check.
 		if middlewares.IsSkipNextPage(manager.OneTimeData()) {
 			return true, nil

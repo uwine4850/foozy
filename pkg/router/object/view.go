@@ -18,10 +18,10 @@ type IView interface {
 	CloseDb() error
 	// Object receives data from the selected table and writes it to a variable structure.
 	// IMPORTANT: connects to the database in this method (or others), but closes the connection only in the TemplateView.
-	Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error)
-	Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error)
-	Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func())
-	OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error)
+	Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) (ObjectContext, error)
+	Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) (ObjectContext, error)
+	Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) (bool, func())
+	OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig, err error)
 	ObjectsName() []string
 }
 
@@ -31,19 +31,19 @@ func (v *BaseView) CloseDb() error {
 	return nil
 }
 
-func (v *BaseView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
+func (v *BaseView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) (ObjectContext, error) {
 	return ObjectContext{}, nil
 }
 
-func (v *BaseView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
+func (v *BaseView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) (ObjectContext, error) {
 	return ObjectContext{}, nil
 }
 
-func (v *BaseView) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
+func (v *BaseView) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) (bool, func()) {
 	return true, func() {}
 }
 
-func (v *BaseView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+func (v *BaseView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig, err error) {
 	panic("OnError is not implement. Please implement this method in your structure.")
 }
 
