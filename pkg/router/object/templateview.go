@@ -28,32 +28,32 @@ func (v *TemplateView) SkipRender() {
 }
 
 func (v *TemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
-	debug.LogRequestInfo(debug.P_OBJECT, "run template view", managerConfig)
+	debug.RequestLogginIfEnable(debug.P_OBJECT, "run template view", managerConfig)
 	if v.View == nil {
 		panic("the ITemplateView field must not be nil")
 	}
 	defer func() {
-		debug.LogRequestInfo(debug.P_OBJECT, "close template view database", managerConfig)
+		debug.RequestLogginIfEnable(debug.P_OBJECT, "close template view database", managerConfig)
 		err := v.View.CloseDb()
 		if err != nil {
-			debug.LogRequestInfo(debug.P_ERROR, err.Error(), managerConfig)
+			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error(), managerConfig)
 			v.View.OnError(w, r, manager, managerConfig, err)
 		}
 	}()
-	debug.LogRequestInfo(debug.P_OBJECT, "handle object", managerConfig)
+	debug.RequestLogginIfEnable(debug.P_OBJECT, "handle object", managerConfig)
 	objectContext, err := v.View.Object(w, r, manager, managerConfig)
 	if err != nil {
 		return func() {
-			debug.LogRequestInfo(debug.P_ERROR, err.Error(), managerConfig)
+			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error(), managerConfig)
 			v.View.OnError(w, r, manager, managerConfig, err)
 		}
 	}
-	debug.LogRequestInfo(debug.P_OBJECT, "handle context", managerConfig)
+	debug.RequestLogginIfEnable(debug.P_OBJECT, "handle context", managerConfig)
 	manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_CONTEXT, objectContext)
 	_context, err := v.View.Context(w, r, manager, managerConfig)
 	if err != nil {
 		return func() {
-			debug.LogRequestInfo(debug.P_ERROR, err.Error(), managerConfig)
+			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error(), managerConfig)
 			v.View.OnError(w, r, manager, managerConfig, err)
 		}
 	}
@@ -61,14 +61,14 @@ func (v *TemplateView) Call(w http.ResponseWriter, r *http.Request, manager inte
 	manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_CONTEXT, objectContext)
 
 	if v.isSkipRender {
-		debug.LogRequestInfo(debug.P_OBJECT, "skip render", managerConfig)
+		debug.RequestLogginIfEnable(debug.P_OBJECT, "skip render", managerConfig)
 		return func() {}
 	}
 
-	debug.LogRequestInfo(debug.P_OBJECT, "handle permissions", managerConfig)
+	debug.RequestLogginIfEnable(debug.P_OBJECT, "handle permissions", managerConfig)
 	permissions, f := v.View.Permissions(w, r, manager, managerConfig)
 	if !permissions {
-		debug.LogRequestInfo(debug.P_OBJECT, "permissions are not granted", managerConfig)
+		debug.RequestLogginIfEnable(debug.P_OBJECT, "permissions are not granted", managerConfig)
 		return func() { f() }
 	}
 	manager.Render().SetContext(objectContext)
@@ -76,7 +76,7 @@ func (v *TemplateView) Call(w http.ResponseWriter, r *http.Request, manager inte
 	err = manager.Render().RenderTemplate(w, r, managerConfig)
 	if err != nil {
 		return func() {
-			debug.LogRequestInfo(debug.P_ERROR, err.Error(), managerConfig)
+			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error(), managerConfig)
 			v.View.OnError(w, r, manager, managerConfig, err)
 		}
 	}
@@ -92,19 +92,19 @@ type JsonObjectTemplateView struct {
 }
 
 func (v *JsonObjectTemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
-	debug.LogRequestInfo(debug.P_OBJECT, "run JsonObjectTemplateView", managerConfig)
+	debug.RequestLogginIfEnable(debug.P_OBJECT, "run JsonObjectTemplateView", managerConfig)
 	onError, viewObject, viewContext := baseParseView(v.View, w, r, manager, managerConfig)
 	if onError != nil {
 		return onError
 	}
 	var filledMessage any
 	if v.Message != nil {
-		debug.LogRequestInfo(debug.P_OBJECT, "fill DTO message...", managerConfig)
+		debug.RequestLogginIfEnable(debug.P_OBJECT, "fill DTO message...", managerConfig)
 		// Retrieves objects by their names and adds them to the general viewContext map.
 		objectContext, err := contextByNameToObjectContext(viewObject[v.View.ObjectsName()[0]])
 		if err != nil {
 			return func() {
-				debug.LogRequestInfo(debug.P_ERROR, err.Error(), managerConfig)
+				debug.RequestLogginIfEnable(debug.P_ERROR, err.Error(), managerConfig)
 				v.View.OnError(w, r, manager, managerConfig, err)
 			}
 		}
@@ -113,18 +113,18 @@ func (v *JsonObjectTemplateView) Call(w http.ResponseWriter, r *http.Request, ma
 		_filledMessage, err := fillMessage(v.DTO, &viewContext, v.Message)
 		if err != nil {
 			return func() {
-				debug.LogRequestInfo(debug.P_ERROR, err.Error(), managerConfig)
+				debug.RequestLogginIfEnable(debug.P_ERROR, err.Error(), managerConfig)
 				v.View.OnError(w, r, manager, managerConfig, err)
 			}
 		}
 		filledMessage = _filledMessage
 	} else {
-		debug.LogRequestInfo(debug.P_OBJECT, "pass context without DTO message", managerConfig)
+		debug.RequestLogginIfEnable(debug.P_OBJECT, "pass context without DTO message", managerConfig)
 		fmap.MergeMap((*map[string]interface{})(&viewContext), viewObject)
 		manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_CONTEXT, viewContext)
 		filledMessage = viewContext
 	}
-	debug.LogRequestInfo(debug.P_OBJECT, "send json", managerConfig)
+	debug.RequestLogginIfEnable(debug.P_OBJECT, "send json", managerConfig)
 	router.SendJson(filledMessage, w)
 	return func() {}
 }
@@ -138,7 +138,7 @@ type JsonMultipleObjectTemplateView struct {
 }
 
 func (v *JsonMultipleObjectTemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
-	debug.LogRequestInfo(debug.P_OBJECT, "run JsonMultipleObjectTemplateView", managerConfig)
+	debug.RequestLogginIfEnable(debug.P_OBJECT, "run JsonMultipleObjectTemplateView", managerConfig)
 	onError, viewObject, viewContext := baseParseView(v.View, w, r, manager, managerConfig)
 	if onError != nil {
 		return onError
@@ -147,13 +147,13 @@ func (v *JsonMultipleObjectTemplateView) Call(w http.ResponseWriter, r *http.Req
 	contextSliceMap := []ObjectContext{}
 	var filledMessages []any
 	if v.Message != nil {
-		debug.LogRequestInfo(debug.P_OBJECT, "fill DTO messages", managerConfig)
+		debug.RequestLogginIfEnable(debug.P_OBJECT, "fill DTO messages", managerConfig)
 		// Retrieves objects by their names and adds them to the general viewContext map.
 		for i := 0; i < len(v.View.ObjectsName()); i++ {
 			viewObjectContext, err := contextByNameToObjectContext(viewObject[v.View.ObjectsName()[i]])
 			if err != nil {
 				return func() {
-					debug.LogRequestInfo(debug.P_ERROR, err.Error(), managerConfig)
+					debug.RequestLogginIfEnable(debug.P_ERROR, err.Error(), managerConfig)
 					v.View.OnError(w, r, manager, managerConfig, err)
 				}
 			}
@@ -169,7 +169,7 @@ func (v *JsonMultipleObjectTemplateView) Call(w http.ResponseWriter, r *http.Req
 			filledMessage, err := fillMessage(v.DTO, &contextSliceMap[i], v.Message)
 			if err != nil {
 				return func() {
-					debug.LogRequestInfo(debug.P_ERROR, err.Error(), managerConfig)
+					debug.RequestLogginIfEnable(debug.P_ERROR, err.Error(), managerConfig)
 					v.View.OnError(w, r, manager, managerConfig, err)
 				}
 			}
@@ -177,12 +177,12 @@ func (v *JsonMultipleObjectTemplateView) Call(w http.ResponseWriter, r *http.Req
 		}
 		return func() { router.SendJson(filledMessages, w) }
 	} else {
-		debug.LogRequestInfo(debug.P_OBJECT, "pass context without DTO messages", managerConfig)
+		debug.RequestLogginIfEnable(debug.P_OBJECT, "pass context without DTO messages", managerConfig)
 		fmap.MergeMap((*map[string]interface{})(&viewContext), viewObject)
 		manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_CONTEXT, viewContext)
 		contextSliceMap = append(contextSliceMap, viewContext)
 	}
-	debug.LogRequestInfo(debug.P_OBJECT, "send json", managerConfig)
+	debug.RequestLogginIfEnable(debug.P_OBJECT, "send json", managerConfig)
 	router.SendJson(contextSliceMap[0], w)
 	return func() {}
 }
@@ -196,7 +196,7 @@ type JsonAllTemplateView struct {
 }
 
 func (v *JsonAllTemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
-	debug.LogRequestInfo(debug.P_OBJECT, "run JsonAllTemplateView", managerConfig)
+	debug.RequestLogginIfEnable(debug.P_OBJECT, "run JsonAllTemplateView", managerConfig)
 	onError, viewObject, viewContext := baseParseView(v.View, w, r, manager, managerConfig)
 	if onError != nil {
 		return onError
@@ -205,19 +205,19 @@ func (v *JsonAllTemplateView) Call(w http.ResponseWriter, r *http.Request, manag
 	contextSliceMap := []ObjectContext{}
 	var filledMessages []any
 	if v.Message != nil {
-		debug.LogRequestInfo(debug.P_OBJECT, "fill DTO messages", managerConfig)
+		debug.RequestLogginIfEnable(debug.P_OBJECT, "fill DTO messages", managerConfig)
 		// Retrieves objects by their names and adds them to the general viewContext map.
 		objectBytes, err := json.Marshal(viewObject[v.View.ObjectsName()[0]])
 		if err != nil {
 			return func() {
-				debug.LogRequestInfo(debug.P_ERROR, err.Error(), managerConfig)
+				debug.RequestLogginIfEnable(debug.P_ERROR, err.Error(), managerConfig)
 				v.View.OnError(w, r, manager, managerConfig, err)
 			}
 		}
 		var objectContextMap []ObjectContext
 		if err := json.Unmarshal(objectBytes, &objectContextMap); err != nil {
 			return func() {
-				debug.LogRequestInfo(debug.P_ERROR, err.Error(), managerConfig)
+				debug.RequestLogginIfEnable(debug.P_ERROR, err.Error(), managerConfig)
 				v.View.OnError(w, r, manager, managerConfig, err)
 			}
 		}
@@ -235,7 +235,7 @@ func (v *JsonAllTemplateView) Call(w http.ResponseWriter, r *http.Request, manag
 			filledMessage, err := fillMessage(v.DTO, &contextSliceMap[i], v.Message)
 			if err != nil {
 				return func() {
-					debug.LogRequestInfo(debug.P_ERROR, err.Error(), managerConfig)
+					debug.RequestLogginIfEnable(debug.P_ERROR, err.Error(), managerConfig)
 					v.View.OnError(w, r, manager, managerConfig, err)
 				}
 			}
@@ -243,12 +243,12 @@ func (v *JsonAllTemplateView) Call(w http.ResponseWriter, r *http.Request, manag
 		}
 		return func() { router.SendJson(filledMessages, w) }
 	} else {
-		debug.LogRequestInfo(debug.P_OBJECT, "pass context without DTO messages", managerConfig)
+		debug.RequestLogginIfEnable(debug.P_OBJECT, "pass context without DTO messages", managerConfig)
 		fmap.MergeMap((*map[string]interface{})(&viewContext), viewObject)
 		manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_CONTEXT, viewContext)
 		contextSliceMap = append(contextSliceMap, viewContext)
 	}
-	debug.LogRequestInfo(debug.P_OBJECT, "send json", managerConfig)
+	debug.RequestLogginIfEnable(debug.P_OBJECT, "send json", managerConfig)
 	router.SendJson(contextSliceMap[0], w)
 	return func() {}
 }
@@ -260,46 +260,46 @@ func baseParseView(view IView, w http.ResponseWriter, r *http.Request, manager i
 	realView := reflect.ValueOf(getRealView(view))
 	if err := fstruct.CheckNotDefaultFields(typeopr.Ptr{}.New(&realView)); err != nil {
 		onError = func() {
-			debug.LogRequestInfo(debug.P_ERROR, err.Error(), managerConfig)
+			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error(), managerConfig)
 			view.OnError(w, r, manager, managerConfig, err)
 		}
 		return
 	}
 	var err error
-	debug.LogRequestInfo(debug.P_OBJECT, "handle object", managerConfig)
+	debug.RequestLogginIfEnable(debug.P_OBJECT, "handle object", managerConfig)
 	viewObject, err = view.Object(w, r, manager, managerConfig)
 	if err != nil {
 		onError = func() {
-			debug.LogRequestInfo(debug.P_ERROR, err.Error(), managerConfig)
+			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error(), managerConfig)
 			view.OnError(w, r, manager, managerConfig, err)
 		}
 		return
 	}
 	manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_CONTEXT, viewObject)
 
-	debug.LogRequestInfo(debug.P_OBJECT, "handle context", managerConfig)
+	debug.RequestLogginIfEnable(debug.P_OBJECT, "handle context", managerConfig)
 	viewContext, err = view.Context(w, r, manager, managerConfig)
 	if err != nil {
 		onError = func() {
-			debug.LogRequestInfo(debug.P_ERROR, err.Error(), managerConfig)
+			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error(), managerConfig)
 			view.OnError(w, r, manager, managerConfig, err)
 		}
 		return
 	}
 
-	debug.LogRequestInfo(debug.P_OBJECT, "handle permissions", managerConfig)
+	debug.RequestLogginIfEnable(debug.P_OBJECT, "handle permissions", managerConfig)
 	permissions, f := view.Permissions(w, r, manager, managerConfig)
 	if !permissions {
-		debug.LogRequestInfo(debug.P_OBJECT, "permissions are not granted", managerConfig)
+		debug.RequestLogginIfEnable(debug.P_OBJECT, "permissions are not granted", managerConfig)
 		onError = func() { f() }
 		return
 	}
 
 	err = view.CloseDb()
 	if err != nil {
-		debug.LogRequestInfo(debug.P_OBJECT, "close view database", managerConfig)
+		debug.RequestLogginIfEnable(debug.P_OBJECT, "close view database", managerConfig)
 		onError = func() {
-			debug.LogRequestInfo(debug.P_ERROR, err.Error(), managerConfig)
+			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error(), managerConfig)
 			view.OnError(w, r, manager, managerConfig, err)
 		}
 		return

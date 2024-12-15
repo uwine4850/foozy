@@ -39,7 +39,7 @@ func (v *ObjView) ObjectsName() []string {
 }
 
 func (v *ObjView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) (ObjectContext, error) {
-	debug.LogRequestInfo(debug.P_OBJECT, "run ObjView object", managerConfig)
+	debug.RequestLogginIfEnable(debug.P_OBJECT, "run ObjView object", managerConfig)
 	if typeopr.IsPointer(v.FillStruct) {
 		return nil, typeopr.ErrValueIsPointer{Value: "FillStruct"}
 	}
@@ -62,7 +62,7 @@ func (v *ObjView) Object(w http.ResponseWriter, r *http.Request, manager interfa
 	if res == nil {
 		return nil, ErrNoData{}
 	}
-	debug.LogRequestInfo(debug.P_OBJECT, "fill object", managerConfig)
+	debug.RequestLogginIfEnable(debug.P_OBJECT, "fill object", managerConfig)
 	value, err := v.fillObject(res[0])
 	if err != nil {
 		return nil, err

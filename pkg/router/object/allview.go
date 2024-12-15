@@ -37,18 +37,18 @@ func (v *AllView) ObjectsName() []string {
 
 // Object sets a slice of rows from the database.
 func (v *AllView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) (ObjectContext, error) {
-	debug.LogRequestInfo(debug.P_OBJECT, "run AllView object", managerConfig)
+	debug.RequestLogginIfEnable(debug.P_OBJECT, "run AllView object", managerConfig)
 	err := v.DB.Connect()
 	if err != nil {
 		return nil, err
 	}
 	manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_DB, v.DB)
-	debug.LogRequestInfo(debug.P_OBJECT, "get object from database", managerConfig)
+	debug.RequestLogginIfEnable(debug.P_OBJECT, "get object from database", managerConfig)
 	objects, err := v.DB.SyncQ().Select([]string{"*"}, v.TableName, dbutils.WHOutput{}, 0)
 	if err != nil {
 		return nil, err
 	}
-	debug.LogRequestInfo(debug.P_OBJECT, "fill objects", managerConfig)
+	debug.RequestLogginIfEnable(debug.P_OBJECT, "fill objects", managerConfig)
 	fillObjects, err := v.fillObjects(objects)
 	if err != nil {
 		return nil, err

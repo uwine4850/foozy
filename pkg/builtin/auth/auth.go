@@ -29,13 +29,13 @@ type AuthItem struct {
 // It can be used to create a user, check the correctness of the login data, change the password and
 // check the availability of the user.
 type Auth struct {
-	database      *database.Database
-	tableName     string
-	w             http.ResponseWriter
-	managerConfig interfaces.IManagerConfig
+	database  *database.Database
+	tableName string
+	w         http.ResponseWriter
+	manager   interfaces.IManager
 }
 
-func NewAuth(database *database.Database, w http.ResponseWriter, manager interfaces.IManagerConfig) *Auth {
+func NewAuth(database *database.Database, w http.ResponseWriter, manager interfaces.IManager) *Auth {
 	if !typeopr.IsPointer(manager) {
 		panic("The manager config must be passed by pointer.")
 	}
@@ -113,16 +113,16 @@ func (a *Auth) UpdateAuthCookie(hashKey []byte, blockKey []byte, r *http.Request
 }
 
 func (a *Auth) addUserCookie(uid string) error {
-	k := a.managerConfig.Key().Get32BytesKey()
+	k := a.manager.Key().Get32BytesKey()
 	if err := cookies.CreateSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), a.w, &http.Cookie{
 		Name:     namelib.AUTH.COOKIE_AUTH,
 		Path:     "/",
 		HttpOnly: true,
 		Secure:   true,
-	}, &AuthCookie{UID: uid, KeyDate: a.managerConfig.Key().Get32BytesKey().Date()}); err != nil {
+	}, &AuthCookie{UID: uid, KeyDate: a.manager.Key().Get32BytesKey().Date()}); err != nil {
 		return err
 	}
-	authDate := a.managerConfig.Key().Get32BytesKey().Date()
+	authDate := a.manager.Key().Get32BytesKey().Date()
 	if err := cookies.CreateSecureNoHMACCookieData([]byte(k.StaticKey()), a.w, &http.Cookie{
 		Name:     namelib.AUTH.COOKIE_AUTH_DATE,
 		Path:     "/",

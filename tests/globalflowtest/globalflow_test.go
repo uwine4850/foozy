@@ -16,19 +16,19 @@ var managerConfig = manager.NewManagerCnf()
 func TestMain(m *testing.M) {
 	mng.SetOneTimeData(manager.NewManagerData())
 	gf := globalflow.NewGlobalFlow(1)
-	gf.AddTask(func(managerConfig interfaces.IManagerConfig) {
+	gf.AddTask(func(manager interfaces.IManager) {
 		mng.OneTimeData().SetUserContext("TASK_1", "TASK 1")
 	})
-	gf.AddTask(func(managerConfig interfaces.IManagerConfig) {
+	gf.AddTask(func(manager interfaces.IManager) {
 		mng.OneTimeData().SetUserContext("TASK_2", "TASK 2")
 	})
-	gf.AddNotWaitTask(func(managerConfig interfaces.IManagerConfig) {
+	gf.AddNotWaitTask(func(manager interfaces.IManager) {
 		mng.OneTimeData().SetUserContext("NOT_WAIT_TASK_1", "NOT WAIT TASK 1")
 	})
-	gf.AddNotWaitTask(func(managerConfig interfaces.IManagerConfig) {
+	gf.AddNotWaitTask(func(manager interfaces.IManager) {
 		mng.OneTimeData().SetUserContext("NOT_WAIT_TASK_2", "NOT WAIT TASK 2")
 	})
-	gf.Run(managerConfig)
+	gf.Run(mng)
 	time.Sleep(1 * time.Second)
 	exitCode := m.Run()
 	os.Exit(exitCode)

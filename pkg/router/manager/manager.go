@@ -8,10 +8,15 @@ import (
 type Manager struct {
 	managerData interfaces.IManagerOneTimeData
 	render      interfaces.IRender
+	key         interfaces.IKey
 }
 
 func (m *Manager) New() (interface{}, error) {
-	return &Manager{}, nil
+	if m.key != nil {
+		return &Manager{key: m.key}, nil
+	} else {
+		return &Manager{}, nil
+	}
 }
 
 func (m *Manager) Render() interfaces.IRender {
@@ -36,9 +41,14 @@ func (m *Manager) OneTimeData() interfaces.IManagerOneTimeData {
 	return m.managerData
 }
 
+func (m *Manager) Key() interfaces.IKey {
+	return m.key
+}
+
 func NewManager(render interfaces.IRender) *Manager {
 	return &Manager{
 		managerData: NewManagerData(),
 		render:      render,
+		key:         &Key{},
 	}
 }

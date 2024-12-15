@@ -47,7 +47,7 @@ func (v *MultipleObjectView) ObjectsName() []string {
 }
 
 func (v *MultipleObjectView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) (ObjectContext, error) {
-	debug.LogRequestInfo(debug.P_OBJECT, "run MultipleObjectView object", managerConfig)
+	debug.RequestLogginIfEnable(debug.P_OBJECT, "run MultipleObjectView object", managerConfig)
 	if err := v.checkMultipleObject(); err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (v *MultipleObjectView) Object(w http.ResponseWriter, r *http.Request, mana
 		return nil, err
 	}
 	manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_DB, v.DB)
-	debug.LogRequestInfo(debug.P_OBJECT, "start fill objects", managerConfig)
+	debug.RequestLogginIfEnable(debug.P_OBJECT, "start fill objects", managerConfig)
 	for i := 0; i < len(v.MultipleObjects); i++ {
 		if typeopr.IsPointer(v.MultipleObjects[i].FillStruct) {
 			return nil, typeopr.ErrValueIsPointer{Value: "FillStruct"}

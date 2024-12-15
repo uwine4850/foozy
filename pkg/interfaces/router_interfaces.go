@@ -14,6 +14,7 @@ type IManager interface {
 	SetRender(render IRender)
 	OneTimeData() IManagerOneTimeData
 	SetOneTimeData(manager IManagerOneTimeData)
+	Key() IKey
 }
 
 type IKey interface {
@@ -49,7 +50,6 @@ type IManagerConfig interface {
 	DebugConfig() IManagerDebugConfig
 	PrintLog(enable bool)
 	IsPrintLog() bool
-	Key() IKey
 }
 
 type IManagerOneTimeData interface {

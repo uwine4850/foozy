@@ -45,8 +45,7 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
-
-	managerConfig.Key().Generate32BytesKeys()
+	mng.Key().Generate32BytesKeys()
 	managerConfig.DebugConfig().Debug(true)
 
 	mddlDb := database.NewDatabase(dbArgs)
@@ -63,21 +62,21 @@ func TestMain(m *testing.M) {
 		if err := auth.CreateAuthTable(_db); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager, managerConfig) }
 		}
-		au := auth.NewAuth(_db, w, managerConfig)
+		au := auth.NewAuth(_db, w, mng)
 		if err := au.RegisterUser("test", "111111"); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager, managerConfig) }
 		}
 		return func() {}
 	})
 	newRouter.Get("/login", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
-		au := auth.NewAuth(_db, w, managerConfig)
+		au := auth.NewAuth(_db, w, mng)
 		if _, err := au.LoginUser("test", "111111"); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager, managerConfig) }
 		}
 		return func() {}
 	})
 	newRouter.Get("/uid", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
-		k := managerConfig.Key().Get32BytesKey()
+		k := mng.Key().Get32BytesKey()
 		var a auth.AuthCookie
 		if err := cookies.ReadSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), r, namelib.AUTH.COOKIE_AUTH, &a); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager, managerConfig) }
@@ -85,7 +84,7 @@ func TestMain(m *testing.M) {
 		return func() {}
 	})
 	newRouter.Get("/upd-keys", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
-		k := managerConfig.Key().Get32BytesKey()
+		k := mng.Key().Get32BytesKey()
 		var a auth.AuthCookie
 		if err := cookies.ReadSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), r, namelib.AUTH.COOKIE_AUTH, &a); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager, managerConfig) }
@@ -195,12 +194,12 @@ func TestReadUID(t *testing.T) {
 }
 
 func TestUpdKeys(t *testing.T) {
-	k := managerConfig.Key().Get32BytesKey()
+	k := mng.Key().Get32BytesKey()
 	hashKey := k.HashKey()
 	blockKey := k.BlockKey()
 	gf := globalflow.NewGlobalFlow(1)
 	gf.AddNotWaitTask(bglobalflow.KeyUpdater(1))
-	gf.Run(managerConfig)
+	gf.Run(mng)
 	time.Sleep(2 * time.Second)
 	if hashKey == k.HashKey() {
 		t.Errorf("HashKey has not been updated.")
