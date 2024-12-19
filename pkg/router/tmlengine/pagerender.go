@@ -60,7 +60,7 @@ func (rn *Render) GetTemplateEngine() interfaces.ITemplateEngine {
 }
 
 // RenderTemplate Rendering a template using a template engine.
-func (rn *Render) RenderTemplate(w http.ResponseWriter, r *http.Request, managerConfig interfaces.IManagerConfig) error {
+func (rn *Render) RenderTemplate(w http.ResponseWriter, r *http.Request) error {
 	if rn.templatePath == "" {
 		return ErrTemplatePathNotSet{}
 	}
@@ -70,7 +70,7 @@ func (rn *Render) RenderTemplate(w http.ResponseWriter, r *http.Request, manager
 	rn.TemplateEngine.SetPath(rn.templatePath)
 	rn.TemplateEngine.SetResponseWriter(w)
 	rn.TemplateEngine.SetRequest(r)
-	err := rn.TemplateEngine.Exec(managerConfig)
+	err := rn.TemplateEngine.Exec()
 	if err != nil {
 		return err
 	}

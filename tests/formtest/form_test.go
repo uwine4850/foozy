@@ -16,6 +16,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/tmlengine"
 	"github.com/uwine4850/foozy/pkg/server"
 	"github.com/uwine4850/foozy/pkg/utils/fstring"
+	initcnf "github.com/uwine4850/foozy/tests/init_cnf"
 )
 
 type Fill struct {
@@ -49,6 +50,7 @@ func removeAllFilesInDirectory(dirPath string) error {
 }
 
 func TestMain(m *testing.M) {
+	initcnf.InitCnf()
 	err := removeAllFilesInDirectory("./saved_files")
 	if err != nil {
 		panic(err)
@@ -60,8 +62,7 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
-	managerConfig := manager.NewManagerCnf()
-	newRouter := router2.NewRouter(manager.NewManager(render), managerConfig)
+	newRouter := router2.NewRouter(manager.NewManager(render))
 	newRouter.SetMiddleware(mddl)
 	newRouter.Post("/application-form", applicationForm)
 	newRouter.Post("/multipart-form", multipartForm)
@@ -84,7 +85,7 @@ func TestMain(m *testing.M) {
 	os.Exit(exitCode)
 }
 
-func saveFile(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
+func saveFile(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	newForm := form.NewForm(r)
 	err := newForm.Parse()
 	if err != nil {
@@ -95,7 +96,7 @@ func saveFile(w http.ResponseWriter, r *http.Request, manager interfaces.IManage
 		return func() { w.Write([]byte(err.Error())) }
 	}
 	var path string
-	err = form.SaveFile(w, header, "./saved_files", &path, manager, managerConfig)
+	err = form.SaveFile(w, header, "./saved_files", &path, manager)
 	if err != nil {
 		return func() { w.Write([]byte(err.Error())) }
 	}
@@ -105,7 +106,7 @@ func saveFile(w http.ResponseWriter, r *http.Request, manager interfaces.IManage
 	return func() {}
 }
 
-func multipartForm(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
+func multipartForm(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	newForm := form.NewForm(r)
 	err := newForm.Parse()
 	if err != nil {
@@ -124,7 +125,7 @@ func multipartForm(w http.ResponseWriter, r *http.Request, manager interfaces.IM
 	return func() {}
 }
 
-func applicationForm(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
+func applicationForm(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	newForm := form.NewForm(r)
 	err := newForm.Parse()
 	if err != nil {

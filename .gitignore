@@ -9,3 +9,6 @@ main.go
 .vscode
 docker-compose.yml
 Dockerfile.*
+mycmd
+tests/**/*.log
+config.yaml

@@ -51,25 +51,25 @@ func (e *TemplateEngine) processingFile() error {
 }
 
 // Exec does all the necessary processing for the template and shows the HTML code on the page.
-func (e *TemplateEngine) Exec(managerConfig interfaces.IManagerConfig) error {
-	debug.RequestLogginIfEnable(debug.P_TEMPLATE_ENGINE, "exec template engine...", managerConfig)
-	debug.RequestLogginIfEnable(debug.P_TEMPLATE_ENGINE, "processing html file", managerConfig)
+func (e *TemplateEngine) Exec() error {
+	debug.RequestLogginIfEnable(debug.P_TEMPLATE_ENGINE, "exec template engine...")
+	debug.RequestLogginIfEnable(debug.P_TEMPLATE_ENGINE, "processing html file")
 	err := e.processingFile()
 	if err != nil {
 		return err
 	}
-	debug.RequestLogginIfEnable(debug.P_TEMPLATE_ENGINE, "set CSRF token", managerConfig)
+	debug.RequestLogginIfEnable(debug.P_TEMPLATE_ENGINE, "set CSRF token")
 	err = e.setCsrfVariable(e.request)
 	if err != nil {
 		return err
 	}
-	debug.RequestLogginIfEnable(debug.P_TEMPLATE_ENGINE, "execute template", managerConfig)
+	debug.RequestLogginIfEnable(debug.P_TEMPLATE_ENGINE, "execute template")
 	execute, err := e.templateFile.Execute(e.context)
 	if err != nil {
 		return err
 	}
 	e.clearContext()
-	debug.RequestLogginIfEnable(debug.P_TEMPLATE_ENGINE, "write template", managerConfig)
+	debug.RequestLogginIfEnable(debug.P_TEMPLATE_ENGINE, "write template")
 	_, err = e.writer.Write([]byte(execute))
 	if err != nil {
 		return err

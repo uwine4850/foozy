@@ -28,29 +28,29 @@ func (v *FormView) ObjectsName() []string {
 	return []string{namelib.OBJECT.OBJECT_CONTEXT_FORM}
 }
 
-func (v *FormView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) (ObjectContext, error) {
-	debug.RequestLogginIfEnable(debug.P_OBJECT, "run FormView object", managerConfig)
+func (v *FormView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
+	debug.RequestLogginIfEnable(debug.P_OBJECT, "run FormView object")
 	frm := form.NewForm(r)
 	if err := frm.Parse(); err != nil {
 		return nil, err
 	}
 	if v.ValidateCSRF {
-		debug.RequestLogginIfEnable(debug.P_OBJECT, "validate CSRF token", managerConfig)
+		debug.RequestLogginIfEnable(debug.P_OBJECT, "validate CSRF token")
 		if err := secure.ValidateFormCsrfToken(r, frm); err != nil {
 			return nil, err
 		}
 	}
 
-	debug.RequestLogginIfEnable(debug.P_OBJECT, "fill form", managerConfig)
+	debug.RequestLogginIfEnable(debug.P_OBJECT, "fill form")
 	fillForm := reflect.New(reflect.TypeOf(v.FormStruct)).Elem()
 	if err := formmapper.FillReflectValueFromForm(frm, &fillForm, v.NilIfNotExist); err != nil {
 		return nil, err
 	}
-	debug.RequestLogginIfEnable(debug.P_OBJECT, "check empty", managerConfig)
+	debug.RequestLogginIfEnable(debug.P_OBJECT, "check empty")
 	if err := v.checkEmpty(typeopr.Ptr{}.New(&fillForm)); err != nil {
 		return nil, err
 	}
-	debug.RequestLogginIfEnable(debug.P_OBJECT, "check extension", managerConfig)
+	debug.RequestLogginIfEnable(debug.P_OBJECT, "check extension")
 	if err := formmapper.CheckExtension(typeopr.Ptr{}.New(&fillForm)); err != nil {
 		return nil, err
 	}

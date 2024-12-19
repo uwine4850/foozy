@@ -19,7 +19,7 @@ type Fill struct {
 	File     []form.FormFile `form:"file" empty:""`
 }
 
-func fill(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
+func fill(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	newForm := form.NewForm(r)
 	err := newForm.Parse()
 	if err != nil {
@@ -61,7 +61,7 @@ func TestFillStructFromForm(t *testing.T) {
 	}
 }
 
-func fillReflectValue(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
+func fillReflectValue(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	newForm := form.NewForm(r)
 	err := newForm.Parse()
 	if err != nil {

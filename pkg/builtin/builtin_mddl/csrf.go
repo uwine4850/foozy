@@ -16,8 +16,8 @@ type onError func(w http.ResponseWriter, r *http.Request, manager interfaces.IMa
 // To use it you need to run the method in a synchronous or asynchronous handler.
 // maxAge - cookie lifetime.
 // onError - a function that will be executed during an error.
-func GenerateAndSetCsrf(maxAge int, onError onError) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) {
-	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) {
+func GenerateAndSetCsrf(maxAge int, onError onError) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
+	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
 		csrfCookie, err := r.Cookie(namelib.ROUTER.COOKIE_CSRF_TOKEN)
 		if err != nil || csrfCookie.Value == "" {
 			csrfToken, err := GenerateCsrfToken()

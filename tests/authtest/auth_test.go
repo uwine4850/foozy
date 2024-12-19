@@ -21,6 +21,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
 	"github.com/uwine4850/foozy/pkg/server"
 	"github.com/uwine4850/foozy/pkg/server/globalflow"
+	initcnf "github.com/uwine4850/foozy/tests/init_cnf"
 )
 
 var dbArgs = database.DbArgs{
@@ -28,10 +29,10 @@ var dbArgs = database.DbArgs{
 }
 
 var mng = manager.NewManager(nil)
-var managerConfig = manager.NewManagerCnf()
-var newRouter = router.NewRouter(mng, managerConfig)
+var newRouter = router.NewRouter(mng)
 
 func TestMain(m *testing.M) {
+	initcnf.InitCnf()
 	_db := database.NewDatabase(dbArgs)
 	if err := _db.Connect(); err != nil {
 		panic(err)
@@ -46,7 +47,6 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 	mng.Key().Generate32BytesKeys()
-	managerConfig.DebugConfig().Debug(true)
 
 	mddlDb := database.NewDatabase(dbArgs)
 	if err := mddlDb.Connect(); err != nil {
@@ -55,43 +55,43 @@ func TestMain(m *testing.M) {
 	defer mddlDb.Close()
 	mddl := middlewares.NewMiddleware()
 	mddl.HandlerMddl(0, builtin_mddl.Auth("/login", mddlDb, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
-		middlewares.SetMddlError(err, manager.OneTimeData(), managerConfig)
+		middlewares.SetMddlError(err, manager.OneTimeData())
 	}))
 
-	newRouter.Get("/register", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
+	newRouter.Get("/register", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		if err := auth.CreateAuthTable(_db); err != nil {
-			return func() { router.ServerError(w, err.Error(), manager, managerConfig) }
+			return func() { router.ServerError(w, err.Error(), manager) }
 		}
 		au := auth.NewAuth(_db, w, mng)
 		if err := au.RegisterUser("test", "111111"); err != nil {
-			return func() { router.ServerError(w, err.Error(), manager, managerConfig) }
+			return func() { router.ServerError(w, err.Error(), manager) }
 		}
 		return func() {}
 	})
-	newRouter.Get("/login", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
+	newRouter.Get("/login", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		au := auth.NewAuth(_db, w, mng)
 		if _, err := au.LoginUser("test", "111111"); err != nil {
-			return func() { router.ServerError(w, err.Error(), manager, managerConfig) }
+			return func() { router.ServerError(w, err.Error(), manager) }
 		}
 		return func() {}
 	})
-	newRouter.Get("/uid", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
+	newRouter.Get("/uid", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		k := mng.Key().Get32BytesKey()
 		var a auth.AuthCookie
 		if err := cookies.ReadSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), r, namelib.AUTH.COOKIE_AUTH, &a); err != nil {
-			return func() { router.ServerError(w, err.Error(), manager, managerConfig) }
+			return func() { router.ServerError(w, err.Error(), manager) }
 		}
 		return func() {}
 	})
-	newRouter.Get("/upd-keys", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
+	newRouter.Get("/upd-keys", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		k := mng.Key().Get32BytesKey()
 		var a auth.AuthCookie
 		if err := cookies.ReadSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), r, namelib.AUTH.COOKIE_AUTH, &a); err != nil {
-			return func() { router.ServerError(w, err.Error(), manager, managerConfig) }
+			return func() { router.ServerError(w, err.Error(), manager) }
 		}
 		return func() {}
 	})
-	newRouter.Get("/user-by-id", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
+	newRouter.Get("/user-by-id", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		user, err := auth.UserByID(_db, 1)
 		if err != nil {
 			panic(err)

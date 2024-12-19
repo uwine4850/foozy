@@ -9,13 +9,14 @@ import (
 	"strconv"
 	"sync"
 
+	"github.com/uwine4850/foozy/pkg/config"
 	"github.com/uwine4850/foozy/pkg/debug"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/utils/fslice"
 )
 
-type MddlFunc func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig)
+type MddlFunc func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 
 type Middleware struct {
 	preHandlerMiddlewares   map[int]MddlFunc
@@ -32,7 +33,7 @@ func NewMiddleware() *Middleware {
 
 // HandlerMddl the middleware that will be executed before the request handler.
 // id indicates the order of execution of the current middleware. No two identical id's can be created.
-func (m *Middleware) HandlerMddl(id int, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig)) {
+func (m *Middleware) HandlerMddl(id int, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) {
 	if !fslice.SliceContains(m.preHandlerId, id) {
 		m.preHandlerId = append(m.preHandlerId, id)
 		m.preHandlerMiddlewares[id] = fn
@@ -42,34 +43,34 @@ func (m *Middleware) HandlerMddl(id int, fn func(w http.ResponseWriter, r *http.
 }
 
 // AsyncHandlerMddl the middleware that will execute asynchronously before the request.
-func (m *Middleware) AsyncHandlerMddl(fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig)) {
-	m.asyncHandlerMiddlewares = append(m.asyncHandlerMiddlewares, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) {
+func (m *Middleware) AsyncHandlerMddl(fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) {
+	m.asyncHandlerMiddlewares = append(m.asyncHandlerMiddlewares, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
 		defer m.wg.Done()
-		fn(w, r, manager, managerConfig)
+		fn(w, r, manager)
 	})
 }
 
 // RunMddl running synchronous middleware.
-func (m *Middleware) RunMddl(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) error {
+func (m *Middleware) RunMddl(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 	if m.mError != nil {
 		return m.mError
 	}
 	sort.Ints(m.preHandlerId)
 	for i := 0; i < len(m.preHandlerId); i++ {
-		debug.RequestLogginIfEnable(debug.P_MIDDLEWARE, fmt.Sprintf("sync middleware with id %s is running", strconv.Itoa(i)), managerConfig)
+		debug.RequestLogginIfEnable(debug.P_MIDDLEWARE, fmt.Sprintf("sync middleware with id %s is running", strconv.Itoa(i)))
 		handlerFunc := m.preHandlerMiddlewares[i]
-		handlerFunc(w, r, manager, managerConfig)
+		handlerFunc(w, r, manager)
 	}
 	return nil
 }
 
 // RunAsyncMddl running asynchronous middleware.
 // IMPORTANT: You must run the WaitAsyncMddl method at the selected location to complete correctly.
-func (m *Middleware) RunAsyncMddl(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) {
+func (m *Middleware) RunAsyncMddl(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
 	for i := 0; i < len(m.asyncHandlerMiddlewares); i++ {
-		debug.RequestLogginIfEnable(debug.P_MIDDLEWARE, fmt.Sprintf("async middleware with id %s is running", strconv.Itoa(i)), managerConfig)
+		debug.RequestLogginIfEnable(debug.P_MIDDLEWARE, fmt.Sprintf("async middleware with id %s is running", strconv.Itoa(i)))
 		m.wg.Add(1)
-		go m.asyncHandlerMiddlewares[i](w, r, manager, managerConfig)
+		go m.asyncHandlerMiddlewares[i](w, r, manager)
 	}
 }
 
@@ -79,12 +80,12 @@ func (m *Middleware) WaitAsyncMddl() {
 }
 
 // SetMddlError sets an error that occurred in the middleware.
-func SetMddlError(mddlErr error, manager interfaces.IManagerOneTimeData, managerConfig interfaces.IManagerConfig) {
+func SetMddlError(mddlErr error, manager interfaces.IManagerOneTimeData) {
 	manager.SetUserContext(namelib.ROUTER.MDDL_ERROR, mddlErr)
-	if managerConfig.DebugConfig().IsRequestInfo() && managerConfig.DebugConfig().GetRequestInfoFile() == "" {
+	if config.LoadedConfig().Default.Debug.RequestInfoLog && config.LoadedConfig().Default.Debug.RequestInfoLogPath == "" {
 		panic("unable to create request info log file. File path not set")
 	}
-	debug.WriteLog(managerConfig.DebugConfig().LoggingLevel()-1, managerConfig.DebugConfig().GetRequestInfoFile(), os.O_APPEND|os.O_CREATE|os.O_WRONLY, debug.P_MIDDLEWARE, fmt.Sprintf("middleware error: %s", mddlErr.Error()), managerConfig)
+	debug.WriteLog(config.LoadedConfig().Default.Debug.SkipLoggingLevel-1, config.LoadedConfig().Default.Debug.RequestInfoLogPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, debug.P_MIDDLEWARE, fmt.Sprintf("middleware error: %s", mddlErr.Error()))
 }
 
 // GetMddlError get error from middleware. Used in router and in pair with SetMddlError.
@@ -101,10 +102,10 @@ func GetMddlError(manager interfaces.IManagerOneTimeData) (error, error) {
 }
 
 // SkipNextPage sends a command to the router to skip rendering the next page.
-func SkipNextPage(manager interfaces.IManagerOneTimeData, managerConfig interfaces.IManagerConfig) {
+func SkipNextPage(manager interfaces.IManagerOneTimeData) {
 	manager.SetUserContext(namelib.ROUTER.SKIP_NEXT_PAGE, true)
 	urlPattern, _ := manager.GetUserContext(namelib.ROUTER.URL_PATTERN)
-	debug.RequestLogginIfEnable(debug.P_MIDDLEWARE, fmt.Sprintf("skip page at %s", urlPattern), managerConfig)
+	debug.RequestLogginIfEnable(debug.P_MIDDLEWARE, fmt.Sprintf("skip page at %s", urlPattern))
 }
 
 // IsSkipNextPage checks if the page rendering should be skipped.
@@ -115,8 +116,8 @@ func IsSkipNextPage(manager interfaces.IManagerOneTimeData) bool {
 }
 
 // SkipNextPageAndRedirect skips the page render and redirects to another page.
-func SkipNextPageAndRedirect(manager interfaces.IManagerOneTimeData, managerConfig interfaces.IManagerConfig, w http.ResponseWriter, r *http.Request, path string) {
+func SkipNextPageAndRedirect(manager interfaces.IManagerOneTimeData, w http.ResponseWriter, r *http.Request, path string) {
 	http.Redirect(w, r, path, http.StatusFound)
-	SkipNextPage(manager, managerConfig)
-	debug.RequestLogginIfEnable(debug.P_MIDDLEWARE, fmt.Sprintf("redirect to %s", path), managerConfig)
+	SkipNextPage(manager)
+	debug.RequestLogginIfEnable(debug.P_MIDDLEWARE, fmt.Sprintf("redirect to %s", path))
 }

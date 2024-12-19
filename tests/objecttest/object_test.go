@@ -18,6 +18,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/rest"
 	"github.com/uwine4850/foozy/pkg/router/tmlengine"
 	"github.com/uwine4850/foozy/pkg/server"
+	initcnf "github.com/uwine4850/foozy/tests/init_cnf"
 )
 
 type JsonObjectViewMessage struct {
@@ -37,6 +38,7 @@ type JsonFormMessage struct {
 var dto = rest.NewDTO()
 
 func TestMain(m *testing.M) {
+	initcnf.InitCnf()
 	dto.AllowedMessages([]rest.AllowMessage{
 		{
 			Package: "objecttest",
@@ -69,8 +71,7 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
-	managerConfig := manager.NewManagerCnf()
-	newRouter := router.NewRouter(manager.NewManager(render), managerConfig)
+	newRouter := router.NewRouter(manager.NewManager(render))
 	newRouter.Get("/object-view/<id>", TObjectViewHNDL(db))
 	newRouter.Get("/object-mul-view/<id>/<id1>", TObjectMultipleViewHNDL(db))
 	newRouter.Get("/object-all-view", TObjectAllViewHNDL(db))
@@ -146,11 +147,11 @@ type TObjectView struct {
 	object.ObjView
 }
 
-func (v *TObjectView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig, err error) {
+func (v *TObjectView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
 	panic(err)
 }
 
-func (v *TObjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) (object.ObjectContext, error) {
+func (v *TObjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
 	objectContext, err := object.GetObjectContext(manager)
 	if err != nil {
 		panic(err)
@@ -161,7 +162,7 @@ func (v *TObjectView) Context(w http.ResponseWriter, r *http.Request, manager in
 	return map[string]interface{}{"TEST": "OK"}, nil
 }
 
-func TObjectViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
+func TObjectViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	view := object.TemplateView{
 		TemplatePath: "./templates/object_view.html",
 		View: &TObjectView{
@@ -199,11 +200,11 @@ type TObjectMultipleView struct {
 	object.MultipleObjectView
 }
 
-func (v *TObjectMultipleView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig, err error) {
+func (v *TObjectMultipleView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
 	panic(err)
 }
 
-func (v *TObjectMultipleView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) (object.ObjectContext, error) {
+func (v *TObjectMultipleView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
 	_objectContext, _ := manager.OneTimeData().GetUserContext(namelib.OBJECT.OBJECT_CONTEXT)
 	objectContext := _objectContext.(object.ObjectContext)
 	if _, ok := objectContext["object"]; !ok {
@@ -215,7 +216,7 @@ func (v *TObjectMultipleView) Context(w http.ResponseWriter, r *http.Request, ma
 	return object.ObjectContext{"TEST": "OK"}, nil
 }
 
-func TObjectMultipleViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
+func TObjectMultipleViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	view := object.TemplateView{
 		TemplatePath: "./templates/object_multiple_view.html",
 		View: &TObjectMultipleView{
@@ -265,11 +266,11 @@ type TObjectAllView struct {
 	object.AllView
 }
 
-func (v *TObjectAllView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig, err error) {
+func (v *TObjectAllView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
 	panic(err)
 }
 
-func (v *TObjectAllView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) (object.ObjectContext, error) {
+func (v *TObjectAllView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
 	_objectContext, _ := manager.OneTimeData().GetUserContext(namelib.OBJECT.OBJECT_CONTEXT)
 	objectContext := _objectContext.(object.ObjectContext)
 	if _, ok := objectContext["all_object"]; !ok {
@@ -278,7 +279,7 @@ func (v *TObjectAllView) Context(w http.ResponseWriter, r *http.Request, manager
 	return object.ObjectContext{"TEST": "OK"}, nil
 }
 
-func TObjectAllViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
+func TObjectAllViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	view := object.TemplateView{
 		TemplatePath: "./templates/object_all_view.html",
 		View: &TObjectAllView{
@@ -320,7 +321,7 @@ type MyFormView struct {
 	object.FormView
 }
 
-func (v *MyFormView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) (object.ObjectContext, error) {
+func (v *MyFormView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
 	filledFormInterface, err := v.FormInterface(manager.OneTimeData())
 	if err != nil {
 		return nil, err
@@ -335,11 +336,11 @@ func (v *MyFormView) Context(w http.ResponseWriter, r *http.Request, manager int
 	return object.ObjectContext{}, nil
 }
 
-func (v *MyFormView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig, err error) {
+func (v *MyFormView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
 	panic(err)
 }
 
-func MyFormViewHNDL() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
+func MyFormViewHNDL() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	tv := object.TemplateView{
 		TemplatePath: "",
 		View: &MyFormView{
@@ -373,15 +374,15 @@ type JsonObjectView struct {
 	object.ObjView
 }
 
-func (v *JsonObjectView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig, err error) {
+func (v *JsonObjectView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
 	panic(err)
 }
 
-func (v *JsonObjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) (object.ObjectContext, error) {
+func (v *JsonObjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
 	return map[string]interface{}{"Test": "OK"}, nil
 }
 
-func TJsonObjectViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
+func TJsonObjectViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	view := object.JsonObjectTemplateView{
 		View: &JsonObjectView{
 			object.ObjView{
@@ -420,15 +421,15 @@ type TJsonObjectMultipleView struct {
 	object.MultipleObjectView
 }
 
-func (v *TJsonObjectMultipleView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig, err error) {
+func (v *TJsonObjectMultipleView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
 	panic(err)
 }
 
-func (v *TJsonObjectMultipleView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) (object.ObjectContext, error) {
+func (v *TJsonObjectMultipleView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
 	return object.ObjectContext{"Test": "OK"}, nil
 }
 
-func TJsonObjectMultipleViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
+func TJsonObjectMultipleViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	view := object.JsonMultipleObjectTemplateView{
 		View: &TJsonObjectMultipleView{
 			object.MultipleObjectView{
@@ -479,15 +480,15 @@ type TJsonObjectAllView struct {
 	object.AllView
 }
 
-func (v *TJsonObjectAllView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig, err error) {
+func (v *TJsonObjectAllView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
 	panic(err)
 }
 
-func (v *TJsonObjectAllView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) (object.ObjectContext, error) {
+func (v *TJsonObjectAllView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
 	return object.ObjectContext{"Test": "OK"}, nil
 }
 
-func TJsonObjectAllViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
+func TJsonObjectAllViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	view := object.JsonAllTemplateView{
 		View: &TJsonObjectAllView{
 			object.AllView{

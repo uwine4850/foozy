@@ -29,29 +29,6 @@ type IKey interface {
 	Get32BytesKey() IKey
 }
 
-type IManagerDebugConfig interface {
-	Debug(enable bool)
-	IsDebug() bool
-	RelativeFilePath(enable bool)
-	IsRelativeFilePath() bool
-	ErrorLogging(enable bool)
-	ErrorLoggingFile(path string)
-	IsErrorLogging() bool
-	RequestInfo(enable bool)
-	RequestInfoFile(path string)
-	GetRequestInfoFile() string
-	IsRequestInfo() bool
-	GetErrorLoggingFile() string
-	SkipLoggingLevel(skip int)
-	LoggingLevel() int
-}
-
-type IManagerConfig interface {
-	DebugConfig() IManagerDebugConfig
-	PrintLog(enable bool)
-	IsPrintLog() bool
-}
-
 type IManagerOneTimeData interface {
 	itypeopr.INewInstance
 	SetUserContext(key string, value interface{})

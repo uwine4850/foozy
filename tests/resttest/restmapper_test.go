@@ -14,22 +14,23 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/rest/restmapper"
 	"github.com/uwine4850/foozy/pkg/server"
 	"github.com/uwine4850/foozy/pkg/typeopr"
+	initcnf "github.com/uwine4850/foozy/tests/init_cnf"
 )
 
 var mng = manager.NewManager(nil)
-var managerConfig = manager.NewManagerCnf()
-var newRouter = router.NewRouter(mng, managerConfig)
+
+var newRouter = router.NewRouter(mng)
 var dto = rest.NewDTO()
 
 func TestMain(m *testing.M) {
+	initcnf.InitCnf()
 	dto.AllowedMessages([]rest.AllowMessage{
 		{
 			Name:    "JsonData",
 			Package: "resttest",
 		},
 	})
-	managerConfig.DebugConfig().Debug(true)
-	newRouter.Get("/json", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) func() {
+	newRouter.Get("/json", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		jsonData := JsonData{
 			Id:       1,
 			Name:     "name",

@@ -21,7 +21,7 @@ type OnError func(w http.ResponseWriter, r *http.Request, manager interfaces.IMa
 // if two or more key iterations have passed, because the old keys are no longer known.
 // This middleware should not work on the login page. Therefore, you need to specify the loginUrl correctly.
 func Auth(loginUrl string, db *database.Database, onErr OnError) middlewares.MddlFunc {
-	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, managerConfig interfaces.IManagerConfig) {
+	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
 		pattern, ok := manager.OneTimeData().GetUserContext(namelib.ROUTER.URL_PATTERN)
 		if !ok {
 			onErr(w, r, manager, ErrUrlPatternNotExist{})
@@ -55,7 +55,7 @@ func Auth(loginUrl string, db *database.Database, onErr OnError) middlewares.Mdd
 				onErr(w, r, manager, err)
 				return
 			}
-			middlewares.SkipNextPageAndRedirect(manager.OneTimeData(), managerConfig, w, r, r.URL.Path)
+			middlewares.SkipNextPageAndRedirect(manager.OneTimeData(), w, r, r.URL.Path)
 		}
 	}
 }

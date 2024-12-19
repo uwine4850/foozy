@@ -11,7 +11,6 @@ import (
 )
 
 var mng = manager.NewManager(nil)
-var managerConfig = manager.NewManagerCnf()
 
 func TestMain(m *testing.M) {
 	mng.SetOneTimeData(manager.NewManagerData())

@@ -7,21 +7,25 @@ import (
 	"testing"
 
 	"github.com/uwine4850/foozy/pkg/builtin/builtin_mddl"
+	"github.com/uwine4850/foozy/pkg/config"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/manager"
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
 	"github.com/uwine4850/foozy/pkg/router/tmlengine"
 	"github.com/uwine4850/foozy/pkg/server"
+	initcnf "github.com/uwine4850/foozy/tests/init_cnf"
 )
 
 func TestMain(m *testing.M) {
+	initcnf.InitCnf()
+	config.Cnf().SetLoadPath("../../config.yaml")
 	mddl := middlewares.NewMiddleware()
 	mddl.AsyncHandlerMddl(builtin_mddl.GenerateAndSetCsrf(1800, nil))
 	render, err := tmlengine.NewRender()
 	if err != nil {
 		panic(err)
 	}
-	newRouter := router.NewRouter(manager.NewManager(render), manager.NewManagerCnf())
+	newRouter := router.NewRouter(manager.NewManager(render))
 	newRouter.SetMiddleware(mddl)
 	newRouter.Post("/mp-default-struct", mpDefaultStruct)
 	newRouter.Post("/mp-empty-string-0-err", mpEmptyString0Err)

@@ -1,8 +1,13 @@
 package fmap
 
 import (
+	"errors"
+	"fmt"
+	"reflect"
 	"sync"
 
+	"github.com/uwine4850/foozy/pkg/interfaces/itypeopr"
+	"github.com/uwine4850/foozy/pkg/typeopr"
 	"github.com/uwine4850/foozy/pkg/utils/fslice"
 )
 
@@ -39,4 +44,72 @@ func Compare[T1 comparable, T2 comparable](map1 *map[T1]T2, map2 *map[T1]T2, exc
 		}
 	}
 	return true
+}
+
+func YamlMapToStruct(targetMap *map[string]interface{}, targetStruct itypeopr.IPtr) error {
+	for mFieldName, mFieldValue := range *targetMap {
+		var sValue reflect.Value
+		var sType reflect.Type
+		if reflect.DeepEqual(reflect.TypeOf(targetStruct.Ptr()).Elem(), reflect.TypeOf(reflect.Value{})) {
+			sValue = *targetStruct.Ptr().(*reflect.Value)
+			sType = sValue.Type()
+		} else {
+			sValue = reflect.ValueOf(targetStruct.Ptr()).Elem()
+			sType = reflect.TypeOf(targetStruct.Ptr()).Elem()
+		}
+
+		for i := 0; i < sType.NumField(); i++ {
+			if sType.Field(i).Tag.Get("yaml") == mFieldName {
+				if sValue.CanSet() {
+					fieldValue := sValue.Field(i)
+					mapFieldValue := reflect.ValueOf(mFieldValue)
+					if err := convertYamlField(&fieldValue, &mapFieldValue); err != nil {
+						return err
+					}
+				} else {
+					return fmt.Errorf("the %s field cannot be set to a value", sType.Field(i).Name)
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func convertYamlField(fieldValue *reflect.Value, yamlValue *reflect.Value) error {
+	switch fieldValue.Kind() {
+	case reflect.Struct:
+		nextTargetMap := yamlValue.Interface().(map[string]interface{})
+		if err := YamlMapToStruct(&nextTargetMap, typeopr.Ptr{}.New(fieldValue)); err != nil {
+			return err
+		}
+	case reflect.Slice:
+		yamlSlice := yamlValue.Interface().([]interface{})
+		newSlice := reflect.MakeSlice(fieldValue.Type(), len(yamlSlice), len(yamlSlice))
+		for i := 0; i < len(yamlSlice); i++ {
+			if reflect.TypeOf(yamlSlice[i]).Kind() == reflect.Slice {
+				yamlSliceElemValue := reflect.ValueOf(yamlSlice[i])
+				newInnerSlice := reflect.New(fieldValue.Type().Elem()).Elem()
+				if err := convertYamlField(&newInnerSlice, &yamlSliceElemValue); err != nil {
+					return err
+				}
+				newSlice.Index(i).Set(newInnerSlice)
+			} else {
+				field := newSlice.Index(i)
+				val := reflect.ValueOf(yamlSlice[i])
+				if err := convertYamlField(&field, &val); err != nil {
+					return err
+				}
+			}
+		}
+		fieldValue.Set(newSlice)
+	case reflect.Map:
+		return errors.New("map data type is not supported, you need to use a structure")
+	default:
+		if fieldValue.Type().ConvertibleTo(fieldValue.Type()) {
+			fieldValue.Set(yamlValue.Convert(fieldValue.Type()))
+		} else {
+			return fmt.Errorf("cannot assign value of type %s to field of type %s", yamlValue.String(), fieldValue.Type().String())
+		}
+	}
+	return nil
 }
