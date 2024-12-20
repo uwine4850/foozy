@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"sync"
 
 	"github.com/uwine4850/foozy/pkg/config"
 	"github.com/uwine4850/foozy/pkg/debug"
@@ -289,6 +290,7 @@ func (rt *Router) initManager() (interfaces.IManager, error) {
 // Middleware errors and the page rendering skip algorithm are also handled here.
 func (rt *Router) runMddl(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, error) {
 	if rt.middleware != nil {
+		var wg sync.WaitGroup
 		debug.RequestLogginIfEnable(debug.P_ROUTER, "run middlewares...")
 		// Running synchronous middleware.
 		err := rt.middleware.RunMddl(w, r, manager)
@@ -296,9 +298,9 @@ func (rt *Router) runMddl(w http.ResponseWriter, r *http.Request, manager interf
 			return false, err
 		}
 		// Running asynchronous middleware.
-		rt.middleware.RunAsyncMddl(w, r, manager)
+		rt.middleware.RunAsyncMddl(w, r, manager, &wg)
 		// Waiting for all asynchronous middleware to complete.
-		rt.middleware.WaitAsyncMddl()
+		wg.Wait()
 		// Handling middleware errors.
 		mddlErr, err := middlewares.GetMddlError(manager.OneTimeData())
 		if err != nil {

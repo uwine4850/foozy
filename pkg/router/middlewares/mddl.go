@@ -17,14 +17,14 @@ import (
 )
 
 type MddlFunc func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
+type AsyncMddlFunc func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, wg *sync.WaitGroup)
 
 type Middleware struct {
 	preHandlerMiddlewares   map[int]MddlFunc
 	preHandlerId            []int
-	asyncHandlerMiddlewares []MddlFunc
+	asyncHandlerMiddlewares []AsyncMddlFunc
 	Context                 sync.Map
 	mError                  error
-	wg                      sync.WaitGroup
 }
 
 func NewMiddleware() *Middleware {
@@ -44,8 +44,8 @@ func (m *Middleware) HandlerMddl(id int, fn func(w http.ResponseWriter, r *http.
 
 // AsyncHandlerMddl the middleware that will execute asynchronously before the request.
 func (m *Middleware) AsyncHandlerMddl(fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) {
-	m.asyncHandlerMiddlewares = append(m.asyncHandlerMiddlewares, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
-		defer m.wg.Done()
+	m.asyncHandlerMiddlewares = append(m.asyncHandlerMiddlewares, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, wg *sync.WaitGroup) {
+		defer wg.Done()
 		fn(w, r, manager)
 	})
 }
@@ -66,17 +66,12 @@ func (m *Middleware) RunMddl(w http.ResponseWriter, r *http.Request, manager int
 
 // RunAsyncMddl running asynchronous middleware.
 // IMPORTANT: You must run the WaitAsyncMddl method at the selected location to complete correctly.
-func (m *Middleware) RunAsyncMddl(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
+func (m *Middleware) RunAsyncMddl(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, wg *sync.WaitGroup) {
 	for i := 0; i < len(m.asyncHandlerMiddlewares); i++ {
 		debug.RequestLogginIfEnable(debug.P_MIDDLEWARE, fmt.Sprintf("async middleware with id %s is running", strconv.Itoa(i)))
-		m.wg.Add(1)
-		go m.asyncHandlerMiddlewares[i](w, r, manager)
+		wg.Add(1)
+		go m.asyncHandlerMiddlewares[i](w, r, manager, wg)
 	}
-}
-
-// WaitAsyncMddl waits for the execution of all asynchronous middleware.
-func (m *Middleware) WaitAsyncMddl() {
-	m.wg.Wait()
 }
 
 // SetMddlError sets an error that occurred in the middleware.
