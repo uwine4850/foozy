@@ -3,7 +3,7 @@ package config
 import (
 	"sync"
 
-	"github.com/uwine4850/foozy/pkg/interfaces/itypeopr"
+	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
 type Config struct {
@@ -23,7 +23,7 @@ func (cnf *Config) SetLoadPath(path string) {
 	cnf.loadPath = path
 }
 
-func (cnf *Config) AppendAdditionally(name string, item itypeopr.IPtr) {
+func (cnf *Config) AppendAdditionally(name string, item typeopr.IPtr) {
 	cnf.Additionally[name] = item.Ptr()
 }
 

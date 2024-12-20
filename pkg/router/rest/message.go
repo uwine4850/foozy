@@ -5,7 +5,6 @@ import (
 	"reflect"
 
 	"github.com/uwine4850/foozy/pkg/interfaces/irest"
-	"github.com/uwine4850/foozy/pkg/interfaces/itypeopr"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
@@ -30,7 +29,7 @@ func (a *AllowMessage) FullName() string {
 
 // DeepCheckSafeMessage checks whether transmitted messages and internal messages are safe.
 // That is, there will be a check of internal structures, in depth to the limit.
-func DeepCheckSafeMessage(dto *DTO, messagePtr itypeopr.IPtr) error {
+func DeepCheckSafeMessage(dto *DTO, messagePtr typeopr.IPtr) error {
 	if err := dto.IsSafeMessage(messagePtr); err != nil {
 		return err
 	}

@@ -5,15 +5,15 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/uwine4850/foozy/pkg/interfaces/itypeopr"
+	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
 type Mapper struct {
 	DatabaseResult []map[string]interface{}
-	Output         itypeopr.IPtr
+	Output         typeopr.IPtr
 }
 
-func NewMapper(databaseResult []map[string]interface{}, output itypeopr.IPtr) Mapper {
+func NewMapper(databaseResult []map[string]interface{}, output typeopr.IPtr) Mapper {
 	return Mapper{DatabaseResult: databaseResult, Output: output}
 }
 

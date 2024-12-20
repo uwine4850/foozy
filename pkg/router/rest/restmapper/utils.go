@@ -8,13 +8,12 @@ import (
 	"reflect"
 
 	"github.com/uwine4850/foozy/pkg/interfaces/irest"
-	"github.com/uwine4850/foozy/pkg/interfaces/itypeopr"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
 // FillMessageFromMap fills in a message from the card.
 // To work you need to use the 'json' tag.
-func FillMessageFromMap(jsonMap *map[string]interface{}, outputPtr itypeopr.IPtr) error {
+func FillMessageFromMap(jsonMap *map[string]interface{}, outputPtr typeopr.IPtr) error {
 	output := outputPtr.Ptr()
 	if !typeopr.IsImplementInterface(typeopr.Ptr{}.New(output), (*irest.IMessage)(nil)) {
 		return errors.New("output param must implement the irest.IMessage interface")

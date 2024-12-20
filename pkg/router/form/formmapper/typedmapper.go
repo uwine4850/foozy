@@ -5,8 +5,8 @@ import (
 	"reflect"
 	"strconv"
 
-	"github.com/uwine4850/foozy/pkg/interfaces/itypeopr"
 	"github.com/uwine4850/foozy/pkg/router/form"
+	"github.com/uwine4850/foozy/pkg/typeopr"
 	"github.com/uwine4850/foozy/pkg/utils/fslice"
 )
 
@@ -14,12 +14,12 @@ import (
 // To work, you need to use the 'form' tag, which means the names of the form fields.
 type TypedMapper struct {
 	Form                   *form.Form
-	Output                 itypeopr.IPtr
+	Output                 typeopr.IPtr
 	IgnoreNotSupConversion bool
 	NilIfNotExist          []string
 }
 
-func NewTypedMapper(frm *form.Form, output itypeopr.IPtr) *TypedMapper {
+func NewTypedMapper(frm *form.Form, output typeopr.IPtr) *TypedMapper {
 	return &TypedMapper{
 		Form:   frm,
 		Output: output,

@@ -4,17 +4,17 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/uwine4850/foozy/pkg/interfaces/itypeopr"
 	"github.com/uwine4850/foozy/pkg/router/form"
+	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
 type Mapper struct {
 	Form          *form.Form
-	Output        itypeopr.IPtr
+	Output        typeopr.IPtr
 	NilIfNotExist []string
 }
 
-func NewMapper(form *form.Form, output itypeopr.IPtr, nilIfNotExist []string) Mapper {
+func NewMapper(form *form.Form, output typeopr.IPtr, nilIfNotExist []string) Mapper {
 	return Mapper{Form: form, Output: output, NilIfNotExist: nilIfNotExist}
 }
 

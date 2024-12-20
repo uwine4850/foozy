@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/uwine4850/foozy/pkg/interfaces/irest"
-	"github.com/uwine4850/foozy/pkg/interfaces/itypeopr"
 	"github.com/uwine4850/foozy/pkg/router/form"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 	"github.com/uwine4850/foozy/pkg/utils/fslice"
@@ -105,7 +104,7 @@ func (d *DTO) Generate() error {
 
 // IsSafeMessage checks whether the message is safe.
 // A message is safe if it is in allowed messages.
-func (d *DTO) IsSafeMessage(message itypeopr.IPtr) error {
+func (d *DTO) IsSafeMessage(message typeopr.IPtr) error {
 	_type := reflect.TypeOf(message.Ptr()).Elem()
 	if !typeopr.IsImplementInterface(message, (*irest.IMessage)(nil)) {
 		return fmt.Errorf("%s message does not implement irest.IMessage interface", _type)

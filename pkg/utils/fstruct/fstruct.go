@@ -5,12 +5,12 @@ import (
 	"reflect"
 	"strconv"
 
-	"github.com/uwine4850/foozy/pkg/interfaces/itypeopr"
+	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
 // CheckNotDefaultFields checks whether the values ​​of the structure fields are default.
 // That is, if the field is not passed or initialized with standard values, for example, nil.
-func CheckNotDefaultFields(objectPtr itypeopr.IPtr) error {
+func CheckNotDefaultFields(objectPtr typeopr.IPtr) error {
 	objectLink := objectPtr.Ptr()
 	var rObjectValue reflect.Value
 	var rObjectType reflect.Type

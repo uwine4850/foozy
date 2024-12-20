@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"reflect"
-
-	"github.com/uwine4850/foozy/pkg/interfaces/itypeopr"
 )
 
 func IsPointer(a any) bool {
@@ -55,11 +53,16 @@ func AnyToBytes(value interface{}) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
+type IPtr interface {
+	New(value interface{}) IPtr
+	Ptr() interface{}
+}
+
 type Ptr struct {
 	value interface{}
 }
 
-func (p Ptr) New(value interface{}) itypeopr.IPtr {
+func (p Ptr) New(value interface{}) IPtr {
 	if !IsPointer(value) {
 		panic(ErrValueNotPointer{Value: fmt.Sprintf("Ptr<%s>", reflect.TypeOf(value))})
 	}
@@ -77,7 +80,7 @@ func (p Ptr) Ptr() interface{} {
 // IsImplementInterface(typeopr.Ptr{}.New(&object), (*MyInterface)(nil))
 // If reflect.Value is used, you can use direct passing or passing by pointer, that is,
 // passing a pointer to a pointer. How to transmit this data depends on the situation.
-func IsImplementInterface(objectPtr itypeopr.IPtr, interfaceType interface{}) bool {
+func IsImplementInterface(objectPtr IPtr, interfaceType interface{}) bool {
 	object := objectPtr.Ptr()
 	// If the type of data passed directly is the desired interface.
 	if reflect.TypeOf(object) == reflect.TypeOf(interfaceType) {

@@ -6,7 +6,6 @@ import (
 	"reflect"
 	"sync"
 
-	"github.com/uwine4850/foozy/pkg/interfaces/itypeopr"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 	"github.com/uwine4850/foozy/pkg/utils/fslice"
 )
@@ -46,7 +45,7 @@ func Compare[T1 comparable, T2 comparable](map1 *map[T1]T2, map2 *map[T1]T2, exc
 	return true
 }
 
-func YamlMapToStruct(targetMap *map[string]interface{}, targetStruct itypeopr.IPtr) error {
+func YamlMapToStruct(targetMap *map[string]interface{}, targetStruct typeopr.IPtr) error {
 	for mFieldName, mFieldValue := range *targetMap {
 		var sValue reflect.Value
 		var sType reflect.Type

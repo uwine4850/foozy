@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/uwine4850/foozy/pkg/interfaces/itypeopr"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 	"github.com/uwine4850/foozy/pkg/utils/fslice"
 )
@@ -66,7 +65,7 @@ func FillMapFromDb(dbRes map[string]interface{}, fill *map[string]string) error 
 // You can also use the "empty" tag to indicate the action when the field is empty. If this tag is empty, nothing will happen. Other meanings:
 // Any text - sets the field values ​​to this text.
 // -error - display an error if the field is empty.
-func FillStructFromDb(dbRes map[string]interface{}, fillPtr itypeopr.IPtr) error {
+func FillStructFromDb(dbRes map[string]interface{}, fillPtr typeopr.IPtr) error {
 	fill := fillPtr.Ptr()
 	if !typeopr.PtrIsStruct(fill) {
 		return typeopr.ErrParameterNotStruct{Param: "fill"}
@@ -104,7 +103,7 @@ func FillStructFromDb(dbRes map[string]interface{}, fillPtr itypeopr.IPtr) error
 
 // ParamsValueFromStruct creates a map from a structure that describes the table.
 // To work correctly, you need a completed structure, and the required fields must have the `db:"<column name>"` tag.
-func ParamsValueFromStruct(filledStructurePtr itypeopr.IPtr, nilIfEmpty []string) (map[string]any, error) {
+func ParamsValueFromStruct(filledStructurePtr typeopr.IPtr, nilIfEmpty []string) (map[string]any, error) {
 	structure := filledStructurePtr.Ptr()
 	if !typeopr.PtrIsStruct(structure) {
 		return nil, typeopr.ErrParameterNotStruct{Param: "structure"}
