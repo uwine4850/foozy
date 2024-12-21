@@ -68,7 +68,6 @@ func (e *TemplateEngine) Exec() error {
 	if err != nil {
 		return err
 	}
-	e.clearContext()
 	debug.RequestLogginIfEnable(debug.P_TEMPLATE_ENGINE, "write template")
 	_, err = e.writer.Write([]byte(execute))
 	if err != nil {
@@ -84,10 +83,6 @@ func (e *TemplateEngine) SetContext(data map[string]interface{}) {
 
 func (e *TemplateEngine) GetContext() map[string]interface{} {
 	return e.context
-}
-
-func (e *TemplateEngine) clearContext() {
-	e.context = make(map[string]interface{})
 }
 
 func (e *TemplateEngine) SetResponseWriter(w http.ResponseWriter) {
