@@ -1,6 +1,8 @@
 package config
 
 import (
+	"fmt"
+	"reflect"
 	"sync"
 
 	"github.com/uwine4850/foozy/pkg/typeopr"
@@ -55,12 +57,43 @@ type DefaultConfig struct {
 }
 
 type DebugConfig struct {
-	PrintInfo             bool   `yaml:"PrintInfo"`
-	Debug                 bool   `yaml:"Debug"`
-	DebugRelativeFilepath bool   `yaml:"DebugRelativeFilepath"`
-	ErrorLogging          bool   `yaml:"ErrorLogging"`
-	ErrorLoggingPath      string `yaml:"ErrorLoggingPath"`
-	RequestInfoLog        bool   `yaml:"RequestInfoLog"`
-	RequestInfoLogPath    string `yaml:"RequestInfoLogPath"`
-	SkipLoggingLevel      int    `yaml:"SkipLoggingLevel"`
+	PrintInfo             bool   `yaml:"PrintInfo" i:"Displays basic information about each request."`
+	Debug                 bool   `yaml:"Debug" i:"Enables debugging"`
+	DebugRelativeFilepath bool   `yaml:"DebugRelativeFilepath" i:"In logs, file paths are displayed relatively"`
+	ErrorLogging          bool   `yaml:"ErrorLogging" i:"Enables error logging"`
+	ErrorLoggingPath      string `yaml:"ErrorLoggingPath" i:"Path to error log file"`
+	RequestInfoLog        bool   `yaml:"RequestInfoLog" i:"Enables request logging"`
+	RequestInfoLogPath    string `yaml:"RequestInfoLogPath" i:"Path to request log file"`
+	SkipLoggingLevel      int    `yaml:"SkipLoggingLevel" i:"Skips logging levels. May need to be configured per project"`
+}
+
+func Info() {
+	cnf := Cnf()
+	defaultConfigType := reflect.TypeOf(cnf.Default)
+	cnfObjectInfo("", &defaultConfigType)
+	if len(cnf.Additionally) != 0 {
+		fmt.Println("Additionally:")
+		for _, configObject := range cnf.Additionally {
+			configObjectType := reflect.TypeOf(configObject).Elem()
+			cnfObjectInfo(" ", &configObjectType)
+		}
+	}
+}
+
+func cnfObjectInfo(sep string, object *reflect.Type) {
+	objectType := *object
+	fmt.Println(sep + objectType.Name() + ":")
+	for i := 0; i < objectType.NumField(); i++ {
+		if objectType.Field(i).Type.Kind() == reflect.Struct {
+			ty := objectType.Field(i).Type
+			cnfObjectInfo(sep+" ", &ty)
+		} else {
+			tag := objectType.Field(i).Tag
+			yamlName := tag.Get("yaml")
+			info := tag.Get("i")
+			if yamlName != "" && info != "" {
+				fmt.Println(sep + " " + yamlName + " — " + info)
+			}
+		}
+	}
 }

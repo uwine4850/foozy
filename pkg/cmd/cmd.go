@@ -10,6 +10,10 @@ import (
 )
 
 var myArgs = map[string]func(args ...string) error{
+	"cnfinfo": func(args ...string) error {
+		config.Info()
+		return nil
+	},
 	"initcnf": func(args ...string) error {
 		if len(args) != 2 {
 			return errors.New("parent directory not specified")
