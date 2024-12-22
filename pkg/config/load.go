@@ -12,6 +12,12 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// Load loads the settings from the .yaml file. The file is loaded by the path(loadPath),
+// which is configured with the Config object. In addition, the configurations are loaded
+// into a new instance of the Config structure.
+// Due to the fact that the field In addition has type map[string]interface{} type interface{}
+// needs to be converted into a structure. For this purpose, we need to use the Config singleton
+// accessed by the Cnf() function.
 func Load() (*Config, error) {
 	loadPath := Cnf().loadPath
 	if !fstring.PathExist(loadPath) {
@@ -67,6 +73,11 @@ func (e *ErrNoFile) Error() string {
 var loadedConfigInstance *Config
 var onceLoadedConfig sync.Once
 
+// LoadedConfig singleton that loads the settings. It is preferable
+// to use this function rather than Load to avoid loading the config every time.
+// It is important to specify that changes in .yaml settings are not taken into
+// account after the framework is started, so it is necessary to restart the server
+// after changing the configuration.
 func LoadedConfig() *Config {
 	onceLoadedConfig.Do(func() {
 		config, err := Load()
