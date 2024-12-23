@@ -6,6 +6,9 @@ import (
 	"path/filepath"
 )
 
+// Generate generates files from a defined path.
+// The map key — path to the directory where the file will be.
+// Map value — path to the file to be generated.
 func Generate(data map[string]string) error {
 	for dirpath, targetFilepath := range data {
 		targetFile, err := os.Open(targetFilepath)
