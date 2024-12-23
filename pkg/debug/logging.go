@@ -12,6 +12,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/utils/fstring"
 )
 
+// A list of prefixes for the log.
 const (
 	P_ERROR           = "ERROR"
 	P_ROUTER          = "ROUTER"
@@ -22,6 +23,19 @@ const (
 	P_DATABASE        = "DATABASE"
 )
 
+// WriteLog writes the message to a log file.
+//
+// skipLevel - skips levels of runtime.Caller.
+// This is used to output the path on which the log is written.
+//
+// filePath - path to the log file.
+//
+// flag - flags for opening a file from the os package.
+//
+// prefix - prefix that will be shown in the log. It is desirable to use
+// constants “P_...” from this package.
+//
+// message - the message that will be recorded.
 func WriteLog(skipLevel int, filePath string, flag int, prefix string, message string) {
 	f, err := os.OpenFile(filePath, flag, 0644)
 	if err != nil {
@@ -65,6 +79,7 @@ func WriteLog(skipLevel int, filePath string, flag int, prefix string, message s
 	ilog.Printf("%s:%d %s\n", loggingFilePath, line, message)
 }
 
+// LogError logs errors to the error log.
 func LogError(message string) {
 	if config.LoadedConfig().Default.Debug.ErrorLoggingPath == "" {
 		panic("unable to create log file. File path not set")
@@ -72,6 +87,9 @@ func LogError(message string) {
 	WriteLog(config.LoadedConfig().Default.Debug.SkipLoggingLevel+1, config.LoadedConfig().Default.Debug.ErrorLoggingPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, "", message)
 }
 
+// ErrorLoggingIfEnableAndWrite writes a message to the log if error logging is enabled.
+// This function also writes a message to the browser page. It is
+// convenient for displaying the error on the page.
 func ErrorLoggingIfEnableAndWrite(w http.ResponseWriter, errorText string, writeText string) {
 	_, err := w.Write([]byte(writeText))
 	if err != nil {
@@ -84,12 +102,14 @@ func ErrorLoggingIfEnableAndWrite(w http.ResponseWriter, errorText string, write
 	}
 }
 
+// ErrorLogginIfEnable writes a message to the log if error logging is enabled.
 func ErrorLogginIfEnable(message string) {
 	if config.LoadedConfig().Default.Debug.ErrorLogging {
 		LogError(message)
 	}
 }
 
+// ClearRequestInfoLogging clears the request log.
 func ClearRequestInfoLogging() error {
 	if config.LoadedConfig().Default.Debug.RequestInfoLogPath != "" && fstring.PathExist(config.LoadedConfig().Default.Debug.RequestInfoLogPath) {
 		f, err := os.OpenFile(config.LoadedConfig().Default.Debug.RequestInfoLogPath, os.O_WRONLY, 0644)
@@ -104,6 +124,7 @@ func ClearRequestInfoLogging() error {
 	return nil
 }
 
+// LogRequestInfo logs information about the request.
 func LogRequestInfo(prefix string, message string) {
 	if config.LoadedConfig().Default.Debug.RequestInfoLogPath == "" {
 		panic("unable to create request info log file. File path not set")
@@ -111,6 +132,7 @@ func LogRequestInfo(prefix string, message string) {
 	WriteLog(config.LoadedConfig().Default.Debug.SkipLoggingLevel, config.LoadedConfig().Default.Debug.RequestInfoLogPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, prefix, message)
 }
 
+// RequestLogginIfEnable logs request information if request logging is enabled.
 func RequestLogginIfEnable(prefix string, message string) {
 	if config.LoadedConfig().Default.Debug.RequestInfoLog {
 		LogRequestInfo(prefix, message)
