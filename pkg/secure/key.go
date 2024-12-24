@@ -1,4 +1,4 @@
-package manager
+package secure
 
 import (
 	"math/rand"

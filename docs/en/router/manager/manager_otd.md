@@ -35,3 +35,9 @@ __GetSlugParams__
 GetSlugParams(key string) (string, bool)
 ```
 Returns the slug value of the parameter.
+
+__CreateNewManagerData__
+```
+CreateNewManagerData(manager interfaces.IManager) (interfaces.IManagerOneTimeData, error)
+```
+Creates and sets a new OneTimeData instance into the manager.

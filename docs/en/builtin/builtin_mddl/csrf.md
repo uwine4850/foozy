@@ -1,9 +1,8 @@
 ## Package builtin_mddl
-Цей пакет містить готові реалізації проміжного ПО.
 
 __GenerateAndSetCsrf__
 ```
-GenerateAndSetCsrf(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
+GenerateAndSetCsrf(maxAge int, onError onError) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 ```
 This function returns a standard middleware implementation.<br>
 maxAge - cookie lifetime.

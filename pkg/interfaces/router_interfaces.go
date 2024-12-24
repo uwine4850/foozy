@@ -1,7 +1,9 @@
 package interfaces
 
 import (
+	"mime/multipart"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -45,4 +47,13 @@ type IWebsocket interface {
 	OnConnect(fn func(w http.ResponseWriter, r *http.Request, conn *websocket.Conn))
 	SendMessage(messageType int, msg []byte, conn *websocket.Conn) error
 	ReceiveMessages(w http.ResponseWriter, r *http.Request) error
+}
+
+type IForm interface {
+	Parse() error
+	GetMultipartForm() *multipart.Form
+	GetApplicationForm() url.Values
+	Value(key string) string
+	File(key string) (multipart.File, *multipart.FileHeader, error)
+	Files(key string) ([]*multipart.FileHeader, bool)
 }

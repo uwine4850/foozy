@@ -29,16 +29,10 @@ Running synchronous middleware.
 
 __RunAsyncMddl__
 ```
-RunAsyncMddl(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
+RunAsyncMddl(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, wg *sync.WaitGroup)
 ```
 Running asynchronous middleware.<br>
 __IMPORTANT__: All middlewares run asynchronously, so you need to wait for them to complete using the ``WaitAsyncMddl`` method.
-
-__WaitAsyncMddl__
-```
-WaitAsyncMddl()
-```
-Wait for the execution of all asynchronous middleware (if any).
 
 ### Package methods
 __SetMddlError__

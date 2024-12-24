@@ -60,7 +60,7 @@ newRouter.SetMiddleware(mddl)
 
 __SaveFile__
 ```
-SaveFile(w http.ResponseWriter, fileHeader *multipart.FileHeader, pathToDir string, buildPath *string) error
+SaveFile(w http.ResponseWriter, fileHeader *multipart.FileHeader, pathToDir string, buildPath *string, manager interfaces.IManager) error
 ```
 Saves the file in the selected location.
 * fileHeader *multipart.FileHeader - information about the file.
@@ -69,7 +69,7 @@ Saves the file in the selected location.
 
 __ReplaceFile__
 ```
-ReplaceFile(pathToFile string, w http.ResponseWriter, fileHeader *multipart.FileHeader, pathToDir string, buildPath *string) error
+ReplaceFile(pathToFile string, w http.ResponseWriter, fileHeader *multipart.FileHeader, pathToDir string, buildPath *string, manager interfaces.IManager) error
 ```
 Replaces an existing file with another.
 

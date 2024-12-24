@@ -3,8 +3,8 @@ package secure
 import (
 	"net/http"
 
+	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
-	"github.com/uwine4850/foozy/pkg/router/form"
 )
 
 // ValidateHeaderCSRFToken validates the CSRF token based on its value in the header.
@@ -26,7 +26,7 @@ func ValidateHeaderCSRFToken(r *http.Request, tokenName string) error {
 
 // ValidateFormCsrfToken checks the validity of the csrf token. If no errors are detected, the token is valid.
 // It is desirable to use this method only after form.Parse() method.
-func ValidateFormCsrfToken(r *http.Request, frm *form.Form) error {
+func ValidateFormCsrfToken(r *http.Request, frm interfaces.IForm) error {
 	csrfToken := frm.Value(namelib.ROUTER.COOKIE_CSRF_TOKEN)
 	if csrfToken == "" {
 		return ErrCsrfTokenNotFound{}

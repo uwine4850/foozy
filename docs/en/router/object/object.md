@@ -36,7 +36,7 @@ A structure to launch any IView interface.
 * _Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()_ - a method that starts the execution 
 of the http request handler.
 
-## Відображення View як JSON.
+## Displaying View as JSON.
 Each of these structures has a Call method that is used to run it.
 Also, each structure displays data only in JSON format.
 If you do not pass data to the `message` field, the JSON will be displayed without DTO validation and in `TemplateView` format.

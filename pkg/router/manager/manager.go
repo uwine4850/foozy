@@ -2,6 +2,7 @@ package manager
 
 import (
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/secure"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
@@ -49,6 +50,6 @@ func NewManager(render interfaces.IRender) *Manager {
 	return &Manager{
 		managerData: NewManagerData(),
 		render:      render,
-		key:         &Key{},
+		key:         &secure.Key{},
 	}
 }

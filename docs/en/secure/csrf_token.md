@@ -3,7 +3,7 @@ This section of the security package is responsible for operations with the CSRF
 
 __ValidateFormCsrfToken__
 ```
-ValidateFormCsrfToken(r *http.Request, frm *form.Form) error
+ValidateFormCsrfToken(r *http.Request, frm frm interfaces.IForm) error
 ```
 The method that validates the CSRF token. For this, the form must have a field called ``csrf_token``, in addition to cookies
 must also have a ``csrf_token`` field.<br>
