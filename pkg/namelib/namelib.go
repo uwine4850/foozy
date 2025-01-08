@@ -1,5 +1,6 @@
 package namelib
 
+// The name for the embedded auth package.
 type AuthNames struct {
 	AUTH_TABLE       string
 	COOKIE_AUTH      string
@@ -12,6 +13,8 @@ var AUTH = AuthNames{
 	COOKIE_AUTH_DATE: "AUTH_DATE",
 }
 
+// The name for the router package.
+// Also used outside the router, but for interaction with it, e.g. MDDL_ERROR.
 type RouterNames struct {
 	URL_PATTERN            string
 	COOKIE_CSRF_TOKEN      string
@@ -32,6 +35,7 @@ var ROUTER = RouterNames{
 	SERVER_FORBIDDEN_ERROR: "SERVER_ERROR",
 }
 
+// The name for the package object.
 type ObjectNames struct {
 	OBJECT_CONTEXT      string
 	OBJECT_CONTEXT_FORM string

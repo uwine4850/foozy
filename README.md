@@ -13,6 +13,7 @@ Modules that the framework contains: <br>
   * [async_queres](https://github.com/uwine4850/foozy/blob/master/docs/en/database/async_queries.md) — asynchronous requests to the database.
 * [debug](https://github.com/uwine4850/foozy/blob/master/docs/en/debug/debug.md) — debug tools.
 * [interfaces](https://github.com/uwine4850/foozy/blob/master/docs/en/interfaces/interfaces.md) — all golang interfaces used in the project.
+* [namelib](https://github.com/uwine4850/foozy/blob/master/docs/en/namelib/namelib.md) — common names for data access.
 * [router](https://github.com/uwine4850/foozy/blob/master/docs/en/router/router.md) — is the most important module, with the help of its functionality project routing and much more is implemented.
   * [manager](https://github.com/uwine4850/foozy/blob/master/docs/en/router/manager/manager.md) — a package for managing processors.
   * [websocket](https://github.com/uwine4850/foozy/blob/master/docs/en/router/websocket.md) — a package for interaction with websockets.
