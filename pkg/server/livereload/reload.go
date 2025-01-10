@@ -3,13 +3,15 @@ package livereload
 import (
 	"bytes"
 	"fmt"
-	"github.com/uwine4850/foozy/pkg/interfaces"
 	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"sync"
+
+	"github.com/uwine4850/foozy/pkg/config"
+	"github.com/uwine4850/foozy/pkg/interfaces"
 )
 
 type Reload struct {
@@ -25,6 +27,10 @@ func NewReload(pathToServerFile string, wiretap interfaces.IWiretap) *Reload {
 }
 
 func (r *Reload) Start() {
+	if !config.LoadedConfig().Default.Debug.Debug {
+		fmt.Println("Debug is disabled, reloader is not working.")
+		return
+	}
 	r.wiretap.OnStart(func() {
 		r.onStart()
 	})

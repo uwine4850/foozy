@@ -11,6 +11,6 @@ func InitCnf() {
 	cnf := config.Cnf()
 	// Use this to add your configurations.
 	// cnf.AppendAdditionally("my_cnf", typeopr.Ptr{}.New(&MyCnfCtruct{}))
-	cnf.SetPath("config.yaml")
-	cnf.SetLoadPath("../config.yaml")
+	cnf.SetPath("cnf/config.yaml")
+	cnf.SetLoadPath("cnf/config.yaml")
 }

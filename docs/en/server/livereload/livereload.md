@@ -6,12 +6,16 @@ This package is divided into two parts, namely the part with rebooting and the p
 saving files.
 
 ### Example of use
-```
+```go
 package main
 
-import "github.com/uwine4850/foozy/pkg/livereload"
+import (
+    "github.com/uwine4850/foozy/pkg/livereload"
+    initcnf "github.com/uwine4850/foozy/mycmd/init_cnf"
+)
 
 func main() {
+    initcnf.InitCnf()
 	reload := livereload.NewReload("project/cmd/main.go", livereload.NewWiretap([]string{"project", "pkg"},
 		[]string{}))
 	reload.Start()
@@ -67,7 +71,7 @@ Start() error
 Starts listening.
 
 ### Example of use
-```
+```go
 wiretap := livereload.NewWiretap3()
 wiretap.SetDirs([]string{"project", "project_files"})
 wiretap.OnStart(func() {
@@ -90,7 +94,7 @@ Constructor __NewReload(pathToServerFile string, wiretap interfaces.IWiretap) *R
 * wiretap - an instance of ``interfaces.IWiretap``.
 
 __Start__
-```
+```go
 Start()
 ```
 Starting a server reboot.

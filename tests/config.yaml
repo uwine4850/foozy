@@ -1,0 +1,13 @@
+GeneratedDefault: true
+GeneratedAdditionally: true
+Config:
+    Debug:
+        PrintInfo: true
+        Debug: true
+        DebugRelativeFilepath: true
+        ErrorLogging: true
+        ErrorLoggingPath: "m_error.log"
+        RequestInfoLog: true
+        RequestInfoLogPath: "m_request_info.log"
+        SkipLoggingLevel: 3
+Additionally: {}
