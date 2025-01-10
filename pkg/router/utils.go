@@ -28,7 +28,10 @@ func CatchRedirectError(r *http.Request, manager interfaces.IManager) {
 	q := r.URL.Query()
 	redirectError := q.Get(namelib.ROUTER.REDIRECT_ERROR)
 	if redirectError != "" {
-		manager.Render().SetContext(map[string]interface{}{namelib.ROUTER.REDIRECT_ERROR: redirectError})
+		if manager.Render() != nil {
+			manager.Render().SetContext(map[string]interface{}{namelib.ROUTER.REDIRECT_ERROR: redirectError})
+		}
+		manager.OneTimeData().SetUserContext(namelib.ROUTER.REDIRECT_ERROR, redirectError)
 	}
 }
 

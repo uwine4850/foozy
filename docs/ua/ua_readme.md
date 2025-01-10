@@ -1,3 +1,5 @@
+# _Українська документація більше не оновлюється._
+
 [UA](https://github.com/uwine4850/foozy/blob/master/docs/ua/ua_readme.md) | [EN](https://github.com/uwine4850/foozy)<br>
 __foozy__ — це легкий та гнучкий веб-фреймворк. В основі проекту лежать модулі http.ServeMux та http.Server. Також,
 по можливості, модулі залежать від інтерфейсів, тому більшість з них відкриті для змін.

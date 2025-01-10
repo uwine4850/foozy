@@ -16,10 +16,10 @@ The name for the embedded auth package.
 ___
 ### RouterNames
 `UC` *URL_PATTERN* — current url pattern.\
-`CK` *COOKIE_CSRF_TOKEN* — CSRF token in the cookie.\
+`CK` `UC` *COOKIE_CSRF_TOKEN* — CSRF token in the cookie.\
 `UC<string>` *MDDL_ERROR* — middleware error.\
 `UC<bool>` *SKIP_NEXT_PAGE* — skipping page rendering.\
-`RN` *REDIRECT_ERROR* — error with redirection to another page. Set in URl, once set the data can be retrieved in the templating engine.\
+`RN` `UC` *REDIRECT_ERROR* — error with redirection to another page. Set in URl, once set the data can be retrieved in the templating engine.\
 `UC<string>` *SERVER_ERROR* — error with redirection to another page.\
 `UC<string>` *SERVER_FORBIDDEN_ERROR* — error with redirection to another page. Access to UserContext.
 ___

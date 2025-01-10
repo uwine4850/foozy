@@ -36,8 +36,11 @@ func GenerateAndSetCsrf(maxAge int, onError onError) func(w http.ResponseWriter,
 				Path:     "/",
 			}
 			http.SetCookie(w, cookie)
-			manager.Render().SetContext(map[string]interface{}{namelib.ROUTER.COOKIE_CSRF_TOKEN: fmt.Sprintf("<input name=\"%s\" type=\"hidden\" value=\"%s\">",
-				namelib.ROUTER.COOKIE_CSRF_TOKEN, csrfToken)})
+			csrfHTMLString := fmt.Sprintf("<input name=\"%s\" type=\"hidden\" value=\"%s\">", namelib.ROUTER.COOKIE_CSRF_TOKEN, csrfToken)
+			if manager.Render() != nil {
+				manager.Render().SetContext(map[string]interface{}{namelib.ROUTER.COOKIE_CSRF_TOKEN: csrfHTMLString})
+			}
+			manager.OneTimeData().SetUserContext(namelib.ROUTER.COOKIE_CSRF_TOKEN, csrfHTMLString)
 		}
 	}
 }
