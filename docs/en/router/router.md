@@ -9,12 +9,12 @@ Tests for the router [here](https://github.com/uwine4850/foozy/tree/master/tests
 All handlers have standard parameters:
 * *pattern* - the path to the handler. For example, the path can be "/home" and everyone is like it. The router also
     supports slug parameters, such as "/post/<id>". If you use such a path and go to the address "/post/1" - it will start
-    the required handler in which the __id__ option will be available in the manager like this ``manager.OneTimeData().GetSlugParams("id")``. Such slug
+    the required handler in which the __id__ option will be available in the manager like this `manager.OneTimeData().GetSlugParams("id")`. Such slug
     parameters can be many, the main thing with different names.
 * *fn func(w http.ResponseWriter, r \*http.Request, manager interfaces.IManager)* - a function that will run when the user
-  goes to the desired address. ``w http.ResponseWriter`` and ``*http.Request`` are standard golang structures. About ``interfaces.IManager``
+  goes to the desired address. `w http.ResponseWriter` and `*http.Request` are standard golang structures. About `interfaces.IManager`
   is described in more detail [here](https://github.com/uwine4850/foozy/blob/master/docs/en/router/manager/manager.md).
-* Each handler returns ``func()`` - this is a function that is executed after the handler itself is finished.
+* Each handler returns `func()` - this is a function that is executed after the handler itself is finished.
 
 Multiple method handlers can be applied to a single route. 
 The main thing is that the methods are not repeated, that is, only one Get, Post, Delete, etc.
@@ -30,7 +30,7 @@ __Post__
 Post(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) func()
 ```
 A method for handling POST requests. It is most often used to work with HTML forms. This method has no new functionality 
-compared to the ``Get`` method. But this can be changed with [form handler package](https://github.com/uwine4850/foozy/blob/master/docs/en/router/form/form.md).
+compared to the `Get` method. But this can be changed with [form handler package](https://github.com/uwine4850/foozy/blob/master/docs/en/router/form/form.md).
 
 __Ws__
 ```
@@ -38,7 +38,7 @@ Ws(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager inter
 ```
 The handler accepts a websocket via the selected path.  Web sockets are written in more detail [here](https://github.com/uwine4850/foozy/blob/master/docs/en/router/websocket.md).<br>
 An example of echo handler implementation:
-```
+```go
 newRouter.Ws("/ws", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	ws := router.NewWebsocket(router.Upgrader)
 	ws.OnConnect(func(w http.ResponseWriter, r *http.Request, conn *websocket.Conn) {
@@ -83,6 +83,24 @@ Options(pattern string, fn func(w http.ResponseWriter, r *http.Request, manager 
 ```
 A method for processing Options requests.
 
+__AddHandlerSet__
+```
+AddHandlerSet(handlers []map[string]map[string]Handler)
+```
+This method is designed to make it easier to register multiple handlers. It works 
+on the same principle as the regular handler register, but register them as a set. 
+This can be useful if you need to add multiple handlers from another location, this 
+method greatly simplifies readability and usability.\
+Example usage:
+```go
+AddHandlerSet([]map[string]map[string]router.Handler{
+	{
+		router.GET: {"/pattern": <handler>},
+		router.POST: {"/pattern": <handler>},
+	},
+)
+```
+
 __InternalError__
 ```
 InternalError(fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error))
@@ -97,24 +115,18 @@ RegisterAll()
 ```
 Registers all handlers.
 
-__SetTemplateEngine__
-```
-SetTemplateEngine(engine interfaces.ITemplateEngine)
-```
-Installs a templater instance that implements the ``interfaces.ITemplateEngine`` interface.
-
 __SetMiddleware__
 ```
 SetMiddleware(middleware interfaces.IMiddleware)
 ```
-Sets an instance of the interface ``interfaces.IMiddleware`` to run before each handler.
+Sets an instance of the interface `interfaces.IMiddleware` to run before each handler.
 
 __getHandleFunc__
 ```
 getHandleFunc(pattern string, method string, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) http.HandlerFunc
 ```
 A private method that is launched before each handler. It runs various validations, middleware and more.
-This method wraps the ``func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)`` function passed from 
+This method wraps the `func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)` function passed from 
 handler Post, Get or Ws.
 
 __validateMethod__
@@ -132,7 +144,7 @@ ValidateRootUrl(w http.ResponseWriter, r *http.Request) bool
 ```
 If the path pattern is __/__, then the handler will accept __all paths__. To prevent this you need to use this 
 method. Now if the path is not found, a 404 error will be displayed instead of the __/__ handler. Example:
-```
+```go
 newRouter.Get("/", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
     if !router.ValidateRootUrl(w, r) {
 	    return
@@ -150,9 +162,9 @@ __HandleSlugUrls__
 ```
 HandleSlugUrls(parseUrl map[int]bool, slugUrl []string, url []string) (string, map[string]string)
 ```
-``slugUrl []string`` this is a pattern parameter that is divided by the __/__ symbol and written in slice.
-``url []string`` this is the real url that is divided by the __/__ symbol and written in a slice.
+`slugUrl []string` this is a pattern parameter that is divided by the __/__ symbol and written in slice.
+`url []string` this is the real url that is divided by the __/__ symbol and written in a slice.
 
 The function processes the url and outputs a string (str) as a url made from the pattern and slug parameters, if any.<br>
-Use ``parseUrl map[int]bool`` to find the parts that are slug parameters and that need to be replaced. Data to change 
+Use `parseUrl map[int]bool` to find the parts that are slug parameters and that need to be replaced. Data to change 
 are taken from the real url by their numerical position.

@@ -14,3 +14,4 @@ tests/**/*.log
 cnf
 main
 reloader
+*.log

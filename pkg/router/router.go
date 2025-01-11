@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"reflect"
 	"strings"
 	"sync"
 
@@ -16,6 +17,15 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
 	"github.com/uwine4850/foozy/pkg/router/tmlengine"
 	"github.com/uwine4850/foozy/pkg/utils/fstring"
+)
+
+const (
+	GET     = "GET"
+	POST    = "POST"
+	PUT     = "PUT"
+	DELETE  = "DELETE"
+	OPTIONS = "OPTIONS"
+	WS      = "WS"
 )
 
 func internalServerError(w http.ResponseWriter, r *http.Request, err error) {
@@ -31,12 +41,12 @@ type Handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IMa
 
 // muxRouter represents a single URL handler that can fire method handlers according to those sent by the client.
 type muxRouter struct {
-	Get     Handler
-	Post    Handler
-	Put     Handler
-	Delete  Handler
-	Options Handler
-	Ws      Handler
+	GET     Handler
+	POST    Handler
+	PUT     Handler
+	DELETE  Handler
+	OPTIONS Handler
+	WS      Handler
 }
 
 var managerObject interfaces.IManager = nil
@@ -62,58 +72,61 @@ func (rt *Router) RegisterAll() {
 	rt.registerAllHandlers()
 }
 
-func (rt *Router) Get(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
-	_muxRouter := rt.getMuxRouter(pattern)
-	if _muxRouter.Get != nil {
-		panic(fmt.Sprintf("the %s method on the %s path is already mounted", "GET", pattern))
+// AddHandlerSet adds a set of handlers at once.
+// Example of use:
+//
+//	AddHandlerSet([]map[string]map[string]router.Handler{
+//		{
+//	 		router.GET: {"/pattern": <handler>},
+//	 		router.POST: {"/pattern": <handler>},
+//		},
+//	 )
+func (rt *Router) AddHandlerSet(handlers []map[string]map[string]Handler) {
+	for i := 0; i < len(handlers); i++ {
+		for method, value := range handlers[i] {
+			for pattern, handler := range value {
+				if err := rt.setMuxRouterHandler(pattern, method, handler); err != nil {
+					panic(err)
+				}
+			}
+		}
 	}
-	_muxRouter.Get = handler
-	rt.setMuxRouter(pattern, _muxRouter)
+}
+
+func (rt *Router) Get(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
+	if err := rt.setMuxRouterHandler(pattern, GET, handler); err != nil {
+		panic(err)
+	}
 }
 
 func (rt *Router) Post(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
-	_muxRouter := rt.getMuxRouter(pattern)
-	if _muxRouter.Post != nil {
-		panic(fmt.Sprintf("the %s method on the %s path is already mounted", "POST", pattern))
+	if err := rt.setMuxRouterHandler(pattern, POST, handler); err != nil {
+		panic(err)
 	}
-	_muxRouter.Post = handler
-	rt.setMuxRouter(pattern, _muxRouter)
 }
 
 func (rt *Router) Put(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
-	_muxRouter := rt.getMuxRouter(pattern)
-	if _muxRouter.Put != nil {
-		panic(fmt.Sprintf("the %s method on the %s path is already mounted", "PUT", pattern))
+	if err := rt.setMuxRouterHandler(pattern, PUT, handler); err != nil {
+		panic(err)
 	}
-	_muxRouter.Put = handler
-	rt.setMuxRouter(pattern, _muxRouter)
 }
 
 func (rt *Router) Delete(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
-	_muxRouter := rt.getMuxRouter(pattern)
-	if _muxRouter.Delete != nil {
-		panic(fmt.Sprintf("the %s method on the %s path is already mounted", "DELETE", pattern))
+	if err := rt.setMuxRouterHandler(pattern, DELETE, handler); err != nil {
+		panic(err)
 	}
-	_muxRouter.Delete = handler
-	rt.setMuxRouter(pattern, _muxRouter)
 }
 
 func (rt *Router) Options(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
-	_muxRouter := rt.getMuxRouter(pattern)
-	if _muxRouter.Options != nil {
-		panic(fmt.Sprintf("the %s method on the %s path is already mounted", "OPTIONS", pattern))
+	if err := rt.setMuxRouterHandler(pattern, OPTIONS, handler); err != nil {
+		panic(err)
 	}
-	_muxRouter.Options = handler
-	rt.setMuxRouter(pattern, _muxRouter)
 }
 
 func (rt *Router) Ws(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
-	_muxRouter := rt.getMuxRouter(pattern)
-	if _muxRouter.Ws != nil {
-		panic(fmt.Sprintf("the %s method on the %s path is already mounted", "WS", pattern))
+	if err := rt.setMuxRouterHandler(pattern, WS, handler); err != nil {
+		panic(err)
 	}
-	_muxRouter.Ws = handler
-	rt.setMuxRouter(pattern, _muxRouter)
 }
 
 func (rt *Router) SetMiddleware(middleware interfaces.IMiddleware) {
@@ -139,6 +152,23 @@ func (rt *Router) getMuxRouter(pattern string) muxRouter {
 // Works well in conjunction with the getMuxRouter method.
 func (rt *Router) setMuxRouter(pattern string, _muxRouter muxRouter) {
 	rt.routes[pattern] = _muxRouter
+}
+
+// setMuxRouterHandler sets the handlers in muxRouter.
+// Automatically set the handler in the desired method,
+// the main thing is to pass the correct name, e.g. GET, POST and so on.
+func (rt *Router) setMuxRouterHandler(pattern string, method string, handler Handler) error {
+	_muxRouter := rt.getMuxRouter(pattern)
+	muxMethod := reflect.ValueOf(&_muxRouter).Elem().FieldByName(method)
+	if !muxMethod.IsValid() {
+		return errors.New("muxRouter field is not valid")
+	}
+	if !muxMethod.IsNil() {
+		return fmt.Errorf("the %s method on the %s path is already mounted", WS, pattern)
+	}
+	muxMethod.Set(reflect.ValueOf(handler))
+	rt.setMuxRouter(pattern, _muxRouter)
+	return nil
 }
 
 // validateMethod checks whether the method is allowed to be applied on the given URL.
@@ -209,7 +239,7 @@ func (rt *Router) switchRegisterMethods(writer http.ResponseWriter, request *htt
 	debug.RequestLogginIfEnable(debug.P_ROUTER, "validate method")
 	connection := request.Header.Get("Connection")
 	if connection != "" && connection == "Upgrade" {
-		handler := _muxRouter.Ws
+		handler := _muxRouter.WS
 		if !rt.validateMethod(handler, "WS", writer) {
 			return
 		}
@@ -219,35 +249,35 @@ func (rt *Router) switchRegisterMethods(writer http.ResponseWriter, request *htt
 	}
 	switch request.Method {
 	case http.MethodGet:
-		handler := _muxRouter.Get
+		handler := _muxRouter.GET
 		if !rt.validateMethod(handler, "GET", writer) {
 			return
 		}
 		debug.RequestLogginIfEnable(debug.P_ROUTER, "run GET handler")
 		handler(writer, request, manager)()
 	case http.MethodPost:
-		handler := _muxRouter.Post
+		handler := _muxRouter.POST
 		if !rt.validateMethod(handler, "POST", writer) {
 			return
 		}
 		debug.RequestLogginIfEnable(debug.P_ROUTER, "run POST handler")
 		handler(writer, request, manager)()
 	case http.MethodPut:
-		handler := _muxRouter.Put
+		handler := _muxRouter.PUT
 		if !rt.validateMethod(handler, "PUT", writer) {
 			return
 		}
 		debug.RequestLogginIfEnable(debug.P_ROUTER, "run PUT handler")
 		handler(writer, request, manager)()
 	case http.MethodDelete:
-		handler := _muxRouter.Delete
+		handler := _muxRouter.DELETE
 		if !rt.validateMethod(handler, "DELETE", writer) {
 			return
 		}
 		debug.RequestLogginIfEnable(debug.P_ROUTER, "run DELETE handler")
 		handler(writer, request, manager)()
 	case http.MethodOptions:
-		handler := _muxRouter.Options
+		handler := _muxRouter.OPTIONS
 		if !rt.validateMethod(handler, "OPTIONS", writer) {
 			return
 		}
