@@ -83,6 +83,58 @@ func (v *TemplateView) Call(w http.ResponseWriter, r *http.Request, manager inte
 	return func() {}
 }
 
+// TemplateRedirectView processes the object.
+// Redirects the page to the selected address.
+type TemplateRedirectView struct {
+	View        IView
+	RedirectUrl string
+}
+
+func (v *TemplateRedirectView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	debug.RequestLogginIfEnable(debug.P_OBJECT, "run template view")
+	if v.View == nil {
+		panic("the ITemplateView field must not be nil")
+	}
+	defer func() {
+		debug.RequestLogginIfEnable(debug.P_OBJECT, "close template view database")
+		err := v.View.CloseDb()
+		if err != nil {
+			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
+			v.View.OnError(w, r, manager, err)
+		}
+	}()
+	debug.RequestLogginIfEnable(debug.P_OBJECT, "handle object")
+	objectContext, err := v.View.Object(w, r, manager)
+	if err != nil {
+		return func() {
+			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
+			v.View.OnError(w, r, manager, err)
+		}
+	}
+	debug.RequestLogginIfEnable(debug.P_OBJECT, "handle context")
+	manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_CONTEXT, objectContext)
+	_context, err := v.View.Context(w, r, manager)
+	if err != nil {
+		return func() {
+			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
+			v.View.OnError(w, r, manager, err)
+		}
+	}
+	fmap.MergeMap((*map[string]interface{})(&objectContext), _context)
+	manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_CONTEXT, objectContext)
+
+	debug.RequestLogginIfEnable(debug.P_OBJECT, "handle permissions")
+	permissions, f := v.View.Permissions(w, r, manager)
+	if !permissions {
+		debug.RequestLogginIfEnable(debug.P_OBJECT, "permissions are not granted")
+		return func() { f() }
+	}
+	if v.RedirectUrl == "" {
+		return func() { http.Redirect(w, r, r.URL.Path, http.StatusFound) }
+	}
+	return func() { http.Redirect(w, r, v.RedirectUrl, http.StatusFound) }
+}
+
 // JsonObjectTemplateView is used to display ObjectView as JSON data.
 // If the Messages field is empty, it renders JSON as a regular TemplateView.
 type JsonObjectTemplateView struct {
