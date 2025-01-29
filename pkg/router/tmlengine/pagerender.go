@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/uwine4850/foozy/pkg/interfaces"
-	"github.com/uwine4850/foozy/pkg/utils/fstring"
+	"github.com/uwine4850/foozy/pkg/utils/fpath"
 )
 
 type Render struct {
@@ -64,7 +64,7 @@ func (rn *Render) RenderTemplate(w http.ResponseWriter, r *http.Request) error {
 	if rn.templatePath == "" {
 		return ErrTemplatePathNotSet{}
 	}
-	if !fstring.PathExist(rn.templatePath) {
+	if !fpath.PathExist(rn.templatePath) {
 		return ErrTemplatePathNotExist{Path: rn.templatePath}
 	}
 	rn.TemplateEngine.SetPath(rn.templatePath)

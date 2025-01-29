@@ -15,7 +15,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
 	"github.com/uwine4850/foozy/pkg/router/tmlengine"
 	"github.com/uwine4850/foozy/pkg/server"
-	"github.com/uwine4850/foozy/pkg/utils/fstring"
+	"github.com/uwine4850/foozy/pkg/utils/fpath"
 	initcnf "github.com/uwine4850/foozy/tests/init_cnf"
 )
 
@@ -100,7 +100,7 @@ func saveFile(w http.ResponseWriter, r *http.Request, manager interfaces.IManage
 	if err != nil {
 		return func() { w.Write([]byte(err.Error())) }
 	}
-	if !fstring.PathExist(path) {
+	if !fpath.PathExist(path) {
 		return func() { w.Write([]byte("File not found.")) }
 	}
 	return func() {}

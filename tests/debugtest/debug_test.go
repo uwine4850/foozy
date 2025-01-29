@@ -12,7 +12,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/manager"
 	"github.com/uwine4850/foozy/pkg/server"
-	"github.com/uwine4850/foozy/pkg/utils/fstring"
+	"github.com/uwine4850/foozy/pkg/utils/fpath"
 	initcnf "github.com/uwine4850/foozy/tests/init_cnf"
 )
 
@@ -68,7 +68,7 @@ func TestLogging(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if fstring.PathExist(config.LoadedConfig().Default.Debug.ErrorLoggingPath) {
+	if fpath.PathExist(config.LoadedConfig().Default.Debug.ErrorLoggingPath) {
 		os.Remove(config.LoadedConfig().Default.Debug.ErrorLoggingPath)
 	} else {
 		t.Errorf("Log file not found.")

@@ -2,17 +2,8 @@ package fstring
 
 import (
 	"fmt"
-	"os"
 	"strings"
 )
-
-func PathExist(path string) bool {
-	_, err := os.Stat(path)
-	if os.IsNotExist(err) {
-		return false
-	}
-	return true
-}
 
 // SplitUrl separates the url by the "/" character. Skips empty slice values.
 func SplitUrl(url string) []string {

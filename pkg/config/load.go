@@ -8,7 +8,7 @@ import (
 
 	"github.com/uwine4850/foozy/pkg/typeopr"
 	"github.com/uwine4850/foozy/pkg/utils/fmap"
-	"github.com/uwine4850/foozy/pkg/utils/fstring"
+	"github.com/uwine4850/foozy/pkg/utils/fpath"
 	"gopkg.in/yaml.v3"
 )
 
@@ -20,7 +20,7 @@ import (
 // accessed by the Cnf() function.
 func Load() (*Config, error) {
 	loadPath := Cnf().loadPath
-	if !fstring.PathExist(loadPath) {
+	if !fpath.PathExist(loadPath) {
 		return nil, &ErrNoFile{Path: loadPath}
 	}
 

@@ -9,7 +9,7 @@ import (
 	"runtime"
 
 	"github.com/uwine4850/foozy/pkg/config"
-	"github.com/uwine4850/foozy/pkg/utils/fstring"
+	"github.com/uwine4850/foozy/pkg/utils/fpath"
 )
 
 // A list of prefixes for the log.
@@ -111,7 +111,7 @@ func ErrorLogginIfEnable(message string) {
 
 // ClearRequestInfoLogging clears the request log.
 func ClearRequestInfoLogging() error {
-	if config.LoadedConfig().Default.Debug.RequestInfoLogPath != "" && fstring.PathExist(config.LoadedConfig().Default.Debug.RequestInfoLogPath) {
+	if config.LoadedConfig().Default.Debug.RequestInfoLogPath != "" && fpath.PathExist(config.LoadedConfig().Default.Debug.RequestInfoLogPath) {
 		f, err := os.OpenFile(config.LoadedConfig().Default.Debug.RequestInfoLogPath, os.O_WRONLY, 0644)
 		if err != nil {
 			return err

@@ -16,7 +16,7 @@ import (
 
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router"
-	"github.com/uwine4850/foozy/pkg/utils/fstring"
+	"github.com/uwine4850/foozy/pkg/utils/fpath"
 )
 
 type FormFile struct {
@@ -84,7 +84,7 @@ func (f *Form) Files(key string) ([]*multipart.FileHeader, bool) {
 // randomiseTheFileName If the file name already exists, randomises it and returns the new file path.
 func randomiseTheFileName(pathToDir string, fileName string) string {
 	outputFilepath := filepath.Join(pathToDir, fileName)
-	if fstring.PathExist(outputFilepath) {
+	if fpath.PathExist(outputFilepath) {
 		hash := sha256.Sum256([]byte(fileName))
 		hashData := hex.EncodeToString(hash[:])
 		ext := filepath.Ext(fileName)
