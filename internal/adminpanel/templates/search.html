@@ -1,0 +1,35 @@
+{% extends "../../../pkg/builtin/builtin_admin/templates/base.html" %}
+{% block content %}
+<div class="panel">
+    <div class="error">{{ REDIRECT_ERROR }}</div>
+    <div class="page-info">Users — {{ search }}</div>
+    <div class="users-search">
+        <form action="/admin/users/search/search-id" method="post" class="search" enctype="application/x-www-form-urlencoded">
+            {{ CSRF_TOKEN|safe }}
+            <div class="search-info"><span>Search by ID</span></div>
+            <input type="number" name="id">
+            <button type="submit">search</button>
+        </form>
+        <form action="/admin/users/search/search-username" method="post" class="search" enctype="application/x-www-form-urlencoded">
+            {{ CSRF_TOKEN|safe }}
+            <div class="search-info"><span>Search by username</span></div>
+            <input type="text" name="username">
+            <button type="submit">search</button>
+        </form>
+    </div>
+    <hr class="line">
+    {% if users|length == 0 %}
+    <div class="users-list">
+        <div class="users-list-message">A list of users will appear after a successful search.</div>
+    </div>
+    {% endif %}
+    {% for user in users %}
+    <div class="user-row">
+        <div class="user-row-id">{{ user.Id }}</div>
+        <div class="user-row-username">{{ user.Username }}</div>
+        <a href="/admin/user/{{ user.Id }}" class="user-row-action ura-view">view</a>
+        <div class="user-row-action ura-delete">delete</div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock content %}

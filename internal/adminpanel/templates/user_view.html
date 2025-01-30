@@ -1,0 +1,35 @@
+{% extends "../../../pkg/builtin/builtin_admin/templates/base.html" %}
+{% block content %}
+<div class="panel">
+    <div class="user-info">
+        <div class="user-info-title">
+            <div class="user-info-id">
+                {{ user.Id }}
+            </div>
+            <div class="user-info-username">
+                {{ user.Username }}
+            </div>
+        </div>
+    </div>
+    <hr class="line">
+    <form class="user-info" method="post" enctype="application/x-www-form-urlencoded">
+        <input type="hidden" name="user-id" value="{{ user.Id }}">
+        <div class="user-info-role">
+            <div class="user-info-role-title">
+                Role
+            </div>
+            <select name="user-info-role-value">
+                <option selected value="---">---</option>
+                {% for role in roles %}
+                    {% if role.Name == userRole.RoleName %}
+                        <option selected value="{{ role.Name }}">{{ role.Name }}</option>
+                    {% else %}
+                        <option value="{{ role.Name }}">{{ role.Name }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <button class="user-info-save-btn">Save</button>
+    </form>
+</div>
+{% endblock content %}

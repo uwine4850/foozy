@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"reflect"
 
+	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/debug"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
@@ -17,7 +18,8 @@ import (
 type FormView struct {
 	BaseView
 
-	FormStruct       interface{} `notdef:"true"`
+	FormStruct       interface{}        `notdef:"true"`
+	DB               *database.Database `notdef:"true"`
 	NotNilFormFields []string
 	NilIfNotExist    []string
 	ValidateCSRF     bool
@@ -27,8 +29,23 @@ func (v *FormView) ObjectsName() []string {
 	return []string{namelib.OBJECT.OBJECT_CONTEXT_FORM}
 }
 
+func (v *FormView) CloseDb() error {
+	if v.DB != nil {
+		if err := v.DB.Close(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (v *FormView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "run FormView object")
+	if v.DB != nil {
+		err := v.DB.Connect()
+		if err != nil {
+			return nil, err
+		}
+	}
 	frm := form.NewForm(r)
 	if err := frm.Parse(); err != nil {
 		return nil, err

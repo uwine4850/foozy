@@ -28,7 +28,7 @@ type IView interface {
 type BaseView struct{}
 
 func (v *BaseView) CloseDb() error {
-	return nil
+	panic("CloseDb is not implement. Please implement this method in your structure.")
 }
 
 func (v *BaseView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {

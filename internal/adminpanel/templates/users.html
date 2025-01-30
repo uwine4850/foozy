@@ -1,0 +1,54 @@
+{% extends "../../../pkg/builtin/builtin_admin/templates/base.html" %}
+{% block content %}
+<a href="/admin/users/search" class="search-users-link">User search</a>
+<div class="panel">
+    <div class="action-info-list">
+        <form action="/admin/users/create-roles-table" method="post" class="action-info" enctype="application/x-www-form-urlencoded">
+            <div class="action-info-item">Table of user roles</div>
+            {% if rolesTableCreated %}
+                <div class="action-info-value">Created</div>
+                <button disabled type="submit" class="action-info-button">Create</button>
+            {% else %}
+                <div class="action-info-value">Not created</div>
+                <button type="submit" class="action-info-button">Create</button>
+            {% endif %}
+        </form>
+    </div>
+</div>
+<div class="panel">
+    <span class="error">{{ REDIRECT_ERROR }}</span>
+    <button id="user-roles-subbpanel" class="subpanel-trigger user-roles-button">Roles</button>
+    <div id="user-roles-subbpanel-elem" class="subpanel subpanel-user-roles">
+        <form action="/admin/users/create-role" method="post" class="create-role-form">
+            {{ CSRF_TOKEN|safe }}
+            <div class="create-role-form-title">Create role</div>
+            <input type="text" name="role-name">
+            <button type="submit">Create</button>
+        </form>
+        <form action="/admin/users/edit-role" method="post" class="edit-role edit-role-hidden" id="edit-role" enctype="application/x-www-form-urlencoded">
+            {{ CSRF_TOKEN|safe }}
+            <div class="edit-role-title">Edit role</div>
+            <input type="text" id="edit-role-input" name="edit-role-name">
+            <input type="hidden" id="edit-role-primary-name" name="edit-role-primary-name">
+            <button type="submit">save</button>
+            <button type="button" id="edit-role-cancel-btn">cancel</button>
+        </form>
+        <form action="/admin/users/delete-role" method="post" id="delete-role" class="delete-role delete-role-hidden">
+            {{ CSRF_TOKEN|safe }}
+            <div class="delete-cole-title">Delete role</div>
+            <div id="delete-role-name" class="delete-role-name"></div>
+            <input type="hidden" name="delete-name" id="delete-name-input">
+            <button class="delete-role-delete-button" type="submit">delete</button>
+            <button type="button" id="delete-role-cancel-btn">cancel</button>
+        </form>
+        {% for role in roles %}
+            <div class="subpanel-user-role">
+                <div class="subpanel-user-role-name">{{ role.Name }}</div>
+                <button class="subpanel-user-role-edit" data-name="{{ role.Name }}">edit</button>
+                <button class="subpanel-user-role-delete" data-name="{{ role.Name }}">delete</button>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+<script type="module" src="/adminS/js/users.js"></script>
+{% endblock content %}
