@@ -1,4 +1,4 @@
-package middlewares_test
+package mddltest
 
 import (
 	"errors"
@@ -13,7 +13,9 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/manager"
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
 	"github.com/uwine4850/foozy/pkg/server"
-	initcnf "github.com/uwine4850/foozy/tests/init_cnf"
+	"github.com/uwine4850/foozy/tests1/common/tconf"
+	testinitcnf "github.com/uwine4850/foozy/tests1/common/test_init_cnf"
+	"github.com/uwine4850/foozy/tests1/common/tutils"
 )
 
 var mng = manager.NewManager(nil)
@@ -26,32 +28,32 @@ func TestMain(m *testing.M) {
 	newRouter.Get("/redirect", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		return func() { w.Write([]byte("is redirect page")) }
 	})
-	serv := server.NewServer(":8050", newRouter, nil)
+	serv := server.NewServer(tconf.PortMddl, newRouter, nil)
 	go func() {
 		err := serv.Start()
-		if err != nil && !errors.Is(http.ErrServerClosed, err) {
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			panic(err)
 		}
 	}()
-	if err := server.WaitStartServer(":8050", 5); err != nil {
+	if err := server.WaitStartServer(tconf.PortMddl, 5); err != nil {
 		panic(err)
 	}
 	exitCode := m.Run()
+	os.Exit(exitCode)
 	err := serv.Stop()
 	if err != nil {
 		panic(err)
 	}
-	os.Exit(exitCode)
 }
 
 func TestSetGetMddlError(t *testing.T) {
-	initcnf.InitCnf()
+	testinitcnf.InitCnf()
 	mddl := middlewares.NewMiddleware()
 	mddl.HandlerMddl(0, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
 		middlewares.SetMddlError(errors.New("mddl error"), manager.OneTimeData())
 	})
 	newRouter.SetMiddleware(mddl)
-	get, err := http.Get("http://localhost:8050/mddl")
+	get, err := http.Get(tutils.MakeUrl(tconf.PortMddl, "mddl"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -74,7 +76,7 @@ func TestSkipAndIsSkipNextPage(t *testing.T) {
 		middlewares.SkipNextPage(manager.OneTimeData())
 	})
 	newRouter.SetMiddleware(mddl)
-	get, err := http.Get("http://localhost:8050/mddl")
+	get, err := http.Get(tutils.MakeUrl(tconf.PortMddl, "mddl"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -99,7 +101,7 @@ func TestSkipNextPageAndRedirect(t *testing.T) {
 		}
 	})
 	newRouter.SetMiddleware(mddl)
-	get, err := http.Get("http://localhost:8050/mddl")
+	get, err := http.Get(tutils.MakeUrl(tconf.PortMddl, "mddl"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -123,7 +125,7 @@ func TestMiddlewaresIndex(t *testing.T) {
 	mddl.HandlerMddl(3, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
 	})
 	newRouter.SetMiddleware(mddl)
-	get, err := http.Get("http://localhost:8050/mddl")
+	get, err := http.Get(tutils.MakeUrl(tconf.PortMddl, "mddl"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -156,7 +158,7 @@ func TestSyncAsyncMiddlewares(t *testing.T) {
 		time.Sleep(200 * time.Millisecond)
 	})
 	newRouter.SetMiddleware(mddl)
-	get, err := http.Get("http://localhost:8050/mddl")
+	get, err := http.Get(tutils.MakeUrl(tconf.PortMddl, "mddl"))
 	if err != nil {
 		t.Error(err)
 	}

@@ -1,4 +1,4 @@
-package main
+package formtest
 
 import (
 	"errors"
@@ -9,14 +9,16 @@ import (
 
 	"github.com/uwine4850/foozy/pkg/builtin/builtin_mddl"
 	"github.com/uwine4850/foozy/pkg/interfaces"
-	router2 "github.com/uwine4850/foozy/pkg/router"
+	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/form"
 	"github.com/uwine4850/foozy/pkg/router/manager"
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
 	"github.com/uwine4850/foozy/pkg/router/tmlengine"
 	"github.com/uwine4850/foozy/pkg/server"
 	"github.com/uwine4850/foozy/pkg/utils/fpath"
-	initcnf "github.com/uwine4850/foozy/tests/init_cnf"
+	"github.com/uwine4850/foozy/tests1/common/tconf"
+	testinitcnf "github.com/uwine4850/foozy/tests1/common/test_init_cnf"
+	"github.com/uwine4850/foozy/tests1/common/tutils"
 )
 
 type Fill struct {
@@ -50,7 +52,7 @@ func removeAllFilesInDirectory(dirPath string) error {
 }
 
 func TestMain(m *testing.M) {
-	initcnf.InitCnf()
+	testinitcnf.InitCnf()
 	err := removeAllFilesInDirectory("./saved_files")
 	if err != nil {
 		panic(err)
@@ -62,27 +64,27 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
-	newRouter := router2.NewRouter(manager.NewManager(render))
+	newRouter := router.NewRouter(manager.NewManager(render))
 	newRouter.SetMiddleware(mddl)
 	newRouter.Post("/application-form", applicationForm)
 	newRouter.Post("/multipart-form", multipartForm)
 	newRouter.Post("/save-file", saveFile)
-	serv := server.NewServer(":8021", newRouter, nil)
+	serv := server.NewServer(tconf.PortForm, newRouter, nil)
 	go func() {
 		err = serv.Start()
-		if err != nil && !errors.Is(http.ErrServerClosed, err) {
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			panic(err)
 		}
 	}()
-	if err := server.WaitStartServer(":8021", 5); err != nil {
+	if err := server.WaitStartServer(tconf.PortForm, 5); err != nil {
 		panic(err)
 	}
 	exitCode := m.Run()
+	os.Exit(exitCode)
 	err = serv.Stop()
 	if err != nil {
 		panic(err)
 	}
-	os.Exit(exitCode)
 }
 
 func saveFile(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -140,7 +142,7 @@ func applicationForm(w http.ResponseWriter, r *http.Request, manager interfaces.
 }
 
 func TestApplicationForm(t *testing.T) {
-	resp, err := form.SendApplicationForm("http://localhost:8021/application-form", map[string][]string{"f1": {"v1"}, "f2": {"v2"}})
+	resp, err := form.SendApplicationForm(tutils.MakeUrl(tconf.PortForm, "application-form"), map[string][]string{"f1": {"v1"}, "f2": {"v2"}})
 	if err != nil {
 		t.Error(err)
 	}
@@ -149,7 +151,7 @@ func TestApplicationForm(t *testing.T) {
 		t.Error(err)
 	}
 	if string(responseBody) != "" {
-		t.Errorf(string(responseBody))
+		t.Error(string(responseBody))
 	}
 	err = resp.Body.Close()
 	if err != nil {
@@ -158,7 +160,7 @@ func TestApplicationForm(t *testing.T) {
 }
 
 func TestMultipartForm(t *testing.T) {
-	multipartForm, err := form.SendMultipartForm("http://localhost:8021/multipart-form", map[string][]string{"f1": {"v1"}}, map[string][]string{"file": {"x.png"}})
+	multipartForm, err := form.SendMultipartForm(tutils.MakeUrl(tconf.PortForm, "multipart-form"), map[string][]string{"f1": {"v1"}}, map[string][]string{"file": {"x.png"}})
 	if err != nil {
 		t.Error(err)
 	}
@@ -168,12 +170,12 @@ func TestMultipartForm(t *testing.T) {
 		t.Error(err)
 	}
 	if string(responseBody) != "" {
-		t.Errorf(string(responseBody))
+		t.Error(string(responseBody))
 	}
 }
 
 func TestSaveFile(t *testing.T) {
-	sendMultipartForm, err := form.SendMultipartForm("http://localhost:8021/save-file", map[string][]string{}, map[string][]string{"file": {"x.png"}})
+	sendMultipartForm, err := form.SendMultipartForm(tutils.MakeUrl(tconf.PortForm, "save-file"), map[string][]string{}, map[string][]string{"file": {"x.png"}})
 	if err != nil {
 		t.Error(err)
 	}
@@ -183,6 +185,6 @@ func TestSaveFile(t *testing.T) {
 		t.Error(err)
 	}
 	if string(responseBody) != "" {
-		t.Errorf(string(responseBody))
+		t.Error(string(responseBody))
 	}
 }

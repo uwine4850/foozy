@@ -13,13 +13,15 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/manager"
 	"github.com/uwine4850/foozy/pkg/server"
 	"github.com/uwine4850/foozy/pkg/utils/fpath"
-	initcnf "github.com/uwine4850/foozy/tests/init_cnf"
+	"github.com/uwine4850/foozy/tests1/common/tconf"
+	testinitcnf "github.com/uwine4850/foozy/tests1/common/test_init_cnf"
+	"github.com/uwine4850/foozy/tests1/common/tutils"
 )
 
 var mngr = manager.NewManager(nil)
 
 func TestMain(m *testing.M) {
-	initcnf.InitCnf()
+	testinitcnf.InitCnf()
 	newRouter := router.NewRouter(mngr)
 	newRouter.Get("/server-forbidden", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		return func() { router.ServerForbidden(w, manager) }
@@ -27,26 +29,26 @@ func TestMain(m *testing.M) {
 	newRouter.Get("/server-logging", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		return func() { router.ServerError(w, "Logging test", manager) }
 	})
-	serv := server.NewServer(":8040", newRouter, nil)
+	serv := server.NewServer(tconf.PortDebug, newRouter, nil)
 	go func() {
 		err := serv.Start()
-		if err != nil && !errors.Is(http.ErrServerClosed, err) {
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			panic(err)
 		}
 	}()
-	if err := server.WaitStartServer(":8040", 5); err != nil {
+	if err := server.WaitStartServer(tconf.PortDebug, 5); err != nil {
 		panic(err)
 	}
 	exitCode := m.Run()
+	os.Exit(exitCode)
 	err := serv.Stop()
 	if err != nil {
 		panic(err)
 	}
-	os.Exit(exitCode)
 }
 
 func TestServerForbidden(t *testing.T) {
-	get, err := http.Get("http://localhost:8040/server-forbidden")
+	get, err := http.Get(tutils.MakeUrl(tconf.PortDebug, "server-forbidden"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -64,7 +66,7 @@ func TestServerForbidden(t *testing.T) {
 }
 
 func TestLogging(t *testing.T) {
-	get, err := http.Get("http://localhost:8040/server-logging")
+	get, err := http.Get(tutils.MakeUrl(tconf.PortDebug, "server-logging"))
 	if err != nil {
 		t.Error(err)
 	}

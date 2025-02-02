@@ -1,6 +1,7 @@
-package dbmappertest_test
+package dbmappertest
 
 import (
+	"fmt"
 	"os"
 	"reflect"
 	"testing"
@@ -10,12 +11,10 @@ import (
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 	"github.com/uwine4850/foozy/pkg/utils/fmap"
+	"github.com/uwine4850/foozy/tests1/common/tconf"
 )
 
-var dbArgs = database.DbArgs{
-	Username: "root", Password: "1111", Host: "localhost", Port: "3408", DatabaseName: "foozy_test",
-}
-var db = database.NewDatabase(dbArgs)
+var db = database.NewDatabase(tconf.DbArgs)
 
 func createDbTest() {
 	_, err := db.SyncQ().Query("INSERT INTO `dbtest` (`col1`, `col2`, `col3`) VALUES (?, ?, ?)",
@@ -31,7 +30,7 @@ func createDbTest() {
 }
 
 func clearDbTest() {
-	_, err := db.SyncQ().Query("DELETE FROM dbtest")
+	_, err := db.SyncQ().Query("TRUNCATE TABLE dbtest")
 	if err != nil {
 		panic(err)
 	}
@@ -66,6 +65,7 @@ func TestDbMapperUseStruct(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+	fmt.Println(len(res))
 	var dbTestMapper []DbTestMapper
 	mapper := dbmapper.NewMapper(res, typeopr.Ptr{}.New(&dbTestMapper))
 	if err := mapper.Fill(); err != nil {
@@ -74,6 +74,7 @@ func TestDbMapperUseStruct(t *testing.T) {
 	if len(dbTestMapper) == 0 {
 		t.Error("DbMapper.Output must not be empty")
 	}
+	fmt.Println(dbTestMapper)
 	map1 := DbTestMapper{Col1: "test1", Col2: "2023-11-15", Col3: "111.22", Col4: "0"}
 	if dbTestMapper[0] != map1 {
 		t.Error("DbMapper.Output value does not match expected")

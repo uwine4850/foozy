@@ -18,7 +18,9 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/rest"
 	"github.com/uwine4850/foozy/pkg/router/tmlengine"
 	"github.com/uwine4850/foozy/pkg/server"
-	initcnf "github.com/uwine4850/foozy/tests/init_cnf"
+	"github.com/uwine4850/foozy/tests1/common/tconf"
+	testinitcnf "github.com/uwine4850/foozy/tests1/common/test_init_cnf"
+	"github.com/uwine4850/foozy/tests1/common/tutils"
 )
 
 type JsonObjectViewMessage struct {
@@ -38,7 +40,7 @@ type JsonFormMessage struct {
 var dto = rest.NewDTO()
 
 func TestMain(m *testing.M) {
-	initcnf.InitCnf()
+	testinitcnf.InitCnf()
 	dto.AllowedMessages([]rest.AllowMessage{
 		{
 			Package: "objecttest",
@@ -56,7 +58,7 @@ func TestMain(m *testing.M) {
 		},
 	})
 
-	db := database.NewDatabase(database.DbArgs{Username: "root", Password: "1111", Host: "localhost", Port: "3408", DatabaseName: "foozy_test"})
+	db := database.NewDatabase(tconf.DbArgs)
 	if err := db.Connect(); err != nil {
 		panic(err)
 	}
@@ -80,22 +82,22 @@ func TestMain(m *testing.M) {
 	newRouter.Get("/object-mul-json-view/<id>/<id1>", TJsonObjectMultipleViewHNDL(db))
 	newRouter.Get("/object-json-all-view", TJsonObjectAllViewHNDL(db))
 
-	serv := server.NewServer(":8031", newRouter, nil)
+	serv := server.NewServer(tconf.PortObject, newRouter, nil)
 	go func() {
 		err = serv.Start()
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			panic(err)
 		}
 	}()
-	if err := server.WaitStartServer(":8031", 5); err != nil {
+	if err := server.WaitStartServer(tconf.PortObject, 5); err != nil {
 		panic(err)
 	}
 	exitCode := m.Run()
+	os.Exit(exitCode)
 	err = serv.Stop()
 	if err != nil {
 		panic(err)
 	}
-	os.Exit(exitCode)
 }
 
 var tableQuery = "CREATE TABLE IF NOT EXISTS object_test (" +
@@ -179,7 +181,7 @@ func TObjectViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.
 }
 
 func TestObjectView(t *testing.T) {
-	get, err := http.Get("http://localhost:8031/object-view/1")
+	get, err := http.Get(tutils.MakeUrl(tconf.PortObject, "object-view/1"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -245,7 +247,7 @@ func TObjectMultipleViewHNDL(db *database.Database) func(w http.ResponseWriter, 
 }
 
 func TestObjectMultipleView(t *testing.T) {
-	get, err := http.Get("http://localhost:8031/object-mul-view/1/1")
+	get, err := http.Get(tutils.MakeUrl(tconf.PortObject, "object-mul-view/1/1"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -295,7 +297,7 @@ func TObjectAllViewHNDL(db *database.Database) func(w http.ResponseWriter, r *ht
 }
 
 func TestObjectAllView(t *testing.T) {
-	get, err := http.Get("http://localhost:8031/object-all-view")
+	get, err := http.Get(tutils.MakeUrl(tconf.PortObject, "object-all-view"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -356,7 +358,7 @@ func MyFormViewHNDL() func(w http.ResponseWriter, r *http.Request, manager inter
 }
 
 func TestMyFormView(t *testing.T) {
-	multipartForm, err := form.SendMultipartForm("http://localhost:8031/object-form-view", map[string][]string{"text": {"field"}}, map[string][]string{"file": {"x.png"}})
+	multipartForm, err := form.SendMultipartForm(tutils.MakeUrl(tconf.PortObject, "object-form-view"), map[string][]string{"text": {"field"}}, map[string][]string{"file": {"x.png"}})
 	if err != nil {
 		t.Error(err)
 	}
@@ -400,7 +402,7 @@ func TJsonObjectViewHNDL(db *database.Database) func(w http.ResponseWriter, r *h
 }
 
 func TestJsonObjectView(t *testing.T) {
-	get, err := http.Get("http://localhost:8031/object-json-view/1")
+	get, err := http.Get(tutils.MakeUrl(tconf.PortObject, "object-json-view/1"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -459,7 +461,7 @@ func TJsonObjectMultipleViewHNDL(db *database.Database) func(w http.ResponseWrit
 }
 
 func TestJsonObjectMultipleView(t *testing.T) {
-	get, err := http.Get("http://localhost:8031/object-mul-json-view/1/1")
+	get, err := http.Get(tutils.MakeUrl(tconf.PortObject, "object-mul-json-view/1/1"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -505,7 +507,7 @@ func TJsonObjectAllViewHNDL(db *database.Database) func(w http.ResponseWriter, r
 }
 
 func TestJsonObjectAllView(t *testing.T) {
-	get, err := http.Get("http://localhost:8031/object-json-all-view")
+	get, err := http.Get(tutils.MakeUrl(tconf.PortObject, "object-json-all-view"))
 	if err != nil {
 		t.Error(err)
 	}

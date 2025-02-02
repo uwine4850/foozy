@@ -1,4 +1,4 @@
-package formmappingtest_test
+package formmappingtest
 
 import (
 	"errors"
@@ -12,6 +12,8 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/form"
 	"github.com/uwine4850/foozy/pkg/router/form/formmapper"
 	"github.com/uwine4850/foozy/pkg/typeopr"
+	"github.com/uwine4850/foozy/tests1/common/tconf"
+	"github.com/uwine4850/foozy/tests1/common/tutils"
 )
 
 type TestMapping struct {
@@ -51,9 +53,9 @@ func mpDefaultStruct(w http.ResponseWriter, r *http.Request, manager interfaces.
 }
 
 func TestDefaultForm(t *testing.T) {
-	multipartForm, err := form.SendMultipartForm("http://localhost:8020/mp-default-struct",
+	multipartForm, err := form.SendMultipartForm(tutils.MakeUrl(tconf.PortFormMapping, "mp-default-struct"),
 		map[string][]string{"text": {"text"}},
-		map[string][]string{"file": {"../x.png"}},
+		map[string][]string{"file": {"x.png"}},
 	)
 	if err != nil {
 		t.Error(err)
@@ -64,7 +66,7 @@ func TestDefaultForm(t *testing.T) {
 		t.Error(err)
 	}
 	if string(responseBody) != "" {
-		t.Errorf(string(responseBody))
+		t.Error(string(responseBody))
 	}
 }
 
@@ -94,9 +96,9 @@ func mpEmptyString0Err(w http.ResponseWriter, r *http.Request, manager interface
 }
 
 func TestEmptyString0(t *testing.T) {
-	multipartForm, err := form.SendMultipartForm("http://localhost:8020/mp-empty-string-0-err",
+	multipartForm, err := form.SendMultipartForm(tutils.MakeUrl(tconf.PortFormMapping, "mp-empty-string-0-err"),
 		map[string][]string{"text": {""}},
-		map[string][]string{"file": {"../x.png"}},
+		map[string][]string{"file": {"x.png"}},
 	)
 	if err != nil {
 		t.Error(err)
@@ -107,7 +109,7 @@ func TestEmptyString0(t *testing.T) {
 		t.Error(err)
 	}
 	if string(responseBody) != "" {
-		t.Errorf(string(responseBody))
+		t.Error(string(responseBody))
 	}
 }
 
@@ -137,9 +139,9 @@ func mpEmptyString1Err(w http.ResponseWriter, r *http.Request, manager interface
 }
 
 func TestEmptyString1(t *testing.T) {
-	multipartForm, err := form.SendMultipartForm("http://localhost:8020/mp-empty-string-1-err",
+	multipartForm, err := form.SendMultipartForm(tutils.MakeUrl(tconf.PortFormMapping, "mp-empty-string-1-err"),
 		map[string][]string{"text": {"text", ""}},
-		map[string][]string{"file": {"../x.png"}},
+		map[string][]string{"file": {"x.png"}},
 	)
 	if err != nil {
 		t.Error(err)
@@ -150,7 +152,7 @@ func TestEmptyString1(t *testing.T) {
 		t.Error(err)
 	}
 	if string(responseBody) != "" {
-		t.Errorf(string(responseBody))
+		t.Error(string(responseBody))
 	}
 }
 
@@ -180,7 +182,7 @@ func mpEmptyFileErr(w http.ResponseWriter, r *http.Request, manager interfaces.I
 }
 
 func TestEmptyFile(t *testing.T) {
-	multipartForm, err := form.SendMultipartForm("http://localhost:8020/mp-empty-file-err",
+	multipartForm, err := form.SendMultipartForm(tutils.MakeUrl(tconf.PortFormMapping, "mp-empty-file-err"),
 		map[string][]string{"text": {"text"}},
 		map[string][]string{"file": {""}},
 	)
@@ -193,7 +195,7 @@ func TestEmptyFile(t *testing.T) {
 		t.Error(err)
 	}
 	if string(responseBody) != "" {
-		t.Errorf(string(responseBody))
+		t.Error(string(responseBody))
 	}
 }
 
@@ -237,7 +239,7 @@ func mpEmptyValue(w http.ResponseWriter, r *http.Request, manager interfaces.IMa
 }
 
 func TestEmptyValue(t *testing.T) {
-	multipartForm, err := form.SendMultipartForm("http://localhost:8020/mp-empty-value",
+	multipartForm, err := form.SendMultipartForm(tutils.MakeUrl(tconf.PortFormMapping, "mp-empty-value"),
 		map[string][]string{"text": {"", ""}},
 		map[string][]string{},
 	)
@@ -250,7 +252,7 @@ func TestEmptyValue(t *testing.T) {
 		t.Error(err)
 	}
 	if string(responseBody) != "" {
-		t.Errorf(string(responseBody))
+		t.Error(string(responseBody))
 	}
 }
 
@@ -297,9 +299,9 @@ func mpTypedMapper(w http.ResponseWriter, r *http.Request, manager interfaces.IM
 }
 
 func TestTypedMapper(t *testing.T) {
-	multipartForm, err := form.SendMultipartForm("http://localhost:8020/mp-typed-struct",
+	multipartForm, err := form.SendMultipartForm(tutils.MakeUrl(tconf.PortFormMapping, "mp-typed-struct"),
 		map[string][]string{"id": {"1"}, "name": {"name"}, "slice": {"a1", "a2"}, "is_ok": {"true"}},
-		map[string][]string{"file": {"../x.png"}},
+		map[string][]string{"file": {"x.png"}},
 	)
 	if err != nil {
 		t.Error(err)
@@ -310,6 +312,6 @@ func TestTypedMapper(t *testing.T) {
 		t.Error(err)
 	}
 	if string(responseBody) != "" {
-		t.Errorf(string(responseBody))
+		t.Error(string(responseBody))
 	}
 }

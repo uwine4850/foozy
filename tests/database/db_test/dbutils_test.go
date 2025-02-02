@@ -10,8 +10,8 @@ import (
 )
 
 func TestParseString(t *testing.T) {
-	clearDbTest()
-	createDbTest()
+	clearSyncTest()
+	createSyncTest()
 	res, err := db.SyncQ().Query("SELECT * FROM dbtest")
 	if err != nil {
 		panic(err)
@@ -38,8 +38,8 @@ func TestParseInt(t *testing.T) {
 }
 
 func TestParseDateTime(t *testing.T) {
-	clearDbTest()
-	createDbTest()
+	clearSyncTest()
+	createSyncTest()
 	res, err := db.SyncQ().Query("SELECT * FROM dbtest")
 	if err != nil {
 		panic(err)
@@ -54,8 +54,8 @@ func TestParseDateTime(t *testing.T) {
 }
 
 func TestParseFloat(t *testing.T) {
-	clearDbTest()
-	createDbTest()
+	clearSyncTest()
+	createSyncTest()
 	res, err := db.SyncQ().Query("SELECT * FROM dbtest")
 	if err != nil {
 		panic(err)

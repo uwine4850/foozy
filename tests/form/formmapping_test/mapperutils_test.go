@@ -1,4 +1,4 @@
-package formmappingtest_test
+package formmappingtest
 
 import (
 	"io"
@@ -10,6 +10,8 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/form"
 	"github.com/uwine4850/foozy/pkg/router/form/formmapper"
 	"github.com/uwine4850/foozy/pkg/typeopr"
+	"github.com/uwine4850/foozy/tests1/common/tconf"
+	"github.com/uwine4850/foozy/tests1/common/tutils"
 )
 
 type Fill struct {
@@ -43,8 +45,8 @@ func fill(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) f
 }
 
 func TestFillStructFromForm(t *testing.T) {
-	multipartForm, err := form.SendMultipartForm("http://localhost:8020/fill",
-		map[string][]string{"f1": {"v1"}}, map[string][]string{"file": {"../x.png"}})
+	multipartForm, err := form.SendMultipartForm(tutils.MakeUrl(tconf.PortFormMapping, "fill"),
+		map[string][]string{"f1": {"v1"}}, map[string][]string{"file": {"x.png"}})
 	if err != nil {
 		t.Error(err)
 	}
@@ -53,7 +55,7 @@ func TestFillStructFromForm(t *testing.T) {
 		t.Error(err)
 	}
 	if string(responseBody) != "" {
-		t.Errorf(string(responseBody))
+		t.Error(string(responseBody))
 	}
 	err = multipartForm.Body.Close()
 	if err != nil {
@@ -86,8 +88,8 @@ func fillReflectValue(w http.ResponseWriter, r *http.Request, manager interfaces
 }
 
 func TestFillReflectValueFromForm(t *testing.T) {
-	multipartForm, err := form.SendMultipartForm("http://localhost:8020/fill-reflect-value",
-		map[string][]string{"f1": {"v1"}}, map[string][]string{"file": {"../x.png"}})
+	multipartForm, err := form.SendMultipartForm(tutils.MakeUrl(tconf.PortFormMapping, "fill-reflect-value"),
+		map[string][]string{"f1": {"v1"}}, map[string][]string{"file": {"x.png"}})
 	if err != nil {
 		t.Error(err)
 	}
@@ -96,7 +98,7 @@ func TestFillReflectValueFromForm(t *testing.T) {
 		t.Error(err)
 	}
 	if string(responseBody) != "" {
-		t.Errorf(string(responseBody))
+		t.Error(string(responseBody))
 	}
 	err = multipartForm.Body.Close()
 	if err != nil {

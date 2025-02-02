@@ -21,19 +21,17 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
 	"github.com/uwine4850/foozy/pkg/server"
 	"github.com/uwine4850/foozy/pkg/server/globalflow"
-	initcnf "github.com/uwine4850/foozy/tests/init_cnf"
+	"github.com/uwine4850/foozy/tests1/common/tconf"
+	testinitcnf "github.com/uwine4850/foozy/tests1/common/test_init_cnf"
+	"github.com/uwine4850/foozy/tests1/common/tutils"
 )
-
-var dbArgs = database.DbArgs{
-	Username: "root", Password: "1111", Host: "localhost", Port: "3408", DatabaseName: "foozy_test",
-}
 
 var mng = manager.NewManager(nil)
 var newRouter = router.NewRouter(mng)
 
 func TestMain(m *testing.M) {
-	initcnf.InitCnf()
-	_db := database.NewDatabase(dbArgs)
+	testinitcnf.InitCnf()
+	_db := database.NewDatabase(tconf.DbArgs)
 	if err := _db.Connect(); err != nil {
 		panic(err)
 	}
@@ -48,7 +46,7 @@ func TestMain(m *testing.M) {
 	}
 	mng.Key().Generate32BytesKeys()
 
-	mddlDb := database.NewDatabase(dbArgs)
+	mddlDb := database.NewDatabase(tconf.DbArgs)
 	if err := mddlDb.Connect(); err != nil {
 		panic(err)
 	}
@@ -58,41 +56,77 @@ func TestMain(m *testing.M) {
 		middlewares.SetMddlError(err, manager.OneTimeData())
 	}))
 
-	newRouter.Get("/register", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		if err := auth.CreateAuthTable(_db); err != nil {
+	newRouter.Get("/register", register(_db))
+	newRouter.Get("/login", login(_db))
+	newRouter.Get("/uid", uid())
+	newRouter.Get("/upd-keys", updKeys())
+	newRouter.Get("/user-by-id", userById(_db))
+	serv := server.NewServer(tconf.PortAuth, newRouter, nil)
+	go func() {
+		err = serv.Start()
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+			panic(err)
+		}
+	}()
+	if err := server.WaitStartServer(tconf.PortAuth, 5); err != nil {
+		panic(err)
+	}
+	exitCode := m.Run()
+	os.Exit(exitCode)
+	err = serv.Stop()
+	if err != nil {
+		panic(err)
+	}
+}
+
+func register(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+		if err := auth.CreateAuthTable(db); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager) }
 		}
-		au := auth.NewAuth(_db, w, mng)
+		au := auth.NewAuth(db, w, mng)
 		if err := au.RegisterUser("test", "111111"); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager) }
 		}
 		return func() {}
-	})
-	newRouter.Get("/login", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		au := auth.NewAuth(_db, w, mng)
+	}
+}
+
+func login(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+		au := auth.NewAuth(db, w, mng)
 		if _, err := au.LoginUser("test", "111111"); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager) }
 		}
 		return func() {}
-	})
-	newRouter.Get("/uid", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	}
+}
+
+func uid() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		k := mng.Key().Get32BytesKey()
 		var a auth.AuthCookie
 		if err := cookies.ReadSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), r, namelib.AUTH.COOKIE_AUTH, &a); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager) }
 		}
 		return func() {}
-	})
-	newRouter.Get("/upd-keys", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	}
+}
+
+func updKeys() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		k := mng.Key().Get32BytesKey()
 		var a auth.AuthCookie
 		if err := cookies.ReadSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), r, namelib.AUTH.COOKIE_AUTH, &a); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager) }
 		}
 		return func() {}
-	})
-	newRouter.Get("/user-by-id", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		user, err := auth.UserByID(_db, 1)
+	}
+}
+
+func userById(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+		user, err := auth.UserByID(db, 1)
 		if err != nil {
 			panic(err)
 		}
@@ -105,27 +139,11 @@ func TestMain(m *testing.M) {
 			}
 		}
 		return func() { w.Write([]byte("!OK")) }
-	})
-	serv := server.NewServer(":8060", newRouter, nil)
-	go func() {
-		err = serv.Start()
-		if err != nil && !errors.Is(http.ErrServerClosed, err) {
-			panic(err)
-		}
-	}()
-	if err := server.WaitStartServer(":8060", 5); err != nil {
-		panic(err)
 	}
-	exitCode := m.Run()
-	err = serv.Stop()
-	if err != nil {
-		panic(err)
-	}
-	os.Exit(exitCode)
 }
 
 func TestRegister(t *testing.T) {
-	get, err := http.Get("http://localhost:8060/register")
+	get, err := http.Get(tutils.MakeUrl(tconf.PortAuth, "register"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -143,7 +161,7 @@ func TestRegister(t *testing.T) {
 }
 
 func TestLogin(t *testing.T) {
-	get, err := http.Get("http://localhost:8060/login")
+	get, err := http.Get(tutils.MakeUrl(tconf.PortAuth, "login"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -161,7 +179,7 @@ func TestLogin(t *testing.T) {
 }
 
 func TestReadUID(t *testing.T) {
-	createReq, err := http.NewRequest("GET", "http://localhost:8060/login", nil)
+	createReq, err := http.NewRequest("GET", tutils.MakeUrl(tconf.PortAuth, "login"), nil)
 	if err != nil {
 		t.Error(err)
 	}
@@ -171,7 +189,7 @@ func TestReadUID(t *testing.T) {
 	}
 	defer createResp.Body.Close()
 
-	readReq, err := http.NewRequest("GET", "http://localhost:8060/uid", nil)
+	readReq, err := http.NewRequest("GET", tutils.MakeUrl(tconf.PortAuth, "uid"), nil)
 	if err != nil {
 		t.Error(err)
 	}
@@ -208,7 +226,7 @@ func TestUpdKeys(t *testing.T) {
 		t.Errorf("BlockKey has not been updated.")
 	}
 
-	get, err := http.Get("http://localhost:8060/login")
+	get, err := http.Get(tutils.MakeUrl(tconf.PortAuth, "login"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -226,7 +244,7 @@ func TestUpdKeys(t *testing.T) {
 }
 
 func TestUserByID(t *testing.T) {
-	get, err := http.Get("http://localhost:8060/user-by-id")
+	get, err := http.Get(tutils.MakeUrl(tconf.PortAuth, "user-by-id"))
 	if err != nil {
 		t.Error(err)
 	}

@@ -104,8 +104,8 @@ func TestAsyncSelectNotInSlice(t *testing.T) {
 }
 
 func TestAsyncInsert(t *testing.T) {
-	clearDbAsyncTest()
-	createDbAsyncTest()
+	clearAsyncTest()
+	createAsyncTest()
 	db.AsyncQ().AsyncInsert("s", "db_async_test", map[string]interface{}{"col1": "text3", "col2": "2023-10-20", "col3": 10.22})
 	db.AsyncQ().Wait()
 	db.AsyncQ().AsyncQuery("s1", "SELECT * FROM db_async_test WHERE col1 = 'text3'")
@@ -124,8 +124,8 @@ func TestAsyncInsert(t *testing.T) {
 }
 
 func TestAsyncCount(t *testing.T) {
-	clearDbAsyncTest()
-	createDbAsyncTest()
+	clearAsyncTest()
+	createAsyncTest()
 	db.AsyncQ().AsyncCount("s", []string{"*"}, "db_async_test", dbutils.WHOutput{}, 0)
 	db.AsyncQ().Wait()
 	res, _ := db.AsyncQ().LoadAsyncRes("s")
@@ -142,8 +142,8 @@ func TestAsyncCount(t *testing.T) {
 }
 
 func TestAsyncDelete(t *testing.T) {
-	clearDbAsyncTest()
-	createDbAsyncTest()
+	clearAsyncTest()
+	createAsyncTest()
 	db.AsyncQ().AsyncDelete("s", "db_async_test", dbutils.WHEquals(map[string]interface{}{
 		"col1": "test1",
 	}, "AND"))
@@ -164,8 +164,8 @@ func TestAsyncDelete(t *testing.T) {
 }
 
 func TestAsyncUpdate(t *testing.T) {
-	clearDbAsyncTest()
-	createDbAsyncTest()
+	clearAsyncTest()
+	createAsyncTest()
 	db.AsyncQ().AsyncUpdate("s", "db_async_test", map[string]any{"col1": "upd1", "col2": "2023-10-15", "col3": 1.1},
 		dbutils.WHEquals(map[string]interface{}{"col1": "test2"}, "AND"))
 	db.AsyncQ().Wait()
@@ -187,8 +187,8 @@ func TestAsyncUpdate(t *testing.T) {
 }
 
 func TestAsyncCommitTransaction(t *testing.T) {
-	clearDbAsyncTest()
-	createDbAsyncTest()
+	clearAsyncTest()
+	createAsyncTest()
 	db.BeginTransaction()
 	db.AsyncQ().AsyncInsert("res", "db_async_test", map[string]interface{}{"col1": "textComm", "col2": "2023-11-21", "col3": 10.24})
 	db.AsyncQ().Wait()
@@ -224,8 +224,8 @@ func TestAsyncCommitTransaction(t *testing.T) {
 }
 
 func TestAsyncRollbackTransaction(t *testing.T) {
-	clearDbAsyncTest()
-	createDbAsyncTest()
+	clearAsyncTest()
+	createAsyncTest()
 	db.BeginTransaction()
 	db.AsyncQ().AsyncInsert("res", "db_async_test", map[string]interface{}{"col1": "textBack", "col2": "2023-11-21", "col3": 10.24})
 	db.AsyncQ().Wait()

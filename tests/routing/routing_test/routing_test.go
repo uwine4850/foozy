@@ -1,4 +1,4 @@
-package routing
+package routingtest
 
 import (
 	"errors"
@@ -11,25 +11,17 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router"
-	"github.com/uwine4850/foozy/pkg/router/cookies"
 	"github.com/uwine4850/foozy/pkg/router/form"
 	"github.com/uwine4850/foozy/pkg/router/manager"
 	"github.com/uwine4850/foozy/pkg/router/tmlengine"
 	"github.com/uwine4850/foozy/pkg/server"
-	initcnf "github.com/uwine4850/foozy/tests/init_cnf"
-)
-
-type SessionData struct {
-	UserID string
-}
-
-var (
-	hashKey  = []byte("1234567890abcdef1234567890abcdef") // 32 bytes
-	blockKey = []byte("abcdefghijklmnopqrstuvwx12345678") // 32 bytes
+	"github.com/uwine4850/foozy/tests1/common/tconf"
+	testinitcnf "github.com/uwine4850/foozy/tests1/common/test_init_cnf"
+	"github.com/uwine4850/foozy/tests1/common/tutils"
 )
 
 func TestMain(m *testing.M) {
-	initcnf.InitCnf()
+	testinitcnf.InitCnf()
 	render, err := tmlengine.NewRender()
 	if err != nil {
 		panic(err)
@@ -60,25 +52,6 @@ func TestMain(m *testing.M) {
 		}
 		return func() {}
 	})
-	newRouter.Get("/session-create", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		if err := cookies.CreateSecureCookieData(hashKey, blockKey, w, &http.Cookie{
-			Name:     "session",
-			Path:     "/",
-			HttpOnly: true,
-			Secure:   true,
-		}, &SessionData{UserID: "111"}); err != nil {
-			panic(err)
-		}
-		return func() {}
-	})
-	newRouter.Get("/session-read", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		var data SessionData
-		if err := cookies.ReadSecureCookieData(hashKey, blockKey, r, "session", &data); err != nil {
-			panic(err)
-		}
-		w.Write([]byte(data.UserID))
-		return func() {}
-	})
 	newRouter.Get("/redirect-error", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		router.RedirectError(w, r, "/catch-redirect-error", "error")
 		return func() {}
@@ -89,17 +62,14 @@ func TestMain(m *testing.M) {
 		w.Write([]byte(strconv.FormatBool(ok)))
 		return func() {}
 	})
-	newRouter.Get("/cookie", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		return func() { cookies.SetStandartCookie(w, "cookie", "value", "/", 0) }
-	})
-	serv := server.NewServer(":8030", newRouter, nil)
+	serv := server.NewServer(tconf.PortRouter, newRouter, nil)
 	go func() {
 		err = serv.Start()
-		if err != nil && !errors.Is(http.ErrServerClosed, err) {
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			panic(err)
 		}
 	}()
-	if err := server.WaitStartServer(":8030", 5); err != nil {
+	if err := server.WaitStartServer(tconf.PortRouter, 5); err != nil {
 		panic(err)
 	}
 	exitCode := m.Run()
@@ -111,7 +81,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestPage(t *testing.T) {
-	get, err := http.Get("http://localhost:8030/page")
+	get, err := http.Get(tutils.MakeUrl(tconf.PortRouter, "page"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -129,7 +99,7 @@ func TestPage(t *testing.T) {
 }
 
 func TestPageSlug(t *testing.T) {
-	get, err := http.Get("http://localhost:8030/page/1")
+	get, err := http.Get(tutils.MakeUrl(tconf.PortRouter, "page/1"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -147,7 +117,7 @@ func TestPageSlug(t *testing.T) {
 }
 
 func TestPageMultipleSlug(t *testing.T) {
-	get, err := http.Get("http://localhost:8030/page2/1/name")
+	get, err := http.Get(tutils.MakeUrl(tconf.PortRouter, "page2/1/name"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -165,7 +135,7 @@ func TestPageMultipleSlug(t *testing.T) {
 }
 
 func TestPost(t *testing.T) {
-	resp, err := form.SendApplicationForm("http://localhost:8030/post/12", map[string][]string{})
+	resp, err := form.SendApplicationForm(tutils.MakeUrl(tconf.PortRouter, "post/12"), map[string][]string{})
 	if err != nil {
 		t.Error(err)
 	}
@@ -179,7 +149,7 @@ func TestPost(t *testing.T) {
 }
 
 func TestRedirectError(t *testing.T) {
-	get, err := http.Get("http://localhost:8030/redirect-error")
+	get, err := http.Get(tutils.MakeUrl(tconf.PortRouter, "redirect-error"))
 	if err != nil {
 		t.Error(err)
 	}

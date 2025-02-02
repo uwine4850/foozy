@@ -6,15 +6,12 @@ import (
 	"testing"
 
 	"github.com/uwine4850/foozy/pkg/database"
+	"github.com/uwine4850/foozy/tests1/common/tconf"
 )
 
-var dbArgs = database.DbArgs{
-	Username: "root", Password: "1111", Host: "localhost", Port: "3408", DatabaseName: "foozy_test",
-}
-
-var dbcc1 = database.NewDatabase(dbArgs)
-var dbcc2 = database.NewDatabase(dbArgs)
-var dbcc3 = database.NewDatabase(dbArgs)
+var dbcc1 = database.NewDatabase(tconf.DbArgs)
+var dbcc2 = database.NewDatabase(tconf.DbArgs)
+var dbcc3 = database.NewDatabase(tconf.DbArgs)
 
 func TestOpenCloseAllConnections(t *testing.T) {
 	cc := database.ControlConnect{}

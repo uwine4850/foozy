@@ -1,4 +1,4 @@
-package resttest
+package restmappertest
 
 import (
 	"errors"
@@ -14,7 +14,9 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/rest/restmapper"
 	"github.com/uwine4850/foozy/pkg/server"
 	"github.com/uwine4850/foozy/pkg/typeopr"
-	initcnf "github.com/uwine4850/foozy/tests/init_cnf"
+	"github.com/uwine4850/foozy/tests1/common/tconf"
+	testinitcnf "github.com/uwine4850/foozy/tests1/common/test_init_cnf"
+	"github.com/uwine4850/foozy/tests1/common/tutils"
 )
 
 var mng = manager.NewManager(nil)
@@ -23,11 +25,11 @@ var newRouter = router.NewRouter(mng)
 var dto = rest.NewDTO()
 
 func TestMain(m *testing.M) {
-	initcnf.InitCnf()
+	testinitcnf.InitCnf()
 	dto.AllowedMessages([]rest.AllowMessage{
 		{
 			Name:    "JsonData",
-			Package: "resttest",
+			Package: "restmappertest",
 		},
 	})
 	newRouter.Get("/json", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -44,14 +46,14 @@ func TestMain(m *testing.M) {
 			router.SendJson(jsonData, w)
 		}
 	})
-	serv := server.NewServer(":8070", newRouter, nil)
+	serv := server.NewServer(tconf.PortRestMapper, newRouter, nil)
 	go func() {
 		err := serv.Start()
-		if err != nil && !errors.Is(http.ErrServerClosed, err) {
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			panic(err)
 		}
 	}()
-	if err := server.WaitStartServer(":8070", 5); err != nil {
+	if err := server.WaitStartServer(tconf.PortRestMapper, 5); err != nil {
 		panic(err)
 	}
 	exitCode := m.Run()
@@ -74,7 +76,7 @@ type JsonData struct {
 }
 
 func TestRestJson(t *testing.T) {
-	get, err := http.Get("http://localhost:8070/json")
+	get, err := http.Get(tutils.MakeUrl(tconf.PortRestMapper, "json"))
 	if err != nil {
 		t.Error(err)
 	}

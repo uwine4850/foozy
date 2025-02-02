@@ -1,4 +1,4 @@
-package formmappingtest_test
+package formmappingtest
 
 import (
 	"errors"
@@ -7,18 +7,17 @@ import (
 	"testing"
 
 	"github.com/uwine4850/foozy/pkg/builtin/builtin_mddl"
-	"github.com/uwine4850/foozy/pkg/config"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/manager"
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
 	"github.com/uwine4850/foozy/pkg/router/tmlengine"
 	"github.com/uwine4850/foozy/pkg/server"
-	initcnf "github.com/uwine4850/foozy/tests/init_cnf"
+	"github.com/uwine4850/foozy/tests1/common/tconf"
+	testinitcnf "github.com/uwine4850/foozy/tests1/common/test_init_cnf"
 )
 
 func TestMain(m *testing.M) {
-	initcnf.InitCnf()
-	config.Cnf().SetLoadPath("../../config.yaml")
+	testinitcnf.InitCnf()
 	mddl := middlewares.NewMiddleware()
 	mddl.AsyncHandlerMddl(builtin_mddl.GenerateAndSetCsrf(1800, nil))
 	render, err := tmlengine.NewRender()
@@ -35,20 +34,20 @@ func TestMain(m *testing.M) {
 	newRouter.Post("/fill", fill)
 	newRouter.Post("/fill-reflect-value", fillReflectValue)
 	newRouter.Post("/mp-typed-struct", mpTypedMapper)
-	serv := server.NewServer(":8020", newRouter, nil)
+	serv := server.NewServer(tconf.PortFormMapping, newRouter, nil)
 	go func() {
 		err = serv.Start()
-		if err != nil && !errors.Is(http.ErrServerClosed, err) {
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			panic(err)
 		}
 	}()
-	if err := server.WaitStartServer(":8020", 5); err != nil {
+	if err := server.WaitStartServer(tconf.PortFormMapping, 5); err != nil {
 		panic(err)
 	}
 	exitCode := m.Run()
+	os.Exit(exitCode)
 	err = serv.Stop()
 	if err != nil {
 		panic(err)
 	}
-	os.Exit(exitCode)
 }
