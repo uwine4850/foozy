@@ -21,7 +21,7 @@ type CreateRoleObject struct {
 }
 
 func (cr *CreateRoleObject) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
-	ok, err := AdminPermissions(cr.DB)
+	ok, err := AdminPermissions(r, manager, cr.DB)
 	if err != nil {
 		return false, func() {
 			router.ServerForbidden(w, manager)
@@ -37,7 +37,7 @@ func (cr *CreateRoleObject) Permissions(w http.ResponseWriter, r *http.Request, 
 }
 
 func (cr *CreateRoleObject) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
-	if errors.Is(err, &errRoleAlreadyExists{}) || IsObjectValidateCSRFError(err) {
+	if errors.Is(err, &errRoleAlreadyExists{}) || IsObjectValidateCSRFError(err) || errors.Is(err, &ErrRolesTableNotCreated{}) {
 		router.RedirectError(w, r, "/admin/users", err.Error())
 	} else {
 		router.ServerError(w, err.Error(), manager)
@@ -45,6 +45,13 @@ func (cr *CreateRoleObject) OnError(w http.ResponseWriter, r *http.Request, mana
 }
 
 func (cr *CreateRoleObject) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
+	rolesTableCreated, err := IsRolesTableCreated(cr.DB)
+	if err != nil {
+		return nil, err
+	}
+	if !rolesTableCreated {
+		return nil, &ErrRolesTableNotCreated{}
+	}
 	formObjectInterface, err := cr.FormInterface(manager.OneTimeData())
 	if err != nil {
 		return nil, err

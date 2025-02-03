@@ -27,7 +27,7 @@ func CreateTables(db *database.Database) router.Handler {
 				router.ServerError(w, err.Error(), manager)
 			}
 		}()
-		ok, err := AdminPermissions(db)
+		ok, err := AdminPermissions(r, manager, db)
 		if err != nil {
 			return func() { router.ServerError(w, err.Error(), manager) }
 		}

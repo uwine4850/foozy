@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"path/filepath"
+	"reflect"
 
 	"github.com/uwine4850/foozy/internal/adminpanel"
 	"github.com/uwine4850/foozy/pkg/database"
@@ -75,7 +76,7 @@ func AdminPage(db *database.Database) router.Handler {
 				router.ServerError(w, err.Error(), manager)
 			}
 		}()
-		ok, err := adminpanel.AdminPermissions(db)
+		ok, err := adminpanel.AdminPermissions(r, manager, db)
 		if err != nil {
 			return func() { router.ServerError(w, err.Error(), manager) }
 		}
@@ -87,12 +88,16 @@ func AdminPage(db *database.Database) router.Handler {
 		if err != nil {
 			return func() { router.ServerError(w, err.Error(), manager) }
 		}
-		adminSettingsDB, err := AdminSettings(db)
-		if err != nil {
-			return func() { router.ServerError(w, err.Error(), manager) }
-		}
 		manager.Render().SetContext(map[string]interface{}{"isSettingsTableCreated": settingsTableCreated})
-		manager.Render().SetContext(map[string]interface{}{"adminSettingsDB": adminSettingsDB})
+
+		if settingsTableCreated {
+			adminSettingsDB, err := AdminSettings(db)
+			if err != nil {
+				fmt.Println(reflect.TypeOf(err))
+				return func() { router.ServerError(w, err.Error(), manager) }
+			}
+			manager.Render().SetContext(map[string]interface{}{"adminSettingsDB": adminSettingsDB})
+		}
 		router.CatchRedirectError(r, manager)
 		manager.Render().SetTemplatePath(adminHTML)
 		if err := manager.Render().RenderTemplate(w, r); err != nil {

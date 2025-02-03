@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/uwine4850/foozy/pkg/database"
-	"github.com/uwine4850/foozy/tests1/common/tconf"
+	"github.com/uwine4850/foozy/tests/common/tconf"
 )
 
 var db = database.NewDatabase(tconf.DbArgs)

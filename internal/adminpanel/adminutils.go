@@ -3,12 +3,16 @@ package adminpanel
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"strings"
 
+	"github.com/uwine4850/foozy/pkg/builtin/auth"
 	"github.com/uwine4850/foozy/pkg/config"
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbmapper"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
+	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/secure"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
@@ -37,7 +41,14 @@ func IsObjectValidateCSRFError(err error) bool {
 	return false
 }
 
-func AdminPermissions(db *database.Database) (bool, error) {
+func AdminPermissions(r *http.Request, mng interfaces.IManager, db *database.Database) (bool, error) {
+	userIsAdmin, err := UserIsAdmin(r, mng, db)
+	if err != nil {
+		return false, err
+	}
+	if !userIsAdmin {
+		return false, nil
+	}
 	isDebug := config.LoadedConfig().Default.Debug.Debug
 	onlyAdminAccess, err := OnlyAdminAccess(db)
 	if err != nil {
@@ -92,6 +103,26 @@ func OnlyAdminAccess(db *database.Database) (bool, error) {
 		}
 	}
 	return false, nil
+}
+
+func UserIsAdmin(r *http.Request, mng interfaces.IManager, db *database.Database) (bool, error) {
+	authCookie, err := r.Cookie(namelib.AUTH.COOKIE_AUTH)
+	if err != nil {
+		return false, err
+	}
+	var authData auth.AuthCookie
+	if err := secure.ReadSecureData([]byte(mng.Key().HashKey()), []byte(mng.Key().BlockKey()), authCookie.Value, &authData); err != nil {
+		return false, err
+	}
+	res, err := db.SyncQ().QB().Select("*", USER_ROLES_TABLE).Where("user_id", "=", authData.UID).Ex()
+	if err != nil {
+		return false, err
+	}
+	if len(res) > 0 {
+		return true, nil
+	} else {
+		return false, nil
+	}
 }
 
 func TableExists(db *database.Database, tableName string) (bool, error) {
@@ -211,4 +242,23 @@ func RoleIsAdmin(name string, db *database.Database) (bool, error) {
 		}
 	}
 	return false, nil
+}
+
+func IsRolesTableCreated(db *database.Database) (bool, error) {
+	ok, err := TableExists(db, USER_ROLES_TABLE)
+	if err != nil {
+		return false, err
+	}
+	if ok {
+		return true, nil
+	} else {
+		return false, nil
+	}
+}
+
+type ErrRolesTableNotCreated struct {
+}
+
+func (e *ErrRolesTableNotCreated) Error() string {
+	return "roles table not created"
 }

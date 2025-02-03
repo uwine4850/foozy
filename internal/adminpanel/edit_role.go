@@ -22,7 +22,7 @@ type EditRoleObject struct {
 }
 
 func (er *EditRoleObject) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
-	ok, err := AdminPermissions(er.DB)
+	ok, err := AdminPermissions(r, manager, er.DB)
 	if err != nil {
 		return false, func() {
 			router.ServerForbidden(w, manager)

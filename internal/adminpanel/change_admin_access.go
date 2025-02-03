@@ -21,7 +21,7 @@ type ChangeAdminAccessObject struct {
 }
 
 func (aa *ChangeAdminAccessObject) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
-	ok, err := AdminPermissions(aa.DB)
+	ok, err := AdminPermissions(r, manager, aa.DB)
 	if err != nil {
 		return false, func() {
 			router.ServerForbidden(w, manager)
@@ -37,7 +37,7 @@ func (aa *ChangeAdminAccessObject) Permissions(w http.ResponseWriter, r *http.Re
 }
 
 func (aa *ChangeAdminAccessObject) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
-	if errors.Is(err, &errAdminUserNotExist{}) {
+	if errors.Is(err, &errAdminUserNotExist{}) || errors.Is(err, &ErrRolesTableNotCreated{}) {
 		router.RedirectError(w, r, "/admin", err.Error())
 		return
 	}
@@ -45,6 +45,13 @@ func (aa *ChangeAdminAccessObject) OnError(w http.ResponseWriter, r *http.Reques
 }
 
 func (aa *ChangeAdminAccessObject) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
+	rolesTableCreated, err := IsRolesTableCreated(aa.DB)
+	if err != nil {
+		return nil, err
+	}
+	if !rolesTableCreated {
+		return nil, &ErrRolesTableNotCreated{}
+	}
 	admin_access_db, err := aa.DB.SyncQ().QB().Select("admin_access", ADMIN_SETTINGS_TABLE).Ex()
 	if err != nil {
 		return nil, err

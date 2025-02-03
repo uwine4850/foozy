@@ -21,7 +21,7 @@ type DeleteRoleObject struct {
 }
 
 func (dr *DeleteRoleObject) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
-	ok, err := AdminPermissions(dr.DB)
+	ok, err := AdminPermissions(r, manager, dr.DB)
 	if err != nil {
 		return false, func() {
 			router.ServerForbidden(w, manager)

@@ -10,7 +10,7 @@ func main() {
     }
 }
 ```
-After that, you need to initialize the configuration settings. To do this, use the same function with the following command `go run <path to cmd.go> initcnf <target dir>`. This command creates a file that contains a configuration setting function, [read more here](https://github.com/uwine4850/foozy/blob/master/docs/config/config.md). It should be used in the `main` function. Now the function can look like the following:
+After that, you need to initialize the configuration settings. To do this, use the same function with the following command `go run <path to cmd.go> cnf-init <target dir>`. This command creates a file that contains a configuration setting function, [read more here](https://github.com/uwine4850/foozy/blob/master/docs/config/config.md). It should be used in the `main` function. Now the function can look like the following:
 ```
 func main() {
 	initcnf.InitCnf()
@@ -22,9 +22,9 @@ func main() {
 After these operations you can fully use cmd.
 
 The package contains the following commands:
-* *cnfinfo* — configuration field information. Only information from the `i` tag is output.
-* *initcnf <target_dir>* — generates a file with configuration settings.
-* *gencnf* — generates a configuration. It is important that the configuration is pre-installed, e.g. with `initcnf`.
+* *cnf-info* — configuration field information. Only information from the `i` tag is output.
+* *cnf-init <target_dir>* — generates a file with configuration settings.
+* *cnf-gen* — generates a configuration. It is important that the configuration is pre-installed, e.g. with `initcnf`.
 
 __Run__
 ```

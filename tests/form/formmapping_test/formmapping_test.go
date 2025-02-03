@@ -12,8 +12,8 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/form"
 	"github.com/uwine4850/foozy/pkg/router/form/formmapper"
 	"github.com/uwine4850/foozy/pkg/typeopr"
-	"github.com/uwine4850/foozy/tests1/common/tconf"
-	"github.com/uwine4850/foozy/tests1/common/tutils"
+	"github.com/uwine4850/foozy/tests/common/tconf"
+	"github.com/uwine4850/foozy/tests/common/tutils"
 )
 
 type TestMapping struct {

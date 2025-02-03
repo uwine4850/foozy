@@ -13,9 +13,9 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/manager"
 	"github.com/uwine4850/foozy/pkg/server"
 	"github.com/uwine4850/foozy/pkg/utils/fpath"
-	"github.com/uwine4850/foozy/tests1/common/tconf"
-	testinitcnf "github.com/uwine4850/foozy/tests1/common/test_init_cnf"
-	"github.com/uwine4850/foozy/tests1/common/tutils"
+	"github.com/uwine4850/foozy/tests/common/tconf"
+	testinitcnf "github.com/uwine4850/foozy/tests/common/test_init_cnf"
+	"github.com/uwine4850/foozy/tests/common/tutils"
 )
 
 var mngr = manager.NewManager(nil)

@@ -26,7 +26,7 @@ type UserSearchByID struct {
 }
 
 func (us *UserSearchByID) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
-	ok, err := AdminPermissions(us.DB)
+	ok, err := AdminPermissions(r, manager, us.DB)
 	if err != nil {
 		return false, func() {
 			router.ServerForbidden(w, manager)
@@ -91,7 +91,7 @@ type UserSearchByUsername struct {
 }
 
 func (us *UserSearchByUsername) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
-	ok, err := AdminPermissions(us.DB)
+	ok, err := AdminPermissions(r, manager, us.DB)
 	if err != nil {
 		return false, func() {
 			router.ServerForbidden(w, manager)

@@ -21,7 +21,7 @@ type UserViewObject struct {
 }
 
 func (uv *UserViewObject) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
-	ok, err := AdminPermissions(uv.DB)
+	ok, err := AdminPermissions(r, manager, uv.DB)
 	if err != nil {
 		return false, func() {
 			router.ServerForbidden(w, manager)
@@ -41,6 +41,13 @@ func (uv *UserViewObject) OnError(w http.ResponseWriter, r *http.Request, manage
 }
 
 func (uv *UserViewObject) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
+	rolesTableCreated, err := IsRolesTableCreated(uv.DB)
+	if err != nil {
+		return nil, err
+	}
+	if !rolesTableCreated {
+		return nil, &ErrRolesTableNotCreated{}
+	}
 	roles, err := getAllRoles(uv.DB)
 	if err != nil {
 		return nil, err
@@ -79,7 +86,7 @@ type UserViewEditFormObject struct {
 }
 
 func (uv *UserViewEditFormObject) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
-	ok, err := AdminPermissions(uv.DB)
+	ok, err := AdminPermissions(r, manager, uv.DB)
 	if err != nil {
 		return false, func() {
 			router.ServerForbidden(w, manager)

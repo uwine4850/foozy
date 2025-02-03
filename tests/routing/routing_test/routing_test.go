@@ -15,9 +15,9 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/manager"
 	"github.com/uwine4850/foozy/pkg/router/tmlengine"
 	"github.com/uwine4850/foozy/pkg/server"
-	"github.com/uwine4850/foozy/tests1/common/tconf"
-	testinitcnf "github.com/uwine4850/foozy/tests1/common/test_init_cnf"
-	"github.com/uwine4850/foozy/tests1/common/tutils"
+	"github.com/uwine4850/foozy/tests/common/tconf"
+	testinitcnf "github.com/uwine4850/foozy/tests/common/test_init_cnf"
+	"github.com/uwine4850/foozy/tests/common/tutils"
 )
 
 func TestMain(m *testing.M) {

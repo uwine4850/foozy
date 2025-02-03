@@ -11,7 +11,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 	"github.com/uwine4850/foozy/pkg/utils/fmap"
-	"github.com/uwine4850/foozy/tests1/common/tconf"
+	"github.com/uwine4850/foozy/tests/common/tconf"
 )
 
 var db = database.NewDatabase(tconf.DbArgs)

@@ -21,9 +21,9 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
 	"github.com/uwine4850/foozy/pkg/server"
 	"github.com/uwine4850/foozy/pkg/server/globalflow"
-	"github.com/uwine4850/foozy/tests1/common/tconf"
-	testinitcnf "github.com/uwine4850/foozy/tests1/common/test_init_cnf"
-	"github.com/uwine4850/foozy/tests1/common/tutils"
+	"github.com/uwine4850/foozy/tests/common/tconf"
+	testinitcnf "github.com/uwine4850/foozy/tests/common/test_init_cnf"
+	"github.com/uwine4850/foozy/tests/common/tutils"
 )
 
 var mng = manager.NewManager(nil)
@@ -52,7 +52,7 @@ func TestMain(m *testing.M) {
 	}
 	defer mddlDb.Close()
 	mddl := middlewares.NewMiddleware()
-	mddl.HandlerMddl(0, builtin_mddl.Auth("/login", mddlDb, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+	mddl.HandlerMddl(0, builtin_mddl.Auth([]string{"/login"}, mddlDb, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
 		middlewares.SetMddlError(err, manager.OneTimeData())
 	}))
 
