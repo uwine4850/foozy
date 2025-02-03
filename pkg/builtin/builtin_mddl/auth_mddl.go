@@ -11,6 +11,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router/cookies"
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
+	"github.com/uwine4850/foozy/pkg/utils/fslice"
 )
 
 type OnError func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error)
@@ -20,14 +21,14 @@ type OnError func(w http.ResponseWriter, r *http.Request, manager interfaces.IMa
 // It is important to note that only previous keys are saved; accordingly, it is impossible to update the encoding
 // if two or more key iterations have passed, because the old keys are no longer known.
 // This middleware should not work on the login page. Therefore, you need to specify the loginUrl correctly.
-func Auth(loginUrl string, db *database.Database, onErr OnError) middlewares.MddlFunc {
+func Auth(excludePatterns []string, db *database.Database, onErr OnError) middlewares.MddlFunc {
 	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
 		pattern, ok := manager.OneTimeData().GetUserContext(namelib.ROUTER.URL_PATTERN)
 		if !ok {
 			onErr(w, r, manager, ErrUrlPatternNotExist{})
 			return
 		}
-		if pattern == loginUrl {
+		if fslice.SliceContains(excludePatterns, pattern.(string)) {
 			return
 		}
 		k := manager.Key().Get32BytesKey()
