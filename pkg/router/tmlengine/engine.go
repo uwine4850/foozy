@@ -96,10 +96,10 @@ func (e *TemplateEngine) SetRequest(r *http.Request) {
 // setCsrfVariable sets the csrf token as a variable for the templating context.
 func (e *TemplateEngine) setCsrfVariable(r *http.Request) error {
 	token, err := r.Cookie(namelib.ROUTER.COOKIE_CSRF_TOKEN)
-	data := make(map[string]interface{})
 	if err != nil && !errors.Is(err, http.ErrNoCookie) {
 		return err
 	}
+	data := make(map[string]interface{})
 	if errors.Is(err, http.ErrNoCookie) {
 		e.SetContext(data)
 		return nil

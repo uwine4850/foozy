@@ -13,6 +13,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
+	"github.com/uwine4850/foozy/pkg/router/form"
 	"github.com/uwine4850/foozy/pkg/secure"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
@@ -42,24 +43,17 @@ func IsObjectValidateCSRFError(err error) bool {
 }
 
 func AdminPermissions(r *http.Request, mng interfaces.IManager, db *database.Database) (bool, error) {
-	userIsAdmin, err := UserIsAdmin(r, mng, db)
-	if err != nil {
-		return false, err
-	}
-	if !userIsAdmin {
-		return false, nil
-	}
 	isDebug := config.LoadedConfig().Default.Debug.Debug
 	onlyAdminAccess, err := OnlyAdminAccess(db)
 	if err != nil {
 		return false, err
 	}
 	if onlyAdminAccess {
-		adminExist, err := AdminUserExists(db)
+		userIsAdmin, err := UserIsAdmin(r, mng, db)
 		if err != nil {
 			return false, err
 		}
-		if adminExist && isDebug {
+		if userIsAdmin && isDebug {
 			return true, nil
 		}
 	} else {
@@ -254,6 +248,14 @@ func IsRolesTableCreated(db *database.Database) (bool, error) {
 	} else {
 		return false, nil
 	}
+}
+
+func validateCSRF(r *http.Request) error {
+	frm := form.NewForm(r)
+	if err := frm.Parse(); err != nil {
+		return err
+	}
+	return secure.ValidateCookieCsrfToken(r, frm.Value(namelib.ROUTER.COOKIE_CSRF_TOKEN))
 }
 
 type ErrRolesTableNotCreated struct {

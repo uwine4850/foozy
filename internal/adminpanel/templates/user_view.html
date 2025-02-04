@@ -13,6 +13,7 @@
     </div>
     <hr class="line">
     <form class="user-info" method="post" enctype="application/x-www-form-urlencoded">
+        {{ CSRF_TOKEN|safe }}
         <input type="hidden" name="user-id" value="{{ user.Id }}">
         <div class="user-info-role">
             <div class="user-info-role-title">

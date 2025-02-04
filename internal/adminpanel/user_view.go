@@ -148,6 +148,7 @@ func UserEditFormView(db *database.Database) router.Handler {
 				FormStruct:       UserViewEditForm{},
 				DB:               db,
 				NotNilFormFields: []string{"user-info-role-value"},
+				ValidateCSRF:     true,
 			},
 		},
 	}

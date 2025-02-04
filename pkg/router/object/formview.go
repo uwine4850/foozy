@@ -52,7 +52,8 @@ func (v *FormView) Object(w http.ResponseWriter, r *http.Request, manager interf
 	}
 	if v.ValidateCSRF {
 		debug.RequestLogginIfEnable(debug.P_OBJECT, "validate CSRF token")
-		if err := secure.ValidateFormCsrfToken(r, frm); err != nil {
+		_csrfToken := frm.Value(namelib.ROUTER.COOKIE_CSRF_TOKEN)
+		if err := secure.ValidateCookieCsrfToken(r, _csrfToken); err != nil {
 			return nil, err
 		}
 	}

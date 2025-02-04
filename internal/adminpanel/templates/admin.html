@@ -7,6 +7,7 @@
     {% endif %}
     <div class="action-info-list">
         <form action="/admin/create-settings-table" method="post" class="action-info" enctype="application/x-www-form-urlencoded">
+            {{ CSRF_TOKEN|safe }}
             <div class="action-info-item">Admin settings table</div>
             {% if isSettingsTableCreated %}
                 <div class="action-info-value">created</div>

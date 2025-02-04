@@ -11,6 +11,9 @@ import (
 // CreateAdminSettingsTable creates a table with administration settings.
 func CreateAdminSettingsTable(db *database.Database) router.Handler {
 	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+		if err := validateCSRF(r); err != nil {
+			return func() { router.RedirectError(w, r, "/admin/create-settings-table", err.Error()) }
+		}
 		if err := db.Connect(); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager) }
 		}

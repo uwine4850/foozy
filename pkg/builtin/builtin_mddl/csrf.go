@@ -1,13 +1,10 @@
 package builtin_mddl
 
 import (
-	"crypto/rand"
-	"encoding/base64"
-	"fmt"
 	"net/http"
 
 	"github.com/uwine4850/foozy/pkg/interfaces"
-	"github.com/uwine4850/foozy/pkg/namelib"
+	"github.com/uwine4850/foozy/pkg/secure"
 )
 
 type onError func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error)
@@ -18,41 +15,8 @@ type onError func(w http.ResponseWriter, r *http.Request, manager interfaces.IMa
 // onError - a function that will be executed during an error.
 func GenerateAndSetCsrf(maxAge int, onError onError) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
 	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
-		csrfCookie, err := r.Cookie(namelib.ROUTER.COOKIE_CSRF_TOKEN)
-		if err != nil || csrfCookie.Value == "" {
-			csrfToken, err := GenerateCsrfToken()
-			if err != nil {
-				if onError != nil {
-					onError(w, r, manager, err)
-				}
-				return
-			}
-			cookie := &http.Cookie{
-				Name:     namelib.ROUTER.COOKIE_CSRF_TOKEN,
-				Value:    csrfToken,
-				MaxAge:   maxAge,
-				HttpOnly: true,
-				Secure:   true,
-				Path:     "/",
-			}
-			http.SetCookie(w, cookie)
-			csrfHTMLString := fmt.Sprintf("<input name=\"%s\" type=\"hidden\" value=\"%s\">", namelib.ROUTER.COOKIE_CSRF_TOKEN, csrfToken)
-			if manager.Render() != nil {
-				manager.Render().SetContext(map[string]interface{}{namelib.ROUTER.COOKIE_CSRF_TOKEN: csrfHTMLString})
-			}
-			manager.OneTimeData().SetUserContext(namelib.ROUTER.COOKIE_CSRF_TOKEN, csrfHTMLString)
+		if err := secure.SetCSRFToken(maxAge, w, r, manager); err != nil {
+			onError(w, r, manager, err)
 		}
 	}
-}
-
-// GenerateCsrfToken generates a CSRF token.
-func GenerateCsrfToken() (string, error) {
-	tokenBytes := make([]byte, 32)
-	_, err := rand.Read(tokenBytes)
-	if err != nil {
-		return "", err
-	}
-
-	csrfToken := base64.StdEncoding.EncodeToString(tokenBytes)
-	return csrfToken, nil
 }
