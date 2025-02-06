@@ -1,7 +1,7 @@
 ## Package dbutils
 Helper functions and structures for the [database package](https://github.com/uwine4850/foozy/blob/master/docs/en/database/database.md).
 
-You can see more about interaction with the database in these [tests](https://github.com/uwine4850/foozy/tree/master/tests/dbtest).
+You can see more about interaction with the database in these [tests](https://github.com/uwine4850/foozy/tree/master/tests/database/db_test).
 
 __AsyncQueryData__
 ```

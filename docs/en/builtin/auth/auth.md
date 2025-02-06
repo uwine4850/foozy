@@ -1,5 +1,5 @@
 ## Package auth
-This package implements basic authentication logic. A more detailed authentication algorithm can be seen in [this test](https://github.com/uwine4850/foozy/blob/master/tests/authtest/auth_test.go).
+This package implements basic authentication logic. A more detailed authentication algorithm can be seen in [this test](https://github.com/uwine4850/foozy/blob/master/tests/auth/auth_test.go).
 
 The authentication algorithm is as follows:
 * Creating an authentication table using the __CreateAuthTable__ method.

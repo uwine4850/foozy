@@ -45,6 +45,11 @@ func Compare[T1 comparable, T2 comparable](map1 *map[T1]T2, map2 *map[T1]T2, exc
 	return true
 }
 
+// YamlMapToStruct writes a yaml map to the structure.
+// IMPOrTANT: the field of the structure to be written must have the
+// yaml tag:"<field_name>". This name must correspond to the name of the
+// field in the targetMap structure.
+// Works in depth, you can make as many attachments as you want.
 func YamlMapToStruct(targetMap *map[string]interface{}, targetStruct typeopr.IPtr) error {
 	for mFieldName, mFieldValue := range *targetMap {
 		var sValue reflect.Value

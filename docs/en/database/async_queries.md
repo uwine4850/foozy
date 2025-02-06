@@ -5,7 +5,7 @@ because it directly uses its query methods.<br>
 Each query method has a parameter ``key string``, this parameter sets the key for the result of the query which is then executed 
 can be used in the __LoadAsyncRes__ method.
 
-You can see more about interaction with the database in these [tests](https://github.com/uwine4850/foozy/tree/master/tests/dbtest).
+You can see more about interaction with the database in these [tests](https://github.com/uwine4850/foozy/tree/master/tests/database/db_test).
 
 __SetSyncQueries__
 ```

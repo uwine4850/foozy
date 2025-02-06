@@ -1,7 +1,7 @@
 ## Form package
 The form package contains all available functionality (at the moment) for working with forms.
 
-Form tests [here](https://github.com/uwine4850/foozy/tree/master/tests/formtest).
+Form tests [here](https://github.com/uwine4850/foozy/tree/master/tests/form/form_test).
 
 ## Methods used by the IForm interface
 __Parse__

@@ -3,6 +3,8 @@ This package contains features and interfaces for more convenient template manag
 To start working with an object, you need to create a new structure and embed the selected object into it. It is important to note that it 
 can be built-in only one object.
 
+The tests for the package are [here](https://github.com/uwine4850/foozy/tree/master/tests/database/object).
+
 ### type IView interface
 The interface that each View must implement.
 
@@ -35,6 +37,12 @@ A structure to launch any IView interface.
 
 * _Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()_ - a method that starts the execution 
 of the http request handler.
+
+### type TemplateRedirectView struct
+Does pretty much everything `TemplateView` does.
+The difference is that after processing this view redirects the 
+user to the selected url address. Therefore, this object accepts 
+__RedirectUrl__ instead of __TemplatePath__ field.
 
 ## Displaying View as JSON.
 Each of these structures has a Call method that is used to run it.

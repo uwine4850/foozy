@@ -2,7 +2,7 @@
 Before describing the methods, it should be noted that each method that makes a request returns ``[]map[string]interface{}`` - the key is 
 name of the column, and __interface{}__ is equal to its value (if there are no values, there will be an empty map). These values ​​can be converted independently or with functions from the [dbutils package](https://github.com/uwine4850/foozy/blob/master/docs/en/database/dbutils/dbutils.md).
 
-You can see more about interaction with the database in these [tests](https://github.com/uwine4850/foozy/tree/master/tests/dbtest).
+You can see more about interaction with the database in these [tests](https://github.com/uwine4850/foozy/tree/master/tests/database/db_test).
 
 __Query__
 ```

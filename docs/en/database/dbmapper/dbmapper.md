@@ -2,7 +2,7 @@
 Writes data to the selected object. Can perform various operations on 
 filled data.
 
-You can see how the package works in these [tests](https://github.com/uwine4850/foozy/tree/master/tests/dbtest/dbmapper_test).
+You can see how the package works in these [tests](https://github.com/uwine4850/foozy/tree/master/tests/database/dbmapper_test).
 
 ### type Mapper struct
 A structure used to populate an object with data from the database.

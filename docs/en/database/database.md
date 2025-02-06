@@ -7,7 +7,7 @@ request interfaces.
 * ISyncQueries - an interface for sending synchronous requests to the database.
 * IAsyncQueries - an interface for sending asynchronous requests to the database.
 
-You can see more about interaction with the database in these [tests](https://github.com/uwine4850/foozy/tree/master/tests/dbtest).
+You can see more about interaction with the database in these [tests](https://github.com/uwine4850/foozy/tree/master/tests/database/db_test).
 
 ## IDatabase
 __Connect__

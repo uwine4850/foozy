@@ -12,9 +12,3 @@ With the help of this function, you can generate and set the csrf_token value in
 mddl := middlewares.NewMiddleware()
 mddl.AsyncHandlerMddl(builtin_mddl.GenerateAndSetCsrf)
 ```
-
-__GenerateCsrfToken__
-```
-GenerateCsrfToken()
-```
-Generates a CSRF token.

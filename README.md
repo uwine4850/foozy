@@ -24,8 +24,10 @@ Modules that the framework contains: <br>
   * [mic](https://github.com/uwine4850/foozy/blob/master/docs/en/router/mic/mic.md) — package is responsible for the functionality of microservices.
   * [tmlengine](https://github.com/uwine4850/foozy/blob/master/docs/en/router/tmlengine/tmlengine.md) — project templater. The pongo2 library is used.
   * secure — the package that contains the security functionality.
-	* [csrf_token](https://github.com/uwine4850/foozy/blob/master/docs/en/router/secure/csrf_token.md) — operations with CSRF token.
-	* [hmac](https://github.com/uwine4850/foozy/blob/master/docs/en/router/secure/hmac.md) — operations with HMAC and other encryption.
+	* [csrf_token](https://github.com/uwine4850/foozy/blob/master/docs/en/secure/csrf_token.md) — operations with CSRF token.
+	* [hmac](https://github.com/uwine4850/foozy/blob/master/docs/en/secure/hmac.md) — operations with HMAC and other encryption.
+	* [key](https://github.com/uwine4850/foozy/blob/master/docs/en/secure/key.md) — key management.
+	* [header](https://github.com/uwine4850/foozy/blob/master/docs/en/secure/header.md) — header management.
 * [server](https://github.com/uwine4850/foozy/blob/master/docs/en/server/server.md) — add-on to http.Server for easier use and work with the router module.
   * [livereload](https://github.com/uwine4850/foozy/blob/master/docs/en/server/livereload/livereload.md) — a module that can be used to restart the project after updating the files.
 * [utils](https://github.com/uwine4850/foozy/blob/master/docs/en/utils/utils.md) — general auxiliary functionality, for example, CSRF token generation.

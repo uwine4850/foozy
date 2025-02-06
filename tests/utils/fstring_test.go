@@ -14,11 +14,3 @@ func TestSplitUrl(t *testing.T) {
 		t.Error("The URL is not separated correctly.")
 	}
 }
-
-func TestJoin(t *testing.T) {
-	elements := []string{"1", "2", "3"}
-	res := fstring.Join(elements, ",")
-	if res != "1,2,3" {
-		t.Error("Join is not done correctly.")
-	}
-}
