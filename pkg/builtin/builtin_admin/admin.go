@@ -1,4 +1,4 @@
-package builtinadmin
+package admin
 
 import (
 	"fmt"
@@ -9,6 +9,7 @@ import (
 	"github.com/uwine4850/foozy/internal/adminpanel"
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbmapper"
+	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/typeopr"
@@ -132,4 +133,17 @@ func AdminSettings(db *database.Database) (AdminSettingsDB, error) {
 		return AdminSettingsDB{}, err
 	}
 	return adminSettingsDB[0], nil
+}
+
+func IsAuthUserAdmin(r *http.Request, mng interfaces.IManager, db *database.Database) (bool, error) {
+	return adminpanel.UserIsAdmin(r, mng, db)
+}
+
+func CheckRole(userID string, roleName string, db *database.Database) (bool, error) {
+	ex, err := db.SyncQ().Exists(adminpanel.USER_ROLES_TABLE, dbutils.WHEquals(dbutils.WHValue{"user_id": userID, "role_name": roleName}, "AND"))
+	if err != nil {
+		return false, err
+	}
+	fmt.Println(ex["exists"].(bool))
+	return false, nil
 }

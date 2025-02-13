@@ -114,3 +114,17 @@ func (q *SyncQueries) Increment(fieldName string, tableName string, where dbutil
 	queryStr := fmt.Sprintf("UPDATE `%s` SET `%s`= `%s`+ 1 %s ", tableName, fieldName, fieldName, whereStr)
 	return q.Exec(queryStr, where.QueryArgs...)
 }
+
+func (q *SyncQueries) Exists(tableName string, where dbutils.WHOutput) (map[string]interface{}, error) {
+	var whereStr string
+	if where.QueryStr != "" {
+		whereStr = " WHERE " + where.QueryStr
+	}
+	queryStr := fmt.Sprintf("SELECT EXISTS(SELECT 1 FROM %s %s) AS is_exists", tableName, whereStr)
+	res, err := q.Query(queryStr, where.QueryArgs...)
+	if err != nil {
+		return nil, err
+	}
+	exists := res[0]["is_exists"].(int64) != 0
+	return map[string]interface{}{"exists": exists}, nil
+}

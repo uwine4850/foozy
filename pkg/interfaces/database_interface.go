@@ -21,6 +21,7 @@ type ISyncQueries interface {
 	Delete(tableName string, where dbutils.WHOutput) (map[string]interface{}, error)
 	Count(rows []string, tableName string, where dbutils.WHOutput, limit int) ([]map[string]interface{}, error)
 	Increment(fieldName string, tableName string, where dbutils.WHOutput) (map[string]interface{}, error)
+	Exists(tableName string, where dbutils.WHOutput) (map[string]interface{}, error)
 }
 
 type IAsyncQueries interface {
@@ -35,6 +36,7 @@ type IAsyncQueries interface {
 	AsyncDelete(key string, tableName string, where dbutils.WHOutput)
 	AsyncCount(key string, rows []string, tableName string, where dbutils.WHOutput, limit int)
 	AsyncIncrement(key string, fieldName string, tableName string, where dbutils.WHOutput)
+	AsyncExists(key string, tableName string, where dbutils.WHOutput)
 }
 
 type IQueryBuild interface {
