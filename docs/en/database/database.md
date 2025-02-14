@@ -10,6 +10,16 @@ request interfaces.
 You can see more about interaction with the database in these [tests](https://github.com/uwine4850/foozy/tree/master/tests/database/db_test).
 
 ## IDatabase
+Database structure for accessing the database.
+It can send both synchronous and asynchronous queries.
+IMPORTANT: after the end of work it is necessary to close the connection using Close method.
+
+Principle of `db` and `tx` swapping:<br>
+After the initial initialization, `db` is used. These are standard database queries. If the `BeginTransaction` method is used,
+the `db` instance will be replaced by the `tx` instance. Then the `CommitTransaction` method changes them back.
+These instances use the same interface, so they are directly used by the `ISyncQueries` interface, which in turn is used by
+the `IAsyncQueries` interface.
+The main difference between `db` and `tx` objects is that the latter is used for the ability to cancel database transactions.
 __Connect__
 ```
 Connect() error

@@ -29,95 +29,99 @@ func (q *AsyncQueries) SetSyncQueries(queries interfaces.ISyncQueries) {
 	q.syncQ = queries
 }
 
-func (q *AsyncQueries) AsyncQuery(key string, query string, args ...any) {
+func (q *AsyncQueries) Query(key string, query string, args ...any) {
 	q.wg.Add(1)
 	go func() {
 		defer q.wg.Done()
-		_res, err := q.syncQ.Query(query, args...)
-		q.setAsyncRes(key, _res, err)
+		res, err := q.syncQ.Query(query, args...)
+		q.storeAsyncRes(key, &dbutils.AsyncQueryData{Res: res, Error: err})
 	}()
 }
 
-func (q *AsyncQueries) AsyncSelect(key string, rows []string, tableName string, where dbutils.WHOutput, limit int) {
+func (q *AsyncQueries) Exec(key string, query string, args ...any) {
 	q.wg.Add(1)
 	go func() {
 		defer q.wg.Done()
-		_res, err := q.syncQ.Select(rows, tableName, where, limit)
-		q.setAsyncRes(key, _res, err)
+		res, err := q.syncQ.Exec(query, args...)
+		q.storeAsyncRes(key, &dbutils.AsyncQueryData{SingleRes: res, Error: err})
 	}()
 }
 
-func (q *AsyncQueries) AsyncInsert(key string, tableName string, params map[string]any) {
+func (q *AsyncQueries) Select(key string, rows []string, tableName string, where dbutils.WHOutput, limit int) {
 	q.wg.Add(1)
 	go func() {
 		defer q.wg.Done()
-		_res, err := q.syncQ.Insert(tableName, params)
-		q.setAsyncRes(key, []map[string]interface{}{_res}, err)
+		res, err := q.syncQ.Select(rows, tableName, where, limit)
+		q.storeAsyncRes(key, &dbutils.AsyncQueryData{Res: res, Error: err})
 	}()
 }
 
-func (q *AsyncQueries) AsyncUpdate(key string, tableName string, params map[string]interface{}, where dbutils.WHOutput) {
+func (q *AsyncQueries) Insert(key string, tableName string, params map[string]any) {
 	q.wg.Add(1)
 	go func() {
 		defer q.wg.Done()
-		_res, err := q.syncQ.Update(tableName, params, where)
-		q.setAsyncRes(key, []map[string]interface{}{_res}, err)
+		res, err := q.syncQ.Insert(tableName, params)
+		q.storeAsyncRes(key, &dbutils.AsyncQueryData{SingleRes: res, Error: err})
 	}()
 }
 
-func (q *AsyncQueries) AsyncDelete(key string, tableName string, where dbutils.WHOutput) {
+func (q *AsyncQueries) Update(key string, tableName string, params map[string]interface{}, where dbutils.WHOutput) {
 	q.wg.Add(1)
 	go func() {
 		defer q.wg.Done()
-		_res, err := q.syncQ.Delete(tableName, where)
-		q.setAsyncRes(key, []map[string]interface{}{_res}, err)
+		res, err := q.syncQ.Update(tableName, params, where)
+		q.storeAsyncRes(key, &dbutils.AsyncQueryData{SingleRes: res, Error: err})
 	}()
 }
 
-func (q *AsyncQueries) AsyncCount(key string, rows []string, tableName string, where dbutils.WHOutput, limit int) {
+func (q *AsyncQueries) Delete(key string, tableName string, where dbutils.WHOutput) {
 	q.wg.Add(1)
 	go func() {
 		defer q.wg.Done()
-		_res, err := q.syncQ.Count(rows, tableName, where, limit)
-		q.setAsyncRes(key, _res, err)
+		res, err := q.syncQ.Delete(tableName, where)
+		q.storeAsyncRes(key, &dbutils.AsyncQueryData{SingleRes: res, Error: err})
 	}()
 }
 
-func (q *AsyncQueries) AsyncIncrement(key string, fieldName string, tableName string, where dbutils.WHOutput) {
+func (q *AsyncQueries) Count(key string, rows []string, tableName string, where dbutils.WHOutput, limit int) {
 	q.wg.Add(1)
 	go func() {
 		defer q.wg.Done()
-		_res, err := q.syncQ.Increment(fieldName, tableName, where)
-		q.setAsyncRes(key, []map[string]interface{}{_res}, err)
+		res, err := q.syncQ.Count(rows, tableName, where, limit)
+		q.storeAsyncRes(key, &dbutils.AsyncQueryData{Res: res, Error: err})
 	}()
 }
 
-func (q *AsyncQueries) AsyncExists(key string, tableName string, where dbutils.WHOutput) {
+func (q *AsyncQueries) Increment(key string, fieldName string, tableName string, where dbutils.WHOutput) {
 	q.wg.Add(1)
 	go func() {
 		defer q.wg.Done()
-		_res, err := q.syncQ.Exists(tableName, where)
-		q.setAsyncRes(key, []map[string]interface{}{_res}, err)
+		res, err := q.syncQ.Increment(fieldName, tableName, where)
+		q.storeAsyncRes(key, &dbutils.AsyncQueryData{SingleRes: res, Error: err})
 	}()
 }
 
-// setAsyncRes sets the result of the key command execution.
-func (q *AsyncQueries) setAsyncRes(key string, _res []map[string]interface{}, err error) {
-	queryData := dbutils.AsyncQueryData{}
-	if err != nil {
-		queryData.Error = err
-	}
-	queryData.Res = _res
-	q.asyncRes.Store(key, queryData)
+func (q *AsyncQueries) Exists(key string, tableName string, where dbutils.WHOutput) {
+	q.wg.Add(1)
+	go func() {
+		defer q.wg.Done()
+		res, err := q.syncQ.Exists(tableName, where)
+		q.storeAsyncRes(key, &dbutils.AsyncQueryData{SingleRes: res, Error: err})
+	}()
+}
+
+// storeAsyncRes sets the result of the key command execution.
+func (q *AsyncQueries) storeAsyncRes(key string, asyncQueryData *dbutils.AsyncQueryData) {
+	q.asyncRes.Store(key, asyncQueryData)
 }
 
 // LoadAsyncRes retrieves command execution data by key.
 func (q *AsyncQueries) LoadAsyncRes(key string) (*dbutils.AsyncQueryData, bool) {
 	value, ok := q.asyncRes.Load(key)
 	if ok {
-		v := value.(dbutils.AsyncQueryData)
+		v := value.(*dbutils.AsyncQueryData)
 		q.asyncRes.Delete(key)
-		return &v, ok
+		return v, ok
 	}
 	return nil, ok
 }

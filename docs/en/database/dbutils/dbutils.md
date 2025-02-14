@@ -6,7 +6,8 @@ You can see more about interaction with the database in these [tests](https://gi
 __AsyncQueryData__
 ```
 type AsyncQueryData struct {
-    Res   []map[string]interface{}
+    Res       []map[string]interface{}
+    SingleRes map[string]interface{}
     Error string
 }
 ```

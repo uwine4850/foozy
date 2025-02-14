@@ -228,7 +228,7 @@ func (qb *QueryBuild) Ex() ([]map[string]interface{}, error) {
 	queryStr += qb.queryStr
 	args = append(args, qb.queryArgs...)
 	if qb.asyncQ != nil {
-		qb.asyncQ.AsyncQuery(qb.keyForAsyncQ, queryStr, args...)
+		qb.asyncQ.Query(qb.keyForAsyncQ, queryStr, args...)
 		return nil, nil
 	} else {
 		res, err := qb.syncQ.Query(queryStr, args...)

@@ -11,8 +11,9 @@ import (
 
 // AsyncQueryData a structure that represents the result of executing an asynchronous database query.
 type AsyncQueryData struct {
-	Res   []map[string]interface{}
-	Error error
+	Res       []map[string]interface{}
+	SingleRes map[string]interface{}
+	Error     error
 }
 
 // DbEquals structure used to represent the column and the value to which it should be equal.

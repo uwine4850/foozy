@@ -8,8 +8,8 @@ import (
 )
 
 func TestAsyncSelect(t *testing.T) {
-	db.AsyncQ().AsyncSelect("s", []string{"col1", "col2", "col3"}, "db_async_test", dbutils.WHOutput{}, 0)
-	db.AsyncQ().AsyncSelect("s1", []string{"col1", "col2", "col3"}, "db_async_test", dbutils.WHOutput{}, 1)
+	db.AsyncQ().Select("s", []string{"col1", "col2", "col3"}, "db_async_test", dbutils.WHOutput{}, 0)
+	db.AsyncQ().Select("s1", []string{"col1", "col2", "col3"}, "db_async_test", dbutils.WHOutput{}, 1)
 	db.AsyncQ().Wait()
 	res, _ := db.AsyncQ().LoadAsyncRes("s")
 	res1, _ := db.AsyncQ().LoadAsyncRes("s1")
@@ -31,7 +31,7 @@ func TestAsyncSelect(t *testing.T) {
 }
 
 func TestAsyncQuery(t *testing.T) {
-	db.AsyncQ().AsyncQuery("s", "SELECT `col1`, `col2`, `col3` FROM `db_async_test` LIMIT 1")
+	db.AsyncQ().Query("s", "SELECT `col1`, `col2`, `col3` FROM `db_async_test` LIMIT 1")
 	db.AsyncQ().Wait()
 	res, _ := db.AsyncQ().LoadAsyncRes("s")
 	if res.Error != nil {
@@ -44,7 +44,7 @@ func TestAsyncQuery(t *testing.T) {
 }
 
 func TestAsyncSelectEquals(t *testing.T) {
-	db.AsyncQ().AsyncSelect("s", []string{"col1", "col2", "col3"}, "db_async_test", dbutils.WHEquals(map[string]interface{}{
+	db.AsyncQ().Select("s", []string{"col1", "col2", "col3"}, "db_async_test", dbutils.WHEquals(map[string]interface{}{
 		"col1": "test2",
 	}, "AND"), 1)
 	db.AsyncQ().Wait()
@@ -59,7 +59,7 @@ func TestAsyncSelectEquals(t *testing.T) {
 }
 
 func TestAsyncSelectNotEquals(t *testing.T) {
-	db.AsyncQ().AsyncSelect("s", []string{"col1", "col2", "col3"}, "db_async_test", dbutils.WHNotEquals(map[string]interface{}{
+	db.AsyncQ().Select("s", []string{"col1", "col2", "col3"}, "db_async_test", dbutils.WHNotEquals(map[string]interface{}{
 		"col1": "test2",
 	}, "AND"), 1)
 	db.AsyncQ().Wait()
@@ -74,7 +74,7 @@ func TestAsyncSelectNotEquals(t *testing.T) {
 }
 
 func TestAsyncSelectInSlice(t *testing.T) {
-	db.AsyncQ().AsyncSelect("s", []string{"col1", "col2", "col3"}, "db_async_test", dbutils.WHInSlice(map[string][]interface{}{
+	db.AsyncQ().Select("s", []string{"col1", "col2", "col3"}, "db_async_test", dbutils.WHInSlice(map[string][]interface{}{
 		"col1": {"test1", "test2"},
 	}, "AND"), 0)
 	db.AsyncQ().Wait()
@@ -90,7 +90,7 @@ func TestAsyncSelectInSlice(t *testing.T) {
 }
 
 func TestAsyncSelectNotInSlice(t *testing.T) {
-	db.AsyncQ().AsyncSelect("s", []string{"col1", "col2", "col3"}, "db_async_test", dbutils.WHNotInSlice(map[string][]interface{}{
+	db.AsyncQ().Select("s", []string{"col1", "col2", "col3"}, "db_async_test", dbutils.WHNotInSlice(map[string][]interface{}{
 		"col1": {"test1", "test2"},
 	}, "AND"), 0)
 	db.AsyncQ().Wait()
@@ -106,9 +106,9 @@ func TestAsyncSelectNotInSlice(t *testing.T) {
 func TestAsyncInsert(t *testing.T) {
 	clearAsyncTest()
 	createAsyncTest()
-	db.AsyncQ().AsyncInsert("s", "db_async_test", map[string]interface{}{"col1": "text3", "col2": "2023-10-20", "col3": 10.22})
+	db.AsyncQ().Insert("s", "db_async_test", map[string]interface{}{"col1": "text3", "col2": "2023-10-20", "col3": 10.22})
 	db.AsyncQ().Wait()
-	db.AsyncQ().AsyncQuery("s1", "SELECT * FROM db_async_test WHERE col1 = 'text3'")
+	db.AsyncQ().Query("s1", "SELECT * FROM db_async_test WHERE col1 = 'text3'")
 	db.AsyncQ().Wait()
 	res, _ := db.AsyncQ().LoadAsyncRes("s")
 	if res.Error != nil {
@@ -126,7 +126,7 @@ func TestAsyncInsert(t *testing.T) {
 func TestAsyncCount(t *testing.T) {
 	clearAsyncTest()
 	createAsyncTest()
-	db.AsyncQ().AsyncCount("s", []string{"*"}, "db_async_test", dbutils.WHOutput{}, 0)
+	db.AsyncQ().Count("s", []string{"*"}, "db_async_test", dbutils.WHOutput{}, 0)
 	db.AsyncQ().Wait()
 	res, _ := db.AsyncQ().LoadAsyncRes("s")
 	if res.Error != nil {
@@ -144,7 +144,7 @@ func TestAsyncCount(t *testing.T) {
 func TestAsyncDelete(t *testing.T) {
 	clearAsyncTest()
 	createAsyncTest()
-	db.AsyncQ().AsyncDelete("s", "db_async_test", dbutils.WHEquals(map[string]interface{}{
+	db.AsyncQ().Delete("s", "db_async_test", dbutils.WHEquals(map[string]interface{}{
 		"col1": "test1",
 	}, "AND"))
 	db.AsyncQ().Wait()
@@ -152,7 +152,7 @@ func TestAsyncDelete(t *testing.T) {
 	if res.Error != nil {
 		t.Error(res.Error)
 	}
-	db.AsyncQ().AsyncQuery("s1", "SELECT * FROM db_async_test WHERE col1 = 'test1'")
+	db.AsyncQ().Query("s1", "SELECT * FROM db_async_test WHERE col1 = 'test1'")
 	db.AsyncQ().Wait()
 	res1, _ := db.AsyncQ().LoadAsyncRes("s1")
 	if res1.Error != nil {
@@ -166,14 +166,14 @@ func TestAsyncDelete(t *testing.T) {
 func TestAsyncUpdate(t *testing.T) {
 	clearAsyncTest()
 	createAsyncTest()
-	db.AsyncQ().AsyncUpdate("s", "db_async_test", map[string]any{"col1": "upd1", "col2": "2023-10-15", "col3": 1.1},
+	db.AsyncQ().Update("s", "db_async_test", map[string]any{"col1": "upd1", "col2": "2023-10-15", "col3": 1.1},
 		dbutils.WHEquals(map[string]interface{}{"col1": "test2"}, "AND"))
 	db.AsyncQ().Wait()
 	res, _ := db.AsyncQ().LoadAsyncRes("s")
 	if res.Error != nil {
 		t.Error(res.Error)
 	}
-	db.AsyncQ().AsyncSelect("s1", []string{"*"}, "db_async_test", dbutils.WHEquals(map[string]interface{}{
+	db.AsyncQ().Select("s1", []string{"*"}, "db_async_test", dbutils.WHEquals(map[string]interface{}{
 		"col1": "upd1", "col2": "2023-10-15",
 	}, "AND"), 0)
 	db.AsyncQ().Wait()
@@ -190,13 +190,13 @@ func TestAsyncCommitTransaction(t *testing.T) {
 	clearAsyncTest()
 	createAsyncTest()
 	db.BeginTransaction()
-	db.AsyncQ().AsyncInsert("res", "db_async_test", map[string]interface{}{"col1": "textComm", "col2": "2023-11-21", "col3": 10.24})
+	db.AsyncQ().Insert("res", "db_async_test", map[string]interface{}{"col1": "textComm", "col2": "2023-11-21", "col3": 10.24})
 	db.AsyncQ().Wait()
 	res, _ := db.AsyncQ().LoadAsyncRes("res")
 	if res.Error != nil {
 		t.Error(res.Error)
 	}
-	db.AsyncQ().AsyncInsert("res1", "db_async_test", map[string]interface{}{"col1": "textComm1", "col2": "2023-11-21", "col3": 10.24})
+	db.AsyncQ().Insert("res1", "db_async_test", map[string]interface{}{"col1": "textComm1", "col2": "2023-11-21", "col3": 10.24})
 	db.AsyncQ().Wait()
 	res1, _ := db.AsyncQ().LoadAsyncRes("res1")
 	if res1.Error != nil {
@@ -206,8 +206,8 @@ func TestAsyncCommitTransaction(t *testing.T) {
 		panic(err)
 	}
 
-	db.AsyncQ().AsyncQuery("s", "SELECT * FROM db_async_test WHERE col1 = 'textComm'")
-	db.AsyncQ().AsyncQuery("s1", "SELECT * FROM db_async_test WHERE col1 = 'textComm1'")
+	db.AsyncQ().Query("s", "SELECT * FROM db_async_test WHERE col1 = 'textComm'")
+	db.AsyncQ().Query("s1", "SELECT * FROM db_async_test WHERE col1 = 'textComm1'")
 	db.AsyncQ().Wait()
 
 	s, _ := db.AsyncQ().LoadAsyncRes("s")
@@ -227,13 +227,13 @@ func TestAsyncRollbackTransaction(t *testing.T) {
 	clearAsyncTest()
 	createAsyncTest()
 	db.BeginTransaction()
-	db.AsyncQ().AsyncInsert("res", "db_async_test", map[string]interface{}{"col1": "textBack", "col2": "2023-11-21", "col3": 10.24})
+	db.AsyncQ().Insert("res", "db_async_test", map[string]interface{}{"col1": "textBack", "col2": "2023-11-21", "col3": 10.24})
 	db.AsyncQ().Wait()
 	res, _ := db.AsyncQ().LoadAsyncRes("res")
 	if res.Error != nil {
 		t.Error(res.Error)
 	}
-	db.AsyncQ().AsyncInsert("res1", "db_async_test", map[string]interface{}{"col1": "textBack1", "col2": "2023-11-21", "col3": 10.24})
+	db.AsyncQ().Insert("res1", "db_async_test", map[string]interface{}{"col1": "textBack1", "col2": "2023-11-21", "col3": 10.24})
 	db.AsyncQ().Wait()
 	res1, _ := db.AsyncQ().LoadAsyncRes("res1")
 	if res1.Error != nil {
@@ -243,8 +243,8 @@ func TestAsyncRollbackTransaction(t *testing.T) {
 		panic(err)
 	}
 
-	db.AsyncQ().AsyncQuery("s", "SELECT * FROM db_async_test WHERE col1 = 'textBack'")
-	db.AsyncQ().AsyncQuery("s1", "SELECT * FROM db_async_test WHERE col1 = 'textBack1'")
+	db.AsyncQ().Query("s", "SELECT * FROM db_async_test WHERE col1 = 'textBack'")
+	db.AsyncQ().Query("s1", "SELECT * FROM db_async_test WHERE col1 = 'textBack1'")
 	db.AsyncQ().Wait()
 
 	s, _ := db.AsyncQ().LoadAsyncRes("s")

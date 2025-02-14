@@ -20,6 +20,13 @@ type DbArgs struct {
 // Database structure for accessing the database.
 // It can send both synchronous and asynchronous queries.
 // IMPORTANT: after the end of work it is necessary to close the connection using Close method.
+//
+// Principle of [db] and [tx] swapping:
+// After the initial initialization, [db] is used. These are standard database queries. If the [BeginTransaction] method is used,
+// the [db] instance will be replaced by the [tx] instance. Then the [CommitTransaction] method changes them back.
+// These instances use the same interface, so they are directly used by the [ISyncQueries] interface, which in turn is used by
+// the [IAsyncQueries] interface.
+// The main difference between [db] and [tx] objects is that the latter is used for the ability to cancel database transactions.
 type Database struct {
 	username string
 	password string
@@ -147,6 +154,7 @@ func (d *Database) DatabaseName() string {
 	return d.database
 }
 
+// DbQuery standard database queries. They are used *sql.DB.
 type DbQuery struct {
 	DB *sql.DB
 }
@@ -185,6 +193,7 @@ func (d *DbQuery) Exec(query string, args ...any) (map[string]interface{}, error
 	return map[string]interface{}{"id": &id, "rows": &rowsId}, nil
 }
 
+// DbTxQuery queries that can be rolled back. Used *sql.Tx.
 type DbTxQuery struct {
 	Tx *sql.Tx
 }

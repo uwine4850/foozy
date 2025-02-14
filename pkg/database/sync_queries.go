@@ -24,14 +24,12 @@ func (q *SyncQueries) QB() interfaces.IUserQueryBuild {
 	return q.qb
 }
 
-// Query sends a query to the database.
-// The result of query execution is processed and converted to []map[string]interface{} format.
-// The map key is the column names. The key values are the current column and string data in the interface{} format,
-// which can be converted to the desired type.
+// Query wrapper for the IDbQuery.Query method.
 func (q *SyncQueries) Query(query string, args ...any) ([]map[string]interface{}, error) {
 	return q.db.Query(query, args...)
 }
 
+// Exec wrapper for the IDbQuery.Exec method.
 func (q *SyncQueries) Exec(query string, args ...any) (map[string]interface{}, error) {
 	return q.db.Exec(query, args...)
 }
