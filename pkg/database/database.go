@@ -42,7 +42,6 @@ type Database struct {
 func NewDatabase(args DbArgs) *Database {
 	d := Database{username: args.Username, password: args.Password, host: args.Host, port: args.Port, database: args.DatabaseName}
 	d.SetSyncQueries(NewSyncQueries(&QueryBuild{}))
-	d.SetAsyncQueries(NewAsyncQueries(&QueryBuild{}))
 	return &d
 }
 
@@ -60,7 +59,11 @@ func (d *Database) Connect() error {
 		return err
 	}
 	d.db = db
-
+	// AsyncQueries should be installed exactly when a new connection to the database is made.
+	// This is mandatory because AsyncQueries contains the results of queries,
+	// so you need to create a new instance for this object to make the data unique for each user.
+	// SyncQueries does not store query data in the object, so there is no need to initialize it every connection.
+	d.SetAsyncQueries(NewAsyncQueries(&QueryBuild{}))
 	d.syncQ.SetDB(&DbQuery{DB: db})
 	d.asyncQ.SetSyncQueries(d.syncQ)
 	return nil
@@ -190,7 +193,7 @@ func (d *DbQuery) Exec(query string, args ...any) (map[string]interface{}, error
 	if err != nil {
 		return nil, err
 	}
-	return map[string]interface{}{"id": &id, "rows": &rowsId}, nil
+	return map[string]interface{}{"id": id, "rows": rowsId}, nil
 }
 
 // DbTxQuery queries that can be rolled back. Used *sql.Tx.

@@ -37,6 +37,7 @@ type IAsyncQueries interface {
 	SetSyncQueries(queries ISyncQueries)
 	Wait()
 	LoadAsyncRes(key string) (*dbutils.AsyncQueryData, bool)
+	Clear()
 	Query(key string, query string, args ...any)
 	Exec(key string, query string, args ...any)
 	Select(key string, rows []string, tableName string, where dbutils.WHOutput, limit int)

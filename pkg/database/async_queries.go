@@ -120,7 +120,6 @@ func (q *AsyncQueries) LoadAsyncRes(key string) (*dbutils.AsyncQueryData, bool) 
 	value, ok := q.asyncRes.Load(key)
 	if ok {
 		v := value.(*dbutils.AsyncQueryData)
-		q.asyncRes.Delete(key)
 		return v, ok
 	}
 	return nil, ok
@@ -131,6 +130,11 @@ func (q *AsyncQueries) LoadAsyncRes(key string) (*dbutils.AsyncQueryData, bool) 
 // Several Wait methods can be called if necessary.
 func (q *AsyncQueries) Wait() {
 	q.wg.Wait()
+}
+
+// Clear clears the query results data.
+func (q *AsyncQueries) Clear() {
+	q.asyncRes = sync.Map{}
 }
 
 // AsyncResError loads the result of several asynchronous key queries and checks for errors.
