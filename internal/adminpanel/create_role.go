@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/uwine4850/foozy/pkg/database"
+	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/object"
@@ -64,7 +65,7 @@ func (cr *CreateRoleObject) Context(w http.ResponseWriter, r *http.Request, mana
 	if roleFound {
 		return object.ObjectContext{}, &errRoleAlreadyExists{}
 	}
-	_, err = cr.DB.SyncQ().QB().Insert(ROLES_TABLE, map[string]interface{}{"name": formObject.Name[0]}).Ex()
+	_, err = qb.NewSyncQB(cr.DB.SyncQ()).Insert(ROLES_TABLE, map[string]interface{}{"name": formObject.Name[0]}).Query()
 	if err != nil {
 		return nil, err
 	}

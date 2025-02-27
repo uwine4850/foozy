@@ -11,6 +11,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbmapper"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
+	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router/form"
@@ -65,7 +66,8 @@ func AdminPermissions(r *http.Request, mng interfaces.IManager, db *database.Dat
 }
 
 func AdminUserExists(db *database.Database) (bool, error) {
-	roleId, err := db.SyncQ().QB().Select("role_name", USER_ROLES_TABLE).Where("role_name", "=", "ADMIN", "LIMIT 1").Ex()
+	roleId, err := qb.NewSyncQB(db.SyncQ()).SelectFrom("role_name", USER_ROLES_TABLE).
+		Where(qb.Compare("role_name", qb.EQUAL, "ADMIN")).Limit(1).Query()
 	if err != nil {
 		return false, err
 	}
@@ -82,7 +84,7 @@ func OnlyAdminAccess(db *database.Database) (bool, error) {
 		return false, err
 	}
 	if isAdminSettingsTable {
-		adminAccesDb, err := db.SyncQ().QB().Select("admin_access", ADMIN_SETTINGS_TABLE).Ex()
+		adminAccesDb, err := qb.NewSyncQB(db.SyncQ()).SelectFrom("admin_access", ADMIN_SETTINGS_TABLE).Query()
 		if err != nil {
 			return false, err
 		}
@@ -102,13 +104,16 @@ func OnlyAdminAccess(db *database.Database) (bool, error) {
 func UserIsAdmin(r *http.Request, mng interfaces.IManager, db *database.Database) (bool, error) {
 	authCookie, err := r.Cookie(namelib.AUTH.COOKIE_AUTH)
 	if err != nil {
+		if errors.Is(err, http.ErrNoCookie) {
+			return false, nil
+		}
 		return false, err
 	}
 	var authData auth.AuthCookie
 	if err := secure.ReadSecureData([]byte(mng.Key().HashKey()), []byte(mng.Key().BlockKey()), authCookie.Value, &authData); err != nil {
 		return false, err
 	}
-	res, err := db.SyncQ().QB().Select("*", USER_ROLES_TABLE).Where("user_id", "=", authData.UID).Ex()
+	res, err := qb.NewSyncQB(db.SyncQ()).SelectFrom("*", USER_ROLES_TABLE).Where(qb.Compare("user_id", qb.EQUAL, authData.UID)).Query()
 	if err != nil {
 		return false, err
 	}
@@ -131,7 +136,7 @@ func TableExists(db *database.Database, tableName string) (bool, error) {
 }
 
 func UserRole(uid string, db *database.Database) (UserRolesDB, error) {
-	userRolesDB, err := db.SyncQ().QB().Select("*", USER_ROLES_TABLE).Ex()
+	userRolesDB, err := qb.NewSyncQB(db.SyncQ()).SelectFrom("*", USER_ROLES_TABLE).Query()
 	if err != nil {
 		return UserRolesDB{}, err
 	}
@@ -157,7 +162,7 @@ func CreateSettingsTable(db *database.Database) error {
 	if err != nil {
 		return err
 	}
-	res, err := db.SyncQ().QB().Select("id", ADMIN_SETTINGS_TABLE).Ex()
+	res, err := qb.NewSyncQB(db.SyncQ()).SelectFrom("id", ADMIN_SETTINGS_TABLE).Query()
 	if err != nil {
 		return err
 	}
@@ -226,7 +231,7 @@ func RoleExists(name string, db *database.Database) (bool, error) {
 }
 
 func RoleIsAdmin(name string, db *database.Database) (bool, error) {
-	res, err := db.SyncQ().QB().Select("name", ROLES_TABLE).Where("name", "=", name).Ex()
+	res, err := qb.NewSyncQB(db.SyncQ()).SelectFrom("name", ROLES_TABLE).Where(qb.Compare("name", qb.EQUAL, name)).Query()
 	if err != nil {
 		return false, err
 	}

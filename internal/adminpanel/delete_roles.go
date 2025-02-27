@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/uwine4850/foozy/pkg/database"
+	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/object"
@@ -57,7 +58,7 @@ func (dr *DeleteRoleObject) Context(w http.ResponseWriter, r *http.Request, mana
 	if isAdmin {
 		return object.ObjectContext{}, &errDeleteAdminRole{}
 	}
-	_, err = dr.DB.SyncQ().QB().Delete(ROLES_TABLE).Where("name", "=", formObject.Name[0]).Ex()
+	_, err = qb.NewSyncQB(dr.DB.SyncQ()).Delete(ROLES_TABLE).Where(qb.Compare("name", qb.EQUAL, formObject.Name[0])).Exec()
 	if err != nil {
 		return nil, err
 	}

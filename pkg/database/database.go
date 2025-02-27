@@ -41,7 +41,7 @@ type Database struct {
 
 func NewDatabase(args DbArgs) *Database {
 	d := Database{username: args.Username, password: args.Password, host: args.Host, port: args.Port, database: args.DatabaseName}
-	d.SetSyncQueries(NewSyncQueries(&QueryBuild{}))
+	d.SetSyncQueries(NewSyncQueries())
 	return &d
 }
 
@@ -63,7 +63,7 @@ func (d *Database) Connect() error {
 	// This is mandatory because AsyncQueries contains the results of queries,
 	// so you need to create a new instance for this object to make the data unique for each user.
 	// SyncQueries does not store query data in the object, so there is no need to initialize it every connection.
-	d.SetAsyncQueries(NewAsyncQueries(&QueryBuild{}))
+	d.SetAsyncQueries(NewAsyncQueries())
 	d.syncQ.SetDB(&DbQuery{DB: db})
 	d.asyncQ.SetSyncQueries(d.syncQ)
 	return nil

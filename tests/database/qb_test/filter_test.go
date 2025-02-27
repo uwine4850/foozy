@@ -66,7 +66,7 @@ func TestExists(t *testing.T) {
 }
 
 func TestWhere(t *testing.T) {
-	q := syncQB.SelectFrom("id", "table").Where(qb.Compare("id", qb.EQUAL, 1))
+	q := syncQB().SelectFrom("id", "table").Where(qb.Compare("id", qb.EQUAL, 1))
 	q.Merge()
 	if q.String() != "SELECT id FROM table WHERE id = ?" {
 		t.Error(testErrorText)
@@ -77,7 +77,7 @@ func TestWhere(t *testing.T) {
 }
 
 func TestWhereInArray(t *testing.T) {
-	q := syncQB.SelectFrom("id", "table").Where(qb.Compare("id", qb.IN, qb.Array(1, 3, 4)))
+	q := syncQB().SelectFrom("id", "table").Where(qb.Compare("id", qb.IN, qb.Array(1, 3, 4)))
 	q.Merge()
 	if q.String() != "SELECT id FROM table WHERE id IN ( ? ? ? )" {
 		t.Error(testErrorText)
@@ -88,7 +88,7 @@ func TestWhereInArray(t *testing.T) {
 }
 
 func TestOrderBy(t *testing.T) {
-	q := syncQB.SelectFrom("id", "table").OrderBy(qb.DESC("id"))
+	q := syncQB().SelectFrom("id", "table").OrderBy(qb.DESC("id"))
 	q.Merge()
 	if q.String() != "SELECT id FROM table ORDER BY id DESC" {
 		t.Error(testErrorText)
@@ -96,7 +96,7 @@ func TestOrderBy(t *testing.T) {
 }
 
 func TestGroupBy(t *testing.T) {
-	q := syncQB.SelectFrom("id, department", "table").GroupBy("department")
+	q := syncQB().SelectFrom("id, department", "table").GroupBy("department")
 	q.Merge()
 	if q.String() != "SELECT id, department FROM table GROUP BY department" {
 		t.Error(testErrorText)
@@ -104,7 +104,7 @@ func TestGroupBy(t *testing.T) {
 }
 
 func TestGroupByHavingCompare(t *testing.T) {
-	q := syncQB.SelectFrom("id, department", "table").GroupBy("department").Having(qb.Compare("id", qb.GREATER, 5))
+	q := syncQB().SelectFrom("id, department", "table").GroupBy("department").Having(qb.Compare("id", qb.GREATER, 5))
 	q.Merge()
 	if q.String() != "SELECT id, department FROM table GROUP BY department HAVING id > ?" {
 		t.Error(testErrorText)
@@ -115,7 +115,7 @@ func TestGroupByHavingCompare(t *testing.T) {
 }
 
 func TestLimit(t *testing.T) {
-	q := syncQB.SelectFrom("*", "table").Limit(5)
+	q := syncQB().SelectFrom("*", "table").Limit(5)
 	q.Merge()
 	if q.String() != "SELECT * FROM table LIMIT 5" {
 		t.Error(testErrorText)
@@ -123,7 +123,7 @@ func TestLimit(t *testing.T) {
 }
 
 func TestOffset(t *testing.T) {
-	q := syncQB.SelectFrom("*", "table").Offset(5)
+	q := syncQB().SelectFrom("*", "table").Offset(5)
 	q.Merge()
 	if q.String() != "SELECT * FROM table OFFSET 5" {
 		t.Error(testErrorText)

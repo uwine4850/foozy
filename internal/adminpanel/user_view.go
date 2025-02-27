@@ -9,6 +9,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbmapper"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
+	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/object"
@@ -115,23 +116,24 @@ func (uv *UserViewEditFormObject) Context(w http.ResponseWriter, r *http.Request
 		return nil, errors.New("error when editing user, ID not found")
 	}
 	if formObject.UserRole[0] == "---" || formObject.UserRole[0] == "" {
-		_, err := uv.DB.SyncQ().QB().Delete(USER_ROLES_TABLE).Where("user_id", "=", formObject.UserId[0]).Ex()
+		_, err := qb.NewSyncQB(uv.DB.SyncQ()).Delete(USER_ROLES_TABLE).Where(qb.Compare("user_id", qb.EQUAL, formObject.UserId[0])).Exec()
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		role, err := uv.DB.SyncQ().QB().Select("*", USER_ROLES_TABLE).Where("user_id", "=", formObject.UserId[0]).Ex()
+		role, err := qb.NewSyncQB(uv.DB.SyncQ()).SelectFrom("*", USER_ROLES_TABLE).Where(qb.Compare("user_id", qb.EQUAL, formObject.UserId[0])).Query()
 		if err != nil {
 			return nil, err
 		}
 		if len(role) > 0 && dbutils.ParseString(role[0]["role_name"]) != formObject.UserRole[0] {
-			_, err := uv.DB.SyncQ().QB().Update(USER_ROLES_TABLE, map[string]any{"role_name": formObject.UserRole[0]}).
-				Where("user_id", "=", formObject.UserId[0]).Ex()
+			_, err := qb.NewSyncQB(uv.DB.SyncQ()).Update(USER_ROLES_TABLE, map[string]any{"role_name": formObject.UserRole[0]}).
+				Where(qb.Compare("user_id", qb.EQUAL, formObject.UserId[0])).Exec()
 			if err != nil {
 				return nil, err
 			}
 		} else {
-			_, err := uv.DB.SyncQ().QB().Insert(USER_ROLES_TABLE, map[string]interface{}{"user_id": formObject.UserId[0], "role_name": formObject.UserRole[0]}).Ex()
+			_, err := qb.NewSyncQB(uv.DB.SyncQ()).
+				Insert(USER_ROLES_TABLE, map[string]interface{}{"user_id": formObject.UserId[0], "role_name": formObject.UserRole[0]}).Exec()
 			if err != nil {
 				return nil, err
 			}
@@ -156,7 +158,7 @@ func UserEditFormView(db *database.Database) router.Handler {
 }
 
 func getAllRoles(db *database.Database) ([]RoleDB, error) {
-	rolesDB, err := db.SyncQ().QB().Select("*", ROLES_TABLE).Ex()
+	rolesDB, err := qb.NewSyncQB(db.SyncQ()).SelectFrom("*", ROLES_TABLE).Query()
 	if err != nil {
 		return nil, err
 	}

@@ -7,6 +7,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/builtin/auth"
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbmapper"
+	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router"
@@ -56,7 +57,7 @@ func (us *UserSearchByID) Context(w http.ResponseWriter, r *http.Request, manage
 	}
 	formObject := formObjectInterface.(UserSearchForm)
 	if len(formObject.Id) > 0 {
-		res, err := us.DB.SyncQ().QB().Select("*", namelib.AUTH.AUTH_TABLE).Where("id", "=", formObject.Id[0]).Ex()
+		res, err := qb.NewSyncQB(us.DB.SyncQ()).SelectFrom("*", namelib.AUTH.AUTH_TABLE).Where(qb.Compare("id", qb.EQUAL, formObject.Id[0])).Query()
 		if err != nil {
 			return nil, err
 		}
@@ -121,7 +122,8 @@ func (us *UserSearchByUsername) Context(w http.ResponseWriter, r *http.Request, 
 	}
 	formObject := formObjectInterface.(UserSearchForm)
 	if len(formObject.Username) > 0 {
-		res, err := us.DB.SyncQ().QB().Select("*", namelib.AUTH.AUTH_TABLE).Where("username", "LIKE", "'%"+formObject.Username[0]+"%'"+" LIMIT 10").Ex()
+		res, err := qb.NewSyncQB(us.DB.SyncQ()).SelectFrom("*", namelib.AUTH.AUTH_TABLE).
+			Where(qb.Compare("username", qb.LIKE, "'%"+formObject.Username[0]+"%'")).Limit(10).Query()
 		if err != nil {
 			return nil, err
 		}

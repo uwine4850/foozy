@@ -12,17 +12,10 @@ type AsyncQueries struct {
 	syncQ    interfaces.ISyncQueries
 	wg       sync.WaitGroup
 	asyncRes sync.Map
-	qb       interfaces.IQueryBuild
 }
 
-func NewAsyncQueries(qb interfaces.IQueryBuild) *AsyncQueries {
-	return &AsyncQueries{qb: qb}
-}
-
-func (q *AsyncQueries) QB(key string) interfaces.IUserQueryBuild {
-	q.qb.SetAsyncQ(q)
-	q.qb.SetKeyForAsyncQ(key)
-	return q.qb
+func NewAsyncQueries() *AsyncQueries {
+	return &AsyncQueries{}
 }
 
 func (q *AsyncQueries) SetSyncQueries(queries interfaces.ISyncQueries) {

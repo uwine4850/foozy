@@ -9,7 +9,7 @@ import (
 
 func TestSubquery(t *testing.T) {
 	sq := qb.SQ(true, qb.NewNoDbQB().SelectFrom(qb.Count("*"), "tableName"))
-	q := syncQB.Select(sq).As("count")
+	q := syncQB().Select(sq).As("count")
 	q.Merge()
 	if q.String() != "SELECT (SELECT COUNT(*) FROM tableName) AS count" {
 		t.Error(testErrorText)

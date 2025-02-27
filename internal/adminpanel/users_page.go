@@ -7,6 +7,7 @@ import (
 
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbmapper"
+	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/typeopr"
@@ -65,7 +66,7 @@ func isRolesTableCreated(db *database.Database) (bool, error) {
 }
 
 func getRoles(db *database.Database) ([]RoleDB, error) {
-	roles, err := db.SyncQ().QB().Select("*", ROLES_TABLE).Ex()
+	roles, err := qb.NewSyncQB(db.SyncQ()).SelectFrom("*", ROLES_TABLE).Query()
 	if err != nil {
 		return nil, err
 	}

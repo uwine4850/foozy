@@ -12,16 +12,10 @@ import (
 
 type SyncQueries struct {
 	db interfaces.IDbQuery
-	qb interfaces.IQueryBuild
 }
 
-func NewSyncQueries(qb interfaces.IQueryBuild) *SyncQueries {
-	return &SyncQueries{qb: qb}
-}
-
-func (q *SyncQueries) QB() interfaces.IUserQueryBuild {
-	q.qb.SetSyncQ(q)
-	return q.qb
+func NewSyncQueries() *SyncQueries {
+	return &SyncQueries{}
 }
 
 // Query wrapper for the IDbQuery.Query method.

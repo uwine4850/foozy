@@ -157,6 +157,8 @@ func (qb *QB) AppendArgs(args []any) {
 	qb.queryArgs = append(qb.queryArgs, args...)
 }
 
+// Merge uses the string parts of the sql query that were added to [queryParts]
+// to combine them into a coherent sql query.
 func (qb *QB) Merge() {
 	qb.queryString = strings.Join(qb.queryParts, " ")
 }

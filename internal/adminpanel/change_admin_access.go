@@ -6,6 +6,7 @@ import (
 
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
+	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/object"
@@ -52,7 +53,7 @@ func (aa *ChangeAdminAccessObject) Context(w http.ResponseWriter, r *http.Reques
 	if !rolesTableCreated {
 		return nil, &ErrRolesTableNotCreated{}
 	}
-	admin_access_db, err := aa.DB.SyncQ().QB().Select("admin_access", ADMIN_SETTINGS_TABLE).Ex()
+	admin_access_db, err := qb.NewSyncQB(aa.DB.SyncQ()).SelectFrom("admin_access", ADMIN_SETTINGS_TABLE).Query()
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +74,7 @@ func (aa *ChangeAdminAccessObject) Context(w http.ResponseWriter, r *http.Reques
 	} else {
 		newAdminAccessValue = 0
 	}
-	_, err = aa.DB.SyncQ().QB().Update(ADMIN_SETTINGS_TABLE, map[string]any{"admin_access": newAdminAccessValue}).Ex()
+	_, err = qb.NewSyncQB(aa.DB.SyncQ()).Update(ADMIN_SETTINGS_TABLE, map[string]any{"admin_access": newAdminAccessValue}).Query()
 	if err != nil {
 		return nil, err
 	}

@@ -10,6 +10,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbmapper"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
+	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/typeopr"
@@ -120,7 +121,7 @@ func IsSettingsTableCreated(db *database.Database) (bool, error) {
 }
 
 func AdminSettings(db *database.Database) (AdminSettingsDB, error) {
-	res, err := db.SyncQ().QB().Select("*", adminpanel.ADMIN_SETTINGS_TABLE).Ex()
+	res, err := qb.NewSyncQB(db.SyncQ()).SelectFrom("*", adminpanel.ADMIN_SETTINGS_TABLE).Query()
 	if err != nil {
 		return AdminSettingsDB{}, err
 	}

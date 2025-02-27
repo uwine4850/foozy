@@ -19,7 +19,6 @@ type IDbQuery interface {
 }
 
 type ISyncQueries interface {
-	QB() IUserQueryBuild
 	SetDB(db IDbQuery)
 	Query(query string, args ...any) ([]map[string]interface{}, error)
 	Exec(query string, args ...any) (map[string]interface{}, error)
@@ -33,7 +32,6 @@ type ISyncQueries interface {
 }
 
 type IAsyncQueries interface {
-	QB(key string) IUserQueryBuild
 	SetSyncQueries(queries ISyncQueries)
 	Wait()
 	LoadAsyncRes(key string) (*dbutils.AsyncQueryData, bool)
@@ -47,22 +45,4 @@ type IAsyncQueries interface {
 	Count(key string, rows []string, tableName string, where dbutils.WHOutput, limit int)
 	Increment(key string, fieldName string, tableName string, where dbutils.WHOutput)
 	Exists(key string, tableName string, where dbutils.WHOutput)
-}
-
-type IQueryBuild interface {
-	IUserQueryBuild
-	SetSyncQ(sq ISyncQueries)
-	SetAsyncQ(aq IAsyncQueries)
-	SetKeyForAsyncQ(key string)
-}
-
-type IUserQueryBuild interface {
-	Select(cols string, tableName string) IUserQueryBuild
-	Insert(tableName string, params map[string]interface{}) IUserQueryBuild
-	Delete(tableName string) IUserQueryBuild
-	Update(tableName string, params map[string]any) IUserQueryBuild
-	Increment(fieldName string, tableName string) IUserQueryBuild
-	Where(args ...any) IUserQueryBuild
-	Count() IUserQueryBuild
-	Ex() ([]map[string]interface{}, error)
 }

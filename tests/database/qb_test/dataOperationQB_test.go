@@ -6,7 +6,7 @@ import (
 )
 
 func TestSelect(t *testing.T) {
-	q := syncQB.Select("'Hello, world!'")
+	q := syncQB().Select("'Hello, world!'")
 	q.Merge()
 	if q.String() != "SELECT 'Hello, world!'" {
 		t.Error(testErrorText)
@@ -14,7 +14,7 @@ func TestSelect(t *testing.T) {
 }
 
 func TestSelectAs(t *testing.T) {
-	q := syncQB.Select("'Hello, world!'").As("test")
+	q := syncQB().Select("'Hello, world!'").As("test")
 	q.Merge()
 	if q.String() != "SELECT 'Hello, world!' AS test" {
 		t.Error(testErrorText)
@@ -22,7 +22,7 @@ func TestSelectAs(t *testing.T) {
 }
 
 func TestSelectFrom(t *testing.T) {
-	q := syncQB.SelectFrom("id", "tableName")
+	q := syncQB().SelectFrom("id", "tableName")
 	q.Merge()
 	if q.String() != "SELECT id FROM tableName" {
 		t.Error(testErrorText)
@@ -30,7 +30,7 @@ func TestSelectFrom(t *testing.T) {
 }
 
 func TestInsert(t *testing.T) {
-	q := syncQB.Insert("tableName", map[string]any{"id": 1, "name": "test"})
+	q := syncQB().Insert("tableName", map[string]any{"id": 1, "name": "test"})
 	q.Merge()
 	if q.String() != "INSERT INTO tableName ( id, name ) VALUES ( ?, ? )" {
 		t.Error(testErrorText)
@@ -41,7 +41,7 @@ func TestInsert(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
-	q := syncQB.Update("tableName", map[string]any{"id": 1, "name": "test"})
+	q := syncQB().Update("tableName", map[string]any{"id": 1, "name": "test"})
 	q.Merge()
 	if q.String() != "UPDATE tableName SET id = ?, name = ?" {
 		t.Error(testErrorText)
@@ -52,7 +52,7 @@ func TestUpdate(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	q := syncQB.Delete("tableName")
+	q := syncQB().Delete("tableName")
 	q.Merge()
 	if q.String() != "DELETE FROM tableName" {
 		t.Error(testErrorText)
