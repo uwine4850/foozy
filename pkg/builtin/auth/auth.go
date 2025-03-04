@@ -8,6 +8,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbmapper"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
+	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router/cookies"
@@ -49,7 +50,11 @@ func (a *Auth) RegisterUser(username string, password string) error {
 	if err != nil {
 		return err
 	}
-	user, err := a.database.SyncQ().Select([]string{"username"}, a.tableName, dbutils.WHEquals(map[string]interface{}{"username": username}, "AND"), 1)
+	qUser := qb.NewSyncQB(a.database.SyncQ()).SelectFrom("username", a.tableName).Where(
+		qb.Compare("username", qb.EQUAL, username),
+	).Limit(1)
+	qUser.Merge()
+	user, err := qUser.Query()
 	if err != nil {
 		return err
 	}
@@ -66,7 +71,9 @@ func (a *Auth) RegisterUser(username string, password string) error {
 	if err != nil {
 		return err
 	}
-	_, err = a.database.SyncQ().Insert(a.tableName, map[string]interface{}{"username": username, "password": hashPass})
+	qIns := qb.NewSyncQB(a.database.SyncQ()).Insert(a.tableName, map[string]interface{}{"username": username, "password": hashPass})
+	qIns.Merge()
+	_, err = qIns.Exec()
 	if err != nil {
 		return err
 	}
@@ -154,7 +161,11 @@ func (a *Auth) ChangePassword(username string, oldPassword string, newPassword s
 	if err != nil {
 		return err
 	}
-	_, err = a.database.SyncQ().Update(a.tableName, map[string]any{"password": password}, dbutils.WHEquals(map[string]interface{}{"username": username}, "AND"))
+	q := qb.NewSyncQB(a.database.SyncQ()).Update(a.tableName, map[string]any{"password": password}).Where(
+		qb.Compare("username", qb.EQUAL, username),
+	)
+	q.Merge()
+	_, err = q.Exec()
 	if err != nil {
 		return err
 	}
@@ -164,7 +175,11 @@ func (a *Auth) ChangePassword(username string, oldPassword string, newPassword s
 // UserByUsername checks if the user is in the database.
 // If it is found, it returns information about it.
 func UserByUsername(db *database.Database, username string) (map[string]interface{}, error) {
-	user, err := db.SyncQ().Select([]string{"*"}, namelib.AUTH.AUTH_TABLE, dbutils.WHEquals(map[string]interface{}{"username": username}, "AND"), 1)
+	qUser := qb.NewSyncQB(db.SyncQ()).SelectFrom("*", namelib.AUTH.AUTH_TABLE).Where(
+		qb.Compare("username", qb.EQUAL, username),
+	).Limit(1)
+	qUser.Merge()
+	user, err := qUser.Query()
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +191,11 @@ func UserByUsername(db *database.Database, username string) (map[string]interfac
 
 // UserByID searches for a user by ID and returns it.
 func UserByID(db *database.Database, id any) (map[string]interface{}, error) {
-	user, err := db.SyncQ().Select([]string{"*"}, namelib.AUTH.AUTH_TABLE, dbutils.WHEquals(map[string]interface{}{"id": id}, "AND"), 1)
+	qUser := qb.NewSyncQB(db.SyncQ()).SelectFrom("*", namelib.AUTH.AUTH_TABLE).Where(
+		qb.Compare("id", qb.EQUAL, id),
+	).Limit(1)
+	qUser.Merge()
+	user, err := qUser.Query()
 	if err != nil {
 		return nil, err
 	}

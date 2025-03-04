@@ -167,7 +167,9 @@ func CreateSettingsTable(db *database.Database) error {
 		return err
 	}
 	if len(res) == 0 {
-		_, err = db.SyncQ().Insert(ADMIN_SETTINGS_TABLE, map[string]any{})
+		q := qb.NewSyncQB(db.SyncQ()).Insert(ADMIN_SETTINGS_TABLE, map[string]any{})
+		q.Merge()
+		_, err := q.Exec()
 		if err != nil {
 			return err
 		}
@@ -187,7 +189,9 @@ func CreateRolesTable(db *database.Database) error {
 		}
 		return err
 	}
-	_, err = db.SyncQ().Insert(ROLES_TABLE, map[string]any{"name": "Admin"})
+	q := qb.NewSyncQB(db.SyncQ()).Insert(ROLES_TABLE, map[string]any{"name": "Admin"})
+	q.Merge()
+	_, err = q.Exec()
 	if err != nil {
 		if err1 := db.RollBackTransaction(); err1 != nil {
 			return err1

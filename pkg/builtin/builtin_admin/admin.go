@@ -9,7 +9,6 @@ import (
 	"github.com/uwine4850/foozy/internal/adminpanel"
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbmapper"
-	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router"
@@ -141,10 +140,11 @@ func IsAuthUserAdmin(r *http.Request, mng interfaces.IManager, db *database.Data
 }
 
 func CheckRole(userID string, roleName string, db *database.Database) (bool, error) {
-	ex, err := db.SyncQ().Exists(adminpanel.USER_ROLES_TABLE, dbutils.WHEquals(dbutils.WHValue{"user_id": userID, "role_name": roleName}, "AND"))
+	ex, err := qb.SelectExists(qb.NewSyncQB(db.SyncQ()), adminpanel.USER_ROLES_TABLE,
+		qb.Compare("user_id", qb.EQUAL, userID), qb.AND,
+		qb.Compare("role_name", qb.EQUAL, roleName))
 	if err != nil {
 		return false, err
 	}
-	fmt.Println(ex["exists"].(bool))
-	return false, nil
+	return ex, nil
 }

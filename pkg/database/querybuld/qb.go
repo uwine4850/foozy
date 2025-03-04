@@ -110,6 +110,7 @@ type QB struct {
 	dataOperationQB
 	filterQB
 	joinQB
+	customFunc
 	queryParts  []string
 	queryString string
 	queryArgs   []any
@@ -123,6 +124,7 @@ func NewNoDbQB() *QB {
 	qb.dataOperationQB.SetQB(qb)
 	qb.filterQB.SetQB(qb)
 	qb.joinQB.SetQB(qb)
+	qb.customFunc.SetQB(qb)
 	return qb
 }
 
@@ -133,6 +135,7 @@ func NewSyncQB(syncQ interfaces.ISyncQueries) *QB {
 	qb.dataOperationQB.SetQB(qb)
 	qb.filterQB.SetQB(qb)
 	qb.joinQB.SetQB(qb)
+	qb.customFunc.SetQB(qb)
 	return qb
 }
 
@@ -144,6 +147,7 @@ func NewAsyncQB(asyncQ interfaces.IAsyncQueries, key string) *QB {
 	qb.dataOperationQB.SetQB(qb)
 	qb.filterQB.SetQB(qb)
 	qb.joinQB.SetQB(qb)
+	qb.customFunc.SetQB(qb)
 	return qb
 }
 
@@ -379,6 +383,27 @@ func (jqb *joinQB) RightJoin(tableName string, values ...any) *QB {
 	}
 	jqb.qb.AppendArgs(qArgs)
 	return jqb.qb
+}
+
+// The customFunc object adds the ability to use [subquery] anywhere in the query.
+// This allows you to make more flexible queries.
+type customFunc struct {
+	qb *QB
+}
+
+func (cf *customFunc) SetQB(qb *QB) {
+	cf.qb = qb
+}
+
+// Func runs a [subquery] in the selected [QB] query fragment.
+func (cf *customFunc) Func(_subquery *subquery) *QB {
+	var qString string
+	qArgs := []any{}
+	if ParseSubQuery(_subquery, &qString, &qArgs) {
+		cf.qb.AppendPart(qString)
+		cf.qb.AppendArgs(qArgs)
+	}
+	return cf.qb
 }
 
 // sql subquery that is inserted in the middle of the main query.

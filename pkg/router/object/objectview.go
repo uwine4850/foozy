@@ -6,7 +6,7 @@ import (
 
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbmapper"
-	"github.com/uwine4850/foozy/pkg/database/dbutils"
+	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/debug"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
@@ -53,9 +53,11 @@ func (v *ObjView) Object(w http.ResponseWriter, r *http.Request, manager interfa
 	if !ok {
 		return nil, ErrNoSlug{v.Slug}
 	}
-	res, err := v.DB.SyncQ().Select([]string{"*"}, v.TableName, dbutils.WHEquals(map[string]interface{}{
-		v.Slug: slugValue,
-	}, "AND"), 1)
+	qRes := qb.NewSyncQB(v.DB.SyncQ()).SelectFrom("*", v.TableName).Where(
+		qb.Compare(v.Slug, qb.EQUAL, slugValue),
+	).Limit(1)
+	qRes.Merge()
+	res, err := qRes.Query()
 	if err != nil {
 		return nil, err
 	}

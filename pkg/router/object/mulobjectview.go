@@ -6,7 +6,7 @@ import (
 
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbmapper"
-	"github.com/uwine4850/foozy/pkg/database/dbutils"
+	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/debug"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
@@ -66,9 +66,11 @@ func (v *MultipleObjectView) Object(w http.ResponseWriter, r *http.Request, mana
 		if !ok {
 			return nil, ErrNoSlug{v.MultipleObjects[i].SlugName}
 		}
-		res, err := v.DB.SyncQ().Select([]string{"*"}, v.MultipleObjects[i].TaleName, dbutils.WHEquals(map[string]interface{}{
-			v.MultipleObjects[i].SlugField: slugValue,
-		}, "AND"), 1)
+		qRes := qb.NewSyncQB(v.DB.SyncQ()).SelectFrom("*", v.MultipleObjects[i].TaleName).Where(
+			qb.Compare(v.MultipleObjects[i].SlugField, qb.EQUAL, slugValue),
+		).Limit(1)
+		qRes.Merge()
+		res, err := qRes.Query()
 		if err != nil {
 			return nil, err
 		}

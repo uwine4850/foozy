@@ -62,6 +62,9 @@ func (fqb *filterQB) SetQB(qb *QB) {
 }
 
 func (fqb *filterQB) Where(values ...any) *QB {
+	if len(values) == 0 {
+		return fqb.mainQB
+	}
 	qString := "WHERE "
 	qArgs := []any{}
 	processingConditionValues(values, &qString, &qArgs)

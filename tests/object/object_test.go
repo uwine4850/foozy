@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/uwine4850/foozy/pkg/database"
+	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/interfaces/irest"
 	"github.com/uwine4850/foozy/pkg/namelib"
@@ -121,10 +122,14 @@ func createAndFillTable(db *database.Database) {
 	if _, err := db.SyncQ().Query("TRUNCATE TABLE object_test;"); err != nil {
 		panic(err)
 	}
-	if _, err := db.SyncQ().Insert("object_test", map[string]interface{}{"name": "name"}); err != nil {
+	q := qb.NewSyncQB(db.SyncQ()).Insert("object_test", map[string]interface{}{"name": "name"})
+	q.Merge()
+	if _, err := q.Exec(); err != nil {
 		panic(err)
 	}
-	if _, err := db.SyncQ().Insert("object_test", map[string]interface{}{"name": "name0"}); err != nil {
+	q1 := qb.NewSyncQB(db.SyncQ()).Insert("object_test", map[string]interface{}{"name": "name0"})
+	q1.Merge()
+	if _, err := q1.Exec(); err != nil {
 		panic(err)
 	}
 
@@ -134,7 +139,9 @@ func createAndFillTable(db *database.Database) {
 	if _, err := db.SyncQ().Query("TRUNCATE TABLE object_test1;"); err != nil {
 		panic(err)
 	}
-	if _, err := db.SyncQ().Insert("object_test1", map[string]interface{}{"name": "name1"}); err != nil {
+	q2 := qb.NewSyncQB(db.SyncQ()).Insert("object_test1", map[string]interface{}{"name": "name1"})
+	q2.Merge()
+	if _, err := q2.Exec(); err != nil {
 		panic(err)
 	}
 }

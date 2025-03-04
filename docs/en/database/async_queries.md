@@ -7,6 +7,21 @@ can be used in the __LoadAsyncRes__ method.
 
 You can see more about interaction with the database in these [tests](https://github.com/uwine4850/foozy/tree/master/tests/database/db_test).
 
+__Query__
+```
+Query(query string, args ...any) ([]map[string]interface{}, error)
+```
+Sends a parameterized query to the database.
+
+__Exec__
+```
+Exec(query string, args ...any) (map[string]interface{}, error)
+```
+Used to execute queries that do not return a result, such as UPDATE or INSERT.
+The method returns a map containing two values:
+* insertID — returns the ID of the field that was inserted using the INSERT command. It is important that there is an AUTO INCREMENT field.
+* rowsAffected — the number of rows that were affected during the query, for example, during the UPDATE command.
+
 __SetSyncQueries__
 ```
 SetSyncQueries(queries interfaces.ISyncQueries)

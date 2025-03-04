@@ -193,7 +193,7 @@ func (d *DbQuery) Exec(query string, args ...any) (map[string]interface{}, error
 	if err != nil {
 		return nil, err
 	}
-	return map[string]interface{}{"id": id, "rows": rowsId}, nil
+	return map[string]interface{}{"insertID": id, "rowsAffected": rowsId}, nil
 }
 
 // DbTxQuery queries that can be rolled back. Used *sql.Tx.

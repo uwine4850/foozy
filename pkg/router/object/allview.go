@@ -6,7 +6,7 @@ import (
 
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbmapper"
-	"github.com/uwine4850/foozy/pkg/database/dbutils"
+	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/debug"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
@@ -44,7 +44,9 @@ func (v *AllView) Object(w http.ResponseWriter, r *http.Request, manager interfa
 	}
 	manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_DB, v.DB)
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "get object from database")
-	objects, err := v.DB.SyncQ().Select([]string{"*"}, v.TableName, dbutils.WHOutput{}, 0)
+	qObjects := qb.NewSyncQB(v.DB.SyncQ()).SelectFrom("*", v.TableName)
+	qObjects.Merge()
+	objects, err := qObjects.Query()
 	if err != nil {
 		return nil, err
 	}
