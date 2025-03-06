@@ -11,6 +11,7 @@ Modules that the framework contains: <br>
   * [dbmapper](https://github.com/uwine4850/foozy/blob/master/docs/en/database/dbmapper/dbmapper.md) — writes data to the selected object.
   * [sync_queres](https://github.com/uwine4850/foozy/blob/master/docs/en/database/sync_queries.md) — synchronous requests to the database.
   * [async_queres](https://github.com/uwine4850/foozy/blob/master/docs/en/database/async_queries.md) — asynchronous requests to the database.
+  * [querybuild](https://github.com/uwine4850/foozy/blob/master/docs/en/database/querybuild/querybuild.md) — creating and sending sql query.
 * [debug](https://github.com/uwine4850/foozy/blob/master/docs/en/debug/debug.md) — debug tools.
 * [interfaces](https://github.com/uwine4850/foozy/blob/master/docs/en/interfaces/interfaces.md) — all golang interfaces used in the project.
 * [namelib](https://github.com/uwine4850/foozy/blob/master/docs/en/namelib/namelib.md) — common names for data access.
