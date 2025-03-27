@@ -30,12 +30,9 @@ func cnfInit(args ...string) error {
 	if len(args) != 2 {
 		return errors.New("parent directory not specified")
 	}
-	rootPath, err := fpath.FindProjectRoot()
-	if err != nil {
-		return err
-	}
+
 	genfiles := map[string]string{
-		filepath.Join(args[1], "init_cnf"): filepath.Join(rootPath, "internal/codegen/init_cnf/init_cnf.go"),
+		filepath.Join(args[1], "init_cnf"): filepath.Join(fpath.CurrentFileDir(), "/../../internal/codegen/init_cnf/init_cnf.go"),
 	}
 	if err := codegen.Generate(genfiles); err != nil {
 		return err
