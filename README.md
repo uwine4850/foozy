@@ -24,6 +24,7 @@ Modules that the framework contains: <br>
 	* [formmapper](https://github.com/uwine4850/foozy/blob/master/docs/en/router/form/formmapper/formmapper.md) — various manipulations with form data.
   * [middlewares](https://github.com/uwine4850/foozy/blob/master/docs/en/router/middlewares/middlewares.md) — a module for creating middleware.
   * [object](https://github.com/uwine4850/foozy/blob/master/docs/en/router/object/object.md) — a package for simpler display of templates.
+  * [rest](https://github.com/uwine4850/foozy/blob/master/docs/en/router/rest/rest.md) — tools for REST api.
   * [mic](https://github.com/uwine4850/foozy/blob/master/docs/en/router/mic/mic.md) — package is responsible for the functionality of microservices.
   * [tmlengine](https://github.com/uwine4850/foozy/blob/master/docs/en/router/tmlengine/tmlengine.md) — project templater. The pongo2 library is used.
   * secure — the package that contains the security functionality.
@@ -128,15 +129,14 @@ func main() {
 	}
 	newManager := manager.NewManager(render)
 	newRouter := router.NewRouter(newManager)
-    newRouter.Get("/home", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) 
-    func() {
+    newRouter.Get("/home", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
         manager.Render().SetTemplatePath("templates/home.html")
         if err := manager.Render().RenderTemplate(w, r); err != nil {
             panic(err)
         }
         return func() {}
     })
-	serv := server.NewServer(":8000", newRouter)
+	serv := server.NewServer(":8000", newRouter, nil)
 	err = serv.Start()
 	if err != nil && !errors.Is(http.ErrServerClosed, err) {
 		panic(err)

@@ -10,7 +10,7 @@ func main() {
     }
 }
 ```
-After that, you need to initialize the configuration settings. To do this, use the same function with the following command `go run <path to cmd.go> cnf-init <target dir>`. This command creates a file that contains a configuration setting function, [read more here](https://github.com/uwine4850/foozy/blob/master/docs/config/config.md). It should be used in the `main` function. Now the function can look like the following:
+After that, you need to initialize the configuration settings. To do this, use the same function with the following command `go run <path to cmd.go> cnf-init <target dir>`. This command creates a file that contains a configuration setting function, [read more here](https://github.com/uwine4850/foozy/blob/master/docs/en/config/config.md). It should be used in the `main` function. Now the function can look like the following:
 ```
 func main() {
 	initcnf.InitCnf()
