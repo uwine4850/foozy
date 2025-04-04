@@ -10,7 +10,7 @@ if err != nil {
 ```
 To stop, you can use 'ctrl + c'.
 
-## Методи
+## Methods
 __Start__
 ```
 Start() error

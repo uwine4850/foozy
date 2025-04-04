@@ -5,8 +5,8 @@ Also, modules depend on interfaces whenever possible, so most of them are open t
 Example project - https://github.com/uwine4850/foozy_proj
 
 Modules that the framework contains: <br>
-* [builtin](https://github.com/uwine4850/foozy/blob/master/docs/en/cmd/cmd.md) — built-in ready-made functionality, for example, authentication. It is not necessary to use.
-* [cmd](https://github.com/uwine4850/foozy/blob/master/docs/en/database/database.md) — project console commands.
+* [builtin](https://github.com/uwine4850/foozy/blob/master/docs/en/builtin/builtin.md) — built-in ready-made functionality, for example, authentication. It is not necessary to use.
+* [cmd](https://github.com/uwine4850/foozy/blob/master/docs/en/cmd/cmd.md) — project console commands.
 * [database](https://github.com/uwine4850/foozy/blob/master/docs/en/database/database.md) — an interface for working with the mysql database.
   * [dbutils](https://github.com/uwine4850/foozy/blob/master/docs/en/database/dbutils/dbutils.md) — auxiliary functionality for using the database package.
   * [dbmapper](https://github.com/uwine4850/foozy/blob/master/docs/en/database/dbmapper/dbmapper.md) — writes data to the selected object.

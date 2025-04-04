@@ -1,8 +1,8 @@
 package config
 
 import (
-	"fmt"
 	"os"
+	"path/filepath"
 	"reflect"
 
 	"github.com/uwine4850/foozy/pkg/utils/fmap"
@@ -34,7 +34,6 @@ func (g *Generate) SetConfig(config *Config) {
 func (g *Generate) Gen() error {
 	loadConfig, err := Load()
 	if err != nil && !reflect.DeepEqual(reflect.TypeOf(err), reflect.TypeOf(&ErrNoFile{})) {
-		fmt.Println(reflect.TypeOf(err))
 		return err
 	}
 	if loadConfig != nil {
@@ -44,6 +43,9 @@ func (g *Generate) Gen() error {
 		if loadConfig.GeneratedAdditionally {
 			fmap.MergeMap(&g.config.Additionally, loadConfig.Additionally)
 		}
+	}
+	if err := os.MkdirAll(filepath.Dir(g.config.path), 0755); err != nil {
+		return err
 	}
 	file, err := os.Create(g.config.path)
 	if err != nil {

@@ -1,187 +1,195 @@
 package livereload
 
 import (
-	"errors"
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
-	"sync"
+	"slices"
+	"syscall"
 	"time"
-
-	"github.com/uwine4850/foozy/pkg/utils/fslice"
+	"unsafe"
 )
 
-type WiretapFiles struct {
-	dirs                []string
-	excludeDirs         []string
-	files               []string
-	onTrigger           func(filePath string)
-	onStart             func()
-	UserParams          sync.Map
-	wg                  sync.WaitGroup
-	excludeDeletedFiles []string
-	parts               int
+type InotifyEvent struct {
+	Wd     int32
+	Mask   uint32
+	Cookie uint32
+	Len    uint32
+	Name   [256]byte
 }
 
-func NewWiretap(dirs []string, excludeDirs []string) *WiretapFiles {
-	return &WiretapFiles{dirs: dirs, excludeDirs: excludeDirs, parts: 10}
+// Pause time between the execution of an event for one observation.
+// This delay applies to each observation separately.
+var observedEventDelay = 1000 * time.Millisecond
+
+func SetObserverEventDelay(delay int) {
+	observedEventDelay = time.Duration(delay) * time.Millisecond
 }
 
-// OnStart set the function that will be executed once during the runServer of the listening session.
-func (f *WiretapFiles) OnStart(fn func()) {
-	f.onStart = fn
+// ObservedElement the element being monitored.
+type ObservedElement struct {
+	Wd            int32
+	Path          string
+	LastEventTime time.Time
 }
 
-func (f *WiretapFiles) GetOnStartFunc() func() {
-	return f.onStart
+// Ready shows whether the delay between invents has passed
+// and whether the file is ready before the re-invent.
+func (of *ObservedElement) Ready() bool {
+	return time.Since(of.LastEventTime) > observedEventDelay
+}
+
+type Wiretap struct {
+	observedElements []*ObservedElement
+	globalWD         int32
+	initFD           int32
+	onStartFn        func()
+	onTriggerFn      func(filePath string)
+	dirs             []string
+	excludeDirs      []string
+	files            []string
+	excludeFiles     []string
+	trackedElemets   []string
+}
+
+func NewWiretap() *Wiretap {
+	return &Wiretap{
+		observedElements: []*ObservedElement{},
+		globalWD:         0,
+	}
+}
+
+// OnStart starts every time during the start of the wiretapping.
+func (w *Wiretap) OnStart(fn func()) {
+	w.onStartFn = fn
+}
+
+func (w *Wiretap) GetOnStartFunc() func() {
+	return w.onStartFn
 }
 
 // OnTrigger a function that will be executed each time the trigger is executed.
-func (f *WiretapFiles) OnTrigger(fn func(filePath string)) {
-	f.onTrigger = fn
+func (w *Wiretap) OnTrigger(fn func(filePath string)) {
+	w.onTriggerFn = fn
 }
 
-// SetUserParams set the parameter to be passed between methods.
-func (f *WiretapFiles) SetUserParams(key string, value interface{}) {
-	f.UserParams.Store(key, value)
+// SetDirs sets the directories to be listened to.
+// It is important to specify that it is the directory and all files in it that is listened to.
+// One directory and all files in it is one [ObservedElement].
+// Subdirectories are already considered new [ObservedElement].
+func (w *Wiretap) SetDirs(dirs []string) {
+	w.dirs = dirs
 }
 
-func (f *WiretapFiles) GetUserParams(key string) (interface{}, bool) {
-	res, ok := f.UserParams.Load(key)
-	return res, ok
+// SetExcludeDirs excludes the directory and absolutely all subdirectories from listening.
+func (w *Wiretap) SetExcludeDirs(dirs []string) {
+	w.excludeDirs = dirs
 }
 
-// SetDirs set the directories whose files will be listened to.
-func (f *WiretapFiles) SetDirs(dirs []string) {
-	f.dirs = dirs
+// SetFiles adds individual files to the wiretap.
+func (w *Wiretap) SetFiles(files []string) {
+	w.files = files
 }
 
-func (f *WiretapFiles) SetExcludeDirs(dirs []string) {
-	f.excludeDirs = dirs
-}
-
-func (f *WiretapFiles) SetNumberOfFileParts(fileParts int) {
-	f.parts = fileParts
-	if f.parts < 2 {
-		panic("parts of file must be greater than 2")
-	}
-}
-
-// Start starting a wiretap.
-func (f *WiretapFiles) Start() error {
-	err := f.readDirs()
-	if err != nil {
+func (w *Wiretap) initInotify() error {
+	fd, _, err := syscall.Syscall(syscall.SYS_INOTIFY_INIT, 0, 0, 0)
+	if err != 0 {
 		return err
 	}
+	w.initFD = int32(fd)
+	return nil
+}
 
-	f.wg.Add(1)
-	go f.onStart()
-
-	var slices [][]string
-	lenFiles := len(f.files)
-	if lenFiles < f.parts {
-		slices = append(slices, f.files)
-	} else {
-		sliceSize := len(f.files) / f.parts
-		for i := 0; i < f.parts; i++ {
-			start := i * sliceSize
-			end := start + sliceSize
-			if i == f.parts-1 {
-				end = len(f.files)
-			}
-			slices = append(slices, f.files[start:end])
-		}
+func (w *Wiretap) addObservedElement(path string, mask uint32) error {
+	cPath := []byte(path)
+	_, _, errno := syscall.Syscall6(syscall.SYS_INOTIFY_ADD_WATCH, uintptr(w.initFD), uintptr(unsafe.Pointer(&cPath[0])), uintptr(mask), 0, 0, 0)
+	if errno != 0 {
+		return errno
 	}
+	w.globalWD++
+	w.observedElements = append(w.observedElements, &ObservedElement{
+		Wd:   w.globalWD,
+		Path: path,
+	})
+	return nil
+}
 
-	for i := 0; i < len(slices); i++ {
-		f.wg.Add(1)
-		go func(i int) {
-			// Initializing the last modification time map.
-			filesModTime := map[string]time.Time{}
-			for j := 0; j < len(slices[i]); j++ {
-				filePath := slices[i][j]
-				filesModTime[filePath] = time.Time{}
-			}
-			// Run an infinite loop to check file modifications.
-			for {
-				for j := 0; j < len(slices[i]); j++ {
-					filePath := slices[i][j]
-					// Skip iteration if file is deleted.
-					if fslice.SliceContains(f.excludeDeletedFiles, filePath) {
-						continue
-					}
-					err := f.watchFile(filePath, &filesModTime)
-					if err != nil {
-						if errors.Is(err, fs.ErrNotExist) {
-							f.excludeDeletedFiles = append(f.excludeDeletedFiles, filePath)
-							return
-						}
-						panic(err)
-					}
+// collectTrackedElements is gathering elements for a wiretap.
+// Directories without files are ignored, but not their subdirectories.
+func (w *Wiretap) collectTrackedElements() {
+	for i := 0; i < len(w.dirs); i++ {
+		filepath.WalkDir(w.dirs[i], func(path string, d fs.DirEntry, err error) error {
+			if d.IsDir() {
+				if slices.Contains(w.excludeDirs, path) {
+					return fs.SkipDir
 				}
-			}
-		}(i)
-	}
-	f.wg.Wait()
-	return nil
-}
-
-func (f *WiretapFiles) watchFile(filePath string, filesModTime *map[string]time.Time) error {
-	var init bool
-	if (*filesModTime)[filePath].String() == "0001-01-01 00:00:00 +0000 UTC" {
-		init = true
-	}
-
-	fileInfo, err := os.Stat(filePath)
-	if err != nil {
-		return err
-	}
-	// When the lastModTime variable is only initialized, it should be set to the correct time to modify the file.
-	// Otherwise, lastModTime and file modification time will not coincide and the event will be filled.
-	if init {
-		(*filesModTime)[filePath] = fileInfo.ModTime()
-		init = false
-		return nil
-	}
-	// If the lastModTime and the current time of file modification do not coincide,
-	// it means that the file has been modified.
-	// The diff variable is responsible for the time difference between the last file save and the current value.
-	// If the time is greater than 1.5 seconds and the above conditions are met, the trigger will be fired.
-	// This is to prevent the trigger from being triggered several times, because some editors save a file several times.
-	diff := fileInfo.ModTime().Sub((*filesModTime)[filePath])
-	if fileInfo.ModTime() != (*filesModTime)[filePath] && diff > 1000*time.Millisecond {
-		(*filesModTime)[filePath] = fileInfo.ModTime()
-		f.onTrigger(filePath)
-	}
-	return nil
-}
-
-// readDirs reads directories and writes the absolute path of each file to the slice.
-func (f *WiretapFiles) readDirs() error {
-	for i := 0; i < len(f.dirs); i++ {
-		visit := func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-			if !info.IsDir() {
-				abs, err := filepath.Abs(path)
-				if err != nil {
+				if ok, err := hasFiles(path); err != nil {
 					return err
-				}
-				f.files = append(f.files, abs)
-			} else {
-				if fslice.SliceContains(f.excludeDirs, path) {
-					return filepath.SkipDir
+				} else if ok {
+					w.trackedElemets = append(w.trackedElemets, path)
 				}
 			}
-			return nil
+			return err
+		})
+	}
+	for i := 0; i < len(w.files); i++ {
+		w.trackedElemets = append(w.trackedElemets, w.files[i])
+	}
+}
+
+func (w *Wiretap) processingTrackedElemetns() {
+	for i := 0; i < len(w.trackedElemets); i++ {
+		w.addObservedElement(w.trackedElemets[i], syscall.IN_MODIFY)
+	}
+}
+
+// Start starts listening. Performs some initialization actions.
+func (w *Wiretap) Start() error {
+	if err := w.initInotify(); err != nil {
+		return err
+	}
+	w.collectTrackedElements()
+	w.processingTrackedElemetns()
+	if w.GetOnStartFunc() != nil {
+		w.GetOnStartFunc()()
+	}
+
+	var buffer []uint8
+	for {
+		buffer = make([]byte, syscall.SizeofInotifyEvent+4096)
+		n, err := syscall.Read(int(w.initFD), buffer)
+		if err != nil {
+			return fmt.Errorf("error reading from inotify descriptor: %s", err.Error())
 		}
 
-		// Recursively traverse all files in the root folder and its subfolders.
-		err := filepath.Walk(f.dirs[i], visit)
-		if err != nil {
-			return err
+		for i := 0; i < n; {
+			event := (*InotifyEvent)(unsafe.Pointer(&buffer[i]))
+			observedElement := w.observedElements[event.Wd-1]
+			if !observedElement.Ready() {
+				i += int(syscall.SizeofInotifyEvent) + int(event.Len)
+				continue
+			}
+			if w.onTriggerFn != nil {
+				w.onTriggerFn(observedElement.Path)
+			}
+
+			observedElement.LastEventTime = time.Now()
+			i += int(syscall.SizeofInotifyEvent) + int(event.Len)
 		}
 	}
-	return nil
+}
+
+func hasFiles(dir string) (bool, error) {
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return false, err
+	}
+
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			return true, nil
+		}
+	}
+	return false, nil
 }

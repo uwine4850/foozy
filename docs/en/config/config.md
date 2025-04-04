@@ -11,7 +11,7 @@ values. You can also use the `Additionally` field to put custom settings there.
 places the data into an instance of the `Config` object.
 
 To get started with the configuration, you must first set up 
-generation. You can use cmd command `go run mycmd/cmd.go initcnf <target_dir>` to configure it. This 
+generation. You can use cmd command `go run mycmd/cmd.go cnf-init <target_dir>` to configure it. This 
 command uses codegeneration to create basic settings. [This file](https://github.com/uwine4850/foozy/blob/master/internal/codegen/init_cnf/init_cnf.go) 
 will be generated.
 
@@ -24,7 +24,7 @@ This is necessary for the configuration generation to be successful.
 
 When everything is set up, you can proceed to configuration generation using the initialized 
 [Cmd](https://github.com/uwine4850/foozy/blob/master/docs/cmd/cmd.md) object. To do this, 
-use the `go run mycmd/cmd.go gencnf` command. After the command is executed, the config will be generated.
+use the `go run mycmd/cmd.go cnf-gen` command. After the command is executed, the config will be generated.
 
 In the default implementation, it is not possible to retrieve a configuration value 
 if it has changed since the server was started. But if you put the directory with 
