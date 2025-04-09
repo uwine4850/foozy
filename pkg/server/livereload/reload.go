@@ -6,8 +6,6 @@ import (
 	"io"
 	"os"
 	"os/exec"
-	"path/filepath"
-	"strings"
 )
 
 type Reloader struct {
@@ -40,14 +38,13 @@ func (r *Reloader) Start() error {
 // onStart actions that are performed at the start.
 // Here the application binary file is built, and then this file is running.
 func (r *Reloader) onStart() {
-	cmd := exec.Command("go", "build", "-o", "myapp", ".")
+	cmd := exec.Command("go", "build", "-o", "myapp", r.serverEntryPointPath)
 	var stderrBuf bytes.Buffer
 	cmd.Stderr = io.MultiWriter(&stderrBuf, os.Stderr)
 	if err := cmd.Run(); err != nil {
 		fmt.Println("Error:", stderrBuf.String())
 	}
-	binaryFileName := strings.Split(filepath.Base("myapp.go"), ".")[0]
-	r.serverProcess = exec.Command("./" + binaryFileName)
+	r.serverProcess = exec.Command("./myapp")
 	r.serverProcess.Stdout = os.Stdout
 	r.serverProcess.Stderr = os.Stderr
 	if err := r.serverProcess.Start(); err != nil {
