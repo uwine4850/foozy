@@ -40,13 +40,13 @@ func (r *Reloader) Start() error {
 // onStart actions that are performed at the start.
 // Here the application binary file is built, and then this file is running.
 func (r *Reloader) onStart() {
-	cmd := exec.Command("go", "build", "-o", "myapp", r.serverEntryPointPath)
+	cmd := exec.Command("go", "build", "-o", "myapp", ".")
 	var stderrBuf bytes.Buffer
 	cmd.Stderr = io.MultiWriter(&stderrBuf, os.Stderr)
 	if err := cmd.Run(); err != nil {
 		fmt.Println("Error:", stderrBuf.String())
 	}
-	binaryFileName := strings.Split(filepath.Base(r.serverEntryPointPath), ".")[0]
+	binaryFileName := strings.Split(filepath.Base("myapp.go"), ".")[0]
 	r.serverProcess = exec.Command("./" + binaryFileName)
 	r.serverProcess.Stdout = os.Stdout
 	r.serverProcess.Stderr = os.Stderr
