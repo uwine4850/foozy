@@ -8,91 +8,62 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
-	"sync"
-
-	"github.com/uwine4850/foozy/pkg/config"
-	"github.com/uwine4850/foozy/pkg/interfaces"
 )
 
-type Reload struct {
-	pathToServerFile string
-	wiretap          interfaces.IWiretap
-	wg               sync.WaitGroup
-	cmd              *exec.Cmd
-	cmdStart         *exec.Cmd
+type Reloader struct {
+	serverEntryPointPath string
+	wiretap              *Wiretap
+	serverProcess        *exec.Cmd
 }
 
-func NewReload(pathToServerFile string, wiretap interfaces.IWiretap) *Reload {
-	return &Reload{pathToServerFile: pathToServerFile, wiretap: wiretap}
-}
-
-func (r *Reload) Start() {
-	if !config.LoadedConfig().Default.Debug.Debug {
-		fmt.Println("Debug is disabled, reloader is not working.")
-		return
+func NewReloader(serverEntryPointPath string, wiretap *Wiretap) *Reloader {
+	return &Reloader{
+		serverEntryPointPath: serverEntryPointPath,
+		wiretap:              wiretap,
 	}
+}
+
+// Start starts listening for files to change and restarts the server.
+func (r *Reloader) Start() error {
 	r.wiretap.OnStart(func() {
 		r.onStart()
 	})
 	r.wiretap.OnTrigger(func(filePath string) {
 		r.onTrigger()
 	})
-	err := r.wiretap.Start()
-	if err != nil {
-		panic(err)
+	if err := r.wiretap.Start(); err != nil {
+		return err
 	}
+	return nil
 }
 
-func (r *Reload) onStart() {
-	r.cmd = exec.Command("go", "build", "-p", "4", r.pathToServerFile)
+// onStart actions that are performed at the start.
+// Here the application binary file is built, and then this file is running.
+func (r *Reloader) onStart() {
+	cmd := exec.Command("go", "build", "-o", "myapp", ".")
 	var stderrBuf bytes.Buffer
-	r.cmd.Stderr = io.MultiWriter(&stderrBuf, os.Stderr)
-	if err := r.cmd.Run(); err != nil {
+	cmd.Stderr = io.MultiWriter(&stderrBuf, os.Stderr)
+	if err := cmd.Run(); err != nil {
 		fmt.Println("Error:", stderrBuf.String())
 	}
-	binaryFileName := strings.Split(filepath.Base(r.pathToServerFile), ".")[0]
-	r.cmdStart = exec.Command("./" + binaryFileName)
-	r.cmdStart.Stdout = os.Stdout
-	r.cmdStart.Stderr = os.Stderr
-	r.wg.Add(1)
-	go r.runServer()
-}
-
-func (r *Reload) onTrigger() {
-	if r.cmdStart.Process == nil {
-		return
-	}
-	err := r.cmdStart.Process.Kill()
-	if err != nil && err.Error() != "os: process already finished" {
-		if err.Error() == "os: process already finished" {
-			fmt.Println("Stop server")
-			r.wg.Wait()
-			r.wiretap.GetOnStartFunc()()
-			return
-		}
+	binaryFileName := strings.Split(filepath.Base("myapp.go"), ".")[0]
+	r.serverProcess = exec.Command("./" + binaryFileName)
+	r.serverProcess.Stdout = os.Stdout
+	r.serverProcess.Stderr = os.Stderr
+	if err := r.serverProcess.Start(); err != nil {
 		panic(err)
-	}
-	if r.cmdStart.Process != nil {
-		err = r.cmdStart.Wait()
-		if err != nil && err.Error() != "exec: Wait was already called" {
-			if err.Error() == "signal: killed" {
-				r.wg.Wait()
-				r.wiretap.GetOnStartFunc()()
-				return
-			}
-			panic(err)
-		}
 	}
 }
 
-func (r *Reload) runServer() {
-	defer r.wg.Done()
-	err := r.cmdStart.Start()
-	if err != nil {
-		if err.Error() == "signal: killed" {
-			fmt.Println("STOP SERVER")
-			return
-		}
-		panic(err)
+// onTrigger action during a file reload.
+// The server stops and then the [onStart] method is called,
+// which starts the rebuilt application again.
+func (r *Reloader) onTrigger() {
+	if err := r.serverProcess.Process.Kill(); err != nil {
+		fmt.Println(err)
 	}
+	if _, err := r.serverProcess.Process.Wait(); err != nil {
+		fmt.Println("err")
+	}
+	r.onStart()
 }

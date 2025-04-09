@@ -18,8 +18,10 @@ func main() {
 	initcnf.InitCnf()
 	wrt := livereload.NewWiretap()
 	wrt.SetDirs([]string{"dir"})
-	reload := livereload.NewReload("main.go", wrt)
-	reload.Start()
+	reload := livereload.NewReloader("main.go", wrt)
+	if err := reload.Start(); err != nil{
+		panic(err)
+	}
 }
 
 ```

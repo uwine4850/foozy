@@ -12,7 +12,7 @@ Dockerfile.*
 mycmd
 tests/**/*.log
 cnf
-main
+myapp
 reloader
 *.log
 _reloader
