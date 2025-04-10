@@ -7,7 +7,7 @@ The authentication algorithm is as follows:
 * User login using the __LoginUser__ method.
 * In order for the encryption keys to be updated, you need to use __globalflow__ and the function *bglobalflow.KeyUpdater(1)*.
     ```
-    gf := globalflow.NewGlobalFlow(1)
+    gf := globalflow.NewGlobalFlow(1000)
     gf.AddNotWaitTask(bglobalflow.KeyUpdater(1))
     gf.Run(manager)
     ```
