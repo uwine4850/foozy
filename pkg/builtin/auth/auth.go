@@ -21,7 +21,7 @@ type AuthCookie struct {
 	KeyDate time.Time
 }
 
-type AuthItem struct {
+type AuthUser struct {
 	Id       string `db:"id"`
 	Username string `db:"username"`
 }
@@ -81,9 +81,8 @@ func (a *Auth) RegisterUser(username string, password string) error {
 }
 
 // LoginUser check if the password and login are the same.
-// Creates a cookie entry.
-// Adds a USER variable to the user context, which contains user data from the auth table.
-func (a *Auth) LoginUser(username string, password string) (*AuthItem, error) {
+// If there was no error returns an [AuthUser] object with user data.
+func (a *Auth) LoginUser(username string, password string) (*AuthUser, error) {
 	userDB, err := UserByUsername(a.database, username)
 	if err != nil {
 		return nil, err
@@ -95,11 +94,8 @@ func (a *Auth) LoginUser(username string, password string) (*AuthItem, error) {
 	if err != nil {
 		return nil, err
 	}
-	var authItem AuthItem
+	var authItem AuthUser
 	if err := dbmapper.FillStructFromDb(userDB, typeopr.Ptr{}.New(&authItem)); err != nil {
-		return nil, err
-	}
-	if err := a.addUserCookie(authItem.Id); err != nil {
 		return nil, err
 	}
 	return &authItem, nil
@@ -113,13 +109,14 @@ func (a *Auth) UpdateAuthCookie(hashKey []byte, blockKey []byte, r *http.Request
 	if err := cookies.ReadSecureCookieData(hashKey, blockKey, r, namelib.AUTH.COOKIE_AUTH, &authCookie); err != nil {
 		return err
 	}
-	if err := a.addUserCookie(authCookie.UID); err != nil {
+	if err := a.AddAuthCookie(authCookie.UID); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (a *Auth) addUserCookie(uid string) error {
+// AddAuthCookie adds the user's authentication cipher to the cookie.
+func (a *Auth) AddAuthCookie(uid string) error {
 	k := a.manager.Key().Get32BytesKey()
 	if err := cookies.CreateSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), a.w, &http.Cookie{
 		Name:     namelib.AUTH.COOKIE_AUTH,

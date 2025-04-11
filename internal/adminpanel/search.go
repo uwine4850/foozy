@@ -61,7 +61,7 @@ func (us *UserSearchByID) Context(w http.ResponseWriter, r *http.Request, manage
 		if err != nil {
 			return nil, err
 		}
-		var out []auth.AuthItem
+		var out []auth.AuthUser
 		mapper := dbmapper.NewMapper(res, typeopr.Ptr{}.New(&out))
 		if err := mapper.Fill(); err != nil {
 			return nil, err
@@ -127,7 +127,7 @@ func (us *UserSearchByUsername) Context(w http.ResponseWriter, r *http.Request, 
 		if err != nil {
 			return nil, err
 		}
-		var out []auth.AuthItem
+		var out []auth.AuthUser
 		mapper := dbmapper.NewMapper(res, typeopr.Ptr{}.New(&out))
 		if err := mapper.Fill(); err != nil {
 			return nil, err

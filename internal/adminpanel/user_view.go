@@ -69,7 +69,7 @@ func UserView(db *database.Database) router.Handler {
 				Name:       "user",
 				DB:         db,
 				TableName:  "auth",
-				FillStruct: auth.AuthItem{},
+				FillStruct: auth.AuthUser{},
 				Slug:       "id",
 			},
 		},

@@ -40,6 +40,13 @@ LoginUser(username string, password string) error
 Checks the correctness of user data. If there is no error, all the data is correct. 
 Returns a __User__ structure that contains user data. Also adds cookie data about the user.
 
+__AddAuthCookie__
+```go
+AddAuthCookie(uid string) error 
+```
+Adds the user's authentication cipher to the cookie.
+It can then be used for authorization.
+
 __UpdateAuthCookie__
 ```
 UpdateAuthCookie(hashKey []byte, blockKey []byte, r *http.Request) error
@@ -85,7 +92,7 @@ ComparePassword(hashedPassword string, password string) error
 Compares whether the hash of the password and the password match.
 
 ## Example of use
-```
+```go
 dbArgs := database.DbArgs{
 	Username: "root", Password: "1111", Host: "localhost", Port: "3408", DatabaseName: "foozy_test",
 }
@@ -103,11 +110,13 @@ defer func(db *database.Database) {
 _auth := auth.NewAuth(db)
 err = _auth.RegisterUser("user", "111111")
 if err != nil {
-    fmt.Println(err)
+    panic(err)
 }
-_, err := _auth.LoginUser("user", "111111")
+user, err := _auth.LoginUser("user", "111111")
 if err != nil {
-    fmt.Println(err)
-	return
+    panic(err)
+}
+if err := _auth.AddAuthCookie(user.Id); err != nil {
+    panic(err)
 }
 ```
