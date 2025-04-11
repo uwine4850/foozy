@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbmapper"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
@@ -15,6 +16,11 @@ import (
 	"github.com/uwine4850/foozy/pkg/typeopr"
 	"golang.org/x/crypto/bcrypt"
 )
+
+type JWTClaims struct {
+	jwt.RegisteredClaims
+	Id string `json:"id"`
+}
 
 type AuthCookie struct {
 	UID     string

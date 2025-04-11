@@ -95,8 +95,13 @@ func register(db *database.Database) func(w http.ResponseWriter, r *http.Request
 func login(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		au := auth.NewAuth(db, w, mng)
-		if _, err := au.LoginUser("test", "111111"); err != nil {
+		if usr, err := au.LoginUser("test", "111111"); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager) }
+		} else {
+			err := au.AddAuthCookie(usr.Id)
+			if err != nil {
+				return func() { router.ServerError(w, err.Error(), manager) }
+			}
 		}
 		return func() {}
 	}

@@ -1,16 +1,19 @@
 package builtin_mddl
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/uwine4850/foozy/pkg/builtin/auth"
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router/cookies"
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
+	"github.com/uwine4850/foozy/pkg/secure"
 	"github.com/uwine4850/foozy/pkg/utils/fslice"
 )
 
@@ -61,9 +64,67 @@ func Auth(excludePatterns []string, db *database.Database, onErr OnError) middle
 	}
 }
 
+// SetToken sets the JWT token for further work with it.
+type SetToken func() (string, error)
+
+// UpdatedToken function, which is called only if the token has been updated.
+// Passes a single updated token.
+type UpdatedToken func(token string) error
+
+// AuthJWT updates the JWT authentication encoding accordingly with key updates.
+// That is, the update depends directly on the frequency of key updates in GloablFlow.
+func AuthJWT(setToken SetToken, updatedToken UpdatedToken, onErr OnError) middlewares.MddlFunc {
+	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
+		tokenString, err := setToken()
+		if err != nil {
+			onErr(w, r, manager, err)
+			return
+		}
+		_claims := &auth.JWTClaims{}
+		_, err = jwt.ParseWithClaims(tokenString, _claims, func(t *jwt.Token) (interface{}, error) {
+			return []byte(manager.Key().HashKey()), nil
+		})
+
+		// The token cannot be decrypted by the current key.
+		// This means that it has been changed and you should try the previous key.
+		if errors.Is(err, jwt.ErrTokenSignatureInvalid) {
+			newClaims := &auth.JWTClaims{}
+			token, err := jwt.ParseWithClaims(tokenString, newClaims, func(t *jwt.Token) (interface{}, error) {
+				return []byte(manager.Key().OldHashKey()), nil
+			})
+			if err != nil {
+				onErr(w, r, manager, err)
+				return
+			}
+			// If the previous key fits and the token is valid, you need to update the encoding.
+			if token.Valid {
+				updatedTokenString, err := secure.NewHmacJwtWithClaims(newClaims, manager)
+				if err != nil {
+					onErr(w, r, manager, err)
+					return
+				}
+				if err := updatedToken(updatedTokenString); err != nil {
+					onErr(w, r, manager, err)
+					return
+				}
+				return
+			} else {
+				onErr(w, r, manager, &ErrJWTNotValid{})
+				return
+			}
+		}
+	}
+}
+
 type ErrUrlPatternNotExist struct {
 }
 
 func (e ErrUrlPatternNotExist) Error() string {
 	return fmt.Sprintf("Data behind the %s key was not found.", namelib.ROUTER.URL_PATTERN)
+}
+
+type ErrJWTNotValid struct{}
+
+func (e ErrJWTNotValid) Error() string {
+	return "JWT is not valid"
 }
