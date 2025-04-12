@@ -38,3 +38,9 @@ type ErrShortUsername struct {
 func (receiver ErrShortUsername) Error() string {
 	return "The username must be equal to or longer than 3 characters."
 }
+
+type ErrUserRegistration struct{}
+
+func (receiver ErrUserRegistration) Error() string {
+	return "Internal user registration error."
+}

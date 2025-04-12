@@ -13,8 +13,8 @@ type IDbQuery interface {
 	// For example, the INSERT command.
 	//
 	// Returns the following data:
-	// Key “id” is the identifier of the inserted row using INSERT.
-	// Key “rows” - Returns the number of rows affected by INSERT, UPDATE, DELETE.
+	// Key "insertID" is the identifier of the inserted row using INSERT.
+	// Key "rowsAffected" - Returns the number of rows affected by INSERT, UPDATE, DELETE.
 	Exec(query string, args ...any) (map[string]interface{}, error)
 }
 

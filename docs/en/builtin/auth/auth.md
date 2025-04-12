@@ -29,9 +29,10 @@ The structure is intended to describe user data.
 
 __RegisterUser__
 ```
-RegisterUser(username string, password string) error
+RegisterUser(username string, password string) (int, error)
 ```
 Creates a new user. If something goes wrong, it returns an error.
+Returns the ID of the new user.
 
 __LoginUser__
 ```

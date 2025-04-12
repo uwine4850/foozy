@@ -177,6 +177,8 @@ func (qb *QB) Args() []any {
 	return qb.queryArgs
 }
 
+// Query executes a query against the database.
+// Returns data if necessary, e.g. SELECT command.
 func (qb *QB) Query() ([]map[string]interface{}, error) {
 	qb.Merge()
 	if qb.syncQ != nil {
@@ -189,6 +191,10 @@ func (qb *QB) Query() ([]map[string]interface{}, error) {
 	return nil, errors.New("no synchronous or asynchronous QB handler found")
 }
 
+// Exec executes a query against a database and returns the result of the query.
+// Returns the following data:
+// Key "insertID" is the identifier of the inserted row using INSERT.
+// Key "rowsAffected" - Returns the number of rows affected by INSERT, UPDATE, DELETE.
 func (qb *QB) Exec() (map[string]interface{}, error) {
 	qb.Merge()
 	if qb.syncQ != nil {

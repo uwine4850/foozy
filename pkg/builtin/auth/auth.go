@@ -51,10 +51,11 @@ func NewAuth(database *database.Database, w http.ResponseWriter, manager interfa
 
 // RegisterUser registers the user in the database.
 // It also checks the password and makes sure that there is no user with that login.
-func (a *Auth) RegisterUser(username string, password string) error {
+// Returns the ID of the new user.
+func (a *Auth) RegisterUser(username string, password string) (int, error) {
 	err := a.database.Ping()
 	if err != nil {
-		return err
+		return 0, err
 	}
 	qUser := qb.NewSyncQB(a.database.SyncQ()).SelectFrom("username", a.tableName).Where(
 		qb.Compare("username", qb.EQUAL, username),
@@ -62,28 +63,32 @@ func (a *Auth) RegisterUser(username string, password string) error {
 	qUser.Merge()
 	user, err := qUser.Query()
 	if err != nil {
-		return err
+		return 0, err
 	}
 	if len(user) >= 1 {
-		return ErrUserAlreadyExist{username}
+		return 0, ErrUserAlreadyExist{username}
 	}
 	if len(password) < 6 {
-		return ErrShortPassword{}
+		return 0, ErrShortPassword{}
 	}
 	if len(username) < 3 {
-		return ErrShortUsername{}
+		return 0, ErrShortUsername{}
 	}
 	hashPass, err := HashPassword(password)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	qIns := qb.NewSyncQB(a.database.SyncQ()).Insert(a.tableName, map[string]interface{}{"username": username, "password": hashPass})
 	qIns.Merge()
-	_, err = qIns.Exec()
+	insertCommand, err := qIns.Exec()
 	if err != nil {
-		return err
+		return 0, err
 	}
-	return nil
+	insertUserId, ok := insertCommand["insertID"].(int64)
+	if !ok {
+		return 0, &ErrUserRegistration{}
+	}
+	return int(insertUserId), nil
 }
 
 // LoginUser check if the password and login are the same.
