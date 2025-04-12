@@ -65,19 +65,22 @@ func Auth(excludePatterns []string, db *database.Database, onErr OnError) middle
 }
 
 // SetToken sets the JWT token for further work with it.
-type SetToken func() (string, error)
+type SetToken func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (string, error)
 
 // UpdatedToken function, which is called only if the token has been updated.
 // Passes a single updated token.
-type UpdatedToken func(token string) error
+type UpdatedToken func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, token string) error
 
 // AuthJWT updates the JWT authentication encoding accordingly with key updates.
 // That is, the update depends directly on the frequency of key updates in GloablFlow.
 func AuthJWT(setToken SetToken, updatedToken UpdatedToken, onErr OnError) middlewares.MddlFunc {
 	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
-		tokenString, err := setToken()
+		tokenString, err := setToken(w, r, manager)
 		if err != nil {
 			onErr(w, r, manager, err)
+			return
+		}
+		if tokenString == "" {
 			return
 		}
 		_claims := &auth.JWTClaims{}
@@ -103,7 +106,7 @@ func AuthJWT(setToken SetToken, updatedToken UpdatedToken, onErr OnError) middle
 					onErr(w, r, manager, err)
 					return
 				}
-				if err := updatedToken(updatedTokenString); err != nil {
+				if err := updatedToken(w, r, manager, updatedTokenString); err != nil {
 					onErr(w, r, manager, err)
 					return
 				}
