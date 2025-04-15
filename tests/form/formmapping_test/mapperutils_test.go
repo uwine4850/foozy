@@ -15,10 +15,10 @@ import (
 )
 
 type Fill struct {
-	NilField []string `form:"isNil"`
+	NilField []string `name:"isNil"`
 	Str      string
-	Field1   []string        `form:"f1"`
-	File     []form.FormFile `form:"file" empty:""`
+	Field1   []string        `name:"f1"`
+	File     []form.FormFile `name:"file" empty:""`
 }
 
 func fill(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {

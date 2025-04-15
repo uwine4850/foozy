@@ -47,3 +47,21 @@ var OBJECT = ObjectNames{
 	OBJECT_CONTEXT_FORM: "OBJECT_CONTEXT_FORM",
 	OBJECT_DB:           "OBJECT_DB",
 }
+
+type TagNames struct {
+	DB_MAPPER_NAME        string
+	DB_MAPPER_EMPTY       string
+	FORM_MAPPER_NAME      string
+	FORM_MAPPER_EMPTY     string
+	FORM_MAPPER_EXTENSION string
+	REST_MAPPER_NAME      string
+}
+
+var TAGS = TagNames{
+	DB_MAPPER_NAME:        "name",
+	DB_MAPPER_EMPTY:       "empty",
+	FORM_MAPPER_NAME:      "name",
+	FORM_MAPPER_EMPTY:     "empty",
+	FORM_MAPPER_EXTENSION: "ext",
+	REST_MAPPER_NAME:      "name",
+}

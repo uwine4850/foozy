@@ -63,8 +63,8 @@ func AdminHandlerSet(db *database.Database, myRouter *router.Router) []map[strin
 }
 
 type AdminSettingsDB struct {
-	Id          string `db:"id"`
-	AdminAccess string `db:"admin_access"`
+	Id          string `name:"id"`
+	AdminAccess string `name:"admin_access"`
 }
 
 func AdminPage(db *database.Database) router.Handler {

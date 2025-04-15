@@ -5,13 +5,14 @@ import (
 	"reflect"
 	"strconv"
 
+	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router/form"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 	"github.com/uwine4850/foozy/pkg/utils/fslice"
 )
 
 // TypedMapper converts form data into typed structure data.
-// To work, you need to use the 'form' tag, which means the names of the form fields.
+// To work, you need to use the "name" tag, which means the names of the form fields.
 type TypedMapper struct {
 	Form                   *form.Form
 	Output                 typeopr.IPtr
@@ -45,7 +46,7 @@ func (m *TypedMapper) fillStruct(OF *OrderedForm) error {
 	for i := 0; i < outT.NumField(); i++ {
 		fieldT := outT.Field(i)
 		fieldV := outV.Field(i)
-		tag := fieldT.Tag.Get("form")
+		tag := fieldT.Tag.Get(namelib.TAGS.FORM_MAPPER_NAME)
 		// Skip if the tag is not a form
 		if tag == "" {
 			continue
@@ -58,7 +59,7 @@ func (m *TypedMapper) fillStruct(OF *OrderedForm) error {
 				return form.ErrFormConvertFieldNotFound{Field: tag}
 			}
 		}
-		if err := m.handleItem(&OFval, &fieldV, fieldT.Name, 0, fieldT.Tag.Get("empty")); err != nil {
+		if err := m.handleItem(&OFval, &fieldV, fieldT.Name, 0, fieldT.Tag.Get(namelib.TAGS.FORM_MAPPER_EMPTY)); err != nil {
 			return err
 		}
 	}

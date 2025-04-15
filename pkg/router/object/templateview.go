@@ -138,12 +138,22 @@ func (v *TemplateRedirectView) Call(w http.ResponseWriter, r *http.Request, mana
 // JsonObjectTemplateView is used to display ObjectView as JSON data.
 // If the Messages field is empty, it renders JSON as a regular TemplateView.
 type JsonObjectTemplateView struct {
-	View    IView
-	DTO     *rest.DTO
-	Message irest.IMessage
+	View            IView
+	DTO             *rest.DTO
+	Message         irest.IMessage
+	onMessageFilled func(message any, manager interfaces.IManager) error
 }
 
 func (v *JsonObjectTemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	defer func() {
+		debug.RequestLogginIfEnable(debug.P_OBJECT, "close view database")
+		err := v.View.CloseDb()
+		if err != nil {
+			v.View.OnError(w, r, manager, err)
+			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
+			return
+		}
+	}()
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "run JsonObjectTemplateView")
 	onError, viewObject, viewContext := baseParseView(v.View, w, r, manager)
 	if onError != nil {
@@ -169,6 +179,18 @@ func (v *JsonObjectTemplateView) Call(w http.ResponseWriter, r *http.Request, ma
 				v.View.OnError(w, r, manager, err)
 			}
 		}
+		if v.onMessageFilled != nil {
+			messageType := reflect.TypeOf(v.Message)
+			tempMessage := reflect.New(messageType)
+			tempMessage.Elem().Set(reflect.ValueOf(_filledMessage))
+			if err := v.onMessageFilled(tempMessage.Interface(), manager); err != nil {
+				return func() {
+					debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
+					v.View.OnError(w, r, manager, err)
+				}
+			}
+			_filledMessage = tempMessage.Elem().Interface().(irest.IMessage)
+		}
 		filledMessage = _filledMessage
 	} else {
 		debug.RequestLogginIfEnable(debug.P_OBJECT, "pass context without DTO message")
@@ -181,7 +203,11 @@ func (v *JsonObjectTemplateView) Call(w http.ResponseWriter, r *http.Request, ma
 	return func() {}
 }
 
-// JsonObjectTemplateView is used to display MultipleObjectView as JSON data.
+func (v *JsonObjectTemplateView) OnMessageFilled(fn func(message any, manager interfaces.IManager) error) {
+	v.onMessageFilled = fn
+}
+
+// JsonMultipleObjectTemplateView is used to display MultipleObjectView as JSON data.
 // If the Messages field is empty, it renders JSON as a regular TemplateView.
 type JsonMultipleObjectTemplateView struct {
 	View    IView
@@ -190,6 +216,15 @@ type JsonMultipleObjectTemplateView struct {
 }
 
 func (v *JsonMultipleObjectTemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	defer func() {
+		debug.RequestLogginIfEnable(debug.P_OBJECT, "close view database")
+		err := v.View.CloseDb()
+		if err != nil {
+			v.View.OnError(w, r, manager, err)
+			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
+			return
+		}
+	}()
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "run JsonMultipleObjectTemplateView")
 	onError, viewObject, viewContext := baseParseView(v.View, w, r, manager)
 	if onError != nil {
@@ -239,7 +274,7 @@ func (v *JsonMultipleObjectTemplateView) Call(w http.ResponseWriter, r *http.Req
 	return func() {}
 }
 
-// JsonObjectTemplateView is used to display AllView as JSON data.
+// JsonAllTemplateView is used to display AllView as JSON data.
 // If the Messages field is empty, it renders JSON as a regular TemplateView.
 type JsonAllTemplateView struct {
 	View    IView
@@ -248,6 +283,15 @@ type JsonAllTemplateView struct {
 }
 
 func (v *JsonAllTemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	defer func() {
+		debug.RequestLogginIfEnable(debug.P_OBJECT, "close view database")
+		err := v.View.CloseDb()
+		if err != nil {
+			v.View.OnError(w, r, manager, err)
+			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
+			return
+		}
+	}()
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "run JsonAllTemplateView")
 	onError, viewObject, viewContext := baseParseView(v.View, w, r, manager)
 	if onError != nil {
@@ -344,16 +388,6 @@ func baseParseView(view IView, w http.ResponseWriter, r *http.Request, manager i
 	if !permissions {
 		debug.RequestLogginIfEnable(debug.P_OBJECT, "permissions are not granted")
 		onError = func() { f() }
-		return
-	}
-
-	err = view.CloseDb()
-	if err != nil {
-		debug.RequestLogginIfEnable(debug.P_OBJECT, "close view database")
-		onError = func() {
-			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
-			view.OnError(w, r, manager, err)
-		}
 		return
 	}
 	return

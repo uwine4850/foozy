@@ -52,10 +52,10 @@ func TestMain(m *testing.M) {
 }
 
 type DbTestMapper struct {
-	Col1 string `db:"col1"`
-	Col2 string `db:"col2"`
-	Col3 string `db:"col3"`
-	Col4 string `db:"col4" empty:"0"`
+	Col1 string `name:"col1"`
+	Col2 string `name:"col2"`
+	Col3 string `name:"col3"`
+	Col4 string `name:"col4" empty:"0"`
 }
 
 func TestDbMapperUseStruct(t *testing.T) {
@@ -115,9 +115,9 @@ func TestDbMapperUseMap(t *testing.T) {
 }
 
 type Fill struct {
-	Col1 string `db:"col1"`
-	Col2 string `db:"col2"`
-	Col3 string `db:"col3"`
+	Col1 string `name:"col1"`
+	Col2 string `name:"col2"`
+	Col3 string `name:"col3"`
 }
 
 func TestFillStructFromDb(t *testing.T) {

@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router/form"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 	"github.com/uwine4850/foozy/pkg/utils/fslice"
@@ -14,7 +15,7 @@ import (
 
 // FillStructFromForm A method that fills the structure with data from the form.
 // The structure should always be passed as a pointer.
-// For correct work it is necessary to specify "form" tag for each field of the structure. For example, `form:<form field name>`.
+// For correct work it is necessary to specify "name" tag for each field of the structure. For example, `name:<form field name>`.
 // Structure fields can be of two types only:
 // []FormFile - form files.
 // []string - all other data.
@@ -29,8 +30,8 @@ func FillStructFromForm(frm *form.Form, fillPtr typeopr.IPtr, nilIfNotExist []st
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 		value := v.Field(i)
-		tag := field.Tag.Get("form")
-		// Skip if the tag is not a form
+		tag := field.Tag.Get(namelib.TAGS.FORM_MAPPER_NAME)
+		// Skip if the tag is not a "name"
 		if tag == "" {
 			continue
 		}
@@ -51,14 +52,14 @@ func FillStructFromForm(frm *form.Form, fillPtr typeopr.IPtr, nilIfNotExist []st
 			// This happens because a field without a file loaded is considered a string.
 			// Therefore, an empty []FormFile field will be of type []string.
 			// If the field is suitable for a string, then you need to skip the iteration to avoid false positives when processing files.
-			ok, err = setFormString(field, orderedFormValue[i].Value, value, field.Tag.Get("empty"))
+			ok, err = setFormString(field, orderedFormValue[i].Value, value, field.Tag.Get(namelib.TAGS.FORM_MAPPER_EMPTY))
 			if err != nil {
 				return err
 			}
 			if ok {
 				continue
 			}
-			if err := setFormFile(field, orderedFormValue[i].Value, value, field.Tag.Get("empty")); err != nil {
+			if err := setFormFile(field, orderedFormValue[i].Value, value, field.Tag.Get(namelib.TAGS.FORM_MAPPER_EMPTY)); err != nil {
 				return err
 			}
 		}
@@ -76,7 +77,7 @@ func FillReflectValueFromForm(frm *form.Form, fillValue *reflect.Value, nilIfNot
 		field := fillType.Field(i)
 		value := fillValue.Field(i)
 
-		tag := field.Tag.Get("form")
+		tag := field.Tag.Get(namelib.TAGS.FORM_MAPPER_NAME)
 		if tag == "" {
 			continue
 		}
@@ -93,14 +94,14 @@ func FillReflectValueFromForm(frm *form.Form, fillValue *reflect.Value, nilIfNot
 			// This happens because a field without a file loaded is considered a string.
 			// Therefore, an empty []FormFile field will be of type []string.
 			// If the field is suitable for a string, then you need to skip the iteration to avoid false positives when processing files.
-			ok, err := setFormString(field, orderedFormValue[i].Value, value, field.Tag.Get("empty"))
+			ok, err := setFormString(field, orderedFormValue[i].Value, value, field.Tag.Get(namelib.TAGS.FORM_MAPPER_EMPTY))
 			if err != nil {
 				return err
 			}
 			if ok {
 				continue
 			}
-			if err := setFormFile(field, orderedFormValue[i].Value, value, field.Tag.Get("empty")); err != nil {
+			if err := setFormFile(field, orderedFormValue[i].Value, value, field.Tag.Get(namelib.TAGS.FORM_MAPPER_EMPTY)); err != nil {
 				return err
 			}
 		}
@@ -121,7 +122,7 @@ func CheckExtension(fillPtr typeopr.IPtr) error {
 	fillType, fillValue := getStructElemFromFillableStruct(fillStruct)
 
 	for i := 0; i < fillType.NumField(); i++ {
-		tag := fillType.Field(i).Tag.Get("ext")
+		tag := fillType.Field(i).Tag.Get(namelib.TAGS.FORM_MAPPER_EXTENSION)
 		if tag == "" {
 			continue
 		}

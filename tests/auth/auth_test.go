@@ -85,7 +85,7 @@ func register(db *database.Database) func(w http.ResponseWriter, r *http.Request
 			return func() { router.ServerError(w, err.Error(), manager) }
 		}
 		au := auth.NewAuth(db, w, mng)
-		if err := au.RegisterUser("test", "111111"); err != nil {
+		if _, err := au.RegisterUser("test", "111111"); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager) }
 		}
 		return func() {}

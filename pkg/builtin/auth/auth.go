@@ -28,8 +28,8 @@ type AuthCookie struct {
 }
 
 type AuthUser struct {
-	Id       string `db:"id"`
-	Username string `db:"username"`
+	Id       string `name:"id"`
+	Username string `name:"username"`
 }
 
 // Auth structure is designed to manage user authentication.

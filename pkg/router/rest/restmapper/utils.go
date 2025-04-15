@@ -8,11 +8,12 @@ import (
 	"reflect"
 
 	"github.com/uwine4850/foozy/pkg/interfaces/irest"
+	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
 // FillMessageFromMap fills in a message from the card.
-// To work you need to use the 'json' tag.
+// To work you need to use the "name" tag.
 func FillMessageFromMap(jsonMap *map[string]interface{}, outputPtr typeopr.IPtr) error {
 	output := outputPtr.Ptr()
 	if !typeopr.IsImplementInterface(typeopr.Ptr{}.New(output), (*irest.IMessage)(nil)) {
@@ -28,7 +29,7 @@ func FillMessageFromMap(jsonMap *map[string]interface{}, outputPtr typeopr.IPtr)
 		v = reflect.ValueOf(output).Elem()
 	}
 	for i := 0; i < t.NumField(); i++ {
-		name := t.Field(i).Tag.Get("json")
+		name := t.Field(i).Tag.Get(namelib.TAGS.REST_MAPPER_NAME)
 		inputValue, ok := (*jsonMap)[name]
 		if !ok {
 			continue

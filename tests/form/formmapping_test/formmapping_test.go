@@ -17,8 +17,8 @@ import (
 )
 
 type TestMapping struct {
-	Text []string        `form:"text" empty:"-err"`
-	File []form.FormFile `form:"file" empty:"-err"`
+	Text []string        `name:"text" empty:"-err"`
+	File []form.FormFile `name:"file" empty:"-err"`
 }
 
 func mpDefaultStruct(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -200,7 +200,7 @@ func TestEmptyFile(t *testing.T) {
 }
 
 type TestMappingEmpty struct {
-	Text []string `form:"text" empty:"def"`
+	Text []string `name:"text" empty:"def"`
 }
 
 func mpEmptyValue(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -257,11 +257,11 @@ func TestEmptyValue(t *testing.T) {
 }
 
 type FillTypedStruct struct {
-	Id    int           `form:"id"`
-	Name  string        `form:"name"`
-	Slice []string      `form:"slice"`
-	IsOk  bool          `form:"is_ok"`
-	File  form.FormFile `form:"file"`
+	Id    int           `name:"id"`
+	Name  string        `name:"name"`
+	Slice []string      `name:"slice"`
+	IsOk  bool          `name:"is_ok"`
+	File  form.FormFile `name:"file"`
 }
 
 func mpTypedMapper(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {

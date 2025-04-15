@@ -4,20 +4,21 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 	"github.com/uwine4850/foozy/pkg/utils/fslice"
 )
 
 // FillReflectValueFromDb fills structure of type reflect.Value with data from a database query.
-// For proper operation, you need to add a "db" tag with the column name for each field that represents a column from the database.
-// For example: `db:"col_name"`.
+// For proper operation, you need to add a "name" tag with the column name for each field that represents a column from the database.
+// For example: `name:"col_name"`.
 // You can also use the "empty" tag to indicate the action when the field is empty. If this tag is empty, nothing will happen. Other meanings:
 // Any text - sets the field values ​​to this text.
 // -error - display an error if the field is empty.
 func FillReflectValueFromDb(dbRes map[string]interface{}, fill *reflect.Value) error {
 	t := fill.Type()
 	for i := 0; i < t.NumField(); i++ {
-		tagName := t.Field(i).Tag.Get("db")
+		tagName := t.Field(i).Tag.Get(namelib.TAGS.DB_MAPPER_NAME)
 		if exist, err := validateDbTag(tagName, &dbRes); err != nil {
 			return err
 		} else {
@@ -30,7 +31,7 @@ func FillReflectValueFromDb(dbRes map[string]interface{}, fill *reflect.Value) e
 			return err
 		}
 		if typeopr.IsEmpty(val) {
-			if err := emptyOperations(&val, t.Field(i).Tag.Get("empty"), tagName); err != nil {
+			if err := emptyOperations(&val, t.Field(i).Tag.Get(namelib.TAGS.DB_MAPPER_EMPTY), tagName); err != nil {
 				return err
 			}
 		}
@@ -60,8 +61,8 @@ func FillMapFromDb(dbRes map[string]interface{}, fill *map[string]string) error 
 }
 
 // FillStructFromDb Fills the structure with data from the database.
-// For proper operation, you need to add a "db" tag with the column name for each field that represents a column from the database.
-// For example: `db:"col_name"`.
+// For proper operation, you need to add a "name" tag with the column name for each field that represents a column from the database.
+// For example: `name:"col_name"`.
 // You can also use the "empty" tag to indicate the action when the field is empty. If this tag is empty, nothing will happen. Other meanings:
 // Any text - sets the field values ​​to this text.
 // -error - display an error if the field is empty.
@@ -76,7 +77,7 @@ func FillStructFromDb(dbRes map[string]interface{}, fillPtr typeopr.IPtr) error 
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 		value := v.Field(i)
-		tag := field.Tag.Get("db")
+		tag := field.Tag.Get(namelib.TAGS.DB_MAPPER_NAME)
 		if exist, err := validateDbTag(tag, &dbRes); err != nil {
 			return err
 		} else {
@@ -91,7 +92,7 @@ func FillStructFromDb(dbRes map[string]interface{}, fillPtr typeopr.IPtr) error 
 				return err
 			}
 			if typeopr.IsEmpty(val) {
-				if err := emptyOperations(&val, t.Field(i).Tag.Get("empty"), tag); err != nil {
+				if err := emptyOperations(&val, t.Field(i).Tag.Get(namelib.TAGS.DB_MAPPER_EMPTY), tag); err != nil {
 					return err
 				}
 			}
@@ -102,7 +103,7 @@ func FillStructFromDb(dbRes map[string]interface{}, fillPtr typeopr.IPtr) error 
 }
 
 // ParamsValueFromStruct creates a map from a structure that describes the table.
-// To work correctly, you need a completed structure, and the required fields must have the `db:"<column name>"` tag.
+// To work correctly, you need a completed structure, and the required fields must have the `name:"<column name>"` tag.
 func ParamsValueFromStruct(filledStructurePtr typeopr.IPtr, nilIfEmpty []string) (map[string]any, error) {
 	structure := filledStructurePtr.Ptr()
 	if !typeopr.PtrIsStruct(structure) {
@@ -114,7 +115,7 @@ func ParamsValueFromStruct(filledStructurePtr typeopr.IPtr, nilIfEmpty []string)
 	valueof := reflect.ValueOf(structure).Elem()
 	for i := 0; i < typeof.NumField(); i++ {
 		fieldValue := valueof.Field(i)
-		dbColName := typeof.Field(i).Tag.Get("db")
+		dbColName := typeof.Field(i).Tag.Get(namelib.TAGS.DB_MAPPER_NAME)
 		if dbColName == "" {
 			continue
 		}
