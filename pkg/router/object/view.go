@@ -9,7 +9,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/namelib"
 )
 
-type ObjectContext map[string]interface{}
+type Context map[string]interface{}
 
 // IView The interface implements the basic structure of any IView. ITemplateView is used to display HTML page in a simpler and more convenient way.
 // For the view to work correctly, you need to create a new structure (for example MyObjView), embed a ready-made implementation of the view
@@ -18,8 +18,8 @@ type IView interface {
 	CloseDb() error
 	// Object receives data from the selected table and writes it to a variable structure.
 	// IMPORTANT: connects to the database in this method (or others), but closes the connection only in the TemplateView.
-	Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error)
-	Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error)
+	Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (Context, error)
+	Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (Context, error)
 	Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func())
 	OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error)
 	ObjectsName() []string
@@ -31,12 +31,12 @@ func (v *BaseView) CloseDb() error {
 	panic("CloseDb is not implement. Please implement this method in your structure.")
 }
 
-func (v *BaseView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
-	return ObjectContext{}, nil
+func (v *BaseView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (Context, error) {
+	return Context{}, nil
 }
 
-func (v *BaseView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
-	return ObjectContext{}, nil
+func (v *BaseView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (Context, error) {
+	return Context{}, nil
 }
 
 func (v *BaseView) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
@@ -47,15 +47,15 @@ func (v *BaseView) OnError(w http.ResponseWriter, r *http.Request, manager inter
 	panic("OnError is not implement. Please implement this method in your structure.")
 }
 
-// GetObjectContext retrieves the ObjectContext from the manager.
+// GetContext retrieves the Context from the manager.
 // It is important to understand that this method can only be used when the IView.Object method has completed running,
 // for example in IView.Context.
-func GetObjectContext(manager interfaces.IManager) (ObjectContext, error) {
+func GetContext(manager interfaces.IManager) (Context, error) {
 	objectInterface, ok := manager.OneTimeData().GetUserContext(namelib.OBJECT.OBJECT_CONTEXT)
 	if !ok {
 		return nil, errors.New("unable to get object context")
 	}
-	object := objectInterface.(ObjectContext)
+	object := objectInterface.(Context)
 	return object, nil
 }
 

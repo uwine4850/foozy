@@ -50,7 +50,7 @@ func (us *UserSearchByID) OnError(w http.ResponseWriter, r *http.Request, manage
 	}
 }
 
-func (us *UserSearchByID) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
+func (us *UserSearchByID) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.Context, error) {
 	formObjectInterface, err := us.FormInterface(manager.OneTimeData())
 	if err != nil {
 		return nil, err
@@ -61,14 +61,14 @@ func (us *UserSearchByID) Context(w http.ResponseWriter, r *http.Request, manage
 		if err != nil {
 			return nil, err
 		}
-		var out []auth.AuthUser
+		var out []auth.User
 		mapper := dbmapper.NewMapper(res, typeopr.Ptr{}.New(&out))
 		if err := mapper.Fill(); err != nil {
 			return nil, err
 		}
 		manager.Render().SetContext(map[string]interface{}{"users": out, "search": "Search by ID: " + formObject.Id[0]})
 	}
-	return object.ObjectContext{}, nil
+	return object.Context{}, nil
 }
 
 func UsersSearchByID(db *database.Database) router.Handler {
@@ -115,7 +115,7 @@ func (us *UserSearchByUsername) OnError(w http.ResponseWriter, r *http.Request, 
 	}
 }
 
-func (us *UserSearchByUsername) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
+func (us *UserSearchByUsername) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.Context, error) {
 	formObjectInterface, err := us.FormInterface(manager.OneTimeData())
 	if err != nil {
 		return nil, err
@@ -127,14 +127,14 @@ func (us *UserSearchByUsername) Context(w http.ResponseWriter, r *http.Request, 
 		if err != nil {
 			return nil, err
 		}
-		var out []auth.AuthUser
+		var out []auth.User
 		mapper := dbmapper.NewMapper(res, typeopr.Ptr{}.New(&out))
 		if err := mapper.Fill(); err != nil {
 			return nil, err
 		}
 		manager.Render().SetContext(map[string]interface{}{"users": out, "search": "Search by username: " + formObject.Username[0]})
 	}
-	return object.ObjectContext{}, nil
+	return object.Context{}, nil
 }
 
 func UsersSearchByUsername(db *database.Database) router.Handler {

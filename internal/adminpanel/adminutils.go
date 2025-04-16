@@ -109,7 +109,7 @@ func UserIsAdmin(r *http.Request, mng interfaces.IManager, db *database.Database
 		}
 		return false, err
 	}
-	var authData auth.AuthCookie
+	var authData auth.Cookie
 	if err := secure.ReadSecureData([]byte(mng.Key().HashKey()), []byte(mng.Key().BlockKey()), authCookie.Value, &authData); err != nil {
 		return false, err
 	}

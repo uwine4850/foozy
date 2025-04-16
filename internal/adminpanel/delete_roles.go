@@ -45,7 +45,7 @@ func (dr *DeleteRoleObject) OnError(w http.ResponseWriter, r *http.Request, mana
 	}
 }
 
-func (dr *DeleteRoleObject) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
+func (dr *DeleteRoleObject) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.Context, error) {
 	formObjectInterface, err := dr.FormInterface(manager.OneTimeData())
 	if err != nil {
 		return nil, err
@@ -56,13 +56,13 @@ func (dr *DeleteRoleObject) Context(w http.ResponseWriter, r *http.Request, mana
 		return nil, err
 	}
 	if isAdmin {
-		return object.ObjectContext{}, &errDeleteAdminRole{}
+		return object.Context{}, &errDeleteAdminRole{}
 	}
 	_, err = qb.NewSyncQB(dr.DB.SyncQ()).Delete(ROLES_TABLE).Where(qb.Compare("name", qb.EQUAL, formObject.Name[0])).Exec()
 	if err != nil {
 		return nil, err
 	}
-	return object.ObjectContext{}, nil
+	return object.Context{}, nil
 }
 
 func DeleteRoleView(db *database.Database) router.Handler {

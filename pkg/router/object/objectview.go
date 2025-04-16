@@ -38,7 +38,7 @@ func (v *ObjView) ObjectsName() []string {
 	return []string{v.Name}
 }
 
-func (v *ObjView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
+func (v *ObjView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (Context, error) {
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "run ObjView object")
 	if typeopr.IsPointer(v.FillStruct) {
 		return nil, typeopr.ErrValueIsPointer{Value: "FillStruct"}
@@ -69,7 +69,7 @@ func (v *ObjView) Object(w http.ResponseWriter, r *http.Request, manager interfa
 	if err != nil {
 		return nil, err
 	}
-	return ObjectContext{v.Name: value.Interface()}, nil
+	return Context{v.Name: value.Interface()}, nil
 }
 
 func (v *ObjView) fillObject(object map[string]interface{}) (*reflect.Value, error) {

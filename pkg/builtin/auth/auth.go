@@ -22,12 +22,12 @@ type JWTClaims struct {
 	Id string `json:"id"`
 }
 
-type AuthCookie struct {
+type Cookie struct {
 	UID     string
 	KeyDate time.Time
 }
 
-type AuthUser struct {
+type User struct {
 	Id       string `name:"id"`
 	Username string `name:"username"`
 }
@@ -92,8 +92,8 @@ func (a *Auth) RegisterUser(username string, password string) (int, error) {
 }
 
 // LoginUser check if the password and login are the same.
-// If there was no error returns an [AuthUser] object with user data.
-func (a *Auth) LoginUser(username string, password string) (*AuthUser, error) {
+// If there was no error returns an [User] object with user data.
+func (a *Auth) LoginUser(username string, password string) (*User, error) {
 	userDB, err := UserByUsername(a.database, username)
 	if err != nil {
 		return nil, err
@@ -105,7 +105,7 @@ func (a *Auth) LoginUser(username string, password string) (*AuthUser, error) {
 	if err != nil {
 		return nil, err
 	}
-	var authItem AuthUser
+	var authItem User
 	if err := dbmapper.FillStructFromDb(userDB, typeopr.Ptr{}.New(&authItem)); err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func (a *Auth) LoginUser(username string, password string) (*AuthUser, error) {
 // IMPORTANT: to work, you need to decode the data; accordingly, in the hashKey and blockKey fields you need to use the keys
 // with which they were encoded. Next, the function itself will take new keys from ManagerConf.
 func (a *Auth) UpdateAuthCookie(hashKey []byte, blockKey []byte, r *http.Request) error {
-	var authCookie AuthCookie
+	var authCookie Cookie
 	if err := cookies.ReadSecureCookieData(hashKey, blockKey, r, namelib.AUTH.COOKIE_AUTH, &authCookie); err != nil {
 		return err
 	}
@@ -134,7 +134,7 @@ func (a *Auth) AddAuthCookie(uid string) error {
 		Path:     "/",
 		HttpOnly: true,
 		Secure:   true,
-	}, &AuthCookie{UID: uid, KeyDate: a.manager.Key().Get32BytesKey().Date()}); err != nil {
+	}, &Cookie{UID: uid, KeyDate: a.manager.Key().Get32BytesKey().Date()}); err != nil {
 		return err
 	}
 	authDate := a.manager.Key().Get32BytesKey().Date()

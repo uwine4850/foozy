@@ -8,16 +8,16 @@ The only difference is that the data of this parameter first goes to the middlew
 
 Tests for Middlewares [here](https://github.com/uwine4850/foozy/tree/master/tests/middlewares).
 
-__HandlerMddl__
+__SyncMddl__
 ```
-HandlerMddl(id int, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManagerData))
+SyncMddl(id int, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManagerData))
 ```
 The method creates middleware that will be executed synchronously. The ``id`` parameter is the serial number of the middleware execution, it 
 must be unique.
 
-__AsyncHandlerMddl__
+__AsyncMddl__
 ```
-AsyncHandlerMddl(fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManagerData))
+AsyncMddl(fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManagerData))
 ```
 You can also create a middleware using this method, but it will run asynchronously. Accordingly, serial numbers do not exist.
 

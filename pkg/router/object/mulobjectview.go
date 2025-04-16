@@ -46,12 +46,12 @@ func (v *MultipleObjectView) ObjectsName() []string {
 	return names
 }
 
-func (v *MultipleObjectView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
+func (v *MultipleObjectView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (Context, error) {
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "run MultipleObjectView object")
 	if err := v.checkMultipleObject(); err != nil {
 		return nil, err
 	}
-	context := make(ObjectContext)
+	context := make(Context)
 	err := v.DB.Connect()
 	if err != nil {
 		return nil, err

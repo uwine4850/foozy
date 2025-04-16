@@ -160,8 +160,8 @@ func (v *TObjectView) OnError(w http.ResponseWriter, r *http.Request, manager in
 	panic(err)
 }
 
-func (v *TObjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
-	objectContext, err := object.GetObjectContext(manager)
+func (v *TObjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.Context, error) {
+	objectContext, err := object.GetContext(manager)
 	if err != nil {
 		panic(err)
 	}
@@ -213,16 +213,16 @@ func (v *TObjectMultipleView) OnError(w http.ResponseWriter, r *http.Request, ma
 	panic(err)
 }
 
-func (v *TObjectMultipleView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
+func (v *TObjectMultipleView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.Context, error) {
 	_objectContext, _ := manager.OneTimeData().GetUserContext(namelib.OBJECT.OBJECT_CONTEXT)
-	objectContext := _objectContext.(object.ObjectContext)
+	objectContext := _objectContext.(object.Context)
 	if _, ok := objectContext["object"]; !ok {
 		panic("ObjectContext does not have a key object.")
 	}
 	if _, ok := objectContext["object1"]; !ok {
 		panic("ObjectContext does not have a key object1.")
 	}
-	return object.ObjectContext{"TEST": "OK"}, nil
+	return object.Context{"TEST": "OK"}, nil
 }
 
 func TObjectMultipleViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -279,13 +279,13 @@ func (v *TObjectAllView) OnError(w http.ResponseWriter, r *http.Request, manager
 	panic(err)
 }
 
-func (v *TObjectAllView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
+func (v *TObjectAllView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.Context, error) {
 	_objectContext, _ := manager.OneTimeData().GetUserContext(namelib.OBJECT.OBJECT_CONTEXT)
-	objectContext := _objectContext.(object.ObjectContext)
+	objectContext := _objectContext.(object.Context)
 	if _, ok := objectContext["all_object"]; !ok {
 		panic("ObjectContext does not have a key all_object.")
 	}
-	return object.ObjectContext{"TEST": "OK"}, nil
+	return object.Context{"TEST": "OK"}, nil
 }
 
 func TObjectAllViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -330,7 +330,7 @@ type MyFormView struct {
 	object.FormView
 }
 
-func (v *MyFormView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
+func (v *MyFormView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.Context, error) {
 	filledFormInterface, err := v.FormInterface(manager.OneTimeData())
 	if err != nil {
 		return nil, err
@@ -342,7 +342,7 @@ func (v *MyFormView) Context(w http.ResponseWriter, r *http.Request, manager int
 	if filledForm.File[0].Header.Filename != "x.png" {
 		return nil, errors.New("FormView unexpected file field value")
 	}
-	return object.ObjectContext{}, nil
+	return object.Context{}, nil
 }
 
 func (v *MyFormView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
@@ -387,7 +387,7 @@ func (v *JsonObjectView) OnError(w http.ResponseWriter, r *http.Request, manager
 	panic(err)
 }
 
-func (v *JsonObjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
+func (v *JsonObjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.Context, error) {
 	return map[string]interface{}{"Test": "OK"}, nil
 }
 
@@ -434,8 +434,8 @@ func (v *TJsonObjectMultipleView) OnError(w http.ResponseWriter, r *http.Request
 	panic(err)
 }
 
-func (v *TJsonObjectMultipleView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
-	return object.ObjectContext{"Test": "OK"}, nil
+func (v *TJsonObjectMultipleView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.Context, error) {
+	return object.Context{"Test": "OK"}, nil
 }
 
 func TJsonObjectMultipleViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -493,8 +493,8 @@ func (v *TJsonObjectAllView) OnError(w http.ResponseWriter, r *http.Request, man
 	panic(err)
 }
 
-func (v *TJsonObjectAllView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
-	return object.ObjectContext{"Test": "OK"}, nil
+func (v *TJsonObjectAllView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.Context, error) {
+	return object.Context{"Test": "OK"}, nil
 }
 
 func TJsonObjectAllViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {

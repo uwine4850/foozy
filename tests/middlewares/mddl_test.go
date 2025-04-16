@@ -49,7 +49,7 @@ func TestMain(m *testing.M) {
 func TestSetGetMddlError(t *testing.T) {
 	testinitcnf.InitCnf()
 	mddl := middlewares.NewMiddleware()
-	mddl.HandlerMddl(0, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
+	mddl.SyncMddl(0, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
 		middlewares.SetMddlError(errors.New("mddl error"), manager.OneTimeData())
 	})
 	newRouter.SetMiddleware(mddl)
@@ -72,7 +72,7 @@ func TestSetGetMddlError(t *testing.T) {
 
 func TestSkipAndIsSkipNextPage(t *testing.T) {
 	mddl := middlewares.NewMiddleware()
-	mddl.HandlerMddl(0, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
+	mddl.SyncMddl(0, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
 		middlewares.SkipNextPage(manager.OneTimeData())
 	})
 	newRouter.SetMiddleware(mddl)
@@ -95,7 +95,7 @@ func TestSkipAndIsSkipNextPage(t *testing.T) {
 
 func TestSkipNextPageAndRedirect(t *testing.T) {
 	mddl := middlewares.NewMiddleware()
-	mddl.HandlerMddl(0, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
+	mddl.SyncMddl(0, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
 		if r.URL.Path == "/mddl" {
 			middlewares.SkipNextPageAndRedirect(manager.OneTimeData(), w, r, "/redirect")
 		}
@@ -120,9 +120,9 @@ func TestSkipNextPageAndRedirect(t *testing.T) {
 
 func TestMiddlewaresIndex(t *testing.T) {
 	mddl := middlewares.NewMiddleware()
-	mddl.HandlerMddl(3, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
+	mddl.SyncMddl(3, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
 	})
-	mddl.HandlerMddl(3, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
+	mddl.SyncMddl(3, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
 	})
 	newRouter.SetMiddleware(mddl)
 	get, err := http.Get(tutils.MakeUrl(tconf.PortMddl, "mddl"))
@@ -145,16 +145,16 @@ func TestMiddlewaresIndex(t *testing.T) {
 func TestSyncAsyncMiddlewares(t *testing.T) {
 	startTime := time.Now()
 	mddl := middlewares.NewMiddleware()
-	mddl.HandlerMddl(0, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
+	mddl.SyncMddl(0, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
 		time.Sleep(200 * time.Millisecond)
 	})
-	mddl.HandlerMddl(1, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
+	mddl.SyncMddl(1, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
 		time.Sleep(200 * time.Millisecond)
 	})
-	mddl.AsyncHandlerMddl(func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
+	mddl.AsyncMddl(func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
 		time.Sleep(200 * time.Millisecond)
 	})
-	mddl.AsyncHandlerMddl(func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
+	mddl.AsyncMddl(func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
 		time.Sleep(200 * time.Millisecond)
 	})
 	newRouter.SetMiddleware(mddl)

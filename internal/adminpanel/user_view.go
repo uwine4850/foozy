@@ -41,7 +41,7 @@ func (uv *UserViewObject) OnError(w http.ResponseWriter, r *http.Request, manage
 	router.ServerError(w, err.Error(), manager)
 }
 
-func (uv *UserViewObject) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
+func (uv *UserViewObject) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.Context, error) {
 	rolesTableCreated, err := IsRolesTableCreated(uv.DB)
 	if err != nil {
 		return nil, err
@@ -58,7 +58,7 @@ func (uv *UserViewObject) Context(w http.ResponseWriter, r *http.Request, manage
 	if err != nil {
 		return nil, err
 	}
-	return object.ObjectContext{"roles": roles, "userRole": userRole}, nil
+	return object.Context{"roles": roles, "userRole": userRole}, nil
 }
 
 func UserView(db *database.Database) router.Handler {
@@ -69,7 +69,7 @@ func UserView(db *database.Database) router.Handler {
 				Name:       "user",
 				DB:         db,
 				TableName:  "auth",
-				FillStruct: auth.AuthUser{},
+				FillStruct: auth.User{},
 				Slug:       "id",
 			},
 		},
@@ -106,7 +106,7 @@ func (uv *UserViewEditFormObject) OnError(w http.ResponseWriter, r *http.Request
 	router.ServerError(w, err.Error(), manager)
 }
 
-func (uv *UserViewEditFormObject) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
+func (uv *UserViewEditFormObject) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.Context, error) {
 	formInterface, err := uv.FormInterface(manager.OneTimeData())
 	if err != nil {
 		return nil, err
@@ -139,7 +139,7 @@ func (uv *UserViewEditFormObject) Context(w http.ResponseWriter, r *http.Request
 			}
 		}
 	}
-	return object.ObjectContext{}, nil
+	return object.Context{}, nil
 }
 
 func UserEditFormView(db *database.Database) router.Handler {

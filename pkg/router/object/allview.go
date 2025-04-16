@@ -36,7 +36,7 @@ func (v *AllView) ObjectsName() []string {
 }
 
 // Object sets a slice of rows from the database.
-func (v *AllView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
+func (v *AllView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (Context, error) {
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "run AllView object")
 	err := v.DB.Connect()
 	if err != nil {
@@ -55,7 +55,7 @@ func (v *AllView) Object(w http.ResponseWriter, r *http.Request, manager interfa
 	if err != nil {
 		return nil, err
 	}
-	return ObjectContext{v.Name: fillObjects}, nil
+	return Context{v.Name: fillObjects}, nil
 }
 
 // fillObjects fills a structure or map with data from a successful query and wraps this in a TemplateStruct.

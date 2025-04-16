@@ -38,7 +38,7 @@ func (v *FormView) CloseDb() error {
 	return nil
 }
 
-func (v *FormView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
+func (v *FormView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (Context, error) {
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "run FormView object")
 	if v.DB != nil {
 		err := v.DB.Connect()
@@ -73,7 +73,7 @@ func (v *FormView) Object(w http.ResponseWriter, r *http.Request, manager interf
 	}
 
 	resultForm := fillForm.Interface()
-	return ObjectContext{namelib.OBJECT.OBJECT_CONTEXT_FORM: &resultForm}, nil
+	return Context{namelib.OBJECT.OBJECT_CONTEXT_FORM: &resultForm}, nil
 }
 
 // If the first character of the slice is "*", then you need to select the entire field of the structure.
@@ -106,7 +106,7 @@ func (v *FormView) FormInterface(manager interfaces.IManagerOneTimeData) (interf
 	if !ok {
 		return nil, errors.New("the ObjectContext not found")
 	}
-	objectContext, ok := context.(ObjectContext)
+	objectContext, ok := context.(Context)
 	if !ok {
 		return nil, errors.New("the ObjectContext type assertion error")
 	}

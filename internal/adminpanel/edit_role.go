@@ -46,7 +46,7 @@ func (er *EditRoleObject) OnError(w http.ResponseWriter, r *http.Request, manage
 	}
 }
 
-func (er *EditRoleObject) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
+func (er *EditRoleObject) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.Context, error) {
 	formObjectInterface, err := er.FormInterface(manager.OneTimeData())
 	if err != nil {
 		return nil, err
@@ -57,14 +57,14 @@ func (er *EditRoleObject) Context(w http.ResponseWriter, r *http.Request, manage
 		return nil, err
 	}
 	if isAdmin {
-		return object.ObjectContext{}, &errEditAdminRole{}
+		return object.Context{}, &errEditAdminRole{}
 	}
 	_, err = qb.NewSyncQB(er.DB.SyncQ()).Update(ROLES_TABLE, map[string]any{"name": formObject.Name[0]}).
 		Where(qb.Compare("name", qb.EQUAL, formObject.PrimaryName[0])).Exec()
 	if err != nil {
 		return nil, err
 	}
-	return object.ObjectContext{}, nil
+	return object.Context{}, nil
 }
 
 func EditRole(db *database.Database) router.Handler {

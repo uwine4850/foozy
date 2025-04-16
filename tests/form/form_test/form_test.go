@@ -59,7 +59,7 @@ func TestMain(m *testing.M) {
 	}
 
 	mddl := middlewares.NewMiddleware()
-	mddl.AsyncHandlerMddl(builtin_mddl.GenerateAndSetCsrf(1800, nil))
+	mddl.AsyncMddl(builtin_mddl.GenerateAndSetCsrf(1800, nil))
 	render, err := tmlengine.NewRender()
 	if err != nil {
 		panic(err)

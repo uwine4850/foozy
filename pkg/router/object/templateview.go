@@ -231,7 +231,7 @@ func (v *JsonMultipleObjectTemplateView) Call(w http.ResponseWriter, r *http.Req
 		return onError
 	}
 
-	contextSliceMap := []ObjectContext{}
+	contextSliceMap := []Context{}
 	var filledMessages []any
 	if v.Message != nil {
 		debug.RequestLogginIfEnable(debug.P_OBJECT, "fill DTO messages")
@@ -246,7 +246,7 @@ func (v *JsonMultipleObjectTemplateView) Call(w http.ResponseWriter, r *http.Req
 			}
 			// The contextBuff variable is needed so that the data from viewContext is assigned separately to each object.
 			// You cannot copy directly to viewContext, since this data must be static for each object.
-			contextBuff := ObjectContext{}
+			contextBuff := Context{}
 			fmap.MergeMap((*map[string]interface{})(&contextBuff), viewContext)
 			fmap.MergeMap((*map[string]interface{})(&contextBuff), viewObjectContext)
 			contextSliceMap = append(contextSliceMap, contextBuff)
@@ -298,7 +298,7 @@ func (v *JsonAllTemplateView) Call(w http.ResponseWriter, r *http.Request, manag
 		return onError
 	}
 
-	contextSliceMap := []ObjectContext{}
+	contextSliceMap := []Context{}
 	var filledMessages []any
 	if v.Message != nil {
 		debug.RequestLogginIfEnable(debug.P_OBJECT, "fill DTO messages")
@@ -310,7 +310,7 @@ func (v *JsonAllTemplateView) Call(w http.ResponseWriter, r *http.Request, manag
 				v.View.OnError(w, r, manager, err)
 			}
 		}
-		var objectContextMap []ObjectContext
+		var objectContextMap []Context
 		if err := json.Unmarshal(objectBytes, &objectContextMap); err != nil {
 			return func() {
 				debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
@@ -321,7 +321,7 @@ func (v *JsonAllTemplateView) Call(w http.ResponseWriter, r *http.Request, manag
 		// The contextBuff variable is needed so that the data from viewContext is assigned separately to each object.
 		// You cannot copy directly to viewContext, since this data must be static for each object.
 		for i := 0; i < len(objectContextMap); i++ {
-			contextBuff := ObjectContext{}
+			contextBuff := Context{}
 			fmap.MergeMap((*map[string]interface{})(&contextBuff), objectContextMap[i])
 			fmap.MergeMap((*map[string]interface{})(&contextBuff), viewContext)
 			contextSliceMap = append(contextSliceMap, contextBuff)
@@ -349,7 +349,7 @@ func (v *JsonAllTemplateView) Call(w http.ResponseWriter, r *http.Request, manag
 	return func() {}
 }
 
-func baseParseView(view IView, w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (onError func(), viewObject ObjectContext, viewContext ObjectContext) {
+func baseParseView(view IView, w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (onError func(), viewObject Context, viewContext Context) {
 	if view == nil {
 		panic("the ITemplateView field must not be nil")
 	}
@@ -406,12 +406,12 @@ func getRealView(wrapperView IView) IView {
 }
 
 // contextByNameToObjectContext converts the View context data into an ObjectContext object.
-func contextByNameToObjectContext(contextData interface{}) (ObjectContext, error) {
+func contextByNameToObjectContext(contextData interface{}) (Context, error) {
 	objectBytes, err := json.Marshal(contextData)
 	if err != nil {
 		return nil, err
 	}
-	var objectContext ObjectContext
+	var objectContext Context
 	if err := json.Unmarshal(objectBytes, &objectContext); err != nil {
 		return nil, err
 	}
@@ -420,7 +420,7 @@ func contextByNameToObjectContext(contextData interface{}) (ObjectContext, error
 
 // fillMessage fills the DTO Message with the data passed to the objectContext.
 // It is important to highlight that the messageType argument is used only to obtain the message type; an instance of this type is returned.
-func fillMessage(dto *rest.DTO, objectContext *ObjectContext, messageType irest.IMessage) (irest.IMessage, error) {
+func fillMessage(dto *rest.DTO, objectContext *Context, messageType irest.IMessage) (irest.IMessage, error) {
 	newMessage := reflect.New(reflect.TypeOf(messageType)).Elem()
 	if err := restmapper.FillMessageFromMap((*map[string]interface{})(objectContext), typeopr.Ptr{}.New(&newMessage)); err != nil {
 		return nil, err

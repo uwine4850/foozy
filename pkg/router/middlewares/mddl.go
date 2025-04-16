@@ -20,31 +20,31 @@ type MddlFunc func(w http.ResponseWriter, r *http.Request, manager interfaces.IM
 type AsyncMddlFunc func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, wg *sync.WaitGroup)
 
 type Middleware struct {
-	preHandlerMiddlewares   map[int]MddlFunc
-	preHandlerId            []int
-	asyncHandlerMiddlewares []AsyncMddlFunc
-	Context                 sync.Map
-	mError                  error
+	syncMiddlewares  map[int]MddlFunc
+	syncHandlerId    []int
+	asyncMiddlewares []AsyncMddlFunc
+	Context          sync.Map
+	mError           error
 }
 
 func NewMiddleware() *Middleware {
-	return &Middleware{preHandlerMiddlewares: make(map[int]MddlFunc)}
+	return &Middleware{syncMiddlewares: make(map[int]MddlFunc)}
 }
 
-// HandlerMddl the middleware that will be executed before the request handler.
+// SyncMddl the middleware that will be executed before the request handler.
 // id indicates the order of execution of the current middleware. No two identical id's can be created.
-func (m *Middleware) HandlerMddl(id int, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) {
-	if !fslice.SliceContains(m.preHandlerId, id) {
-		m.preHandlerId = append(m.preHandlerId, id)
-		m.preHandlerMiddlewares[id] = fn
+func (m *Middleware) SyncMddl(id int, fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) {
+	if !fslice.SliceContains(m.syncHandlerId, id) {
+		m.syncHandlerId = append(m.syncHandlerId, id)
+		m.syncMiddlewares[id] = fn
 	} else {
 		m.mError = &ErrIdAlreadyExist{id}
 	}
 }
 
 // AsyncHandlerMddl the middleware that will execute asynchronously before the request.
-func (m *Middleware) AsyncHandlerMddl(fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) {
-	m.asyncHandlerMiddlewares = append(m.asyncHandlerMiddlewares, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, wg *sync.WaitGroup) {
+func (m *Middleware) AsyncMddl(fn func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)) {
+	m.asyncMiddlewares = append(m.asyncMiddlewares, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, wg *sync.WaitGroup) {
 		defer wg.Done()
 		fn(w, r, manager)
 	})
@@ -55,10 +55,10 @@ func (m *Middleware) RunMddl(w http.ResponseWriter, r *http.Request, manager int
 	if m.mError != nil {
 		return m.mError
 	}
-	sort.Ints(m.preHandlerId)
-	for i := 0; i < len(m.preHandlerId); i++ {
+	sort.Ints(m.syncHandlerId)
+	for i := 0; i < len(m.syncHandlerId); i++ {
 		debug.RequestLogginIfEnable(debug.P_MIDDLEWARE, fmt.Sprintf("sync middleware with id %s is running", strconv.Itoa(i)))
-		handlerFunc := m.preHandlerMiddlewares[i]
+		handlerFunc := m.syncMiddlewares[i]
 		handlerFunc(w, r, manager)
 	}
 	return nil
@@ -67,10 +67,10 @@ func (m *Middleware) RunMddl(w http.ResponseWriter, r *http.Request, manager int
 // RunAsyncMddl running asynchronous middleware.
 // IMPORTANT: You must run the WaitAsyncMddl method at the selected location to complete correctly.
 func (m *Middleware) RunAsyncMddl(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, wg *sync.WaitGroup) {
-	for i := 0; i < len(m.asyncHandlerMiddlewares); i++ {
+	for i := 0; i < len(m.asyncMiddlewares); i++ {
 		debug.RequestLogginIfEnable(debug.P_MIDDLEWARE, fmt.Sprintf("async middleware with id %s is running", strconv.Itoa(i)))
 		wg.Add(1)
-		go m.asyncHandlerMiddlewares[i](w, r, manager, wg)
+		go m.asyncMiddlewares[i](w, r, manager, wg)
 	}
 }
 

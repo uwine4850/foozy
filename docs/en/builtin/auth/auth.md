@@ -36,7 +36,7 @@ Returns the ID of the new user.
 
 __LoginUser__
 ```
-LoginUser(username string, password string) error
+LoginUser(username string, password string) (*User, error)
 ```
 Checks the correctness of user data. If there is no error, all the data is correct. 
 Returns a __User__ structure that contains user data. Also adds cookie data about the user.

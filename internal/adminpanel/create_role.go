@@ -45,7 +45,7 @@ func (cr *CreateRoleObject) OnError(w http.ResponseWriter, r *http.Request, mana
 	}
 }
 
-func (cr *CreateRoleObject) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
+func (cr *CreateRoleObject) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.Context, error) {
 	rolesTableCreated, err := IsRolesTableCreated(cr.DB)
 	if err != nil {
 		return nil, err
@@ -63,13 +63,13 @@ func (cr *CreateRoleObject) Context(w http.ResponseWriter, r *http.Request, mana
 		return nil, err
 	}
 	if roleFound {
-		return object.ObjectContext{}, &errRoleAlreadyExists{}
+		return object.Context{}, &errRoleAlreadyExists{}
 	}
 	_, err = qb.NewSyncQB(cr.DB.SyncQ()).Insert(ROLES_TABLE, map[string]interface{}{"name": formObject.Name[0]}).Query()
 	if err != nil {
 		return nil, err
 	}
-	return object.ObjectContext{}, nil
+	return object.Context{}, nil
 }
 
 func CreateRoleView(db *database.Database) router.Handler {

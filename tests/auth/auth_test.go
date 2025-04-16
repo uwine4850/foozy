@@ -52,7 +52,7 @@ func TestMain(m *testing.M) {
 	}
 	defer mddlDb.Close()
 	mddl := middlewares.NewMiddleware()
-	mddl.HandlerMddl(0, builtin_mddl.Auth([]string{"/login"}, mddlDb, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+	mddl.SyncMddl(0, builtin_mddl.Auth([]string{"/login"}, mddlDb, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
 		middlewares.SetMddlError(err, manager.OneTimeData())
 	}))
 
@@ -110,7 +110,7 @@ func login(db *database.Database) func(w http.ResponseWriter, r *http.Request, m
 func uid() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		k := mng.Key().Get32BytesKey()
-		var a auth.AuthCookie
+		var a auth.Cookie
 		if err := cookies.ReadSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), r, namelib.AUTH.COOKIE_AUTH, &a); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager) }
 		}
@@ -121,7 +121,7 @@ func uid() func(w http.ResponseWriter, r *http.Request, manager interfaces.IMana
 func updKeys() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		k := mng.Key().Get32BytesKey()
-		var a auth.AuthCookie
+		var a auth.Cookie
 		if err := cookies.ReadSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), r, namelib.AUTH.COOKIE_AUTH, &a); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager) }
 		}

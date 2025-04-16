@@ -8,9 +8,9 @@ The tests for the package are [here](https://github.com/uwine4850/foozy/tree/mas
 ### type IView interface
 The interface that each View must implement.
 
-* _Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error)_ - method 
+* _Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (Context, error)_ - method 
 accesses the database and writes them to the templating context.<br>
-* _Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) ObjectContext_ - method that
+* _Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) Context_ - method that
 needs to be overridden in the user structure. The important point is that the __Object__ method writes data to the context
 before executing this method, so you need to use the method to get the data that is set in Object 
 manager.OneTimeData().GetUserContext(namelib.OBJECT_CONTEXT). An active database connection is also available in this method,
@@ -22,11 +22,11 @@ need to return false and the function to be executed.<br>
 This method will be executed when an error occurs during the internal execution of the algorithms.<br>
 * _ObjectsName() []string_ - returns the names of objects, or one object.
 
-__GetObjectContext__
+__GetContext__
 ```
-GetObjectContext(manager interfaces.IManager) (ObjectContext, error)
+GetContext(manager interfaces.IManager) (Context, error)
 ```
-Returns from the ObjectContext manager.
+Returns from the Context manager.
 It is important to understand that this method can only be used when the IView.Object method has completed its work, 
 for example, IView.Context.
 
@@ -67,9 +67,9 @@ type ProfileView struct {
     object.ObjView
 }
 
-func (v *ProfileView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
+func (v *ProfileView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (Context, error) {
     fmt.Println(v.GetContext())
-    return ObjectContext{"id": 50000}, nil
+    return Context{"id": 50000}, nil
 }
 
 func Init() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -103,8 +103,8 @@ type ProfileMulView struct {
     object.MultipleObjectView
 }
 
-func (v *ProfileMulView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
-    return ObjectContext{}, nil
+func (v *ProfileMulView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (Context, error) {
+    return Context{}, nil
 }
 
 func Init() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -155,8 +155,8 @@ type ProjectView struct {
     object.AllView
 }
 
-func (v *ProjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (ObjectContext, error) {
-    return ObjectContext{}, nil
+func (v *ProjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (Context, error) {
+    return Context{}, nil
 }
 
 func Init() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -207,7 +207,7 @@ type MyFormView struct {
 	object.FormView
 }
 
-func (v *MyFormView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
+func (v *MyFormView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.Context, error) {
 	filledFormInterface, err := v.FormInterface(manager.OneTimeData())
 	if err != nil {
 		return nil, err
@@ -219,7 +219,7 @@ func (v *MyFormView) Context(w http.ResponseWriter, r *http.Request, manager int
 	if filledForm.File[0].Header.Filename != "x.png" {
 		return nil, errors.New("FormView unexpected file field value")
 	}
-	return object.ObjectContext{}, nil
+	return object.Context{}, nil
 }
 
 func (v *MyFormView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {

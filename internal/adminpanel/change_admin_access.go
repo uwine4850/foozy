@@ -45,7 +45,7 @@ func (aa *ChangeAdminAccessObject) OnError(w http.ResponseWriter, r *http.Reques
 	router.ServerError(w, err.Error(), manager)
 }
 
-func (aa *ChangeAdminAccessObject) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
+func (aa *ChangeAdminAccessObject) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.Context, error) {
 	rolesTableCreated, err := IsRolesTableCreated(aa.DB)
 	if err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func (aa *ChangeAdminAccessObject) Context(w http.ResponseWriter, r *http.Reques
 			return nil, err
 		}
 		if !adminUserOK {
-			return object.ObjectContext{}, &errAdminUserNotExist{}
+			return object.Context{}, &errAdminUserNotExist{}
 		}
 		newAdminAccessValue = 1
 	} else {
@@ -78,7 +78,7 @@ func (aa *ChangeAdminAccessObject) Context(w http.ResponseWriter, r *http.Reques
 	if err != nil {
 		return nil, err
 	}
-	return object.ObjectContext{}, nil
+	return object.Context{}, nil
 }
 
 func ChangeAdminAccessView(db *database.Database) router.Handler {
