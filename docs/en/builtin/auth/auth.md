@@ -14,7 +14,7 @@ The authentication algorithm is as follows:
 * Now, when the keys are updated, you need to update the encoding with Middlewares. This can be done using a method *builtin_mddl.Auth*.
     ```
     mddl := middlewares.NewMiddleware()
-    mddl.HandlerMddl(0, builtin_mddl.Auth("/login", mddlDb))
+    mddl.SyncMddl(0, builtin_mddl.Auth("/login", mddlDb))
     ```
 
 It is important to note that skipping the globalflow iteration without updating the coding, the user will not be able to update them and will need to log in again. This is because only the penultimate keys are matched, and to change the encoding you need to have matching keys. Accordingly, if the iteration is skipped, the necessary keys for encoding will simply be lost.

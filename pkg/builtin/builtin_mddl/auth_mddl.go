@@ -69,11 +69,13 @@ type SetToken func(w http.ResponseWriter, r *http.Request, manager interfaces.IM
 
 // UpdatedToken function, which is called only if the token has been updated.
 // Passes a single updated token.
-type UpdatedToken func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, token string, UID string) error
+type UpdatedToken func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, token string, AID string) error
+
+type CurrentUID func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, AID string) error
 
 // AuthJWT updates the JWT authentication encoding accordingly with key updates.
 // That is, the update depends directly on the frequency of key updates in GloablFlow.
-func AuthJWT(setToken SetToken, updatedToken UpdatedToken, onErr OnError) middlewares.MddlFunc {
+func AuthJWT(setToken SetToken, updatedToken UpdatedToken, currentUID CurrentUID, onErr OnError) middlewares.MddlFunc {
 	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
 		tokenString, err := setToken(w, r, manager)
 		if err != nil {
@@ -110,11 +112,19 @@ func AuthJWT(setToken SetToken, updatedToken UpdatedToken, onErr OnError) middle
 					onErr(w, r, manager, err)
 					return
 				}
+				if err := currentUID(w, r, manager, newClaims.Id); err != nil {
+					onErr(w, r, manager, err)
+					return
+				}
 				return
 			} else {
 				onErr(w, r, manager, &ErrJWTNotValid{})
 				return
 			}
+		}
+		if err := currentUID(w, r, manager, _claims.Id); err != nil {
+			onErr(w, r, manager, err)
+			return
 		}
 	}
 }
