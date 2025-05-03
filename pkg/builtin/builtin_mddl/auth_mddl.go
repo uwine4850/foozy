@@ -69,9 +69,9 @@ type SetToken func(w http.ResponseWriter, r *http.Request, manager interfaces.IM
 
 // UpdatedToken function, which is called only if the token has been updated.
 // Passes a single updated token.
-type UpdatedToken func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, token string, AID string) error
+type UpdatedToken func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, token string, AID int) error
 
-type CurrentUID func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, AID string) error
+type CurrentUID func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, AID int) error
 
 // AuthJWT updates the JWT authentication encoding accordingly with key updates.
 // That is, the update depends directly on the frequency of key updates in GloablFlow.

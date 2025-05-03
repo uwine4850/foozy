@@ -19,16 +19,16 @@ import (
 
 type JWTClaims struct {
 	jwt.RegisteredClaims
-	Id string `json:"id"`
+	Id int `json:"id"`
 }
 
 type Cookie struct {
-	UID     string
+	UID     int
 	KeyDate time.Time
 }
 
 type User struct {
-	Id       string `db:"id"`
+	Id       int    `db:"id"`
 	Username string `db:"username"`
 }
 
@@ -127,7 +127,7 @@ func (a *Auth) UpdateAuthCookie(hashKey []byte, blockKey []byte, r *http.Request
 }
 
 // AddAuthCookie adds the user's authentication cipher to the cookie.
-func (a *Auth) AddAuthCookie(uid string) error {
+func (a *Auth) AddAuthCookie(uid int) error {
 	k := a.manager.Key().Get32BytesKey()
 	if err := cookies.CreateSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), a.w, &http.Cookie{
 		Name:     namelib.AUTH.COOKIE_AUTH,

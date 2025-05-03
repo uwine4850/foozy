@@ -26,10 +26,10 @@ import (
 
 type JsonObjectViewMessage struct {
 	rest.ImplementDTOMessage
-	Id   string `json:"Id" dto:"Id"`
-	Name string `json:"Name" dto:"Name"`
-	FF   string `json:"Ff" dto:"Ff"`
-	Test string `json:"Test" dto:"Test"`
+	Id   int     `json:"Id" dto:"Id"`
+	Name string  `json:"Name" dto:"Name"`
+	FF   float64 `json:"Ff" dto:"Ff"`
+	Test string  `json:"Test" dto:"Test"`
 }
 
 type JsonFormMessage struct {
@@ -147,9 +147,9 @@ func createAndFillTable(db *database.Database) {
 }
 
 type TObjectViewDB struct {
-	Id   string `db:"id"`
-	Name string `db:"name"`
-	FF   string `db:"FF"`
+	Id   int     `db:"id"`
+	Name string  `db:"name"`
+	FF   float64 `db:"FF"`
 }
 
 type TObjectView struct {
@@ -417,7 +417,7 @@ func TestJsonObjectView(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if string(body) != `{"Id":"1","Name":"name","Ff":"","Test":"OK"}` {
+	if string(body) != `{"Id":1,"Name":"name","Ff":0,"Test":"OK"}` {
 		t.Errorf("Error on page retrieval.")
 	}
 	err = get.Body.Close()
@@ -476,7 +476,7 @@ func TestJsonObjectMultipleView(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if string(body) != `[{"Id":"1","Name":"name","Ff":"","Test":"OK"},{"Id":"1","Name":"name1","Ff":"","Test":"OK"}]` {
+	if string(body) != `[{"Id":1,"Name":"name","Ff":0,"Test":"OK"},{"Id":1,"Name":"name1","Ff":0,"Test":"OK"}]` {
 		t.Errorf("Error on page retrieval.")
 	}
 	err = get.Body.Close()
@@ -522,7 +522,7 @@ func TestJsonObjectAllView(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if string(body) != `[{"Id":"1","Name":"name","Ff":"","Test":"OK"},{"Id":"2","Name":"name0","Ff":"","Test":"OK"}]` {
+	if string(body) != `[{"Id":1,"Name":"name","Ff":0,"Test":"OK"},{"Id":2,"Name":"name0","Ff":0,"Test":"OK"}]` {
 		t.Errorf("Error on page retrieval.")
 	}
 	err = get.Body.Close()

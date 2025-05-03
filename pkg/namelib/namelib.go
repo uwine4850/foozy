@@ -51,6 +51,7 @@ var OBJECT = ObjectNames{
 type TagNames struct {
 	DB_MAPPER_NAME        string
 	DB_MAPPER_EMPTY       string
+	DB_MAPPER_DATE_F      string
 	FORM_MAPPER_NAME      string
 	FORM_MAPPER_EMPTY     string
 	FORM_MAPPER_EXTENSION string
@@ -60,6 +61,7 @@ type TagNames struct {
 var TAGS = TagNames{
 	DB_MAPPER_NAME:        "db",
 	DB_MAPPER_EMPTY:       "empty",
+	DB_MAPPER_DATE_F:      "date-f",
 	FORM_MAPPER_NAME:      "form",
 	FORM_MAPPER_EMPTY:     "empty",
 	FORM_MAPPER_EXTENSION: "ext",

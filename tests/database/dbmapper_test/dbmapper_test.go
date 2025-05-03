@@ -1,10 +1,10 @@
 package dbmappertest
 
 import (
-	"fmt"
 	"os"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbmapper"
@@ -52,10 +52,10 @@ func TestMain(m *testing.M) {
 }
 
 type DbTestMapper struct {
-	Col1 string `db:"col1"`
-	Col2 string `db:"col2"`
-	Col3 string `db:"col3"`
-	Col4 string `db:"col4" empty:"0"`
+	Col1 string    `db:"col1"`
+	Col2 time.Time `db:"col2"`
+	Col3 float64   `db:"col3"`
+	Col4 int       `db:"col4" empty:"0"`
 }
 
 func TestDbMapperUseStruct(t *testing.T) {
@@ -67,7 +67,6 @@ func TestDbMapperUseStruct(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	fmt.Println(len(res))
 	var dbTestMapper []DbTestMapper
 	mapper := dbmapper.NewMapper(res, typeopr.Ptr{}.New(&dbTestMapper))
 	if err := mapper.Fill(); err != nil {
@@ -76,12 +75,19 @@ func TestDbMapperUseStruct(t *testing.T) {
 	if len(dbTestMapper) == 0 {
 		t.Error("DbMapper.Output must not be empty")
 	}
-	fmt.Println(dbTestMapper)
-	map1 := DbTestMapper{Col1: "test1", Col2: "2023-11-15", Col3: "111.22", Col4: "0"}
+	tm, err := time.Parse(time.DateOnly, "2023-11-15")
+	if err != nil {
+		t.Error(err)
+	}
+	map1 := DbTestMapper{Col1: "test1", Col2: tm, Col3: 111.22, Col4: 0}
 	if dbTestMapper[0] != map1 {
 		t.Error("DbMapper.Output value does not match expected")
 	}
-	map2 := DbTestMapper{Col1: "test2", Col2: "2023-11-20", Col3: "222.11", Col4: "0"}
+	tm2, err := time.Parse(time.DateOnly, "2023-11-20")
+	if err != nil {
+		t.Error(err)
+	}
+	map2 := DbTestMapper{Col1: "test2", Col2: tm2, Col3: 222.11, Col4: 0}
 	if dbTestMapper[1] != map2 {
 		t.Error("DbMapper.Output value does not match expected")
 	}
@@ -115,16 +121,20 @@ func TestDbMapperUseMap(t *testing.T) {
 }
 
 type Fill struct {
-	Col1 string `db:"col1"`
-	Col2 string `db:"col2"`
-	Col3 string `db:"col3"`
+	Col1 string    `db:"col1"`
+	Col2 time.Time `db:"col2"`
+	Col3 float64   `db:"col3"`
 }
 
 func TestFillStructFromDb(t *testing.T) {
+	tm, err := time.Parse(time.DateOnly, "2023-11-15")
+	if err != nil {
+		t.Error(err)
+	}
 	expected := Fill{
 		Col1: "test1",
-		Col2: "2023-11-15",
-		Col3: "111.22",
+		Col2: tm,
+		Col3: 111.22,
 	}
 	res, err := db.SyncQ().Query("SELECT * FROM dbtest")
 	if err != nil {
@@ -141,10 +151,14 @@ func TestFillStructFromDb(t *testing.T) {
 }
 
 func TestFillReflectValueFromDb(t *testing.T) {
+	tm, err := time.Parse(time.DateOnly, "2023-11-15")
+	if err != nil {
+		t.Error(err)
+	}
 	expected := Fill{
 		Col1: "test1",
-		Col2: "2023-11-15",
-		Col3: "111.22",
+		Col2: tm,
+		Col3: 111.22,
 	}
 	res, err := db.SyncQ().Query("SELECT * FROM dbtest")
 	if err != nil {

@@ -9,12 +9,6 @@ import (
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 )
 
-type DbTestTable struct {
-	Col1 string  `db:"col1"`
-	Col2 string  `db:"col2"`
-	Col3 float32 `db:"col3"`
-}
-
 func TestConnect(t *testing.T) {
 	err := db.Connect()
 	if err != nil {
