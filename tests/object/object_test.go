@@ -26,16 +26,16 @@ import (
 
 type JsonObjectViewMessage struct {
 	rest.ImplementDTOMessage
-	Id   string `json:"Id" name:"Id"`
-	Name string `json:"Name" name:"Name"`
-	FF   string `json:"Ff" name:"Ff"`
-	Test string `json:"Test" name:"Test"`
+	Id   string `json:"Id" dto:"Id"`
+	Name string `json:"Name" dto:"Name"`
+	FF   string `json:"Ff" dto:"Ff"`
+	Test string `json:"Test" dto:"Test"`
 }
 
 type JsonFormMessage struct {
 	rest.ImplementDTOMessage
-	Text string `json:"Text" name:"Text"`
-	Test string `json:"Test" name:"Test"`
+	Text string `json:"Text" dto:"Text"`
+	Test string `json:"Test" dto:"Test"`
 }
 
 var dto = rest.NewDTO()
@@ -147,9 +147,9 @@ func createAndFillTable(db *database.Database) {
 }
 
 type TObjectViewDB struct {
-	Id   string `name:"id"`
-	Name string `name:"name"`
-	FF   string `name:"FF"`
+	Id   string `db:"id"`
+	Name string `db:"name"`
+	FF   string `db:"FF"`
 }
 
 type TObjectView struct {
@@ -322,8 +322,8 @@ func TestObjectAllView(t *testing.T) {
 }
 
 type ObjectForm struct {
-	Text []string        `name:"text"`
-	File []form.FormFile `name:"file" ext:".jpg .png"`
+	Text []string        `form:"text"`
+	File []form.FormFile `form:"file" ext:".jpg .png"`
 }
 
 type MyFormView struct {

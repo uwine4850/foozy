@@ -58,10 +58,10 @@ type TagNames struct {
 }
 
 var TAGS = TagNames{
-	DB_MAPPER_NAME:        "name",
+	DB_MAPPER_NAME:        "db",
 	DB_MAPPER_EMPTY:       "empty",
-	FORM_MAPPER_NAME:      "name",
+	FORM_MAPPER_NAME:      "form",
 	FORM_MAPPER_EMPTY:     "empty",
 	FORM_MAPPER_EXTENSION: "ext",
-	REST_MAPPER_NAME:      "name",
+	REST_MAPPER_NAME:      "dto",
 }

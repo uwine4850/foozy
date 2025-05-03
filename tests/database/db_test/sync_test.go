@@ -10,9 +10,9 @@ import (
 )
 
 type DbTestTable struct {
-	Col1 string  `name:"col1"`
-	Col2 string  `name:"col2"`
-	Col3 float32 `name:"col3"`
+	Col1 string  `db:"col1"`
+	Col2 string  `db:"col2"`
+	Col3 float32 `db:"col3"`
 }
 
 func TestConnect(t *testing.T) {

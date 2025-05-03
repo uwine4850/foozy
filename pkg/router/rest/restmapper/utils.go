@@ -29,7 +29,12 @@ func FillMessageFromMap(jsonMap *map[string]interface{}, outputPtr typeopr.IPtr)
 		v = reflect.ValueOf(output).Elem()
 	}
 	for i := 0; i < t.NumField(); i++ {
-		name := t.Field(i).Tag.Get(namelib.TAGS.REST_MAPPER_NAME)
+		var name string
+		if _name := t.Field(i).Tag.Get(namelib.TAGS.REST_MAPPER_NAME); _name != "" {
+			name = _name
+		} else {
+			name = t.Field(i).Name
+		}
 		inputValue, ok := (*jsonMap)[name]
 		if !ok {
 			continue

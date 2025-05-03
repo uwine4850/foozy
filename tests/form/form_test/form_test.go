@@ -22,10 +22,10 @@ import (
 )
 
 type Fill struct {
-	NilField []string `name:"isNil"`
+	NilField []string `form:"isNil"`
 	Str      string
-	Field1   []string        `name:"f1"`
-	File     []form.FormFile `name:"file" empty:""`
+	Field1   []string        `form:"f1"`
+	File     []form.FormFile `form:"file" empty:""`
 }
 
 func removeAllFilesInDirectory(dirPath string) error {

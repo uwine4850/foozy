@@ -51,18 +51,6 @@ func (s *Server) GetServ() *http.Server {
 	return s.serv
 }
 
-func isServerRunning(url string) bool {
-	client := http.Client{
-		Timeout: 1 * time.Second, // Устанавливаем таймаут запроса
-	}
-	resp, err := client.Get(url)
-	if err != nil {
-		return false
-	}
-	defer resp.Body.Close()
-	return resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusNotFound
-}
-
 // Stop stops the server.
 func (s *Server) Stop() error {
 	if err := s.serv.Close(); err != nil {

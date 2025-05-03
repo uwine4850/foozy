@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/uwine4850/foozy/pkg/interfaces/irest"
+	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router/form"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 	"github.com/uwine4850/foozy/pkg/utils/fslice"
@@ -142,7 +143,12 @@ func (d *DTO) getGenMessaages(messages *[]irest.IMessage) ([]genMessage, []Allow
 			if err != nil {
 				return nil, nil, err
 			}
-			messageField := genMessageField{Name: _type.Field(i).Name, Type: cnvType}
+			messageField := genMessageField{Type: cnvType}
+			if tagFieldName := _type.Field(i).Tag.Get(namelib.TAGS.REST_MAPPER_NAME); tagFieldName != "" {
+				messageField.Name = tagFieldName
+			} else {
+				messageField.Name = _type.Field(i).Name
+			}
 			genMsg.Fields = append(genMsg.Fields, messageField)
 		}
 		if len(genMsg.Fields) == 0 {
@@ -170,7 +176,7 @@ func (d *DTO) convertType(goType reflect.Type, messages *[]irest.IMessage, mainM
 		return fmt.Sprintf("%s[]", cnvType), nil
 	case reflect.Struct:
 		if goType == reflect.TypeOf(form.FormFile{}) {
-			return "File", nil
+			return "File | null", nil
 		}
 		typeInfo := strings.Split(goType.String(), ".")
 		if !fslice.SliceContains(d.allowedMessages, AllowMessage{Package: typeInfo[0], Name: typeInfo[1]}) {
