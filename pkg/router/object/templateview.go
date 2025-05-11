@@ -17,6 +17,8 @@ import (
 	"github.com/uwine4850/foozy/pkg/utils/fstruct"
 )
 
+type OnMessageFilled func(message any, manager interfaces.IManager) error
+
 type TemplateView struct {
 	TemplatePath string
 	View         IView
@@ -141,7 +143,7 @@ type JsonObjectTemplateView struct {
 	View            IView
 	DTO             *rest.DTO
 	Message         irest.IMessage
-	onMessageFilled func(message any, manager interfaces.IManager) error
+	onMessageFilled OnMessageFilled
 }
 
 func (v *JsonObjectTemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -180,16 +182,13 @@ func (v *JsonObjectTemplateView) Call(w http.ResponseWriter, r *http.Request, ma
 			}
 		}
 		if v.onMessageFilled != nil {
-			messageType := reflect.TypeOf(v.Message)
-			tempMessage := reflect.New(messageType)
-			tempMessage.Elem().Set(reflect.ValueOf(_filledMessage))
-			if err := v.onMessageFilled(tempMessage.Interface(), manager); err != nil {
+			tempMessage := makePointerToFilledMessage(v.Message, reflect.ValueOf(_filledMessage))
+			if err := runOnMessageFilledFunction(v.onMessageFilled, &_filledMessage, tempMessage, manager); err != nil {
 				return func() {
 					debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
 					v.View.OnError(w, r, manager, err)
 				}
 			}
-			_filledMessage = tempMessage.Elem().Interface().(irest.IMessage)
 		}
 		filledMessage = _filledMessage
 	} else {
@@ -210,9 +209,10 @@ func (v *JsonObjectTemplateView) OnMessageFilled(fn func(message any, manager in
 // JsonMultipleObjectTemplateView is used to display MultipleObjectView as JSON data.
 // If the Messages field is empty, it renders JSON as a regular TemplateView.
 type JsonMultipleObjectTemplateView struct {
-	View    IView
-	DTO     *rest.DTO
-	Message irest.IMessage
+	View            IView
+	DTO             *rest.DTO
+	Messages        map[string]irest.IMessage
+	onMessageFilled OnMessageFilled
 }
 
 func (v *JsonMultipleObjectTemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -231,55 +231,65 @@ func (v *JsonMultipleObjectTemplateView) Call(w http.ResponseWriter, r *http.Req
 		return onError
 	}
 
-	contextSliceMap := []Context{}
-	var filledMessages []any
-	if v.Message != nil {
+	returnData := Context{}
+
+	if v.Messages != nil {
 		debug.RequestLogginIfEnable(debug.P_OBJECT, "fill DTO messages")
-		// Retrieves objects by their names and adds them to the general viewContext map.
-		for i := 0; i < len(v.View.ObjectsName()); i++ {
-			viewObjectContext, err := contextByNameToObjectContext(viewObject[v.View.ObjectsName()[i]])
+		objectsData := Context{}
+		fmap.MergeMap((*map[string]interface{})(&objectsData), viewContext)
+		fmap.MergeMap((*map[string]interface{})(&objectsData), viewObject)
+		manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_CONTEXT, objectsData)
+
+		// Fill messages.
+		for objectName, message := range v.Messages {
+			objectData := objectsData[objectName]
+			viewObjectContext, err := contextByNameToObjectContext(objectData)
 			if err != nil {
 				return func() {
 					debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
 					v.View.OnError(w, r, manager, err)
 				}
 			}
-			// The contextBuff variable is needed so that the data from viewContext is assigned separately to each object.
-			// You cannot copy directly to viewContext, since this data must be static for each object.
-			contextBuff := Context{}
-			fmap.MergeMap((*map[string]interface{})(&contextBuff), viewContext)
-			fmap.MergeMap((*map[string]interface{})(&contextBuff), viewObjectContext)
-			contextSliceMap = append(contextSliceMap, contextBuff)
-		}
-		manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_CONTEXT, contextSliceMap)
-		for i := 0; i < len(contextSliceMap); i++ {
-			filledMessage, err := fillMessage(v.DTO, &contextSliceMap[i], v.Message)
+			filledMessage, err := fillMessage(v.DTO, &viewObjectContext, message)
 			if err != nil {
 				return func() {
 					debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
 					v.View.OnError(w, r, manager, err)
 				}
 			}
-			filledMessages = append(filledMessages, filledMessage)
+			if v.onMessageFilled != nil {
+				tempMessage := makePointerToFilledMessage(message, reflect.ValueOf(filledMessage))
+				if err := runOnMessageFilledFunction(v.onMessageFilled, &filledMessage, tempMessage, manager); err != nil {
+					return func() {
+						debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
+						v.View.OnError(w, r, manager, err)
+					}
+				}
+			}
+			returnData[objectName] = filledMessage
 		}
-		return func() { router.SendJson(filledMessages, w) }
 	} else {
 		debug.RequestLogginIfEnable(debug.P_OBJECT, "pass context without DTO messages")
 		fmap.MergeMap((*map[string]interface{})(&viewContext), viewObject)
 		manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_CONTEXT, viewContext)
-		contextSliceMap = append(contextSliceMap, viewContext)
+		returnData = viewContext
 	}
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "send json")
-	router.SendJson(contextSliceMap[0], w)
+	router.SendJson(returnData, w)
 	return func() {}
+}
+
+func (v *JsonMultipleObjectTemplateView) OnMessageFilled(fn func(message any, manager interfaces.IManager) error) {
+	v.onMessageFilled = fn
 }
 
 // JsonAllTemplateView is used to display AllView as JSON data.
 // If the Messages field is empty, it renders JSON as a regular TemplateView.
 type JsonAllTemplateView struct {
-	View    IView
-	DTO     *rest.DTO
-	Message irest.IMessage
+	View            IView
+	DTO             *rest.DTO
+	Message         irest.IMessage
+	onMessageFilled OnMessageFilled
 }
 
 func (v *JsonAllTemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -297,7 +307,6 @@ func (v *JsonAllTemplateView) Call(w http.ResponseWriter, r *http.Request, manag
 	if onError != nil {
 		return onError
 	}
-
 	contextSliceMap := []Context{}
 	var filledMessages []any
 	if v.Message != nil {
@@ -335,6 +344,15 @@ func (v *JsonAllTemplateView) Call(w http.ResponseWriter, r *http.Request, manag
 					v.View.OnError(w, r, manager, err)
 				}
 			}
+			if v.onMessageFilled != nil {
+				tempMessage := makePointerToFilledMessage(v.Message, reflect.ValueOf(filledMessage))
+				if err := runOnMessageFilledFunction(v.onMessageFilled, &filledMessage, tempMessage, manager); err != nil {
+					return func() {
+						debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
+						v.View.OnError(w, r, manager, err)
+					}
+				}
+			}
 			filledMessages = append(filledMessages, filledMessage)
 		}
 		return func() { router.SendJson(filledMessages, w) }
@@ -347,6 +365,10 @@ func (v *JsonAllTemplateView) Call(w http.ResponseWriter, r *http.Request, manag
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "send json")
 	router.SendJson(contextSliceMap[0], w)
 	return func() {}
+}
+
+func (v *JsonAllTemplateView) OnMessageFilled(fn func(message any, manager interfaces.IManager) error) {
+	v.onMessageFilled = fn
 }
 
 func baseParseView(view IView, w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (onError func(), viewObject Context, viewContext Context) {
@@ -430,4 +452,25 @@ func fillMessage(dto *rest.DTO, objectContext *Context, messageType irest.IMessa
 		return nil, err
 	}
 	return newMessageInface, nil
+}
+
+func makePointerToFilledMessage(messageInstance irest.IMessage, filledMessage reflect.Value) interface{} {
+	messageType := reflect.TypeOf(messageInstance)
+	tempMessage := reflect.New(messageType)
+	tempMessage.Elem().Set(filledMessage)
+	return tempMessage.Interface()
+}
+
+func runOnMessageFilledFunction(onMessageFilledFn OnMessageFilled, sourceFilledMessage any, filledMessagePointer any, manager interfaces.IManager) error {
+	if !typeopr.IsPointer(sourceFilledMessage) {
+		return typeopr.ErrValueNotPointer{Value: "sourceFilledMessage"}
+	}
+	if !typeopr.IsPointer(filledMessagePointer) {
+		return typeopr.ErrValueNotPointer{Value: "filledMessagePointer"}
+	}
+	if err := onMessageFilledFn(filledMessagePointer, manager); err != nil {
+		return err
+	}
+	reflect.ValueOf(sourceFilledMessage).Elem().Set(reflect.ValueOf(filledMessagePointer))
+	return nil
 }

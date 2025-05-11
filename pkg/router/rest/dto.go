@@ -184,7 +184,7 @@ func (d *DTO) convertType(goType reflect.Type, messages *[]irest.IMessage, mainM
 		}
 		for i := 0; i < len(*messages); i++ {
 			if reflect.TypeOf((*messages)[i]) == goType {
-				return goType.Name(), nil
+				return fmt.Sprintf("%s | undefined", goType.Name()), nil
 			}
 		}
 		return "", ErrNoDependency{DependencyType: goType.String(), MessageType: mainMessage.FullName()}

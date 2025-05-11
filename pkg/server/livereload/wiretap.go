@@ -49,7 +49,6 @@ type Wiretap struct {
 	dirs             []string
 	excludeDirs      []string
 	files            []string
-	excludeFiles     []string
 	trackedElemets   []string
 }
 

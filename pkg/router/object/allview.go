@@ -14,12 +14,15 @@ import (
 )
 
 // AllView displays HTML page by passing all data from the selected table to it.
+// If the [slug] parameter is set, all data from the table that match the condition will be output.
+// If the [slug] parameter is not set, all data from the table will be output.
 type AllView struct {
 	BaseView
 	Name       string             `notdef:"true"`
 	DB         *database.Database `notdef:"true"`
 	TableName  string             `notdef:"true"`
-	FillStruct interface{}        `notdef:"true"`
+	Slug       string
+	FillStruct interface{} `notdef:"true"`
 }
 
 func (v *AllView) CloseDb() error {
@@ -44,7 +47,16 @@ func (v *AllView) Object(w http.ResponseWriter, r *http.Request, manager interfa
 	}
 	manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_DB, v.DB)
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "get object from database")
-	qObjects := qb.NewSyncQB(v.DB.SyncQ()).SelectFrom("*", v.TableName)
+	qObjects := qb.NewSyncQB(v.DB.SyncQ())
+	if v.Slug != "" {
+		slugValue, ok := manager.OneTimeData().GetSlugParams(v.Slug)
+		if !ok {
+			return nil, ErrNoSlug{v.Slug}
+		}
+		qObjects.SelectFrom("*", v.TableName).Where(qb.Compare(v.Slug, qb.EQUAL, slugValue))
+	} else {
+		qObjects.SelectFrom("*", v.TableName)
+	}
 	qObjects.Merge()
 	objects, err := qObjects.Query()
 	if err != nil {
