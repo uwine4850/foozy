@@ -7,13 +7,12 @@ import (
 
 	"github.com/uwine4850/foozy/pkg/builtin/auth"
 	"github.com/uwine4850/foozy/pkg/database"
-	"github.com/uwine4850/foozy/pkg/database/dbmapper"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/mapper"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/object"
-	"github.com/uwine4850/foozy/pkg/typeopr"
 	"github.com/uwine4850/foozy/pkg/utils/fpath"
 )
 
@@ -162,9 +161,9 @@ func getAllRoles(db *database.Database) ([]RoleDB, error) {
 	if err != nil {
 		return nil, err
 	}
-	var roles []RoleDB
-	mapper := dbmapper.NewMapper(rolesDB, typeopr.Ptr{}.New(&roles))
-	if err := mapper.Fill(); err != nil {
+	roles := make([]RoleDB, len(rolesDB))
+	raw := mapper.NewDBRawStruct(&RoleDB{})
+	if err := mapper.FillStructSliceFromDb(raw, &roles, &rolesDB); err != nil {
 		return nil, err
 	}
 	return roles, nil

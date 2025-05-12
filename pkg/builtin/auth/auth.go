@@ -7,10 +7,10 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/uwine4850/foozy/pkg/database"
-	"github.com/uwine4850/foozy/pkg/database/dbmapper"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/mapper"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router/cookies"
 	"github.com/uwine4850/foozy/pkg/typeopr"
@@ -106,7 +106,8 @@ func (a *Auth) LoginUser(username string, password string) (*User, error) {
 		return nil, err
 	}
 	var authItem User
-	if err := dbmapper.FillStructFromDb(userDB, typeopr.Ptr{}.New(&authItem)); err != nil {
+	err = mapper.FillStructFromDb(mapper.NewDBRawStruct(&User{}), typeopr.Ptr{}.New(&authItem), &userDB)
+	if err != nil {
 		return nil, err
 	}
 	return &authItem, nil

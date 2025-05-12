@@ -7,10 +7,9 @@ import (
 	"time"
 
 	"github.com/uwine4850/foozy/pkg/database"
-	"github.com/uwine4850/foozy/pkg/database/dbmapper"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
+	"github.com/uwine4850/foozy/pkg/mapper"
 	"github.com/uwine4850/foozy/pkg/typeopr"
-	"github.com/uwine4850/foozy/pkg/utils/fmap"
 	"github.com/uwine4850/foozy/tests/common/tconf"
 )
 
@@ -67,9 +66,9 @@ func TestDbMapperUseStruct(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	var dbTestMapper []DbTestMapper
-	mapper := dbmapper.NewMapper(res, typeopr.Ptr{}.New(&dbTestMapper))
-	if err := mapper.Fill(); err != nil {
+	dbTestMapper := make([]DbTestMapper, len(res))
+	raw := mapper.NewDBRawStruct(&DbTestMapper{})
+	if err := mapper.FillStructSliceFromDb(raw, &dbTestMapper, &res); err != nil {
 		t.Error(err)
 	}
 	if len(dbTestMapper) == 0 {
@@ -93,32 +92,32 @@ func TestDbMapperUseStruct(t *testing.T) {
 	}
 }
 
-func TestDbMapperUseMap(t *testing.T) {
-	clearDbTest()
-	createDbTest()
-	q := qb.NewSyncQB(db.SyncQ()).SelectFrom("*", "dbtest")
-	q.Merge()
-	res, err := q.Query()
-	if err != nil {
-		t.Error(err)
-	}
-	var dbTestMapper = []map[string]string{}
-	mapper := dbmapper.NewMapper(res, typeopr.Ptr{}.New(&dbTestMapper))
-	if err := mapper.Fill(); err != nil {
-		t.Error(err)
-	}
-	if len(dbTestMapper) == 0 {
-		t.Error("DbMapper.Output must not be empty")
-	}
-	map1 := map[string]string{"col1": "test1", "col2": "2023-11-15", "col3": "111.22", "col4": "0", "id": ""}
-	if !fmap.Compare(&map1, &dbTestMapper[0], []string{"id"}) {
-		t.Error("DbMapper.Output value does not match expected")
-	}
-	map2 := map[string]string{"col1": "test2", "col2": "2023-11-20", "col3": "222.11", "col4": "0", "id": ""}
-	if !fmap.Compare(&map2, &dbTestMapper[1], []string{"id"}) {
-		t.Error("DbMapper.Output value does not match expected")
-	}
-}
+// func TestDbMapperUseMap(t *testing.T) {
+// 	clearDbTest()
+// 	createDbTest()
+// 	q := qb.NewSyncQB(db.SyncQ()).SelectFrom("*", "dbtest")
+// 	q.Merge()
+// 	res, err := q.Query()
+// 	if err != nil {
+// 		t.Error(err)
+// 	}
+// 	var dbTestMapper = []map[string]string{}
+// 	mapper := dbmapper.NewMapper(res, typeopr.Ptr{}.New(&dbTestMapper))
+// 	if err := mapper.Fill(); err != nil {
+// 		t.Error(err)
+// 	}
+// 	if len(dbTestMapper) == 0 {
+// 		t.Error("DbMapper.Output must not be empty")
+// 	}
+// 	map1 := map[string]string{"col1": "test1", "col2": "2023-11-15", "col3": "111.22", "col4": "0", "id": ""}
+// 	if !fmap.Compare(&map1, &dbTestMapper[0], []string{"id"}) {
+// 		t.Error("DbMapper.Output value does not match expected")
+// 	}
+// 	map2 := map[string]string{"col1": "test2", "col2": "2023-11-20", "col3": "222.11", "col4": "0", "id": ""}
+// 	if !fmap.Compare(&map2, &dbTestMapper[1], []string{"id"}) {
+// 		t.Error("DbMapper.Output value does not match expected")
+// 	}
+// }
 
 type Fill struct {
 	Col1 string    `db:"col1"`
@@ -141,7 +140,7 @@ func TestFillStructFromDb(t *testing.T) {
 		t.Error(err)
 	}
 	var f Fill
-	err = dbmapper.FillStructFromDb(res[0], typeopr.Ptr{}.New(&f))
+	err = mapper.FillStructFromDb(mapper.NewDBRawStruct(&Fill{}), typeopr.Ptr{}.New(&f), &res[0])
 	if err != nil {
 		t.Error(err)
 	}
@@ -166,7 +165,8 @@ func TestFillReflectValueFromDb(t *testing.T) {
 	}
 	f := Fill{}
 	fValue := reflect.ValueOf(&f).Elem()
-	if err := dbmapper.FillReflectValueFromDb(res[0], &fValue); err != nil {
+	err = mapper.FillStructFromDb(mapper.NewDBRawStruct(&fValue), typeopr.Ptr{}.New(&fValue), &res[0])
+	if err != nil {
 		t.Error(err)
 	}
 	if f != expected {
@@ -174,17 +174,17 @@ func TestFillReflectValueFromDb(t *testing.T) {
 	}
 }
 
-func TestFillMapFromDb(t *testing.T) {
-	expected := map[string]string{"col1": "test1", "col2": "2023-11-15", "col3": "111.22"}
-	res, err := db.SyncQ().Query("SELECT * FROM dbtest")
-	if err != nil {
-		t.Error(err)
-	}
-	m := map[string]string{}
-	if err := dbmapper.FillMapFromDb(res[0], &m); err != nil {
-		t.Error(err)
-	}
-	if !fmap.Compare(&expected, &m, []string{"id", "col4"}) {
-		t.Error("the completed map does not match the expected one")
-	}
-}
+// func TestFillMapFromDb(t *testing.T) {
+// 	expected := map[string]string{"col1": "test1", "col2": "2023-11-15", "col3": "111.22"}
+// 	res, err := db.SyncQ().Query("SELECT * FROM dbtest")
+// 	if err != nil {
+// 		t.Error(err)
+// 	}
+// 	m := map[string]string{}
+// 	if err := dbmapper.FillMapFromDb(res[0], &m); err != nil {
+// 		t.Error(err)
+// 	}
+// 	if !fmap.Compare(&expected, &m, []string{"id", "col4"}) {
+// 		t.Error("the completed map does not match the expected one")
+// 	}
+// }

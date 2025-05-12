@@ -1,5 +1,5 @@
 package interfaces
 
-type IMapper interface {
-	Fill() error
-}
+// type IMapper interface {
+// 	Fill() error
+// }

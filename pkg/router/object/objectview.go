@@ -1,17 +1,21 @@
 package object
 
 import (
+	"errors"
 	"net/http"
 	"reflect"
+	"sync"
 
 	"github.com/uwine4850/foozy/pkg/database"
-	"github.com/uwine4850/foozy/pkg/database/dbmapper"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/debug"
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/mapper"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
+
+var OVrawStructCache sync.Map
 
 // ObjView displays only the HTML page only with a specific row from the database.
 // Needs to be used with slug parameter URL path, specify the name of the parameter in the Slug parameter.
@@ -74,10 +78,18 @@ func (v *ObjView) Object(w http.ResponseWriter, r *http.Request, manager interfa
 
 func (v *ObjView) fillObject(object map[string]interface{}) (*reflect.Value, error) {
 	if v.FillStruct == nil {
-		panic("the FillStruct field must not be nil")
+		return nil, errors.New("the FillStruct field must not be nil")
 	}
-	value := reflect.New(reflect.TypeOf(v.FillStruct)).Elem()
-	err := dbmapper.FillReflectValueFromDb(object, &value)
+	fillType := reflect.TypeOf(v.FillStruct)
+	value := reflect.New(fillType).Elem()
+	var raw mapper.RawStruct
+	if rawStoredValue, ok := OVrawStructCache.Load(fillType); ok {
+		raw = rawStoredValue.(mapper.RawStruct)
+	} else {
+		raw = mapper.NewDBRawStruct(&value)
+		OVrawStructCache.Store(fillType, raw)
+	}
+	err := mapper.FillStructFromDb(raw, typeopr.Ptr{}.New(&value), &object)
 	if err != nil {
 		return nil, err
 	}

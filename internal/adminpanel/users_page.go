@@ -6,11 +6,10 @@ import (
 	"path/filepath"
 
 	"github.com/uwine4850/foozy/pkg/database"
-	"github.com/uwine4850/foozy/pkg/database/dbmapper"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/mapper"
 	"github.com/uwine4850/foozy/pkg/router"
-	"github.com/uwine4850/foozy/pkg/typeopr"
 	"github.com/uwine4850/foozy/pkg/utils/fpath"
 )
 
@@ -66,14 +65,14 @@ func isRolesTableCreated(db *database.Database) (bool, error) {
 }
 
 func getRoles(db *database.Database) ([]RoleDB, error) {
-	roles, err := qb.NewSyncQB(db.SyncQ()).SelectFrom("*", ROLES_TABLE).Query()
+	res, err := qb.NewSyncQB(db.SyncQ()).SelectFrom("*", ROLES_TABLE).Query()
 	if err != nil {
 		return nil, err
 	}
-	var rolesDB []RoleDB
-	mapper := dbmapper.NewMapper(roles, typeopr.Ptr{}.New(&rolesDB))
-	if err := mapper.Fill(); err != nil {
+	roles := make([]RoleDB, len(res))
+	raw := mapper.NewDBRawStruct(&RoleDB{})
+	if err := mapper.FillStructSliceFromDb(raw, &roles, &res); err != nil {
 		return nil, err
 	}
-	return rolesDB, nil
+	return roles, nil
 }

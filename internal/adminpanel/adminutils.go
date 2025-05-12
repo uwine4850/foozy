@@ -9,14 +9,13 @@ import (
 	"github.com/uwine4850/foozy/pkg/builtin/auth"
 	"github.com/uwine4850/foozy/pkg/config"
 	"github.com/uwine4850/foozy/pkg/database"
-	"github.com/uwine4850/foozy/pkg/database/dbmapper"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/mapper"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router/form"
 	"github.com/uwine4850/foozy/pkg/secure"
-	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
 const (
@@ -140,12 +139,12 @@ func UserRole(uid string, db *database.Database) (UserRolesDB, error) {
 	if err != nil {
 		return UserRolesDB{}, err
 	}
-	var userRoles []UserRolesDB
-	mapper := dbmapper.NewMapper(userRolesDB, typeopr.Ptr{}.New(&userRoles))
-	if err := mapper.Fill(); err != nil {
-		return UserRolesDB{}, err
-	}
-	if len(userRoles) > 0 {
+	if len(userRolesDB) > 0 {
+		userRoles := make([]UserRolesDB, len(userRolesDB))
+		raw := mapper.NewDBRawStruct(&UserRolesDB{})
+		if err := mapper.FillStructSliceFromDb(raw, &userRoles, &userRolesDB); err != nil {
+			return UserRolesDB{}, err
+		}
 		return userRoles[0], nil
 	} else {
 		return UserRolesDB{}, nil

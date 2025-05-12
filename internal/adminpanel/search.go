@@ -6,13 +6,12 @@ import (
 
 	"github.com/uwine4850/foozy/pkg/builtin/auth"
 	"github.com/uwine4850/foozy/pkg/database"
-	"github.com/uwine4850/foozy/pkg/database/dbmapper"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/mapper"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/object"
-	"github.com/uwine4850/foozy/pkg/typeopr"
 	"github.com/uwine4850/foozy/pkg/utils/fpath"
 )
 
@@ -61,9 +60,9 @@ func (us *UserSearchByID) Context(w http.ResponseWriter, r *http.Request, manage
 		if err != nil {
 			return nil, err
 		}
-		var out []auth.User
-		mapper := dbmapper.NewMapper(res, typeopr.Ptr{}.New(&out))
-		if err := mapper.Fill(); err != nil {
+		out := make([]auth.User, len(res))
+		raw := mapper.NewDBRawStruct(&auth.User{})
+		if err := mapper.FillStructSliceFromDb(raw, &out, &res); err != nil {
 			return nil, err
 		}
 		manager.Render().SetContext(map[string]interface{}{"users": out, "search": "Search by ID: " + formObject.Id[0]})
@@ -127,9 +126,9 @@ func (us *UserSearchByUsername) Context(w http.ResponseWriter, r *http.Request, 
 		if err != nil {
 			return nil, err
 		}
-		var out []auth.User
-		mapper := dbmapper.NewMapper(res, typeopr.Ptr{}.New(&out))
-		if err := mapper.Fill(); err != nil {
+		out := make([]auth.User, len(res))
+		raw := mapper.NewDBRawStruct(&auth.User{})
+		if err := mapper.FillStructSliceFromDb(raw, &out, &res); err != nil {
 			return nil, err
 		}
 		manager.Render().SetContext(map[string]interface{}{"users": out, "search": "Search by username: " + formObject.Username[0]})

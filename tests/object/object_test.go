@@ -461,8 +461,11 @@ func TJsonObjectMultipleViewHNDL(db *database.Database) func(w http.ResponseWrit
 				},
 			},
 		},
-		DTO:     dto,
-		Message: JsonObjectViewMessage{},
+		DTO: dto,
+		Messages: map[string]irest.IMessage{
+			"object":  JsonObjectViewMessage{},
+			"object1": JsonObjectViewMessage{},
+		},
 	}
 	return view.Call
 }
@@ -476,7 +479,7 @@ func TestJsonObjectMultipleView(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if string(body) != `[{"Id":1,"Name":"name","Ff":0,"Test":"OK"},{"Id":1,"Name":"name1","Ff":0,"Test":"OK"}]` {
+	if string(body) != `{"object":{"Id":1,"Name":"name","Ff":0,"Test":""},"object1":{"Id":1,"Name":"name1","Ff":0,"Test":""}}` {
 		t.Errorf("Error on page retrieval.")
 	}
 	err = get.Body.Close()

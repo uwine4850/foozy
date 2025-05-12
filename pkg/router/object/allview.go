@@ -3,15 +3,18 @@ package object
 import (
 	"net/http"
 	"reflect"
+	"sync"
 
 	"github.com/uwine4850/foozy/pkg/database"
-	"github.com/uwine4850/foozy/pkg/database/dbmapper"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/debug"
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/mapper"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
+
+var AVrawStructCache sync.Map
 
 // AllView displays HTML page by passing all data from the selected table to it.
 // If the [slug] parameter is set, all data from the table that match the condition will be output.
@@ -80,8 +83,16 @@ func (v *AllView) fillObjects(objects []map[string]interface{}) ([]interface{}, 
 	}
 	var objectsStruct []interface{}
 	for i := 0; i < len(objects); i++ {
-		value := reflect.New(reflect.TypeOf(v.FillStruct)).Elem()
-		err := dbmapper.FillReflectValueFromDb(objects[i], &value)
+		fillType := reflect.TypeOf(v.FillStruct)
+		value := reflect.New(fillType).Elem()
+		var raw mapper.RawStruct
+		if rawStoredValue, ok := AVrawStructCache.Load(fillType); ok {
+			raw = rawStoredValue.(mapper.RawStruct)
+		} else {
+			raw = mapper.NewDBRawStruct(&value)
+			AVrawStructCache.Store(fillType, raw)
+		}
+		err := mapper.FillStructFromDb(raw, typeopr.Ptr{}.New(&value), &objects[i])
 		if err != nil {
 			return nil, err
 		}

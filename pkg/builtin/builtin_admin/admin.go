@@ -8,11 +8,10 @@ import (
 
 	"github.com/uwine4850/foozy/internal/adminpanel"
 	"github.com/uwine4850/foozy/pkg/database"
-	"github.com/uwine4850/foozy/pkg/database/dbmapper"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/mapper"
 	"github.com/uwine4850/foozy/pkg/router"
-	"github.com/uwine4850/foozy/pkg/typeopr"
 	"github.com/uwine4850/foozy/pkg/utils/fpath"
 )
 
@@ -63,8 +62,8 @@ func AdminHandlerSet(db *database.Database, myRouter *router.Router) []map[strin
 }
 
 type AdminSettingsDB struct {
-	Id          string `name:"id"`
-	AdminAccess string `name:"admin_access"`
+	Id          string `db:"id"`
+	AdminAccess string `db:"admin_access"`
 }
 
 func AdminPage(db *database.Database) router.Handler {
@@ -127,10 +126,10 @@ func AdminSettings(db *database.Database) (AdminSettingsDB, error) {
 	if len(res) == 0 {
 		return AdminSettingsDB{}, nil
 	}
-	var adminSettingsDB []AdminSettingsDB
-	mapper := dbmapper.NewMapper(res, typeopr.Ptr{}.New(&adminSettingsDB))
-	if err := mapper.Fill(); err != nil {
-		return AdminSettingsDB{}, err
+	adminSettingsDB := make([]AdminSettingsDB, len(res))
+	raw := mapper.NewDBRawStruct(&AdminSettingsDB{})
+	if err := mapper.FillStructSliceFromDb(raw, &adminSettingsDB, &res); err != nil {
+		return AdminSettingsDB{}, nil
 	}
 	return adminSettingsDB[0], nil
 }
