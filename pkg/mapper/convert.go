@@ -33,11 +33,13 @@ func dbValueConversionToByte(value interface{}) ([]byte, error) {
 	return val, nil
 }
 
-var typeTime = reflect.TypeOf(time.Time{})
-var typeBoolean = reflect.TypeOf(true)
-var typeMap = reflect.TypeOf(map[string]interface{}{})
-var typeByte = reflect.TypeOf([]byte{})
-var typeDecimal = reflect.TypeOf(decimal.Decimal{})
+var (
+	typeTime    = reflect.TypeOf(time.Time{})
+	typeBool    = reflect.TypeOf(true)
+	typeMap     = reflect.TypeOf(map[string]interface{}{})
+	typeBytes   = reflect.TypeOf([]byte{})
+	typeDecimal = reflect.TypeOf(decimal.Decimal{})
+)
 
 func convertDBType(value *reflect.Value, structTag *reflect.StructTag, dataPtr *any) error {
 	data := *dataPtr
@@ -52,7 +54,7 @@ func convertDBType(value *reflect.Value, structTag *reflect.StructTag, dataPtr *
 			return err
 		}
 		value.Set(reflect.ValueOf(pTime))
-	case typeBoolean:
+	case typeBool:
 		cVal, err := convertBoolean(dataPtr)
 		if err != nil {
 			return err
@@ -64,7 +66,7 @@ func convertDBType(value *reflect.Value, structTag *reflect.StructTag, dataPtr *
 			return err
 		}
 		value.Set(reflect.ValueOf(v))
-	case typeByte:
+	case typeBytes:
 		value.Set(reflect.ValueOf(data))
 	case typeDecimal:
 		cVal, err := convertDecimal(dataPtr)
@@ -81,54 +83,22 @@ func convertDBType(value *reflect.Value, structTag *reflect.StructTag, dataPtr *
 }
 
 func convertTimeF(val *[]byte, dateFormat string) (time.Time, error) {
-	var pTime time.Time
 	if dateFormat != "" {
 		parsedTime, err := time.Parse(dateFormat, string(*val))
 		if err != nil {
 			return time.Time{}, err
 		}
-		pTime = parsedTime
+		return parsedTime, nil
 	} else {
-		var dateTimeError bool
-		var dateError bool
-
-		var parseError *time.ParseError
-
-		// Datetime.
-		parsedTime, err := time.Parse(time.DateTime, string(*val))
-		if err != nil {
-			if errors.As(err, &parseError) {
-				dateTimeError = true
-			} else {
-				return time.Time{}, err
-			}
-		} else {
-			pTime = parsedTime
-		}
-		if dateTimeError {
-			// Date.
-			parsedTime, err = time.Parse(time.DateOnly, string(*val))
-			if err != nil {
-				if errors.As(err, &parseError) {
-					dateError = true
-				} else {
-					return time.Time{}, err
-				}
-			} else {
-				pTime = parsedTime
+		formats := []string{time.DateTime, time.DateOnly, time.TimeOnly}
+		for _, format := range formats {
+			p, err := time.Parse(format, string(*val))
+			if err == nil {
+				return p, nil
 			}
 		}
-		if dateError {
-			// Time.
-			parsedTime, err = time.Parse(time.TimeOnly, string(*val))
-			if err != nil {
-				return time.Time{}, err
-			} else {
-				pTime = parsedTime
-			}
-		}
+		return time.Time{}, errors.New("invalid time format")
 	}
-	return pTime, nil
 }
 
 func convertBoolean(dataPtr *any) (bool, error) {

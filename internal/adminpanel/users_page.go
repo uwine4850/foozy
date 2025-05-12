@@ -70,8 +70,7 @@ func getRoles(db *database.Database) ([]RoleDB, error) {
 		return nil, err
 	}
 	roles := make([]RoleDB, len(res))
-	raw := mapper.NewDBRawStruct(&RoleDB{})
-	if err := mapper.FillStructSliceFromDb(raw, &roles, &res); err != nil {
+	if err := mapper.FillStructSliceFromDb(&roles, &res); err != nil {
 		return nil, err
 	}
 	return roles, nil

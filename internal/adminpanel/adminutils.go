@@ -141,8 +141,7 @@ func UserRole(uid string, db *database.Database) (UserRolesDB, error) {
 	}
 	if len(userRolesDB) > 0 {
 		userRoles := make([]UserRolesDB, len(userRolesDB))
-		raw := mapper.NewDBRawStruct(&UserRolesDB{})
-		if err := mapper.FillStructSliceFromDb(raw, &userRoles, &userRolesDB); err != nil {
+		if err := mapper.FillStructSliceFromDb(&userRoles, &userRolesDB); err != nil {
 			return UserRolesDB{}, err
 		}
 		return userRoles[0], nil

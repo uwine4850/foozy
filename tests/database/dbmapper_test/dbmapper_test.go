@@ -67,8 +67,7 @@ func TestDbMapperUseStruct(t *testing.T) {
 		t.Error(err)
 	}
 	dbTestMapper := make([]DbTestMapper, len(res))
-	raw := mapper.NewDBRawStruct(&DbTestMapper{})
-	if err := mapper.FillStructSliceFromDb(raw, &dbTestMapper, &res); err != nil {
+	if err := mapper.FillStructSliceFromDb(&dbTestMapper, &res); err != nil {
 		t.Error(err)
 	}
 	if len(dbTestMapper) == 0 {
@@ -140,7 +139,7 @@ func TestFillStructFromDb(t *testing.T) {
 		t.Error(err)
 	}
 	var f Fill
-	err = mapper.FillStructFromDb(mapper.NewDBRawStruct(&Fill{}), typeopr.Ptr{}.New(&f), &res[0])
+	err = mapper.FillStructFromDb(typeopr.Ptr{}.New(&f), &res[0])
 	if err != nil {
 		t.Error(err)
 	}
@@ -165,7 +164,7 @@ func TestFillReflectValueFromDb(t *testing.T) {
 	}
 	f := Fill{}
 	fValue := reflect.ValueOf(&f).Elem()
-	err = mapper.FillStructFromDb(mapper.NewDBRawStruct(&fValue), typeopr.Ptr{}.New(&fValue), &res[0])
+	err = mapper.FillStructFromDb(typeopr.Ptr{}.New(&fValue), &res[0])
 	if err != nil {
 		t.Error(err)
 	}

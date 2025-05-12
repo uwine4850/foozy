@@ -3,7 +3,6 @@ package object
 import (
 	"net/http"
 	"reflect"
-	"sync"
 
 	"github.com/uwine4850/foozy/pkg/database"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
@@ -14,8 +13,6 @@ import (
 	"github.com/uwine4850/foozy/pkg/typeopr"
 	"github.com/uwine4850/foozy/pkg/utils/fstruct"
 )
-
-var MOrawStructCache sync.Map
 
 type MultipleObject struct {
 	Name       string      `notdef:"true"`
@@ -95,14 +92,7 @@ func (v *MultipleObjectView) fillObject(object map[string]interface{}, fillStruc
 	}
 	fillType := reflect.TypeOf(fillStruct)
 	value := reflect.New(fillType).Elem()
-	var raw mapper.RawStruct
-	if rawStoredValue, ok := OVrawStructCache.Load(fillType); ok {
-		raw = rawStoredValue.(mapper.RawStruct)
-	} else {
-		raw = mapper.NewDBRawStruct(&value)
-		OVrawStructCache.Store(fillType, raw)
-	}
-	err := mapper.FillStructFromDb(raw, typeopr.Ptr{}.New(&value), &object)
+	err := mapper.FillStructFromDb(typeopr.Ptr{}.New(&value), &object)
 	if err != nil {
 		return nil, err
 	}

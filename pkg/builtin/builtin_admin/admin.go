@@ -127,8 +127,7 @@ func AdminSettings(db *database.Database) (AdminSettingsDB, error) {
 		return AdminSettingsDB{}, nil
 	}
 	adminSettingsDB := make([]AdminSettingsDB, len(res))
-	raw := mapper.NewDBRawStruct(&AdminSettingsDB{})
-	if err := mapper.FillStructSliceFromDb(raw, &adminSettingsDB, &res); err != nil {
+	if err := mapper.FillStructSliceFromDb(&adminSettingsDB, &res); err != nil {
 		return AdminSettingsDB{}, nil
 	}
 	return adminSettingsDB[0], nil

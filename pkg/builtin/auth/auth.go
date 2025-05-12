@@ -106,7 +106,7 @@ func (a *Auth) LoginUser(username string, password string) (*User, error) {
 		return nil, err
 	}
 	var authItem User
-	err = mapper.FillStructFromDb(mapper.NewDBRawStruct(&User{}), typeopr.Ptr{}.New(&authItem), &userDB)
+	err = mapper.FillStructFromDb(typeopr.Ptr{}.New(&authItem), &userDB)
 	if err != nil {
 		return nil, err
 	}

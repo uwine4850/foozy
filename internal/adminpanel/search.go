@@ -61,8 +61,7 @@ func (us *UserSearchByID) Context(w http.ResponseWriter, r *http.Request, manage
 			return nil, err
 		}
 		out := make([]auth.User, len(res))
-		raw := mapper.NewDBRawStruct(&auth.User{})
-		if err := mapper.FillStructSliceFromDb(raw, &out, &res); err != nil {
+		if err := mapper.FillStructSliceFromDb(&out, &res); err != nil {
 			return nil, err
 		}
 		manager.Render().SetContext(map[string]interface{}{"users": out, "search": "Search by ID: " + formObject.Id[0]})
@@ -127,8 +126,7 @@ func (us *UserSearchByUsername) Context(w http.ResponseWriter, r *http.Request, 
 			return nil, err
 		}
 		out := make([]auth.User, len(res))
-		raw := mapper.NewDBRawStruct(&auth.User{})
-		if err := mapper.FillStructSliceFromDb(raw, &out, &res); err != nil {
+		if err := mapper.FillStructSliceFromDb(&out, &res); err != nil {
 			return nil, err
 		}
 		manager.Render().SetContext(map[string]interface{}{"users": out, "search": "Search by username: " + formObject.Username[0]})
