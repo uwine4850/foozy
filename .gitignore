@@ -16,3 +16,4 @@ myapp
 reloader
 *.log
 _reloader
+tee.html

@@ -82,7 +82,7 @@ func (v *AllView) fillObjects(objects []map[string]interface{}) ([]interface{}, 
 	for i := 0; i < len(objects); i++ {
 		fillType := reflect.TypeOf(v.FillStruct)
 		value := reflect.New(fillType).Elem()
-		err := mapper.FillStructFromDb(typeopr.Ptr{}.New(&value), &objects[i])
+		err := mapper.FillStructFromDb(&value, &objects[i])
 		if err != nil {
 			return nil, err
 		}

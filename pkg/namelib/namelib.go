@@ -55,6 +55,7 @@ type TagNames struct {
 	FORM_MAPPER_NAME      string
 	FORM_MAPPER_EMPTY     string
 	FORM_MAPPER_EXTENSION string
+	FORM_MAPPER_NIL       string
 	REST_MAPPER_NAME      string
 }
 
@@ -65,5 +66,6 @@ var TAGS = TagNames{
 	FORM_MAPPER_NAME:      "form",
 	FORM_MAPPER_EMPTY:     "empty",
 	FORM_MAPPER_EXTENSION: "ext",
+	FORM_MAPPER_NIL:       "nil",
 	REST_MAPPER_NAME:      "dto",
 }

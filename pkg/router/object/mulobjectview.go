@@ -92,7 +92,7 @@ func (v *MultipleObjectView) fillObject(object map[string]interface{}, fillStruc
 	}
 	fillType := reflect.TypeOf(fillStruct)
 	value := reflect.New(fillType).Elem()
-	err := mapper.FillStructFromDb(typeopr.Ptr{}.New(&value), &object)
+	err := mapper.FillStructFromDb(&value, &object)
 	if err != nil {
 		return nil, err
 	}

@@ -79,7 +79,7 @@ func (v *ObjView) fillObject(object map[string]interface{}) (*reflect.Value, err
 	}
 	fillType := reflect.TypeOf(v.FillStruct)
 	value := reflect.New(fillType).Elem()
-	err := mapper.FillStructFromDb(typeopr.Ptr{}.New(&value), &object)
+	err := mapper.FillStructFromDb(&value, &object)
 	if err != nil {
 		return nil, err
 	}

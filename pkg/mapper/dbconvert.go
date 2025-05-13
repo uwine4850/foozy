@@ -12,7 +12,9 @@ import (
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
-func dbValueConversionToByte(value interface{}) ([]byte, error) {
+type DatabaseConverter struct{}
+
+func (dc DatabaseConverter) dbValueConversionToByte(value interface{}) ([]byte, error) {
 	if value == nil {
 		return nil, nil
 	}
@@ -41,21 +43,21 @@ var (
 	typeDecimal = reflect.TypeOf(decimal.Decimal{})
 )
 
-func convertDBType(value *reflect.Value, structTag *reflect.StructTag, dataPtr *any) error {
+func (dc DatabaseConverter) convertDBType(value *reflect.Value, structTag *reflect.StructTag, dataPtr *any) error {
 	data := *dataPtr
 	switch value.Type() {
 	case typeTime:
-		val, err := dbValueConversionToByte(data)
+		val, err := dc.dbValueConversionToByte(data)
 		if err != nil {
 			return err
 		}
-		pTime, err := convertTimeF(&val, structTag.Get(namelib.TAGS.DB_MAPPER_DATE_F))
+		pTime, err := dc.convertTimeF(&val, structTag.Get(namelib.TAGS.DB_MAPPER_DATE_F))
 		if err != nil {
 			return err
 		}
 		value.Set(reflect.ValueOf(pTime))
 	case typeBool:
-		cVal, err := convertBoolean(dataPtr)
+		cVal, err := dc.convertBoolean(dataPtr)
 		if err != nil {
 			return err
 		}
@@ -69,20 +71,20 @@ func convertDBType(value *reflect.Value, structTag *reflect.StructTag, dataPtr *
 	case typeBytes:
 		value.Set(reflect.ValueOf(data))
 	case typeDecimal:
-		cVal, err := convertDecimal(dataPtr)
+		cVal, err := dc.convertDecimal(dataPtr)
 		if err != nil {
 			return err
 		}
 		value.Set(reflect.ValueOf(cVal))
 	default:
-		if err := convertOther(value, dataPtr); err != nil {
+		if err := dc.convertOther(value, dataPtr); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func convertTimeF(val *[]byte, dateFormat string) (time.Time, error) {
+func (dc DatabaseConverter) convertTimeF(val *[]byte, dateFormat string) (time.Time, error) {
 	if dateFormat != "" {
 		parsedTime, err := time.Parse(dateFormat, string(*val))
 		if err != nil {
@@ -101,7 +103,7 @@ func convertTimeF(val *[]byte, dateFormat string) (time.Time, error) {
 	}
 }
 
-func convertBoolean(dataPtr *any) (bool, error) {
+func (dc DatabaseConverter) convertBoolean(dataPtr *any) (bool, error) {
 	data := *dataPtr
 	var zero int64
 	if reflect.ValueOf(data).CanConvert(reflect.TypeOf(zero)) {
@@ -113,7 +115,7 @@ func convertBoolean(dataPtr *any) (bool, error) {
 	}
 }
 
-func convertDecimal(dataPtr *any) (decimal.Decimal, error) {
+func (dc DatabaseConverter) convertDecimal(dataPtr *any) (decimal.Decimal, error) {
 	data := *dataPtr
 	decimalString := string(data.([]byte))
 	newDecimal, err := decimal.NewFromString(decimalString)
@@ -123,7 +125,7 @@ func convertDecimal(dataPtr *any) (decimal.Decimal, error) {
 	return newDecimal, nil
 }
 
-func convertOther(fieldValue *reflect.Value, dataPtr *any) error {
+func (dc DatabaseConverter) convertOther(fieldValue *reflect.Value, dataPtr *any) error {
 	data := *dataPtr
 	value := *fieldValue
 	if value.Type().Kind() == reflect.Interface {

@@ -1,4 +1,4 @@
-package formmapper
+package mapper
 
 import (
 	"mime/multipart"
