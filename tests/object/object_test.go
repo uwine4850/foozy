@@ -52,7 +52,7 @@ func TestMain(m *testing.M) {
 			Name:    "JsonFormMessage",
 		},
 	})
-	dto.Messages(map[string]*[]irest.IMessage{
+	dto.Messages(map[string][]irest.IMessage{
 		"s": {
 			JsonObjectViewMessage{},
 			JsonFormMessage{},
@@ -354,9 +354,9 @@ func MyFormViewHNDL() func(w http.ResponseWriter, r *http.Request, manager inter
 		TemplatePath: "",
 		View: &MyFormView{
 			object.FormView{
-				FormStruct:       ObjectForm{},
-				NotNilFormFields: []string{"*"},
-				NilIfNotExist:    []string{},
+				FormStruct: ObjectForm{},
+				// NotNilFormFields: []string{"*"},
+				// NilIfNotExist:    []string{},
 			},
 		},
 	}

@@ -1,19 +1,20 @@
 package restmappertest
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"testing"
 
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/mapper"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/manager"
 	"github.com/uwine4850/foozy/pkg/router/rest"
-	"github.com/uwine4850/foozy/pkg/router/rest/restmapper"
 	"github.com/uwine4850/foozy/pkg/server"
-	"github.com/uwine4850/foozy/pkg/typeopr"
 	"github.com/uwine4850/foozy/tests/common/tconf"
 	testinitcnf "github.com/uwine4850/foozy/tests/common/test_init_cnf"
 	"github.com/uwine4850/foozy/tests/common/tutils"
@@ -66,13 +67,13 @@ func TestMain(m *testing.M) {
 
 type JsonData struct {
 	rest.ImplementDTOMessage
-	Id       int                 `json:"Id"`
-	Name     string              `json:"Name"`
-	Slice    []string            `json:"Slice"`
-	IsOk     bool                `json:"IsOk"`
-	Map      map[string]int      `json:"Map"`
-	SliceMap []map[string]string `json:"SliceMap"`
-	MapSlice map[string][]int    `json:"MapSlice"`
+	Id       int                 `json:"Id" dto:"Id"`
+	Name     string              `json:"Name" dto:"Name"`
+	Slice    []string            `json:"Slice" dto:"Slice"`
+	IsOk     bool                `json:"IsOk" dto:"IsOk"`
+	Map      map[string]int      `json:"Map" dto:"Map"`
+	SliceMap []map[string]string `json:"SliceMap" dto:"SliceMap"`
+	MapSlice map[string][]int    `json:"MapSlice" dto:"MapSlice"`
 }
 
 func TestRestJson(t *testing.T) {
@@ -86,13 +87,15 @@ func TestRestJson(t *testing.T) {
 		t.Error(err)
 	}
 	var jsonMap map[string]interface{}
-	if err := restmapper.JsonStringToMap(string(body), &jsonMap); err != nil {
+	if err := json.Unmarshal([]byte(string(body)), &jsonMap); err != nil {
 		t.Error(err)
 	}
+
 	var jsonData JsonData
-	if err := restmapper.JsonToMessage(&jsonMap, dto, typeopr.Ptr{}.New(&jsonData)); err != nil {
+	if err := mapper.JsonToDTOMessage(jsonMap, dto, &jsonData); err != nil {
 		t.Error(err)
 	}
+	fmt.Println(jsonData)
 	err = get.Body.Close()
 	if err != nil {
 		t.Error(err)

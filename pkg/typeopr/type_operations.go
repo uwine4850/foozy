@@ -96,6 +96,18 @@ func IsImplementInterface(objectPtr IPtr, interfaceType interface{}) bool {
 	return objType.Implements(intrfcType)
 }
 
+var typeReflectValue = reflect.TypeOf(&reflect.Value{}).Elem()
+
+func GetReflectValue[T any](target *T) reflect.Value {
+	var v reflect.Value
+	if reflect.TypeOf(*target) == typeReflectValue {
+		v = *reflect.ValueOf(target).Interface().(*reflect.Value)
+	} else {
+		v = reflect.ValueOf(target).Elem()
+	}
+	return v
+}
+
 type ErrValueNotPointer struct {
 	Value string
 }

@@ -8,10 +8,10 @@ import (
 	"github.com/uwine4850/foozy/pkg/debug"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/interfaces/irest"
+	"github.com/uwine4850/foozy/pkg/mapper"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/rest"
-	"github.com/uwine4850/foozy/pkg/router/rest/restmapper"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 	"github.com/uwine4850/foozy/pkg/utils/fmap"
 	"github.com/uwine4850/foozy/pkg/utils/fstruct"
@@ -443,14 +443,14 @@ func contextByNameToObjectContext(contextData interface{}) (Context, error) {
 // fillMessage fills the DTO Message with the data passed to the objectContext.
 // It is important to highlight that the messageType argument is used only to obtain the message type; an instance of this type is returned.
 func fillMessage(dto *rest.DTO, objectContext *Context, messageType irest.IMessage) (irest.IMessage, error) {
+	if err := mapper.DeepCheckDTOSafeMessage(dto, typeopr.Ptr{}.New(&messageType)); err != nil {
+		return nil, err
+	}
 	newMessage := reflect.New(reflect.TypeOf(messageType)).Elem()
-	if err := restmapper.FillMessageFromMap((*map[string]interface{})(objectContext), typeopr.Ptr{}.New(&newMessage)); err != nil {
+	if err := mapper.FillDTOMessageFromMap(*(*map[string]interface{})(objectContext), &newMessage); err != nil {
 		return nil, err
 	}
 	newMessageInface := newMessage.Interface().(irest.IMessage)
-	if err := rest.DeepCheckSafeMessage(dto, typeopr.Ptr{}.New(&newMessageInface)); err != nil {
-		return nil, err
-	}
 	return newMessageInface, nil
 }
 

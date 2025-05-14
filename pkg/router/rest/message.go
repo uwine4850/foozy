@@ -3,15 +3,16 @@ package rest
 import (
 	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/uwine4850/foozy/pkg/interfaces/irest"
 	"github.com/uwine4850/foozy/pkg/typeopr"
+	"github.com/uwine4850/foozy/pkg/utils/fslice"
 )
 
 // ImplementDTOMessage structure to be embedded in a message.
 // Once inlined, the framework will implement the irest.IMessage interface.
-type ImplementDTOMessage struct {
-}
+type ImplementDTOMessage struct{}
 
 func (m ImplementDTOMessage) IsImplementDTOMessage() {}
 
@@ -27,28 +28,21 @@ func (a *AllowMessage) FullName() string {
 	return fmt.Sprintf("%s.%s", a.Package, a.Name)
 }
 
-// DeepCheckSafeMessage checks whether transmitted messages and internal messages are safe.
-// That is, there will be a check of internal structures, in depth to the limit.
-func DeepCheckSafeMessage(dto *DTO, messagePtr typeopr.IPtr) error {
-	if err := dto.IsSafeMessage(messagePtr); err != nil {
-		return err
+// IsSafeMessage checks whether the message is safe.
+// A message is safe if it is in allowed messages.
+func IsSafeMessage(message typeopr.IPtr, allowedMessages []AllowMessage) error {
+	_type := reflect.TypeOf(message.Ptr()).Elem()
+	if !typeopr.IsImplementInterface(message, (*irest.IMessage)(nil)) {
+		return fmt.Errorf("%s message does not implement irest.IMessage interface", _type)
 	}
-	message := messagePtr.Ptr()
-	_type := reflect.TypeOf(message).Elem()
-	value := reflect.ValueOf(message).Elem()
 	// If the message type is passed through the irest.IMessage interface.
 	if _type == reflect.TypeOf((*irest.IMessage)(nil)).Elem() {
-		_type = reflect.TypeOf(reflect.ValueOf(message).Elem())
-		value = reflect.ValueOf(value.Interface())
+		_type = reflect.TypeOf(reflect.ValueOf(message.Ptr()).Elem().Interface())
 	}
-	for i := 0; i < _type.NumField(); i++ {
-		field := _type.Field(i)
-		v := value.Field(i)
-		if field.Type.Kind() == reflect.Struct && !reflect.DeepEqual(field.Type, reflect.TypeOf(ImplementDTOMessage{})) {
-			if err := DeepCheckSafeMessage(dto, typeopr.Ptr{}.New(v.Addr().Interface())); err != nil {
-				return err
-			}
-		}
+	typeInfo := strings.Split(_type.String(), ".")
+	msg := AllowMessage{Package: typeInfo[0], Name: typeInfo[1]}
+	if !fslice.SliceContains(allowedMessages, msg) {
+		return fmt.Errorf("%s message is unsafe", msg.FullName())
 	}
 	return nil
 }

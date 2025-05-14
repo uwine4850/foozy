@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"slices"
 	"sync"
 	"text/template"
 
@@ -12,8 +13,6 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces/irest"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router/form"
-	"github.com/uwine4850/foozy/pkg/typeopr"
-	"github.com/uwine4850/foozy/pkg/utils/fslice"
 )
 
 var (
@@ -32,13 +31,23 @@ export interface {{.Name}} {
 {{- end}}
 `
 
-// DTO(Data Transfer Object) generates a typescript interface using message.
-// For proper operation, you need to make sure that the allowed messages match the transmitted ones.
-// It is important to understand that allowed messages must ALL be used, that is, if a message is allowed, it must always be used when generated.
-// Any dependencies also need to be included in resolved messages and they must be in the same file as the parent object.
+// DTO (Data Transfer Object) generates a typescript interface using a message.
+// For proper operation, you must make sure that the allowed messages match the
+// transferred messages.
+//
+// IMPORTANT: Allowed messages [AllowedMessages] must be exactly the same as the
+// messages to generate [Messages].  This is only needed during genarration.
+// If no generation is taking place, you can use the allowed [AllowedMessages] alone.
+//
+// Any dependencies must also be included in the allowed messages, and they must be
+// in the same file as the parent object. Importing from other files is not allowed.
+//
+// Structure fields must have the `dto:“<field_name>”` tag for successful generation.
+// Where <field_name> is the name of the field in the typescript interface.
+// If the tag is not added, the field will simply be skipped during generation.
 type DTO struct {
 	allowedMessages []AllowMessage
-	messages        map[string]*[]irest.IMessage
+	messages        map[string][]irest.IMessage
 	isGenerated     bool
 }
 
@@ -50,10 +59,9 @@ func NewDTO() *DTO {
 }
 
 // AllowedMessages list of allowed messages for generation.
+// These messages will be checked before using the message,
+// if it is not in this list, an error will be raised.
 func (d *DTO) AllowedMessages(messages []AllowMessage) {
-	if d.allowedMessages != nil {
-		panic("AllowedMessages can only be call once")
-	}
 	d.allowedMessages = messages
 }
 
@@ -62,29 +70,28 @@ func (d *DTO) GetAllowedMessages() []AllowMessage {
 }
 
 // Messages a list of messages that will be used for generation.
-func (d *DTO) Messages(messages map[string]*[]irest.IMessage) {
-	if d.messages != nil {
-		panic("Messages can only be call once")
-	}
+// So will check the generation allowances for each message.
+func (d *DTO) Messages(messages map[string][]irest.IMessage) {
 	d.messages = messages
 }
 
 // Generate start of generation.
+// Uses a template to generate typescript interfaces.
 func (d *DTO) Generate() error {
 	if d.isGenerated {
-		panic("Generate can only be call once")
+		return ErrMultipleGenerateCall{}
 	}
-	allGeneretedAllowMessages := []AllowMessage{}
+	allGeneratedAllowMessages := []AllowMessage{}
 	acceptMessages := map[string][]genMessage{}
 	for path, messages := range d.messages {
-		generetedMessaages, generetedAllowMessages, err := d.getGenMessaages(messages)
+		generatedMessages, generetedAllowMessages, err := d.getGenMessages(messages)
 		if err != nil {
 			return err
 		}
-		allGeneretedAllowMessages = append(allGeneretedAllowMessages, generetedAllowMessages...)
-		acceptMessages[path] = generetedMessaages
+		allGeneratedAllowMessages = append(allGeneratedAllowMessages, generetedAllowMessages...)
+		acceptMessages[path] = generatedMessages
 	}
-	if err := d.validateGeneratedMessage(allGeneretedAllowMessages); err != nil {
+	if err := d.validateGeneratedMessage(allGeneratedAllowMessages); err != nil {
 		return err
 	}
 	for path, genMessages := range acceptMessages {
@@ -103,64 +110,51 @@ func (d *DTO) Generate() error {
 	return nil
 }
 
-// IsSafeMessage checks whether the message is safe.
-// A message is safe if it is in allowed messages.
-func (d *DTO) IsSafeMessage(message typeopr.IPtr) error {
-	_type := reflect.TypeOf(message.Ptr()).Elem()
-	if !typeopr.IsImplementInterface(message, (*irest.IMessage)(nil)) {
-		return fmt.Errorf("%s message does not implement irest.IMessage interface", _type)
-	}
-	// If the message type is passed through the irest.IMessage interface.
-	if _type == reflect.TypeOf((*irest.IMessage)(nil)).Elem() {
-		_type = reflect.TypeOf(reflect.ValueOf(message.Ptr()).Elem().Interface())
-	}
-	typeInfo := strings.Split(_type.String(), ".")
-	msg := AllowMessage{Package: typeInfo[0], Name: typeInfo[1]}
-	if !fslice.SliceContains(d.allowedMessages, msg) {
-		return fmt.Errorf("%s message is unsafe", msg.FullName())
-	}
-	return nil
-}
-
-func (d *DTO) getGenMessaages(messages *[]irest.IMessage) ([]genMessage, []AllowMessage, error) {
+// getGenMessages generates typescript interfaces and stores them
+// in the special structures [genMessage]. Each such structure contains data of one interface.
+// Also returns [AllowMessage]. This structure contains data about one generated DTO message.
+func (d *DTO) getGenMessages(messages []irest.IMessage) ([]genMessage, []AllowMessage, error) {
 	generatedMessages := []genMessage{}
 	generatedAllowMessages := []AllowMessage{}
-	for i := 0; i < len(*messages); i++ {
-		_type := reflect.TypeOf((*messages)[i])
+	for i := 0; i < len(messages); i++ {
+		_type := reflect.TypeOf((messages)[i])
 		typeInfo := strings.Split(_type.String(), ".")
 
-		allowMessage := AllowMessage{Package: typeInfo[0], Name: typeInfo[1]}
-		if !fslice.SliceContains(d.allowedMessages, allowMessage) {
-			return nil, nil, ErrMessageNotAllowed{MessageType: allowMessage.FullName()}
+		allowedMessage := AllowMessage{Package: typeInfo[0], Name: typeInfo[1]}
+		if !slices.Contains(d.allowedMessages, allowedMessage) {
+			return nil, nil, ErrMessageNotAllowed{MessageType: allowedMessage.FullName()}
 		}
 		var genMsg genMessage
 		genMsg.Name = _type.Name()
 		for i := 0; i < _type.NumField(); i++ {
+			// Skip implemetation object.
 			if _type.Field(i).Type == reflect.TypeOf(ImplementDTOMessage{}) {
 				continue
 			}
-			cnvType, err := d.convertType(_type.Field(i).Type, messages, allowMessage)
+			cnvType, err := d.convertType(_type.Field(i).Type, messages, allowedMessage)
 			if err != nil {
 				return nil, nil, err
 			}
-			messageField := genMessageField{Type: cnvType}
 			if tagFieldName := _type.Field(i).Tag.Get(namelib.TAGS.REST_MAPPER_NAME); tagFieldName != "" {
+				// Formation of the [genMessageField] structure.
+				messageField := genMessageField{Type: cnvType}
 				messageField.Name = tagFieldName
+				genMsg.Fields = append(genMsg.Fields, messageField)
 			} else {
-				messageField.Name = _type.Field(i).Name
+				// Skip if tag no exists.
+				continue
 			}
-			genMsg.Fields = append(genMsg.Fields, messageField)
 		}
 		if len(genMsg.Fields) == 0 {
-			return nil, nil, ErrNumberOfFields{MessageType: allowMessage.FullName()}
+			return nil, nil, ErrNumberOfFields{MessageType: allowedMessage.FullName()}
 		}
 		generatedMessages = append(generatedMessages, genMsg)
-		generatedAllowMessages = append(generatedAllowMessages, allowMessage)
+		generatedAllowMessages = append(generatedAllowMessages, allowedMessage)
 	}
 	return generatedMessages, generatedAllowMessages, nil
 }
 
-func (d *DTO) convertType(goType reflect.Type, messages *[]irest.IMessage, mainMessage AllowMessage) (string, error) {
+func (d *DTO) convertType(goType reflect.Type, messages []irest.IMessage, mainMessage AllowMessage) (string, error) {
 	switch goType.Kind() {
 	case reflect.Int, reflect.Float64, reflect.Float32:
 		return "number", nil
@@ -179,11 +173,11 @@ func (d *DTO) convertType(goType reflect.Type, messages *[]irest.IMessage, mainM
 			return "File | null", nil
 		}
 		typeInfo := strings.Split(goType.String(), ".")
-		if !fslice.SliceContains(d.allowedMessages, AllowMessage{Package: typeInfo[0], Name: typeInfo[1]}) {
+		if !slices.Contains(d.allowedMessages, AllowMessage{Package: typeInfo[0], Name: typeInfo[1]}) {
 			return "", ErrMessageNotAllowed{MessageType: goType.String()}
 		}
-		for i := 0; i < len(*messages); i++ {
-			if reflect.TypeOf((*messages)[i]) == goType {
+		for i := 0; i < len(messages); i++ {
+			if reflect.TypeOf((messages)[i]) == goType {
 				return fmt.Sprintf("%s | undefined", goType.Name()), nil
 			}
 		}
@@ -197,15 +191,17 @@ func (d *DTO) convertType(goType reflect.Type, messages *[]irest.IMessage, mainM
 		if err != nil {
 			return "", err
 		}
-		return fmt.Sprintf("Map<%s, %s>", cnvKeyType, cnvValueType), nil
+		return fmt.Sprintf("Record<%s, %s>", cnvKeyType, cnvValueType), nil
 	default:
-		panic(fmt.Sprintf("%s data type is not supported", goType))
+		return "", fmt.Errorf("unsupported data type: %s", goType.String())
 	}
 }
 
+// validateGeneratedMessage validation of generated messages.
+// Checks if the generated messages match the allowed messages.
 func (d *DTO) validateGeneratedMessage(generatedMessage []AllowMessage) error {
 	for i := 0; i < len(d.allowedMessages); i++ {
-		if !fslice.SliceContains(generatedMessage, d.allowedMessages[i]) {
+		if !slices.Contains(generatedMessage, d.allowedMessages[i]) {
 			return ErrMessageNotImplemented{MessageType: d.allowedMessages[i].FullName()}
 		}
 	}
@@ -253,4 +249,10 @@ type ErrMessageNotImplemented struct {
 
 func (e ErrMessageNotImplemented) Error() string {
 	return fmt.Sprintf("%s message not implemented", e.MessageType)
+}
+
+type ErrMultipleGenerateCall struct{}
+
+func (e ErrMultipleGenerateCall) Error() string {
+	return "generate can only be called once"
 }

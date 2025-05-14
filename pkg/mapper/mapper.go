@@ -3,6 +3,8 @@ package mapper
 import (
 	"reflect"
 	"sync"
+
+	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
 // RawObject is used to store data of type undefined structure.
@@ -40,17 +42,15 @@ func (s *SomeRawObject) Fields() *map[string]reflect.StructField {
 	return s.fields
 }
 
-var typeReflectValue = reflect.TypeOf(&reflect.Value{}).Elem()
-
 // NewSomeRawObjectWithTag creates and fills a new instance of [SomeRawObject] from a given object.
 // Accepts an object as a direct instance or reflect.Value object.
-
+//
 // Only fields that have the `<tag_name>:<field_name>` tag will be stored.
 // This tag must contain the names of the column in the table, for which
 // the structure field is intended. The names must exactly match.
 // If there is no tag, the field will be simply skipped.
 func NewSomeRawObjectWithTag[T any](target *T, tagName string) RawObject {
-	t := getFillStructRV(target).Type()
+	t := typeopr.GetReflectValue(target).Type()
 	fields := make(map[string]reflect.StructField)
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
@@ -67,9 +67,9 @@ func NewSomeRawObjectWithTag[T any](target *T, tagName string) RawObject {
 	}
 }
 
-// LoadRawObjectFromCache loads an object from the selected cache.
+// LoadSomeRawObjectFromCache loads an object from the selected cache.
 // If the object is not in the cache, creates a RawObject for it and sets it.
-func LoadRawObjectFromCache(objectValue reflect.Value, rawCache *sync.Map, tagName string) RawObject {
+func LoadSomeRawObjectFromCache(objectValue reflect.Value, rawCache *sync.Map, tagName string) RawObject {
 	var raw RawObject
 	objectType := objectValue.Type()
 	if storedRaw, ok := rawCache.Load(objectType); ok {
@@ -79,16 +79,4 @@ func LoadRawObjectFromCache(objectValue reflect.Value, rawCache *sync.Map, tagNa
 		rawCache.Store(objectType, raw)
 	}
 	return raw
-}
-
-// getFillStructRV returns reflect.Value from the passed structure.
-// Object references or reflect.Value are accepted.
-func getFillStructRV[T any](target *T) reflect.Value {
-	var v reflect.Value
-	if reflect.TypeOf(*target) == typeReflectValue {
-		v = *reflect.ValueOf(target).Interface().(*reflect.Value)
-	} else {
-		v = reflect.ValueOf(target).Elem()
-	}
-	return v
 }

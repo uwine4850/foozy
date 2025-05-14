@@ -10,6 +10,7 @@ import (
 
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router/form"
+	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
 var formFileType = reflect.TypeOf(form.FormFile{})
@@ -45,8 +46,8 @@ var FC FormConverter
 func FillStructFromForm[T any](frm *form.Form, out *T) error {
 	of := FrmValueToOrderedForm(frm)
 
-	v := getFillStructRV(out)
-	raw := LoadRawObjectFromCache(v, &frmRawCache, namelib.TAGS.FORM_MAPPER_NAME)
+	v := typeopr.GetReflectValue(out)
+	raw := LoadSomeRawObjectFromCache(v, &frmRawCache, namelib.TAGS.FORM_MAPPER_NAME)
 
 	for name, f := range *raw.Fields() {
 		fieldValue := v.FieldByName(f.Name)
@@ -74,8 +75,8 @@ func FillStructFromForm[T any](frm *form.Form, out *T) error {
 // To work, you need to add an ext tag with the necessary extensions (if there are many, separated by commas).
 // For example, ext:".jpg .jpeg .png".
 func CheckExtension[T any](filledStruct *T) error {
-	v := getFillStructRV(filledStruct)
-	raw := LoadRawObjectFromCache(v, &frmRawCache, namelib.TAGS.FORM_MAPPER_NAME)
+	v := typeopr.GetReflectValue(filledStruct)
+	raw := LoadSomeRawObjectFromCache(v, &frmRawCache, namelib.TAGS.FORM_MAPPER_NAME)
 
 	for _, f := range *raw.Fields() {
 		fieldValue := v.FieldByName(f.Name)

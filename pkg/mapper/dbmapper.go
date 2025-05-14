@@ -38,8 +38,8 @@ func FillStructSliceFromDb[T any](slice *[]T, dbRes *[]map[string]interface{}) e
 // Caches the structure using the implemented [RawObject] interface.
 // This means that all subsequent accesses to this structure will be faster.
 func FillStructFromDb[T any](fillStruct *T, dbRes *map[string]interface{}) error {
-	v := getFillStructRV(fillStruct)
-	raw := LoadRawObjectFromCache(v, &dbRawCache, namelib.TAGS.DB_MAPPER_NAME)
+	v := typeopr.GetReflectValue(fillStruct)
+	raw := LoadSomeRawObjectFromCache(v, &dbRawCache, namelib.TAGS.DB_MAPPER_NAME)
 
 	for name, f := range *raw.Fields() {
 		field := v.FieldByName(f.Name)
