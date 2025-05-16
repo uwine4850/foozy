@@ -2,7 +2,46 @@ package interfaces
 
 import (
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
+	"github.com/uwine4850/foozy/pkg/interfaces/itypeopr"
 )
+
+type IDatabase interface {
+	IReadDatabase
+	IOpenCloseDatabase
+}
+
+type ISyncAsync interface {
+	// SyncQ gives access to [ISyncQueries].
+	// Unlike [NewAsyncQ], it does not create any new instances,
+	// but simply provides access to one shared instance.
+	SyncQ() ISyncQueries
+	// NewAsyncQ NewAsyncQ creates a new instance of [IAsyncQueries]
+	// for asynchronous queries. The new instance is created using
+	// the [INewInstance] interface.
+	NewAsyncQ() (IAsyncQueries, error)
+}
+
+type IReadDatabase interface {
+	ISyncAsync
+	// NewTransaction creates a new transaction instance.
+	// Creating a new [ITransaction] object for each transaction
+	// is necessary for data security reasons.
+	// That is, for each new transaction a new instance of [ITransaction]
+	// should be created, which works in its own scope. This behavior prevents any data leaks.
+	NewTransaction() ITransaction
+}
+
+type ITransaction interface {
+	ISyncAsync
+	BeginTransaction() error
+	CommitTransaction() error
+	RollBackTransaction() error
+}
+
+type IOpenCloseDatabase interface {
+	Open() error
+	Close() error
+}
 
 // IDbQuery an interface represents any object that can query a database.
 type IDbQuery interface {
@@ -25,6 +64,7 @@ type ISyncQueries interface {
 }
 
 type IAsyncQueries interface {
+	itypeopr.INewInstance
 	SetSyncQueries(queries ISyncQueries)
 	Wait()
 	LoadAsyncRes(key string) (*dbutils.AsyncQueryData, bool)

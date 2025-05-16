@@ -61,7 +61,7 @@ func clear() {
 }
 
 func TestMain(m *testing.M) {
-	err := db.Connect()
+	err := db.Open()
 	if err != nil {
 		panic(err)
 	}

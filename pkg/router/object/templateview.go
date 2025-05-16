@@ -34,14 +34,6 @@ func (v *TemplateView) Call(w http.ResponseWriter, r *http.Request, manager inte
 	if v.View == nil {
 		panic("the ITemplateView field must not be nil")
 	}
-	defer func() {
-		debug.RequestLogginIfEnable(debug.P_OBJECT, "close template view database")
-		err := v.View.CloseDb()
-		if err != nil {
-			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
-			v.View.OnError(w, r, manager, err)
-		}
-	}()
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "handle object")
 	objectContext, err := v.View.Object(w, r, manager)
 	if err != nil {
@@ -97,14 +89,6 @@ func (v *TemplateRedirectView) Call(w http.ResponseWriter, r *http.Request, mana
 	if v.View == nil {
 		panic("the ITemplateView field must not be nil")
 	}
-	defer func() {
-		debug.RequestLogginIfEnable(debug.P_OBJECT, "close template view database")
-		err := v.View.CloseDb()
-		if err != nil {
-			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
-			v.View.OnError(w, r, manager, err)
-		}
-	}()
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "handle object")
 	objectContext, err := v.View.Object(w, r, manager)
 	if err != nil {
@@ -147,15 +131,6 @@ type JsonObjectTemplateView struct {
 }
 
 func (v *JsonObjectTemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-	defer func() {
-		debug.RequestLogginIfEnable(debug.P_OBJECT, "close view database")
-		err := v.View.CloseDb()
-		if err != nil {
-			v.View.OnError(w, r, manager, err)
-			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
-			return
-		}
-	}()
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "run JsonObjectTemplateView")
 	onError, viewObject, viewContext := baseParseView(v.View, w, r, manager)
 	if onError != nil {
@@ -216,15 +191,6 @@ type JsonMultipleObjectTemplateView struct {
 }
 
 func (v *JsonMultipleObjectTemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-	defer func() {
-		debug.RequestLogginIfEnable(debug.P_OBJECT, "close view database")
-		err := v.View.CloseDb()
-		if err != nil {
-			v.View.OnError(w, r, manager, err)
-			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
-			return
-		}
-	}()
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "run JsonMultipleObjectTemplateView")
 	onError, viewObject, viewContext := baseParseView(v.View, w, r, manager)
 	if onError != nil {
@@ -293,15 +259,6 @@ type JsonAllTemplateView struct {
 }
 
 func (v *JsonAllTemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-	defer func() {
-		debug.RequestLogginIfEnable(debug.P_OBJECT, "close view database")
-		err := v.View.CloseDb()
-		if err != nil {
-			v.View.OnError(w, r, manager, err)
-			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
-			return
-		}
-	}()
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "run JsonAllTemplateView")
 	onError, viewObject, viewContext := baseParseView(v.View, w, r, manager)
 	if onError != nil {
@@ -335,7 +292,7 @@ func (v *JsonAllTemplateView) Call(w http.ResponseWriter, r *http.Request, manag
 			fmap.MergeMap((*map[string]interface{})(&contextBuff), viewContext)
 			contextSliceMap = append(contextSliceMap, contextBuff)
 		}
-		manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_CONTEXT, contextSliceMap[0])
+		manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_CONTEXT, contextSliceMap)
 		for i := 0; i < len(contextSliceMap); i++ {
 			filledMessage, err := fillMessage(v.DTO, &contextSliceMap[i], v.Message)
 			if err != nil {

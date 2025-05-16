@@ -58,6 +58,9 @@ func Cnf() *Config {
 					ErrorLoggingPath:   "errors.log",
 					RequestInfoLogPath: "request.log",
 				},
+				Database: DatabaseConfig{
+					MainConnectionPoolName: "main",
+				},
 			},
 		}
 	})
@@ -66,7 +69,8 @@ func Cnf() *Config {
 
 // DefaultConfig a standard set of configurations.
 type DefaultConfig struct {
-	Debug DebugConfig `yaml:"Debug"`
+	Debug    DebugConfig    `yaml:"Debug"`
+	Database DatabaseConfig `yaml:"Database"`
 }
 
 type DebugConfig struct {
@@ -78,6 +82,10 @@ type DebugConfig struct {
 	RequestInfoLog        bool   `yaml:"RequestInfoLog" i:"Enables request logging"`
 	RequestInfoLogPath    string `yaml:"RequestInfoLogPath" i:"Path to request log file"`
 	SkipLoggingLevel      int    `yaml:"SkipLoggingLevel" i:"Skips logging levels. May need to be configured per project"`
+}
+
+type DatabaseConfig struct {
+	MainConnectionPoolName string `yaml:"MainConnectionPoolName" i:"The name of the main connection pool"`
 }
 
 // Info displays information about each command.

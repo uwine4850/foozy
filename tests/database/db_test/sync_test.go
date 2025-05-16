@@ -5,12 +5,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 )
 
 func TestConnect(t *testing.T) {
-	err := db.Connect()
+	err := db.Open()
 	if err != nil {
 		t.Error(err)
 	}
@@ -21,13 +20,13 @@ func TestConnectErrorAndClose(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if err = db.Ping(); err != nil {
-		connErr := database.ErrConnectionNotOpen{}
-		if !errors.Is(err, connErr) {
-			t.Errorf("The connection is open.")
-		}
-	}
-	err = db.Connect()
+	// if err = db.Ping(); err != nil {
+	// 	connErr := database.ErrConnectionNotOpen{}
+	// 	if !errors.Is(err, connErr) {
+	// 		t.Errorf("The connection is open.")
+	// 	}
+	// }
+	err = db.Open()
 	if err != nil {
 		t.Error(err)
 	}

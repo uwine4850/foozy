@@ -4,12 +4,11 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/uwine4850/foozy/pkg/database"
+	"github.com/uwine4850/foozy/pkg/config"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/debug"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/mapper"
-	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
@@ -18,20 +17,10 @@ import (
 // If the [slug] parameter is not set, all data from the table will be output.
 type AllView struct {
 	BaseView
-	Name       string             `notdef:"true"`
-	DB         *database.Database `notdef:"true"`
-	TableName  string             `notdef:"true"`
+	Name       string `notdef:"true"`
+	TableName  string `notdef:"true"`
 	Slug       string
 	FillStruct interface{} `notdef:"true"`
-}
-
-func (v *AllView) CloseDb() error {
-	if v.DB != nil {
-		if err := v.DB.Close(); err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 func (v *AllView) ObjectsName() []string {
@@ -41,13 +30,12 @@ func (v *AllView) ObjectsName() []string {
 // Object sets a slice of rows from the database.
 func (v *AllView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (Context, error) {
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "run AllView object")
-	err := v.DB.Connect()
+	dbRead, err := manager.Database().ConnectionPool(config.LoadedConfig().Default.Database.MainConnectionPoolName)
 	if err != nil {
 		return nil, err
 	}
-	manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_DB, v.DB)
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "get object from database")
-	qObjects := qb.NewSyncQB(v.DB.SyncQ())
+	qObjects := qb.NewSyncQB(dbRead.SyncQ())
 	if v.Slug != "" {
 		slugValue, ok := manager.OneTimeData().GetSlugParams(v.Slug)
 		if !ok {

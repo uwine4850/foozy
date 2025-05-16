@@ -12,6 +12,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/builtin/auth"
 	"github.com/uwine4850/foozy/pkg/builtin/bglobalflow"
 	"github.com/uwine4850/foozy/pkg/builtin/builtin_mddl"
+	"github.com/uwine4850/foozy/pkg/config"
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
@@ -32,12 +33,15 @@ var newRouter = router.NewRouter(mng)
 func TestMain(m *testing.M) {
 	testinitcnf.InitCnf()
 	_db := database.NewDatabase(tconf.DbArgs)
-	if err := _db.Connect(); err != nil {
+	if err := _db.Open(); err != nil {
 		panic(err)
 	}
 	defer _db.Close()
+	if err := database.InitDatabasePool(mng, _db); err != nil {
+		panic(err)
+	}
 
-	if err := auth.CreateAuthTable(_db); err != nil {
+	if err := auth.CreateAuthTable(_db, tconf.DbArgs.DatabaseName); err != nil {
 		panic(err)
 	}
 	_, err := _db.SyncQ().Query(fmt.Sprintf("TRUNCATE TABLE %s", namelib.AUTH.AUTH_TABLE))
@@ -47,20 +51,20 @@ func TestMain(m *testing.M) {
 	mng.Key().Generate32BytesKeys()
 
 	mddlDb := database.NewDatabase(tconf.DbArgs)
-	if err := mddlDb.Connect(); err != nil {
+	if err := mddlDb.Open(); err != nil {
 		panic(err)
 	}
 	defer mddlDb.Close()
 	mddl := middlewares.NewMiddleware()
-	mddl.SyncMddl(0, builtin_mddl.Auth([]string{"/login"}, mddlDb, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+	mddl.SyncMddl(0, builtin_mddl.Auth([]string{"/login"}, func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
 		middlewares.SetMddlError(err, manager.OneTimeData())
 	}))
 
-	newRouter.Get("/register", register(_db))
-	newRouter.Get("/login", login(_db))
+	newRouter.Get("/register", register())
+	newRouter.Get("/login", login())
 	newRouter.Get("/uid", uid())
 	newRouter.Get("/upd-keys", updKeys())
-	newRouter.Get("/user-by-id", userById(_db))
+	newRouter.Get("/user-by-id", userById())
 	serv := server.NewServer(tconf.PortAuth, newRouter, nil)
 	go func() {
 		err = serv.Start()
@@ -79,12 +83,19 @@ func TestMain(m *testing.M) {
 	}
 }
 
-func register(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func register() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		if err := auth.CreateAuthTable(db); err != nil {
+		dbRead, err := manager.Database().ConnectionPool(config.LoadedConfig().Default.Database.MainConnectionPoolName)
+		if err != nil {
 			return func() { router.ServerError(w, err.Error(), manager) }
 		}
-		au := auth.NewAuth(db, w, mng)
+		if err := auth.CreateAuthTable(dbRead, tconf.DbArgs.DatabaseName); err != nil {
+			return func() { router.ServerError(w, err.Error(), manager) }
+		}
+		au, err := auth.NewAuth(w, mng)
+		if err != nil {
+			return func() { router.ServerError(w, err.Error(), manager) }
+		}
 		if _, err := au.RegisterUser("test", "111111"); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager) }
 		}
@@ -92,9 +103,12 @@ func register(db *database.Database) func(w http.ResponseWriter, r *http.Request
 	}
 }
 
-func login(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func login() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		au := auth.NewAuth(db, w, mng)
+		au, err := auth.NewAuth(w, mng)
+		if err != nil {
+			return func() { router.ServerError(w, err.Error(), manager) }
+		}
 		if usr, err := au.LoginUser("test", "111111"); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager) }
 		} else {
@@ -129,9 +143,13 @@ func updKeys() func(w http.ResponseWriter, r *http.Request, manager interfaces.I
 	}
 }
 
-func userById(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func userById() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		user, err := auth.UserByID(db, 1)
+		dbRead, err := manager.Database().ConnectionPool(config.LoadedConfig().Default.Database.MainConnectionPoolName)
+		if err != nil {
+			panic(err)
+		}
+		user, err := auth.UserByID(dbRead, 1)
 		if err != nil {
 			panic(err)
 		}

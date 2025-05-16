@@ -15,7 +15,6 @@ type Context map[string]interface{}
 // For the view to work correctly, you need to create a new structure (for example MyObjView), embed a ready-made implementation of the view
 // (for example ObjView) into it, then you need to initialize this structure in the ITemplateView field in the TemplateView data type.
 type IView interface {
-	CloseDb() error
 	// Object receives data from the selected table and writes it to a variable structure.
 	// IMPORTANT: connects to the database in this method (or others), but closes the connection only in the TemplateView.
 	Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (Context, error)

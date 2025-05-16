@@ -4,12 +4,11 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/uwine4850/foozy/pkg/database"
+	"github.com/uwine4850/foozy/pkg/config"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/debug"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/mapper"
-	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 	"github.com/uwine4850/foozy/pkg/utils/fstruct"
 )
@@ -25,17 +24,7 @@ type MultipleObject struct {
 type MultipleObjectView struct {
 	BaseView
 
-	DB              *database.Database `notdef:"true"`
-	MultipleObjects []MultipleObject   `notdef:"true"`
-}
-
-func (v *MultipleObjectView) CloseDb() error {
-	if v.DB != nil {
-		if err := v.DB.Close(); err != nil {
-			return err
-		}
-	}
-	return nil
+	MultipleObjects []MultipleObject `notdef:"true"`
 }
 
 func (v *MultipleObjectView) ObjectsName() []string {
@@ -52,11 +41,10 @@ func (v *MultipleObjectView) Object(w http.ResponseWriter, r *http.Request, mana
 		return nil, err
 	}
 	context := make(Context)
-	err := v.DB.Connect()
+	dbRead, err := manager.Database().ConnectionPool(config.LoadedConfig().Default.Database.MainConnectionPoolName)
 	if err != nil {
 		return nil, err
 	}
-	manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_DB, v.DB)
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "start fill objects")
 	for i := 0; i < len(v.MultipleObjects); i++ {
 		if typeopr.IsPointer(v.MultipleObjects[i].FillStruct) {
@@ -66,7 +54,7 @@ func (v *MultipleObjectView) Object(w http.ResponseWriter, r *http.Request, mana
 		if !ok {
 			return nil, ErrNoSlug{v.MultipleObjects[i].SlugName}
 		}
-		qRes := qb.NewSyncQB(v.DB.SyncQ()).SelectFrom("*", v.MultipleObjects[i].TaleName).Where(
+		qRes := qb.NewSyncQB(dbRead.SyncQ()).SelectFrom("*", v.MultipleObjects[i].TaleName).Where(
 			qb.Compare(v.MultipleObjects[i].SlugField, qb.EQUAL, slugValue),
 		).Limit(1)
 		qRes.Merge()

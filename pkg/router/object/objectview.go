@@ -5,12 +5,11 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/uwine4850/foozy/pkg/database"
+	"github.com/uwine4850/foozy/pkg/config"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/debug"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/mapper"
-	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
@@ -19,20 +18,10 @@ import (
 type ObjView struct {
 	BaseView
 
-	Name       string             `notdef:"true"`
-	DB         *database.Database `notdef:"true"`
-	TableName  string             `notdef:"true"`
-	FillStruct interface{}        `notdef:"true"`
-	Slug       string             `notdef:"true"`
-}
-
-func (v *ObjView) CloseDb() error {
-	if v.DB != nil {
-		if err := v.DB.Close(); err != nil {
-			return err
-		}
-	}
-	return nil
+	Name       string      `notdef:"true"`
+	TableName  string      `notdef:"true"`
+	FillStruct interface{} `notdef:"true"`
+	Slug       string      `notdef:"true"`
 }
 
 func (v *ObjView) ObjectsName() []string {
@@ -44,17 +33,17 @@ func (v *ObjView) Object(w http.ResponseWriter, r *http.Request, manager interfa
 	if typeopr.IsPointer(v.FillStruct) {
 		return nil, typeopr.ErrValueIsPointer{Value: "FillStruct"}
 	}
-	err := v.DB.Connect()
+
+	dbRead, err := manager.Database().ConnectionPool(config.LoadedConfig().Default.Database.MainConnectionPoolName)
 	if err != nil {
 		return nil, err
 	}
-	manager.OneTimeData().SetUserContext(namelib.OBJECT.OBJECT_DB, v.DB)
 
 	slugValue, ok := manager.OneTimeData().GetSlugParams(v.Slug)
 	if !ok {
 		return nil, ErrNoSlug{v.Slug}
 	}
-	qRes := qb.NewSyncQB(v.DB.SyncQ()).SelectFrom("*", v.TableName).Where(
+	qRes := qb.NewSyncQB(dbRead.SyncQ()).SelectFrom("*", v.TableName).Where(
 		qb.Compare(v.Slug, qb.EQUAL, slugValue),
 	).Limit(1)
 	qRes.Merge()

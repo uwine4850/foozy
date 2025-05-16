@@ -2,9 +2,11 @@ package database
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/uwine4850/foozy/pkg/config"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 )
@@ -20,13 +22,8 @@ type DbArgs struct {
 // Database structure for accessing the database.
 // It can send both synchronous and asynchronous queries.
 // IMPORTANT: after the end of work it is necessary to close the connection using Close method.
-//
-// Principle of [db] and [tx] swapping:
-// After the initial initialization, [db] is used. These are standard database queries. If the [BeginTransaction] method is used,
-// the [db] instance will be replaced by the [tx] instance. Then the [CommitTransaction] method changes them back.
-// These instances use the same interface, so they are directly used by the [ISyncQueries] interface, which in turn is used by
-// the [IAsyncQueries] interface.
-// The main difference between [db] and [tx] objects is that the latter is used for the ability to cancel database transactions.
+// For each transaction a new instance of the [interfaces.ITransaction] object is created,
+// so each transaction is executed in its own scope and is completely safe.
 type Database struct {
 	username string
 	password string
@@ -39,15 +36,16 @@ type Database struct {
 	asyncQ   interfaces.IAsyncQueries
 }
 
-func NewDatabase(args DbArgs) *Database {
+func NewDatabase(args DbArgs, syncQ interfaces.ISyncQueries, asyncQ interfaces.IAsyncQueries) *Database {
 	d := Database{username: args.Username, password: args.Password, host: args.Host, port: args.Port, database: args.DatabaseName}
-	d.SetSyncQueries(NewSyncQueries())
+	d.syncQ = syncQ
+	d.asyncQ = asyncQ
 	return &d
 }
 
-// Connect connecting to a mysql database.
+// Open connecting to a mysql database.
 // Also, initialization of synchronous and asynchronous queries.
-func (d *Database) Connect() error {
+func (d *Database) Open() error {
 	connStr := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", d.username, d.password, d.host, d.port, d.database)
 	db, err := sql.Open("mysql", connStr)
 	if err != nil {
@@ -59,24 +57,7 @@ func (d *Database) Connect() error {
 		return err
 	}
 	d.db = db
-	// AsyncQueries should be installed exactly when a new connection to the database is made.
-	// This is mandatory because AsyncQueries contains the results of queries,
-	// so you need to create a new instance for this object to make the data unique for each user.
-	// SyncQueries does not store query data in the object, so there is no need to initialize it every connection.
-	d.SetAsyncQueries(NewAsyncQueries())
 	d.syncQ.SetDB(&DbQuery{DB: db})
-	d.asyncQ.SetSyncQueries(d.syncQ)
-	return nil
-}
-
-func (d *Database) Ping() error {
-	if d.db == nil {
-		return ErrConnectionNotOpen{}
-	}
-	err := d.db.Ping()
-	if err != nil {
-		return ErrConnectionNotOpen{}
-	}
 	return nil
 }
 
@@ -88,58 +69,16 @@ func (d *Database) Close() error {
 	}
 	if d.tx != nil {
 		if err := d.tx.Rollback(); err != nil {
-			return nil
+			return err
 		}
 		d.tx = nil
 	}
 	return nil
 }
 
-// BeginTransaction begins executing a transaction.
-// Changes the executable object for database queries, so all queries that run under this method will use *sql.Tx.
-func (d *Database) BeginTransaction() {
-	tx, err := d.db.Begin()
-	if err != nil {
-		panic(err)
-	}
-	d.syncQ.SetDB(&DbTxQuery{Tx: tx})
-	d.asyncQ.SetSyncQueries(d.syncQ)
-	d.tx = tx
-}
-
-// CommitTransaction records changes in the database.
-// This method ends the transaction and changes the executable query object from *sql.Tx to *sql.DB.
-// Therefore, all the following queries are executed using *sql.DB.
-func (d *Database) CommitTransaction() error {
-	if err := d.tx.Commit(); err != nil {
-		return err
-	}
-	d.tx = nil
-	d.syncQ.SetDB(&DbQuery{DB: d.db})
-	d.asyncQ.SetSyncQueries(d.syncQ)
-	return nil
-}
-
-// RollBackTransaction rolls back changes made by commands AFTER CALLING BeginTransaction().
-// This method ends the transaction and changes the executable query object from *sql.Tx to *sql.DB.
-func (d *Database) RollBackTransaction() error {
-	if err := d.tx.Rollback(); err != nil {
-		return err
-	}
-	d.tx = nil
-	d.syncQ.SetDB(&DbQuery{DB: d.db})
-	d.asyncQ.SetSyncQueries(d.syncQ)
-	return nil
-}
-
-// SetSyncQueries sets the synchronous query interface.
-func (d *Database) SetSyncQueries(q interfaces.ISyncQueries) {
-	d.syncQ = q
-}
-
-// SetAsyncQueries sets the asynchronous query interface.
-func (d *Database) SetAsyncQueries(q interfaces.IAsyncQueries) {
-	d.asyncQ = q
+// NewTransaction creates a new transaction instance.
+func (d *Database) NewTransaction() interfaces.ITransaction {
+	return NewMysqlTransaction(d.db, d.syncQ, d.asyncQ)
 }
 
 // SyncQ getting access to synchronous requests.
@@ -147,17 +86,88 @@ func (d *Database) SyncQ() interfaces.ISyncQueries {
 	return d.syncQ
 }
 
-// AsyncQ getting access to asynchronous requests.
-func (d *Database) AsyncQ() interfaces.IAsyncQueries {
-	return d.asyncQ
+func (d *Database) NewAsyncQ() (interfaces.IAsyncQueries, error) {
+	aq, err := d.asyncQ.New()
+	if err != nil {
+		return nil, err
+	}
+	return aq.(interfaces.IAsyncQueries), nil
 }
 
-// DatabaseName Getting the database name.
-func (d *Database) DatabaseName() string {
-	return d.database
+// MysqlTransaction An object that performs transactions
+// to the mysql database.
+// This object is used only for one transaction, for each
+// next transaction a new instance of the object must be created.
+type MysqlTransaction struct {
+	db     *sql.DB
+	tx     *sql.Tx
+	syncQ  interfaces.ISyncQueries
+	asyncQ interfaces.IAsyncQueries
+}
+
+// NewMysqlTransaction creates a new [MysqlTransaction] escamp.
+// For correct creation, it is necessary to pass an already open
+// connection to the database.
+func NewMysqlTransaction(db *sql.DB, syncQ interfaces.ISyncQueries, asyncQ interfaces.IAsyncQueries) *MysqlTransaction {
+	return &MysqlTransaction{
+		db:     db,
+		syncQ:  syncQ,
+		asyncQ: asyncQ,
+	}
+}
+
+// BeginTransaction starts the transaction.
+// Only one transaction can be started per object instance.
+func (t *MysqlTransaction) BeginTransaction() error {
+	if t.tx != nil {
+		return errors.New("transaction already started")
+	}
+	tx, err := t.db.Begin()
+	if err != nil {
+		return err
+	}
+	t.syncQ.SetDB(&DbTxQuery{Tx: tx})
+	t.asyncQ.SetSyncQueries(t.syncQ)
+	t.tx = tx
+	return nil
+}
+
+// CommitTransaction writes the transaction to the database.
+func (t *MysqlTransaction) CommitTransaction() error {
+	if err := t.tx.Commit(); err != nil {
+		return err
+	}
+	t.tx = nil
+	return nil
+}
+
+// RollBackTransaction undoes any changes that were made
+// during the transaction.
+// That is, after executing the [BeginTransaction] method.
+func (t *MysqlTransaction) RollBackTransaction() error {
+	if err := t.tx.Rollback(); err != nil {
+		return err
+	}
+	t.tx = nil
+	return nil
+}
+
+// SyncQ getting access to synchronous requests.
+func (t *MysqlTransaction) SyncQ() interfaces.ISyncQueries {
+	return t.syncQ
+}
+
+// AsyncQ getting access to asynchronous requests.
+func (t *MysqlTransaction) NewAsyncQ() (interfaces.IAsyncQueries, error) {
+	aq, err := t.asyncQ.New()
+	if err != nil {
+		return nil, err
+	}
+	return aq.(interfaces.IAsyncQueries), nil
 }
 
 // DbQuery standard database queries. They are used *sql.DB.
+// Requests are executed as usual.
 type DbQuery struct {
 	DB *sql.DB
 }
@@ -197,6 +207,8 @@ func (d *DbQuery) Exec(query string, args ...any) (map[string]interface{}, error
 }
 
 // DbTxQuery queries that can be rolled back. Used *sql.Tx.
+// This object will perform queries with the [*sql.Tx]
+// object that is used for transactions.
 type DbTxQuery struct {
 	Tx *sql.Tx
 }
@@ -233,7 +245,21 @@ func (d *DbTxQuery) Exec(query string, args ...any) (map[string]interface{}, err
 	if err != nil {
 		return nil, err
 	}
-	return map[string]interface{}{"id": &id, "rows": &rowsId}, nil
+	return map[string]interface{}{"id": id, "rows": rowsId}, nil
+}
+
+// InitDatabasePool initializes a database pool.
+// Only one pool is created, which is specified in the
+// [Default.Database.MainConnectionPoolName] settings.
+// Once created, the pool is locked. Therefore, you need to
+// initialize it manually if you need more connections.
+func InitDatabasePool(manager interfaces.IManager, db interfaces.IDatabase) error {
+	name := config.LoadedConfig().Default.Database.MainConnectionPoolName
+	if err := manager.Database().AddConnection(name, db); err != nil {
+		return err
+	}
+	manager.Database().Lock()
+	return nil
 }
 
 func scanRows(sqlRows *sql.Rows) ([]map[string]interface{}, error) {

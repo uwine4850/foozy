@@ -8,14 +8,29 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces"
 )
 
+// AsyncQueries asynchronous database queries.
+// The [ISyncQueries] is used to implement the queries, only it is wrapped in this object.
+// For each query, you must specify a key by which it can be identified.
+// IMPORTANT_1: it is necessary to call [Wait] method to correctly wait for queries execution.
+// IMPORTANT_2: for each new asynchronous request you must create a separate instance of this object.
+// This is done to protect the user from data leakage, because the object saves user request data
+// and should not be shared.
 type AsyncQueries struct {
 	syncQ    interfaces.ISyncQueries
 	wg       sync.WaitGroup
 	asyncRes sync.Map
 }
 
-func NewAsyncQueries() *AsyncQueries {
-	return &AsyncQueries{}
+func NewAsyncQueries(syncQ interfaces.ISyncQueries) *AsyncQueries {
+	return &AsyncQueries{
+		syncQ: syncQ,
+	}
+}
+
+func (q *AsyncQueries) New() (interface{}, error) {
+	return &AsyncQueries{
+		syncQ: q.syncQ,
+	}, nil
 }
 
 func (q *AsyncQueries) SetSyncQueries(queries interfaces.ISyncQueries) {
@@ -68,9 +83,9 @@ func (q *AsyncQueries) Clear() {
 }
 
 // AsyncResError loads the result of several asynchronous key queries and checks for errors.
-func AsyncResError(keys []string, db *Database) error {
+func AsyncResError(keys []string, asyncQ interfaces.IAsyncQueries) error {
 	for i := 0; i < len(keys); i++ {
-		res, ok := db.AsyncQ().LoadAsyncRes(keys[i])
+		res, ok := asyncQ.LoadAsyncRes(keys[i])
 		if !ok {
 			return errors.New("key for loading the result of asynchronous query not found")
 		}

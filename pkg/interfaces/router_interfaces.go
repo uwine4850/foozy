@@ -17,6 +17,7 @@ type IManager interface {
 	OneTimeData() IManagerOneTimeData
 	SetOneTimeData(manager IManagerOneTimeData)
 	Key() IKey
+	Database() IDatabasePool
 }
 
 type IKey interface {
@@ -38,6 +39,12 @@ type IManagerOneTimeData interface {
 	DelUserContext(key string)
 	SetSlugParams(params map[string]string)
 	GetSlugParams(key string) (string, bool)
+}
+
+type IDatabasePool interface {
+	ConnectionPool(name string) (IReadDatabase, error)
+	AddConnection(name string, rd IReadDatabase) error
+	Lock()
 }
 
 type IWebsocket interface {

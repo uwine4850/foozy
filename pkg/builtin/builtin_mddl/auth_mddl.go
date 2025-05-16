@@ -8,7 +8,6 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/uwine4850/foozy/pkg/builtin/auth"
-	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router/cookies"
@@ -24,7 +23,7 @@ type OnError func(w http.ResponseWriter, r *http.Request, manager interfaces.IMa
 // It is important to note that only previous keys are saved; accordingly, it is impossible to update the encoding
 // if two or more key iterations have passed, because the old keys are no longer known.
 // This middleware should not work on the login page. Therefore, you need to specify the loginUrl correctly.
-func Auth(excludePatterns []string, db *database.Database, onErr OnError) middlewares.MddlFunc {
+func Auth(excludePatterns []string, onErr OnError) middlewares.MddlFunc {
 	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
 		pattern, ok := manager.OneTimeData().GetUserContext(namelib.ROUTER.URL_PATTERN)
 		if !ok {
@@ -43,18 +42,22 @@ func Auth(excludePatterns []string, db *database.Database, onErr OnError) middle
 		d1 := manager.Key().Get32BytesKey().Date().Format("02.01.2006 15:04:05")
 		d2 := auth_date.Format("02.01.2006 15:04:05")
 		if d1 != d2 {
-			cc := database.NewConnectControl()
-			if err := cc.OpenUnnamedConnection(db); err != nil {
+			// cc := database.NewConnectControl()
+			// if err := cc.OpenUnnamedConnection(db); err != nil {
+			// 	onErr(w, r, manager, err)
+			// 	return
+			// }
+			// defer func() {
+			// 	if err := cc.CloseAllUnnamedConnection(); err != nil {
+			// 		onErr(w, r, manager, err)
+			// 		return
+			// 	}
+			// }()
+			_auth, err := auth.NewAuth(w, manager)
+			if err != nil {
 				onErr(w, r, manager, err)
 				return
 			}
-			defer func() {
-				if err := cc.CloseAllUnnamedConnection(); err != nil {
-					onErr(w, r, manager, err)
-					return
-				}
-			}()
-			_auth := auth.NewAuth(db, w, manager)
 			if err := _auth.UpdateAuthCookie([]byte(k.OldHashKey()), []byte(k.OldBlockKey()), r); err != nil {
 				onErr(w, r, manager, err)
 				return

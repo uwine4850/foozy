@@ -7,6 +7,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/uwine4850/foozy/pkg/config"
 	"github.com/uwine4850/foozy/pkg/database"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
@@ -60,7 +61,7 @@ func TestMain(m *testing.M) {
 	})
 
 	db := database.NewDatabase(tconf.DbArgs)
-	if err := db.Connect(); err != nil {
+	if err := db.Open(); err != nil {
 		panic(err)
 	}
 	defer func() {
@@ -68,20 +69,28 @@ func TestMain(m *testing.M) {
 			panic(err)
 		}
 	}()
-	createAndFillTable(db)
-
 	render, err := tmlengine.NewRender()
 	if err != nil {
 		panic(err)
 	}
-	newRouter := router.NewRouter(manager.NewManager(render))
-	newRouter.Get("/object-view/<id>", TObjectViewHNDL(db))
-	newRouter.Get("/object-mul-view/<id>/<id1>", TObjectMultipleViewHNDL(db))
-	newRouter.Get("/object-all-view", TObjectAllViewHNDL(db))
+	newManager := manager.NewManager(render)
+	if err := database.InitDatabasePool(newManager, db); err != nil {
+		panic(err)
+	}
+	dbRead, err := newManager.Database().ConnectionPool(config.LoadedConfig().Default.Database.MainConnectionPoolName)
+	if err != nil {
+		panic(err)
+	}
+	createAndFillTable(dbRead)
+
+	newRouter := router.NewRouter(newManager)
+	newRouter.Get("/object-view/<id>", TObjectViewHNDL())
+	newRouter.Get("/object-mul-view/<id>/<id1>", TObjectMultipleViewHNDL())
+	newRouter.Get("/object-all-view", TObjectAllViewHNDL())
 	newRouter.Post("/object-form-view", MyFormViewHNDL())
-	newRouter.Get("/object-json-view/<id>", TJsonObjectViewHNDL(db))
-	newRouter.Get("/object-mul-json-view/<id>/<id1>", TJsonObjectMultipleViewHNDL(db))
-	newRouter.Get("/object-json-all-view", TJsonObjectAllViewHNDL(db))
+	newRouter.Get("/object-json-view/<id>", TJsonObjectViewHNDL())
+	newRouter.Get("/object-mul-json-view/<id>/<id1>", TJsonObjectMultipleViewHNDL())
+	newRouter.Get("/object-json-all-view", TJsonObjectAllViewHNDL())
 
 	serv := server.NewServer(tconf.PortObject, newRouter, nil)
 	go func() {
@@ -115,31 +124,31 @@ var tableQuery1 = "CREATE TABLE IF NOT EXISTS object_test1 (" +
 	"PRIMARY KEY (id)" +
 	");"
 
-func createAndFillTable(db *database.Database) {
-	if _, err := db.SyncQ().Query(tableQuery); err != nil {
+func createAndFillTable(dbRead interfaces.IReadDatabase) {
+	if _, err := dbRead.SyncQ().Query(tableQuery); err != nil {
 		panic(err)
 	}
-	if _, err := db.SyncQ().Query("TRUNCATE TABLE object_test;"); err != nil {
+	if _, err := dbRead.SyncQ().Query("TRUNCATE TABLE object_test;"); err != nil {
 		panic(err)
 	}
-	q := qb.NewSyncQB(db.SyncQ()).Insert("object_test", map[string]interface{}{"name": "name"})
+	q := qb.NewSyncQB(dbRead.SyncQ()).Insert("object_test", map[string]interface{}{"name": "name"})
 	q.Merge()
 	if _, err := q.Exec(); err != nil {
 		panic(err)
 	}
-	q1 := qb.NewSyncQB(db.SyncQ()).Insert("object_test", map[string]interface{}{"name": "name0"})
+	q1 := qb.NewSyncQB(dbRead.SyncQ()).Insert("object_test", map[string]interface{}{"name": "name0"})
 	q1.Merge()
 	if _, err := q1.Exec(); err != nil {
 		panic(err)
 	}
 
-	if _, err := db.SyncQ().Query(tableQuery1); err != nil {
+	if _, err := dbRead.SyncQ().Query(tableQuery1); err != nil {
 		panic(err)
 	}
-	if _, err := db.SyncQ().Query("TRUNCATE TABLE object_test1;"); err != nil {
+	if _, err := dbRead.SyncQ().Query("TRUNCATE TABLE object_test1;"); err != nil {
 		panic(err)
 	}
-	q2 := qb.NewSyncQB(db.SyncQ()).Insert("object_test1", map[string]interface{}{"name": "name1"})
+	q2 := qb.NewSyncQB(dbRead.SyncQ()).Insert("object_test1", map[string]interface{}{"name": "name1"})
 	q2.Merge()
 	if _, err := q2.Exec(); err != nil {
 		panic(err)
@@ -171,13 +180,12 @@ func (v *TObjectView) Context(w http.ResponseWriter, r *http.Request, manager in
 	return map[string]interface{}{"TEST": "OK"}, nil
 }
 
-func TObjectViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func TObjectViewHNDL() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	view := object.TemplateView{
 		TemplatePath: "./templates/object_view.html",
 		View: &TObjectView{
 			object.ObjView{
 				Name:       "object",
-				DB:         db,
 				TableName:  "object_test",
 				FillStruct: TObjectViewDB{},
 				Slug:       "id",
@@ -225,12 +233,11 @@ func (v *TObjectMultipleView) Context(w http.ResponseWriter, r *http.Request, ma
 	return object.Context{"TEST": "OK"}, nil
 }
 
-func TObjectMultipleViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func TObjectMultipleViewHNDL() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	view := object.TemplateView{
 		TemplatePath: "./templates/object_multiple_view.html",
 		View: &TObjectMultipleView{
 			object.MultipleObjectView{
-				DB: db,
 				MultipleObjects: []object.MultipleObject{
 					{
 						Name:       "object",
@@ -288,13 +295,12 @@ func (v *TObjectAllView) Context(w http.ResponseWriter, r *http.Request, manager
 	return object.Context{"TEST": "OK"}, nil
 }
 
-func TObjectAllViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func TObjectAllViewHNDL() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	view := object.TemplateView{
 		TemplatePath: "./templates/object_all_view.html",
 		View: &TObjectAllView{
 			object.AllView{
 				Name:       "all_object",
-				DB:         db,
 				TableName:  "object_test",
 				FillStruct: TObjectViewDB{},
 			},
@@ -391,12 +397,11 @@ func (v *JsonObjectView) Context(w http.ResponseWriter, r *http.Request, manager
 	return map[string]interface{}{"Test": "OK"}, nil
 }
 
-func TJsonObjectViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func TJsonObjectViewHNDL() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	view := object.JsonObjectTemplateView{
 		View: &JsonObjectView{
 			object.ObjView{
 				Name:       "object",
-				DB:         db,
 				TableName:  "object_test",
 				FillStruct: TObjectViewDB{},
 				Slug:       "id",
@@ -438,11 +443,10 @@ func (v *TJsonObjectMultipleView) Context(w http.ResponseWriter, r *http.Request
 	return object.Context{"Test": "OK"}, nil
 }
 
-func TJsonObjectMultipleViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func TJsonObjectMultipleViewHNDL() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	view := object.JsonMultipleObjectTemplateView{
 		View: &TJsonObjectMultipleView{
 			object.MultipleObjectView{
-				DB: db,
 				MultipleObjects: []object.MultipleObject{
 					{
 						Name:       "object",
@@ -500,12 +504,11 @@ func (v *TJsonObjectAllView) Context(w http.ResponseWriter, r *http.Request, man
 	return object.Context{"Test": "OK"}, nil
 }
 
-func TJsonObjectAllViewHNDL(db *database.Database) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func TJsonObjectAllViewHNDL() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	view := object.JsonAllTemplateView{
 		View: &TJsonObjectAllView{
 			object.AllView{
 				Name:       "all_object",
-				DB:         db,
 				TableName:  "object_test",
 				FillStruct: TObjectViewDB{},
 			},

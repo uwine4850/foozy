@@ -6,9 +6,10 @@ import (
 )
 
 func TestAsyncQuery(t *testing.T) {
-	db.AsyncQ().Query("s", "SELECT `col1`, `col2`, `col3` FROM `db_async_test` LIMIT 1")
-	db.AsyncQ().Wait()
-	res, _ := db.AsyncQ().LoadAsyncRes("s")
+	asyncQ := db.NewAsyncQ()
+	asyncQ.Query("s", "SELECT `col1`, `col2`, `col3` FROM `db_async_test` LIMIT 1")
+	asyncQ.Wait()
+	res, _ := asyncQ.LoadAsyncRes("s")
 	if res.Error != nil {
 		t.Error(res.Error)
 	}

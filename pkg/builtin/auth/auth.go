@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/uwine4850/foozy/pkg/database"
+	"github.com/uwine4850/foozy/pkg/config"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
@@ -36,28 +36,29 @@ type User struct {
 // It can be used to create a user, check the correctness of the login data, change the password and
 // check the availability of the user.
 type Auth struct {
-	database  *database.Database
+	// database  *database.Database
+	dbPool    interfaces.IReadDatabase
 	tableName string
 	w         http.ResponseWriter
 	manager   interfaces.IManager
 }
 
-func NewAuth(database *database.Database, w http.ResponseWriter, manager interfaces.IManager) *Auth {
+func NewAuth(w http.ResponseWriter, manager interfaces.IManager) (*Auth, error) {
 	if !typeopr.IsPointer(manager) {
 		panic("The manager config must be passed by pointer.")
 	}
-	return &Auth{database, namelib.AUTH.AUTH_TABLE, w, manager}
+	db, err := manager.Database().ConnectionPool(config.LoadedConfig().Default.Database.MainConnectionPoolName)
+	if err != nil {
+		return nil, err
+	}
+	return &Auth{db, namelib.AUTH.AUTH_TABLE, w, manager}, nil
 }
 
 // RegisterUser registers the user in the database.
 // It also checks the password and makes sure that there is no user with that login.
 // Returns the ID of the new user.
 func (a *Auth) RegisterUser(username string, password string) (int, error) {
-	err := a.database.Ping()
-	if err != nil {
-		return 0, err
-	}
-	qUser := qb.NewSyncQB(a.database.SyncQ()).SelectFrom("username", a.tableName).Where(
+	qUser := qb.NewSyncQB(a.dbPool.SyncQ()).SelectFrom("username", a.tableName).Where(
 		qb.Compare("username", qb.EQUAL, username),
 	).Limit(1)
 	qUser.Merge()
@@ -78,7 +79,7 @@ func (a *Auth) RegisterUser(username string, password string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	qIns := qb.NewSyncQB(a.database.SyncQ()).Insert(a.tableName, map[string]interface{}{"username": username, "password": hashPass})
+	qIns := qb.NewSyncQB(a.dbPool.SyncQ()).Insert(a.tableName, map[string]interface{}{"username": username, "password": hashPass})
 	qIns.Merge()
 	insertCommand, err := qIns.Exec()
 	if err != nil {
@@ -94,7 +95,7 @@ func (a *Auth) RegisterUser(username string, password string) (int, error) {
 // LoginUser check if the password and login are the same.
 // If there was no error returns an [User] object with user data.
 func (a *Auth) LoginUser(username string, password string) (*User, error) {
-	userDB, err := UserByUsername(a.database, username)
+	userDB, err := UserByUsername(a.dbPool, username)
 	if err != nil {
 		return nil, err
 	}
@@ -152,7 +153,7 @@ func (a *Auth) AddAuthCookie(uid int) error {
 
 // ChangePassword changes the current user password.
 func (a *Auth) ChangePassword(username string, oldPassword string, newPassword string) error {
-	user, err := UserByUsername(a.database, username)
+	user, err := UserByUsername(a.dbPool, username)
 	if err != nil {
 		return err
 	}
@@ -170,7 +171,7 @@ func (a *Auth) ChangePassword(username string, oldPassword string, newPassword s
 	if err != nil {
 		return err
 	}
-	q := qb.NewSyncQB(a.database.SyncQ()).Update(a.tableName, map[string]any{"password": password}).Where(
+	q := qb.NewSyncQB(a.dbPool.SyncQ()).Update(a.tableName, map[string]any{"password": password}).Where(
 		qb.Compare("username", qb.EQUAL, username),
 	)
 	q.Merge()
@@ -183,7 +184,7 @@ func (a *Auth) ChangePassword(username string, oldPassword string, newPassword s
 
 // UserByUsername checks if the user is in the database.
 // If it is found, it returns information about it.
-func UserByUsername(db *database.Database, username string) (map[string]interface{}, error) {
+func UserByUsername(db interfaces.IReadDatabase, username string) (map[string]interface{}, error) {
 	qUser := qb.NewSyncQB(db.SyncQ()).SelectFrom("*", namelib.AUTH.AUTH_TABLE).Where(
 		qb.Compare("username", qb.EQUAL, username),
 	).Limit(1)
@@ -199,8 +200,8 @@ func UserByUsername(db *database.Database, username string) (map[string]interfac
 }
 
 // UserByID searches for a user by ID and returns it.
-func UserByID(db *database.Database, id any) (map[string]interface{}, error) {
-	qUser := qb.NewSyncQB(db.SyncQ()).SelectFrom("*", namelib.AUTH.AUTH_TABLE).Where(
+func UserByID(dbRead interfaces.IReadDatabase, id any) (map[string]interface{}, error) {
+	qUser := qb.NewSyncQB(dbRead.SyncQ()).SelectFrom("*", namelib.AUTH.AUTH_TABLE).Where(
 		qb.Compare("id", qb.EQUAL, id),
 	).Limit(1)
 	qUser.Merge()
@@ -215,12 +216,12 @@ func UserByID(db *database.Database, id any) (map[string]interface{}, error) {
 }
 
 // CreateAuthTable creates a user authentication table.
-func CreateAuthTable(database *database.Database) error {
+func CreateAuthTable(dbRead interfaces.IReadDatabase, databaseName string) error {
 	sql := fmt.Sprintf("CREATE TABLE IF NOT EXISTS `%s`.`%s` "+
 		"(`id` INT NOT NULL AUTO_INCREMENT , "+
 		"`username` VARCHAR(200) NOT NULL , "+
-		"`password` TEXT NOT NULL , PRIMARY KEY (`id`))", database.DatabaseName(), namelib.AUTH.AUTH_TABLE)
-	_, err := database.SyncQ().Query(sql)
+		"`password` TEXT NOT NULL , PRIMARY KEY (`id`))", databaseName, namelib.AUTH.AUTH_TABLE)
+	_, err := dbRead.SyncQ().Query(sql)
 	if err != nil {
 		return err
 	}
