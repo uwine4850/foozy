@@ -22,12 +22,9 @@ type TemplateEngine struct {
 	mu           sync.Mutex
 }
 
-func NewTemplateEngine() (interfaces.ITemplateEngine, error) {
-	newTemplate, err := (&TemplateEngine{}).New()
-	if err != nil {
-		return nil, err
-	}
-	return newTemplate.(interfaces.ITemplateEngine), nil
+func NewTemplateEngine() interfaces.ITemplateEngine {
+	RegisterMultipleGlobalFilter(BuiltinFilters)
+	return &TemplateEngine{context: make(map[string]interface{})}
 }
 
 func (e *TemplateEngine) New() (interface{}, error) {

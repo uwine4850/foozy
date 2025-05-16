@@ -13,7 +13,6 @@ import (
 var mng = manager.NewManager(nil)
 
 func TestMain(m *testing.M) {
-	mng.SetOneTimeData(manager.NewManagerData())
 	gf := globalflow.NewGlobalFlow(1)
 	gf.AddTask(func(manager interfaces.IManager) {
 		mng.OneTimeData().SetUserContext("TASK_1", "TASK 1")

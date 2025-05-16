@@ -1,17 +1,21 @@
 package manager
 
 import (
+	"fmt"
 	"sync"
-
-	"github.com/uwine4850/foozy/pkg/interfaces"
 )
 
+// OneTimeData one-time manager data.
+// This object stores temporary data for the router handler.
+// The data goes through a full request cycle and can be used between mddlewares, for example.
+//
+// You should not store permanent data here, only temporary data for each request.
 type OneTimeData struct {
 	userContext sync.Map
 	slugParams  map[string]string
 }
 
-func NewManagerData() *OneTimeData {
+func NewOneTimeData() *OneTimeData {
 	return &OneTimeData{}
 }
 
@@ -38,6 +42,10 @@ func (m *OneTimeData) SetUserContext(key string, value interface{}) {
 
 // GetUserContext getting the user context.
 func (m *OneTimeData) GetUserContext(key string) (any, bool) {
+	m.userContext.Range(func(key, value any) bool {
+		fmt.Println(key)
+		return true
+	})
 	value, ok := m.userContext.Load(key)
 	return value, ok
 }
@@ -45,14 +53,4 @@ func (m *OneTimeData) GetUserContext(key string) (any, bool) {
 // DelUserContext deletes a user context by key.
 func (m *OneTimeData) DelUserContext(key string) {
 	m.userContext.Delete(key)
-}
-
-// CreateAndSetNewManagerData сreates and sets a new OneTimeData instance into the manager.
-func CreateNewManagerData(manager interfaces.IManager) (interfaces.IManagerOneTimeData, error) {
-	otd := manager.OneTimeData()
-	newOtd, err := otd.New()
-	if err != nil {
-		return nil, err
-	}
-	return newOtd.(interfaces.IManagerOneTimeData), nil
 }

@@ -13,9 +13,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/debug"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
-	"github.com/uwine4850/foozy/pkg/router/manager"
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
-	"github.com/uwine4850/foozy/pkg/router/tmlengine"
 	"github.com/uwine4850/foozy/pkg/utils/fstring"
 )
 
@@ -296,20 +294,6 @@ func (rt *Router) initManager() (interfaces.IManager, error) {
 		return nil, err
 	}
 	newManager := _newManager.(interfaces.IManager)
-	// Set OneTimeData.
-	newOTD, err := manager.CreateNewManagerData(managerObject)
-	if err != nil {
-		return nil, err
-	}
-	// Set render.
-	newManager.SetOneTimeData(newOTD)
-	if managerObject.Render() != nil {
-		newRender, err := tmlengine.CreateNewRenderInstance(managerObject)
-		if err != nil {
-			return nil, err
-		}
-		newManager.SetRender(newRender)
-	}
 	return newManager, nil
 }
 

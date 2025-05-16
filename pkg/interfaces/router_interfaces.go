@@ -13,9 +13,7 @@ import (
 type IManager interface {
 	itypeopr.INewInstance
 	Render() IRender
-	SetRender(render IRender)
 	OneTimeData() IManagerOneTimeData
-	SetOneTimeData(manager IManagerOneTimeData)
 	Key() IKey
 	Database() IDatabasePool
 }

@@ -24,7 +24,6 @@ func NewRender() (interfaces.IRender, error) {
 
 func (rn *Render) New() (interface{}, error) {
 	var engine interfaces.ITemplateEngine
-	var err error
 	if rn.TemplateEngine != nil {
 		_engine, err := rn.TemplateEngine.New()
 		if err != nil {
@@ -32,10 +31,7 @@ func (rn *Render) New() (interface{}, error) {
 		}
 		engine = _engine.(interfaces.ITemplateEngine)
 	} else {
-		engine, err = NewTemplateEngine()
-		if err != nil {
-			return nil, err
-		}
+		engine = NewTemplateEngine()
 	}
 	return &Render{TemplateEngine: engine}, nil
 }
@@ -94,14 +90,4 @@ func (rn *Render) RenderJson(data interface{}, w http.ResponseWriter) error {
 		return err
 	}
 	return nil
-}
-
-// CreateAndSetNewRenderInstance creates and sets a new Render instance into the manager.
-func CreateNewRenderInstance(manager interfaces.IManager) (interfaces.IRender, error) {
-	render := manager.Render()
-	newRender, err := render.New()
-	if err != nil {
-		return nil, err
-	}
-	return newRender.(interfaces.IRender), nil
 }

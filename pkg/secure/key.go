@@ -23,6 +23,10 @@ type Key struct {
 	date        time.Time
 }
 
+func NewKey() *Key {
+	return &Key{}
+}
+
 func (k *Key) HashKey() string {
 	return k.hashKey
 }
