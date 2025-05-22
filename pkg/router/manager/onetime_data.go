@@ -1,7 +1,6 @@
 package manager
 
 import (
-	"fmt"
 	"sync"
 )
 
@@ -43,7 +42,6 @@ func (m *OneTimeData) SetUserContext(key string, value interface{}) {
 // GetUserContext getting the user context.
 func (m *OneTimeData) GetUserContext(key string) (any, bool) {
 	m.userContext.Range(func(key, value any) bool {
-		fmt.Println(key)
 		return true
 	})
 	value, ok := m.userContext.Load(key)

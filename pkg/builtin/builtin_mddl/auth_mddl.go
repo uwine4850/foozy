@@ -23,47 +23,41 @@ type OnError func(w http.ResponseWriter, r *http.Request, manager interfaces.IMa
 // It is important to note that only previous keys are saved; accordingly, it is impossible to update the encoding
 // if two or more key iterations have passed, because the old keys are no longer known.
 // This middleware should not work on the login page. Therefore, you need to specify the loginUrl correctly.
-func Auth(excludePatterns []string, onErr OnError) middlewares.MddlFunc {
-	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
+//
+// The onErr element is used for error management only within this middleware. When any error occurs,
+// this function will be called instead of sending it to the router.
+// This is designed for more flexible control.
+func Auth(excludePatterns []string, onErr OnError) middlewares.PreMiddleware {
+	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 		pattern, ok := manager.OneTimeData().GetUserContext(namelib.ROUTER.URL_PATTERN)
 		if !ok {
 			onErr(w, r, manager, ErrUrlPatternNotExist{})
-			return
+			return nil
 		}
 		if fslice.SliceContains(excludePatterns, pattern.(string)) {
-			return
+			return nil
 		}
 		k := manager.Key().Get32BytesKey()
 		var auth_date time.Time
 		if err := cookies.ReadSecureNoHMACCookieData([]byte(k.StaticKey()), r, namelib.AUTH.COOKIE_AUTH_DATE, &auth_date); err != nil {
 			onErr(w, r, manager, err)
-			return
+			return nil
 		}
 		d1 := manager.Key().Get32BytesKey().Date().Format("02.01.2006 15:04:05")
 		d2 := auth_date.Format("02.01.2006 15:04:05")
 		if d1 != d2 {
-			// cc := database.NewConnectControl()
-			// if err := cc.OpenUnnamedConnection(db); err != nil {
-			// 	onErr(w, r, manager, err)
-			// 	return
-			// }
-			// defer func() {
-			// 	if err := cc.CloseAllUnnamedConnection(); err != nil {
-			// 		onErr(w, r, manager, err)
-			// 		return
-			// 	}
-			// }()
 			_auth, err := auth.NewAuth(w, manager)
 			if err != nil {
 				onErr(w, r, manager, err)
-				return
+				return nil
 			}
 			if err := _auth.UpdateAuthCookie([]byte(k.OldHashKey()), []byte(k.OldBlockKey()), r); err != nil {
 				onErr(w, r, manager, err)
-				return
+				return nil
 			}
 			middlewares.SkipNextPageAndRedirect(manager.OneTimeData(), w, r, r.URL.Path)
 		}
+		return nil
 	}
 }
 
@@ -78,15 +72,19 @@ type CurrentUID func(w http.ResponseWriter, r *http.Request, manager interfaces.
 
 // AuthJWT updates the JWT authentication encoding accordingly with key updates.
 // That is, the update depends directly on the frequency of key updates in GloablFlow.
-func AuthJWT(setToken SetToken, updatedToken UpdatedToken, currentUID CurrentUID, onErr OnError) middlewares.MddlFunc {
-	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
+//
+// The onErr element is used for error management only within this middleware. When any error occurs,
+// this function will be called instead of sending it to the router.
+// This is designed for more flexible control.
+func AuthJWT(setToken SetToken, updatedToken UpdatedToken, currentUID CurrentUID, onErr OnError) middlewares.PreMiddleware {
+	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 		tokenString, err := setToken(w, r, manager)
 		if err != nil {
 			onErr(w, r, manager, err)
-			return
+			return nil
 		}
 		if tokenString == "" {
-			return
+			return nil
 		}
 		_claims := &auth.JWTClaims{}
 		_, err = jwt.ParseWithClaims(tokenString, _claims, func(t *jwt.Token) (interface{}, error) {
@@ -102,33 +100,34 @@ func AuthJWT(setToken SetToken, updatedToken UpdatedToken, currentUID CurrentUID
 			})
 			if err != nil {
 				onErr(w, r, manager, err)
-				return
+				return nil
 			}
 			// If the previous key fits and the token is valid, you need to update the encoding.
 			if token.Valid {
 				updatedTokenString, err := secure.NewHmacJwtWithClaims(newClaims, manager)
 				if err != nil {
 					onErr(w, r, manager, err)
-					return
+					return nil
 				}
 				if err := updatedToken(w, r, manager, updatedTokenString, newClaims.Id); err != nil {
 					onErr(w, r, manager, err)
-					return
+					return nil
 				}
 				if err := currentUID(w, r, manager, newClaims.Id); err != nil {
 					onErr(w, r, manager, err)
-					return
+					return nil
 				}
-				return
+				return nil
 			} else {
 				onErr(w, r, manager, &ErrJWTNotValid{})
-				return
+				return nil
 			}
 		}
 		if err := currentUID(w, r, manager, _claims.Id); err != nil {
 			onErr(w, r, manager, err)
-			return
+			return nil
 		}
+		return nil
 	}
 }
 

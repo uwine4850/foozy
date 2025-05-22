@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"reflect"
 	"strings"
-	"sync"
 
 	"github.com/uwine4850/foozy/pkg/config"
 	"github.com/uwine4850/foozy/pkg/debug"
@@ -52,7 +51,7 @@ var managerObject interfaces.IManager = nil
 type Router struct {
 	mux               http.ServeMux
 	routes            map[string]muxRouter
-	middleware        interfaces.IMiddleware
+	middleware        middlewares.IMiddleware
 	internalErrorFunc func(w http.ResponseWriter, r *http.Request, err error)
 }
 
@@ -127,7 +126,7 @@ func (rt *Router) Ws(pattern string, handler func(w http.ResponseWriter, r *http
 	}
 }
 
-func (rt *Router) SetMiddleware(middleware interfaces.IMiddleware) {
+func (rt *Router) SetMiddleware(middleware middlewares.IMiddleware) {
 	rt.middleware = middleware
 }
 
@@ -213,7 +212,7 @@ func (rt *Router) register(_muxRouter muxRouter, urlPattern string) http.Handler
 		debug.RequestLogginIfEnable(debug.P_ROUTER, "slug url is parsed")
 
 		// Run middlewares.
-		if skip, err := rt.runMddl(writer, request, manager); err != nil {
+		if skip, err := rt.runPreAndAsyncMddl(writer, request, manager); err != nil {
 			if rt.internalErrorFunc != nil {
 				rt.internalErrorFunc(writer, request, err)
 				debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
@@ -229,6 +228,10 @@ func (rt *Router) register(_muxRouter muxRouter, urlPattern string) http.Handler
 		}
 		rt.switchRegisterMethods(writer, request, _muxRouter, manager)
 		rt.printLog(request)
+		if err := rt.middleware.RunPostMiddlewares(request, manager); err != nil {
+			rt.internalErrorFunc(writer, request, err)
+			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
+		}
 	}
 }
 
@@ -297,31 +300,37 @@ func (rt *Router) initManager() (interfaces.IManager, error) {
 	return newManager, nil
 }
 
-// runMddl runs the middleware.
+// runPreAndAsyncMddl runs the middleware.
 // Conventional middleware is run first because it is more prioritized than asynchronous. They usually
 // perform important logic, which, for example, should be run first.
 // After execution of synchronous middleware, asynchronous ones are executed.
 // Middleware errors and the page rendering skip algorithm are also handled here.
-func (rt *Router) runMddl(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, error) {
+func (rt *Router) runPreAndAsyncMddl(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, error) {
 	if rt.middleware != nil {
-		var wg sync.WaitGroup
-		debug.RequestLogginIfEnable(debug.P_ROUTER, "run middlewares...")
+		// var wg sync.WaitGroup
 		// Running synchronous middleware.
-		err := rt.middleware.RunMddl(w, r, manager)
-		if err != nil {
-			return false, err
-		}
+		// err := rt.middleware.RunMddl(w, r, manager)
+		// if err != nil {
+		// 	return false, err
+		// }
 		// Running asynchronous middleware.
-		rt.middleware.RunAsyncMddl(w, r, manager, &wg)
+		// rt.middleware.RunAsyncMddl(w, r, manager, &wg)
 		// Waiting for all asynchronous middleware to complete.
-		wg.Wait()
+		// wg.Wait()
 		// Handling middleware errors.
-		mddlErr, err := middlewares.GetMddlError(manager.OneTimeData())
-		if err != nil {
+		// mddlErr, err := middlewares.GetMddlError(manager.OneTimeData())
+		// if err != nil {
+		// 	return false, err
+		// }
+		// if mddlErr != nil {
+		// 	return false, errors.New(mddlErr.Error())
+		// }
+		debug.RequestLogginIfEnable(debug.P_ROUTER, "run middlewares...")
+		if err := rt.middleware.RunPreMiddlewares(w, r, manager); err != nil {
 			return false, err
 		}
-		if mddlErr != nil {
-			return false, errors.New(mddlErr.Error())
+		if err := rt.middleware.RunAndWaitAsyncMiddlewares(w, r, manager); err != nil {
+			return false, err
 		}
 		debug.RequestLogginIfEnable(debug.P_ROUTER, "middlewares are completed")
 		// Checking the skip of the next page. Runs after a more important error check.
