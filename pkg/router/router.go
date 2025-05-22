@@ -46,9 +46,8 @@ type muxRouter struct {
 	WS      Handler
 }
 
-var managerObject interfaces.IManager = nil
-
 type Router struct {
+	manager           interfaces.IManager
 	mux               http.ServeMux
 	routes            map[string]muxRouter
 	middleware        middlewares.IMiddleware
@@ -56,8 +55,11 @@ type Router struct {
 }
 
 func NewRouter(manager interfaces.IManager) *Router {
-	managerObject = manager
-	return &Router{mux: *http.NewServeMux(), routes: map[string]muxRouter{}, internalErrorFunc: internalServerError}
+	return &Router{manager: manager,
+		mux:               *http.NewServeMux(),
+		routes:            map[string]muxRouter{},
+		internalErrorFunc: internalServerError,
+	}
 }
 
 func (rt *Router) GetMux() *http.ServeMux {
@@ -229,8 +231,10 @@ func (rt *Router) register(_muxRouter muxRouter, urlPattern string) http.Handler
 		rt.switchRegisterMethods(writer, request, _muxRouter, manager)
 		rt.printLog(request)
 		if err := rt.middleware.RunPostMiddlewares(request, manager); err != nil {
-			rt.internalErrorFunc(writer, request, err)
-			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
+			if !errors.Is(err, middlewares.ErrStopMiddlewares{}) {
+				rt.internalErrorFunc(writer, request, err)
+				debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
+			}
 		}
 	}
 }
@@ -292,7 +296,7 @@ func (rt *Router) switchRegisterMethods(writer http.ResponseWriter, request *htt
 // Must be called for each new request.
 func (rt *Router) initManager() (interfaces.IManager, error) {
 	debug.RequestLogginIfEnable(debug.P_ROUTER, "init manager")
-	_newManager, err := managerObject.New()
+	_newManager, err := rt.manager.New()
 	if err != nil {
 		return nil, err
 	}
@@ -307,29 +311,17 @@ func (rt *Router) initManager() (interfaces.IManager, error) {
 // Middleware errors and the page rendering skip algorithm are also handled here.
 func (rt *Router) runPreAndAsyncMddl(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, error) {
 	if rt.middleware != nil {
-		// var wg sync.WaitGroup
-		// Running synchronous middleware.
-		// err := rt.middleware.RunMddl(w, r, manager)
-		// if err != nil {
-		// 	return false, err
-		// }
-		// Running asynchronous middleware.
-		// rt.middleware.RunAsyncMddl(w, r, manager, &wg)
-		// Waiting for all asynchronous middleware to complete.
-		// wg.Wait()
-		// Handling middleware errors.
-		// mddlErr, err := middlewares.GetMddlError(manager.OneTimeData())
-		// if err != nil {
-		// 	return false, err
-		// }
-		// if mddlErr != nil {
-		// 	return false, errors.New(mddlErr.Error())
-		// }
 		debug.RequestLogginIfEnable(debug.P_ROUTER, "run middlewares...")
 		if err := rt.middleware.RunPreMiddlewares(w, r, manager); err != nil {
+			if errors.Is(err, middlewares.ErrStopMiddlewares{}) {
+				return false, nil
+			}
 			return false, err
 		}
 		if err := rt.middleware.RunAndWaitAsyncMiddlewares(w, r, manager); err != nil {
+			if errors.Is(err, middlewares.ErrStopMiddlewares{}) {
+				return false, nil
+			}
 			return false, err
 		}
 		debug.RequestLogginIfEnable(debug.P_ROUTER, "middlewares are completed")

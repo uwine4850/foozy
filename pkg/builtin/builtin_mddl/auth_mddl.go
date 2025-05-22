@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"slices"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -13,7 +14,6 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/cookies"
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
 	"github.com/uwine4850/foozy/pkg/secure"
-	"github.com/uwine4850/foozy/pkg/utils/fslice"
 )
 
 type OnError func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error)
@@ -32,16 +32,16 @@ func Auth(excludePatterns []string, onErr OnError) middlewares.PreMiddleware {
 		pattern, ok := manager.OneTimeData().GetUserContext(namelib.ROUTER.URL_PATTERN)
 		if !ok {
 			onErr(w, r, manager, ErrUrlPatternNotExist{})
-			return nil
+			return middlewares.ErrStopMiddlewares{}
 		}
-		if fslice.SliceContains(excludePatterns, pattern.(string)) {
+		if slices.Contains(excludePatterns, pattern.(string)) {
 			return nil
 		}
 		k := manager.Key().Get32BytesKey()
 		var auth_date time.Time
 		if err := cookies.ReadSecureNoHMACCookieData([]byte(k.StaticKey()), r, namelib.AUTH.COOKIE_AUTH_DATE, &auth_date); err != nil {
 			onErr(w, r, manager, err)
-			return nil
+			return middlewares.ErrStopMiddlewares{}
 		}
 		d1 := manager.Key().Get32BytesKey().Date().Format("02.01.2006 15:04:05")
 		d2 := auth_date.Format("02.01.2006 15:04:05")
@@ -49,11 +49,11 @@ func Auth(excludePatterns []string, onErr OnError) middlewares.PreMiddleware {
 			_auth, err := auth.NewAuth(w, manager)
 			if err != nil {
 				onErr(w, r, manager, err)
-				return nil
+				return middlewares.ErrStopMiddlewares{}
 			}
 			if err := _auth.UpdateAuthCookie([]byte(k.OldHashKey()), []byte(k.OldBlockKey()), r); err != nil {
 				onErr(w, r, manager, err)
-				return nil
+				return middlewares.ErrStopMiddlewares{}
 			}
 			middlewares.SkipNextPageAndRedirect(manager.OneTimeData(), w, r, r.URL.Path)
 		}

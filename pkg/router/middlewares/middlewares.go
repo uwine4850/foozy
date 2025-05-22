@@ -13,8 +13,6 @@ import (
 	"github.com/uwine4850/foozy/pkg/namelib"
 )
 
-var mu sync.Mutex
-
 type PreMiddleware func(w http.ResponseWriter, r *http.Request, m interfaces.IManager) error
 type PostMiddleware func(r *http.Request, m interfaces.IManager) error
 type AsyncMiddleware func(w http.ResponseWriter, r *http.Request, m interfaces.IManager) error
@@ -102,7 +100,8 @@ func (mddl *Middlewares) RunPreMiddlewares(w http.ResponseWriter, r *http.Reques
 func (mddl *Middlewares) RunAndWaitAsyncMiddlewares(w http.ResponseWriter, r *http.Request, m interfaces.IManager) error {
 	var wg sync.WaitGroup
 	var asyncError error
-	stopAsyncMiddlewares := make(chan struct{})
+	var mu sync.Mutex
+	stop := make(chan struct{})
 	for i := 0; i < len(mddl.asyncMiddlewares); i++ {
 		handler := mddl.asyncMiddlewares[i]
 		wg.Add(1)
@@ -111,7 +110,7 @@ func (mddl *Middlewares) RunAndWaitAsyncMiddlewares(w http.ResponseWriter, r *ht
 
 			// If at least one handler causes an error, all other handlers will fail to run.
 			select {
-			case <-stopAsyncMiddlewares:
+			case <-stop:
 				return
 			default:
 			}
@@ -119,7 +118,7 @@ func (mddl *Middlewares) RunAndWaitAsyncMiddlewares(w http.ResponseWriter, r *ht
 			if err := h(w, r, m); err != nil {
 				mu.Lock()
 				asyncError = err
-				close(stopAsyncMiddlewares)
+				close(stop)
 				mu.Unlock()
 			}
 		}(handler)
@@ -158,4 +157,18 @@ func SkipNextPageAndRedirect(manager interfaces.IManagerOneTimeData, w http.Resp
 	http.Redirect(w, r, path, http.StatusFound)
 	SkipNextPage(manager)
 	debug.RequestLogginIfEnable(debug.P_MIDDLEWARE, fmt.Sprintf("redirect to %s", path))
+}
+
+type ErrIdAlreadyExist struct {
+	id int
+}
+
+func (e ErrIdAlreadyExist) Error() string {
+	return fmt.Sprintf("Middleware with id %s already exists.", strconv.Itoa(e.id))
+}
+
+type ErrStopMiddlewares struct{}
+
+func (e ErrStopMiddlewares) Error() string {
+	return "stop middlewares"
 }

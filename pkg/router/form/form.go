@@ -2,8 +2,6 @@ package form
 
 import (
 	"bytes"
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
 	"html/template"
 	"io"
@@ -14,9 +12,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/google/uuid"
 	"github.com/uwine4850/foozy/pkg/interfaces"
-	"github.com/uwine4850/foozy/pkg/router"
-	"github.com/uwine4850/foozy/pkg/utils/fpath"
 )
 
 type FormFile struct {
@@ -82,38 +79,29 @@ func (f *Form) Files(key string) ([]*multipart.FileHeader, bool) {
 }
 
 // randomiseTheFileName If the file name already exists, randomises it and returns the new file path.
-func randomiseTheFileName(pathToDir string, fileName string) string {
-	outputFilepath := filepath.Join(pathToDir, fileName)
-	if fpath.PathExist(outputFilepath) {
-		hash := sha256.Sum256([]byte(fileName))
-		hashData := hex.EncodeToString(hash[:])
-		ext := filepath.Ext(fileName)
-		return randomiseTheFileName(pathToDir, hashData+ext)
-	}
-	return outputFilepath
+func randomiseFileName(fileName string) string {
+	ext := filepath.Ext(fileName)
+	base := fileName[:len(fileName)-len(ext)]
+	uniqueID := uuid.New().String()
+	return base + "-" + uniqueID + ext
 }
 
 // SaveFile Saves the file in the specified directory.
 // If the file name is already found, uses the randomiseTheFileName function to randomise the file name.
-func SaveFile(w http.ResponseWriter, fileHeader *multipart.FileHeader, pathToDir string, buildPath *string, manager interfaces.IManager) error {
+func SaveFile(fileHeader *multipart.FileHeader, pathToDir string, buildPath *string, manager interfaces.IManager) error {
 	file, err := fileHeader.Open()
 	if err != nil {
 		return err
 	}
-	fp := randomiseTheFileName(pathToDir, fileHeader.Filename)
+	fn := randomiseFileName(fileHeader.Filename)
+	newFilePath := filepath.Join(pathToDir, fn)
 	if buildPath != nil {
-		*buildPath = fp
+		*buildPath = newFilePath
 	}
-	dst, err := os.Create(fp)
+	dst, err := os.Create(newFilePath)
 	if err != nil {
 		return err
 	}
-	defer func(dst *os.File) {
-		err := dst.Close()
-		if err != nil {
-			router.ServerError(w, err.Error(), manager)
-		}
-	}(dst)
 	_, err = io.Copy(dst, file)
 	if err != nil {
 		return err
@@ -122,16 +110,20 @@ func SaveFile(w http.ResponseWriter, fileHeader *multipart.FileHeader, pathToDir
 	if err != nil {
 		return err
 	}
+	// Close dst.
+	if err := dst.Close(); err != nil {
+		return err
+	}
 	return nil
 }
 
 // ReplaceFile Changes the specified file to a new file.
-func ReplaceFile(pathToFile string, w http.ResponseWriter, fileHeader *multipart.FileHeader, pathToDir string, buildPath *string, manager interfaces.IManager) error {
+func ReplaceFile(pathToFile string, fileHeader *multipart.FileHeader, pathToDir string, buildPath *string, manager interfaces.IManager) error {
 	err := os.Remove(pathToFile)
 	if err != nil {
 		return err
 	}
-	err = SaveFile(w, fileHeader, pathToDir, buildPath, manager)
+	err = SaveFile(fileHeader, pathToDir, buildPath, manager)
 	if err != nil {
 		return err
 	}

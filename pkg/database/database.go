@@ -19,12 +19,12 @@ type DbArgs struct {
 	DatabaseName string
 }
 
-// Database structure for accessing the database.
+// MysqlDatabase structure for accessing the database.
 // It can send both synchronous and asynchronous queries.
 // IMPORTANT: after the end of work it is necessary to close the connection using Close method.
 // For each transaction a new instance of the [interfaces.ITransaction] object is created,
 // so each transaction is executed in its own scope and is completely safe.
-type Database struct {
+type MysqlDatabase struct {
 	username string
 	password string
 	host     string
@@ -36,8 +36,8 @@ type Database struct {
 	asyncQ   interfaces.IAsyncQueries
 }
 
-func NewDatabase(args DbArgs, syncQ interfaces.ISyncQueries, asyncQ interfaces.IAsyncQueries) *Database {
-	d := Database{username: args.Username, password: args.Password, host: args.Host, port: args.Port, database: args.DatabaseName}
+func NewMysqlDatabase(args DbArgs, syncQ interfaces.ISyncQueries, asyncQ interfaces.IAsyncQueries) *MysqlDatabase {
+	d := MysqlDatabase{username: args.Username, password: args.Password, host: args.Host, port: args.Port, database: args.DatabaseName}
 	d.syncQ = syncQ
 	d.asyncQ = asyncQ
 	return &d
@@ -45,7 +45,7 @@ func NewDatabase(args DbArgs, syncQ interfaces.ISyncQueries, asyncQ interfaces.I
 
 // Open connecting to a mysql database.
 // Also, initialization of synchronous and asynchronous queries.
-func (d *Database) Open() error {
+func (d *MysqlDatabase) Open() error {
 	connStr := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", d.username, d.password, d.host, d.port, d.database)
 	db, err := sql.Open("mysql", connStr)
 	if err != nil {
@@ -62,7 +62,7 @@ func (d *Database) Open() error {
 }
 
 // Close closes the connection to the database.
-func (d *Database) Close() error {
+func (d *MysqlDatabase) Close() error {
 	err := d.db.Close()
 	if err != nil {
 		return err
@@ -77,16 +77,16 @@ func (d *Database) Close() error {
 }
 
 // NewTransaction creates a new transaction instance.
-func (d *Database) NewTransaction() interfaces.ITransaction {
+func (d *MysqlDatabase) NewTransaction() interfaces.ITransaction {
 	return NewMysqlTransaction(d.db, d.syncQ, d.asyncQ)
 }
 
 // SyncQ getting access to synchronous requests.
-func (d *Database) SyncQ() interfaces.ISyncQueries {
+func (d *MysqlDatabase) SyncQ() interfaces.ISyncQueries {
 	return d.syncQ
 }
 
-func (d *Database) NewAsyncQ() (interfaces.IAsyncQueries, error) {
+func (d *MysqlDatabase) NewAsyncQ() (interfaces.IAsyncQueries, error) {
 	aq, err := d.asyncQ.New()
 	if err != nil {
 		return nil, err
