@@ -22,14 +22,13 @@ type Server struct {
 // rcors - CORS data, which is set using the cors.Options library at github.com/rs/cors.
 // These settings will be applied to all requests.
 func NewServer(addr string, router *router.Router, rcors *cors.Options) *Server {
-	router.RegisterAll()
 	s := &Server{router: router, addr: addr}
-	var handler http.Handler
+	var handler http.Handler = router
+
 	if rcors != nil {
-		handler = cors.New(*rcors).Handler(s.router.GetMux())
-	} else {
-		handler = s.router.GetMux()
+		handler = cors.New(*rcors).Handler(handler)
 	}
+
 	s.serv = &http.Server{
 		Addr:    s.addr,
 		Handler: handler,

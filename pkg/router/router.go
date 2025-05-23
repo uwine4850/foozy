@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"reflect"
 	"strings"
 
 	"github.com/uwine4850/foozy/pkg/config"
@@ -13,17 +12,13 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
-	"github.com/uwine4850/foozy/pkg/utils/fstring"
 )
 
-const (
-	GET     = "GET"
-	POST    = "POST"
-	PUT     = "PUT"
-	DELETE  = "DELETE"
-	OPTIONS = "OPTIONS"
-	WS      = "WS"
-)
+type Handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()
+
+type IAdapter interface {
+	Adapt(pattern string, handler Handler) http.HandlerFunc
+}
 
 func internalServerError(w http.ResponseWriter, r *http.Request, err error) {
 	w.WriteHeader(http.StatusInternalServerError)
@@ -34,192 +29,60 @@ func internalServerError(w http.ResponseWriter, r *http.Request, err error) {
 	}
 }
 
-type Handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()
-
-// muxRouter represents a single URL handler that can fire method handlers according to those sent by the client.
-type muxRouter struct {
-	GET     Handler
-	POST    Handler
-	PUT     Handler
-	DELETE  Handler
-	OPTIONS Handler
-	WS      Handler
-}
-
-type Router struct {
+// Adapter is an object that handles router.Handler and adapts it to work as an http.HandlerFunc.
+// This object triggers all the additional functionality of the handler.
+// That is, it simply wraps the http.HandlerFunc controller in additional functionality and gives
+// it as http.HandlerFunc.
+//
+// [internalErrorFunc] is responsible for handling internal errors.
+// This function can be overridden using the [SetOnErrorFunc] method.
+type Adapter struct {
 	manager           interfaces.IManager
-	mux               http.ServeMux
-	routes            map[string]muxRouter
-	middleware        middlewares.IMiddleware
+	middlewares       middlewares.IMiddleware
 	internalErrorFunc func(w http.ResponseWriter, r *http.Request, err error)
 }
 
-func NewRouter(manager interfaces.IManager) *Router {
-	return &Router{manager: manager,
-		mux:               *http.NewServeMux(),
-		routes:            map[string]muxRouter{},
+func NewAdapter(manager interfaces.IManager, middlewares middlewares.IMiddleware) *Adapter {
+	return &Adapter{
+		manager:           manager,
+		middlewares:       middlewares,
 		internalErrorFunc: internalServerError,
 	}
 }
 
-func (rt *Router) GetMux() *http.ServeMux {
-	return &rt.mux
-}
-
-// RegisterAll registers all route handlers
-func (rt *Router) RegisterAll() {
-	rt.registerAllHandlers()
-}
-
-// AddHandlerSet adds a set of handlers at once.
-// Example of use:
-//
-//	AddHandlerSet([]map[string]map[string]router.Handler{
-//		{
-//	 		router.GET: {"/pattern": <handler>},
-//	 		router.POST: {"/pattern": <handler>},
-//		},
-//	 )
-func (rt *Router) AddHandlerSet(handlers []map[string]map[string]Handler) {
-	for i := 0; i < len(handlers); i++ {
-		for method, value := range handlers[i] {
-			for pattern, handler := range value {
-				if err := rt.setMuxRouterHandler(pattern, method, handler); err != nil {
-					panic(err)
-				}
-			}
-		}
-	}
-}
-
-func (rt *Router) Get(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
-	if err := rt.setMuxRouterHandler(pattern, GET, handler); err != nil {
-		panic(err)
-	}
-}
-
-func (rt *Router) Post(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
-	if err := rt.setMuxRouterHandler(pattern, POST, handler); err != nil {
-		panic(err)
-	}
-}
-
-func (rt *Router) Put(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
-	if err := rt.setMuxRouterHandler(pattern, PUT, handler); err != nil {
-		panic(err)
-	}
-}
-
-func (rt *Router) Delete(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
-	if err := rt.setMuxRouterHandler(pattern, DELETE, handler); err != nil {
-		panic(err)
-	}
-}
-
-func (rt *Router) Options(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
-	if err := rt.setMuxRouterHandler(pattern, OPTIONS, handler); err != nil {
-		panic(err)
-	}
-}
-
-func (rt *Router) Ws(pattern string, handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()) {
-	if err := rt.setMuxRouterHandler(pattern, WS, handler); err != nil {
-		panic(err)
-	}
-}
-
-func (rt *Router) SetMiddleware(middleware middlewares.IMiddleware) {
-	rt.middleware = middleware
-}
-
-// InternalError sets the function to be used when handling internal errors.
-func (rt *Router) InternalError(fn func(w http.ResponseWriter, r *http.Request, err error)) {
-	rt.internalErrorFunc = fn
-}
-
-// getMuxRouter returns a muxRouter structure.
-// If it does not exist, creates and returns it.
-func (rt *Router) getMuxRouter(pattern string) muxRouter {
-	_muxRouter, exists := rt.routes[pattern]
-	if !exists {
-		_muxRouter = muxRouter{}
-	}
-	return _muxRouter
-}
-
-// setMuxRouter set the muxRouter structure in the routes map.
-// Works well in conjunction with the getMuxRouter method.
-func (rt *Router) setMuxRouter(pattern string, _muxRouter muxRouter) {
-	rt.routes[pattern] = _muxRouter
-}
-
-// setMuxRouterHandler sets the handlers in muxRouter.
-// Automatically set the handler in the desired method,
-// the main thing is to pass the correct name, e.g. GET, POST and so on.
-func (rt *Router) setMuxRouterHandler(pattern string, method string, handler Handler) error {
-	_muxRouter := rt.getMuxRouter(pattern)
-	muxMethod := reflect.ValueOf(&_muxRouter).Elem().FieldByName(method)
-	if !muxMethod.IsValid() {
-		return errors.New("muxRouter field is not valid")
-	}
-	if !muxMethod.IsNil() {
-		return fmt.Errorf("the %s method on the %s path is already mounted", WS, pattern)
-	}
-	muxMethod.Set(reflect.ValueOf(handler))
-	rt.setMuxRouter(pattern, _muxRouter)
-	return nil
-}
-
-// validateMethod checks whether the method is allowed to be applied on the given URL.
-func (rt *Router) validateMethod(handler Handler, method string, w http.ResponseWriter) bool {
-	if handler == nil {
-		w.Header().Set("Allow", method)
-		http.Error(w, fmt.Sprintf("Method %s Not Allowed", method), http.StatusMethodNotAllowed)
-		return false
-	}
-	return true
-}
-
-// register passed to muxRouter.
-// When navigating to a URL, the handler will look for a function from muxRouter to run that handler.
-// Various services are also started here for the correct operation of the processor.
-func (rt *Router) register(_muxRouter muxRouter, urlPattern string) http.HandlerFunc {
-	return func(writer http.ResponseWriter, request *http.Request) {
+// Adapt wraps router.Handler in additional functionality.
+// It creates a new manager, starts middlewares and does other small operations.
+func (a *Adapter) Adapt(pattern string, handler Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		if err := debug.ClearRequestInfoLogging(); err != nil {
-			rt.internalErrorFunc(writer, request, err)
+			a.internalErrorFunc(w, r, err)
 			return
 		}
-		debug.RequestLogginIfEnable(debug.P_ROUTER, fmt.Sprintf("request url: %s", request.URL))
-		manager, err := rt.initManager()
+		debug.RequestLogginIfEnable(debug.P_ROUTER, fmt.Sprintf("request url: %s", r.URL))
+		debug.RequestLogginIfEnable(debug.P_ROUTER, "init manager")
+		newManager, err := a.newManager()
 		if err != nil {
-			rt.internalErrorFunc(writer, request, err)
+			a.internalErrorFunc(w, r, err)
 			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
 			return
 		}
 		debug.RequestLogginIfEnable(debug.P_ROUTER, "manager is initialized")
 
-		manager.OneTimeData().SetUserContext(namelib.ROUTER.URL_PATTERN, urlPattern)
-
-		parseUrl := ParseSlugIndex(fstring.SplitUrl(urlPattern))
-		if request.URL.Path != "/" && len(parseUrl) > 0 {
-			res, params := HandleSlugUrls(parseUrl, fstring.SplitUrl(urlPattern), fstring.SplitUrl(request.URL.Path))
-			if res != request.URL.Path {
-				http.NotFound(writer, request)
-				return
-			}
-			if params != nil {
-				manager.OneTimeData().SetSlugParams(params)
-			}
+		// Slug params
+		segments := strings.Split(strings.Trim(pattern, "/"), "/")
+		urlSegments := strings.Split(strings.Trim(r.URL.Path, "/"), "/")
+		params := MatchUrlSegments(segments, urlSegments)
+		if params != nil {
+			newManager.OneTimeData().SetSlugParams(params)
 		}
-		debug.RequestLogginIfEnable(debug.P_ROUTER, "slug url is parsed")
 
-		// Run middlewares.
-		if skip, err := rt.runPreAndAsyncMddl(writer, request, manager); err != nil {
-			if rt.internalErrorFunc != nil {
-				rt.internalErrorFunc(writer, request, err)
+		// Run middlewares
+		if skip, err := a.runPreAndAsyncMddl(w, r, newManager); err != nil {
+			if a.internalErrorFunc != nil {
+				a.internalErrorFunc(w, r, err)
 				debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
 			} else {
-				rt.internalErrorFunc(writer, request, err)
+				a.internalErrorFunc(w, r, err)
 				debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
 			}
 			return
@@ -228,75 +91,25 @@ func (rt *Router) register(_muxRouter muxRouter, urlPattern string) http.Handler
 				return
 			}
 		}
-		rt.switchRegisterMethods(writer, request, _muxRouter, manager)
-		rt.printLog(request)
-		if err := rt.middleware.RunPostMiddlewares(request, manager); err != nil {
+		newManager.OneTimeData().SetUserContext(namelib.ROUTER.URL_PATTERN, pattern)
+		handler(w, r, newManager)()
+		a.printLog(r)
+		if err := a.middlewares.RunPostMiddlewares(r, newManager); err != nil {
 			if !errors.Is(err, middlewares.ErrStopMiddlewares{}) {
-				rt.internalErrorFunc(writer, request, err)
+				a.internalErrorFunc(w, r, err)
 				debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
+				return
 			}
 		}
 	}
 }
 
-func (rt *Router) switchRegisterMethods(writer http.ResponseWriter, request *http.Request, _muxRouter muxRouter, manager interfaces.IManager) {
-	debug.RequestLogginIfEnable(debug.P_ROUTER, "run switch methods...")
-	debug.RequestLogginIfEnable(debug.P_ROUTER, "validate method")
-	connection := request.Header.Get("Connection")
-	if connection != "" && connection == "Upgrade" {
-		handler := _muxRouter.WS
-		if !rt.validateMethod(handler, "WS", writer) {
-			return
-		}
-		debug.RequestLogginIfEnable(debug.P_ROUTER, "run WS handler")
-		handler(writer, request, manager)()
-		return
-	}
-	switch request.Method {
-	case http.MethodGet:
-		handler := _muxRouter.GET
-		if !rt.validateMethod(handler, "GET", writer) {
-			return
-		}
-		debug.RequestLogginIfEnable(debug.P_ROUTER, "run GET handler")
-		handler(writer, request, manager)()
-	case http.MethodPost:
-		handler := _muxRouter.POST
-		if !rt.validateMethod(handler, "POST", writer) {
-			return
-		}
-		debug.RequestLogginIfEnable(debug.P_ROUTER, "run POST handler")
-		handler(writer, request, manager)()
-	case http.MethodPut:
-		handler := _muxRouter.PUT
-		if !rt.validateMethod(handler, "PUT", writer) {
-			return
-		}
-		debug.RequestLogginIfEnable(debug.P_ROUTER, "run PUT handler")
-		handler(writer, request, manager)()
-	case http.MethodDelete:
-		handler := _muxRouter.DELETE
-		if !rt.validateMethod(handler, "DELETE", writer) {
-			return
-		}
-		debug.RequestLogginIfEnable(debug.P_ROUTER, "run DELETE handler")
-		handler(writer, request, manager)()
-	case http.MethodOptions:
-		handler := _muxRouter.OPTIONS
-		if !rt.validateMethod(handler, "OPTIONS", writer) {
-			return
-		}
-		debug.RequestLogginIfEnable(debug.P_ROUTER, "run OPTIONS handler")
-		handler(writer, request, manager)()
-	}
-	debug.RequestLogginIfEnable(debug.P_ROUTER, "method completed")
+func (a *Adapter) SetOnErrorFunc(fn func(w http.ResponseWriter, r *http.Request, err error)) {
+	a.internalErrorFunc = fn
 }
 
-// initManager initializes a new manager instance.
-// Must be called for each new request.
-func (rt *Router) initManager() (interfaces.IManager, error) {
-	debug.RequestLogginIfEnable(debug.P_ROUTER, "init manager")
-	_newManager, err := rt.manager.New()
+func (a *Adapter) newManager() (interfaces.IManager, error) {
+	_newManager, err := a.manager.New()
 	if err != nil {
 		return nil, err
 	}
@@ -309,16 +122,16 @@ func (rt *Router) initManager() (interfaces.IManager, error) {
 // perform important logic, which, for example, should be run first.
 // After execution of synchronous middleware, asynchronous ones are executed.
 // Middleware errors and the page rendering skip algorithm are also handled here.
-func (rt *Router) runPreAndAsyncMddl(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, error) {
-	if rt.middleware != nil {
+func (a *Adapter) runPreAndAsyncMddl(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, error) {
+	if a.middlewares != nil {
 		debug.RequestLogginIfEnable(debug.P_ROUTER, "run middlewares...")
-		if err := rt.middleware.RunPreMiddlewares(w, r, manager); err != nil {
+		if err := a.middlewares.RunPreMiddlewares(w, r, manager); err != nil {
 			if errors.Is(err, middlewares.ErrStopMiddlewares{}) {
 				return false, nil
 			}
 			return false, err
 		}
-		if err := rt.middleware.RunAndWaitAsyncMiddlewares(w, r, manager); err != nil {
+		if err := a.middlewares.RunAndWaitAsyncMiddlewares(w, r, manager); err != nil {
 			if errors.Is(err, middlewares.ErrStopMiddlewares{}) {
 				return false, nil
 			}
@@ -333,69 +146,95 @@ func (rt *Router) runPreAndAsyncMddl(w http.ResponseWriter, r *http.Request, man
 	return false, nil
 }
 
-func (rt *Router) registerAllHandlers() {
-	for pattern, _muxRouter := range rt.routes {
-		rt.mux.Handle(splitUrlFromFirstSlug(pattern), rt.register(_muxRouter, pattern))
-	}
-}
-
-func (rt *Router) printLog(request *http.Request) {
+func (a *Adapter) printLog(request *http.Request) {
 	if config.LoadedConfig().Default.Debug.PrintInfo {
 		log.Printf("%s %s", request.Method, request.URL.Path)
 	}
 }
 
-// ValidateRootUrl Checks if the root url matches the "/" character.
-func ValidateRootUrl(w http.ResponseWriter, r *http.Request) bool {
-	if r.URL.Path != "/" {
-		http.NotFound(w, r)
-		return false
-	}
-	return true
+type RegisterHandler func(method string, pattern string, handler Handler)
+
+type Route struct {
+	Pattern  string
+	Segments []string
+	Handler  http.HandlerFunc
 }
 
-// ParseSlugIndex parses url fragments and records their indexes as keys in the map.
-// The values are bool values: if true - this fragment is a slug field, if false - it is a regular fragment.
-func ParseSlugIndex(path []string) map[int]bool {
-	res := make(map[int]bool)
-	for i := 0; i < len(path); i++ {
-		if len(path) < 2 {
-			continue
-		}
-		if string(path[i][0]) == "<" && string(path[i][len(path[i])-1]) == ">" {
-			res[i] = true
-		} else {
-			res[i] = false
-		}
-	}
-	return res
+// Router store in itself the paths to the handler.
+type Router struct {
+	routes  map[string][]Route // method → slice of Route
+	adapter IAdapter
 }
 
-// HandleSlugUrls by number, inserts values from the current addressee into the url pattern in place of slug values.
-// Also, sets slug parameters as a map.
-func HandleSlugUrls(parseUrl map[int]bool, slugUrl []string, url []string) (string, map[string]string) {
-	if len(slugUrl) != len(url) {
-		return "", nil
+func NewRouter(adapter IAdapter) *Router {
+	return &Router{
+		routes:  make(map[string][]Route),
+		adapter: adapter,
 	}
-	if len(slugUrl) != len(parseUrl) {
-		return "", nil
+}
+
+func (r *Router) HandlerSet(handlers []map[string]map[string]Handler) {
+	for i := 0; i < len(handlers); i++ {
+		for method, h := range handlers[i] {
+			for pattern, handler := range h {
+				r.Register(method, pattern, handler)
+			}
+		}
 	}
+}
+
+func (r *Router) Register(method string, pattern string, handler Handler) {
+	segments := strings.Split(strings.Trim(pattern, "/"), "/")
+	adapted := r.adapter.Adapt(pattern, handler)
+	r.routes[method] = append(r.routes[method], Route{
+		Pattern:  pattern,
+		Segments: segments,
+		Handler:  adapted,
+	})
+}
+
+func (r *Router) Routes() map[string][]Route {
+	return r.routes
+}
+
+// ServeHTTP run handlers.
+// Implementation of the [http.Handler] interface.
+func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	method := req.Method
+	path := req.URL.Path
+	segments := strings.Split(strings.Trim(path, "/"), "/")
+
+	if routes, ok := r.routes[method]; ok {
+		for _, route := range routes {
+			params := MatchUrlSegments(route.Segments, segments)
+			if params != nil {
+				route.Handler.ServeHTTP(w, req)
+				return
+			}
+		}
+	}
+
+	http.NotFound(w, req)
+}
+
+func MatchUrlSegments(routeSegments, pathSegments []string) map[string]string {
+	if len(routeSegments) != len(pathSegments) {
+		return nil
+	}
+
 	params := make(map[string]string)
-	for i, isSlug := range parseUrl {
-		if isSlug {
-			params[strings.Trim(slugUrl[i], "<>")] = url[i]
-			slugUrl[i] = url[i]
+
+	for i := 0; i < len(routeSegments); i++ {
+		rSeg := routeSegments[i]
+		pSeg := pathSegments[i]
+
+		if strings.HasPrefix(rSeg, ":") {
+			paramName := rSeg[1:]
+			params[paramName] = pSeg
+		} else if rSeg != pSeg {
+			return nil
 		}
 	}
-	res := "/" + strings.Join(slugUrl, "/")
-	return res, params
-}
 
-// SplitUrlFromFirstSlug returns the left side of the url before the "<" sign.
-func splitUrlFromFirstSlug(url string) string {
-	index := strings.Index(url, "<")
-	if index == -1 {
-		return url
-	}
-	return url[:index]
+	return params
 }
