@@ -1,6 +1,7 @@
 package router
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"log"
@@ -13,6 +14,63 @@ import (
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
 )
+
+type IBufferedResponseWriter interface {
+	Flush() (int, error)
+	OriginalWriter() http.ResponseWriter
+}
+
+// BufferedResponseWriter wrapper around [http.ResponseWriter].
+// Used to buffer the write into an http response. Now the [Write]
+// method doesn't send the response, it just writes it to the buffer.
+// To send a response you need to use the [Flush] method.
+type BufferedResponseWriter struct {
+	original    http.ResponseWriter
+	header      http.Header
+	statusCode  int
+	buffer      bytes.Buffer
+	wroteHeader bool
+}
+
+func NewBufferedResponseWriter(w http.ResponseWriter) *BufferedResponseWriter {
+	return &BufferedResponseWriter{
+		original:   w,
+		header:     make(http.Header),
+		statusCode: http.StatusOK,
+	}
+}
+
+func (rw *BufferedResponseWriter) OriginalWriter() http.ResponseWriter {
+	return rw.original
+}
+
+func (rw *BufferedResponseWriter) Header() http.Header {
+	return rw.header
+}
+
+func (rw *BufferedResponseWriter) WriteHeader(statusCode int) {
+	if rw.wroteHeader {
+		return
+	}
+	rw.statusCode = statusCode
+	rw.wroteHeader = true
+}
+
+// Write writes data to the buffer.
+func (rw *BufferedResponseWriter) Write(data []byte) (int, error) {
+	return rw.buffer.Write(data)
+}
+
+// Flush sending the http response of the previously recorded response.
+func (rw *BufferedResponseWriter) Flush() (int, error) {
+	for k, vv := range rw.header {
+		for _, v := range vv {
+			rw.original.Header().Add(k, v)
+		}
+	}
+	rw.original.WriteHeader(rw.statusCode)
+	return rw.original.Write(rw.buffer.Bytes())
+}
 
 type Handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()
 
@@ -52,54 +110,63 @@ func NewAdapter(manager interfaces.IManager, middlewares middlewares.IMiddleware
 
 // Adapt wraps router.Handler in additional functionality.
 // It creates a new manager, starts middlewares and does other small operations.
+//
+// IMPORTANT: if the connection is a websocket connection, [PostMiddlewares] will not work.
+// This is done to provide complete security against unexpected behavior.
+// In all other cases, [PostMiddlewares] will work as usual.
 func (a *Adapter) Adapt(pattern string, handler Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		isWebsocketConn := isWebsocket(r)
+		bw := NewBufferedResponseWriter(w)
 		if err := debug.ClearRequestInfoLogging(); err != nil {
-			a.internalErrorFunc(w, r, err)
+			a.internalErrorFunc(bw.OriginalWriter(), r, err)
 			return
 		}
 		debug.RequestLogginIfEnable(debug.P_ROUTER, fmt.Sprintf("request url: %s", r.URL))
 		debug.RequestLogginIfEnable(debug.P_ROUTER, "init manager")
 		newManager, err := a.newManager()
 		if err != nil {
-			a.internalErrorFunc(w, r, err)
+			a.internalErrorFunc(bw.OriginalWriter(), r, err)
 			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
 			return
 		}
 		debug.RequestLogginIfEnable(debug.P_ROUTER, "manager is initialized")
 
 		// Slug params
-		segments := strings.Split(strings.Trim(pattern, "/"), "/")
-		urlSegments := strings.Split(strings.Trim(r.URL.Path, "/"), "/")
-		params := MatchUrlSegments(segments, urlSegments)
-		if params != nil {
+		if params := a.getSlugParams(r.URL.Path, pattern); params != nil {
 			newManager.OneTimeData().SetSlugParams(params)
 		}
 
 		// Run middlewares
 		if skip, err := a.runPreAndAsyncMddl(w, r, newManager); err != nil {
-			if a.internalErrorFunc != nil {
-				a.internalErrorFunc(w, r, err)
-				debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
-			} else {
-				a.internalErrorFunc(w, r, err)
-				debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
-			}
+			a.internalErrorFunc(bw.OriginalWriter(), r, err)
+			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
 			return
-		} else {
-			if skip {
-				return
-			}
+		} else if skip {
+			return
 		}
 		newManager.OneTimeData().SetUserContext(namelib.ROUTER.URL_PATTERN, pattern)
-		handler(w, r, newManager)()
 		a.printLog(r)
-		if err := a.middlewares.RunPostMiddlewares(r, newManager); err != nil {
-			if !errors.Is(err, middlewares.ErrStopMiddlewares{}) {
-				a.internalErrorFunc(w, r, err)
-				debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
-				return
+		if !isWebsocketConn {
+			handler(bw, r, newManager)()
+			if err := a.middlewares.RunPostMiddlewares(r, newManager); err != nil {
+				if !errors.Is(err, middlewares.ErrStopMiddlewares{}) {
+					a.internalErrorFunc(bw.OriginalWriter(), r, err)
+					debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
+					return
+				}
 			}
+			if middlewares.IsSkipNextPage(newManager.OneTimeData()) {
+				return
+			} else {
+				if _, err := bw.Flush(); err != nil {
+					a.internalErrorFunc(bw.OriginalWriter(), r, err)
+					debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
+					return
+				}
+			}
+		} else {
+			handler(bw.OriginalWriter(), r, newManager)()
 		}
 	}
 }
@@ -150,6 +217,12 @@ func (a *Adapter) printLog(request *http.Request) {
 	if config.LoadedConfig().Default.Debug.PrintInfo {
 		log.Printf("%s %s", request.Method, request.URL.Path)
 	}
+}
+
+func (a *Adapter) getSlugParams(currentPath string, pattern string) map[string]string {
+	segments := strings.Split(strings.Trim(pattern, "/"), "/")
+	urlSegments := strings.Split(strings.Trim(currentPath, "/"), "/")
+	return MatchUrlSegments(segments, urlSegments)
 }
 
 type RegisterHandler func(method string, pattern string, handler Handler)
@@ -237,4 +310,10 @@ func MatchUrlSegments(routeSegments, pathSegments []string) map[string]string {
 	}
 
 	return params
+}
+
+func isWebsocket(r *http.Request) bool {
+	connHdr := strings.ToLower(r.Header.Get("Connection"))
+	return strings.Contains(connHdr, "upgrade") &&
+		strings.EqualFold(r.Header.Get("Upgrade"), "websocket")
 }
