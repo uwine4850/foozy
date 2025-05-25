@@ -72,7 +72,9 @@ func (rw *BufferedResponseWriter) Flush() (int, error) {
 	return rw.original.Write(rw.buffer.Bytes())
 }
 
-type Handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func()
+// Handler handles the http method.
+// Returns an error that is handled by the proper method from [Adapter].
+type Handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error
 
 type IAdapter interface {
 	Adapt(pattern string, handler Handler) http.HandlerFunc
@@ -148,7 +150,9 @@ func (a *Adapter) Adapt(pattern string, handler Handler) http.HandlerFunc {
 		newManager.OneTimeData().SetUserContext(namelib.ROUTER.URL_PATTERN, pattern)
 		a.printLog(r)
 		if !isWebsocketConn {
-			handler(bw, r, newManager)()
+			if err := handler(bw, r, newManager); err != nil {
+				a.internalErrorFunc(bw.OriginalWriter(), r, err)
+			}
 			if err := a.middlewares.RunPostMiddlewares(r, newManager); err != nil {
 				if !errors.Is(err, middlewares.ErrStopMiddlewares{}) {
 					a.internalErrorFunc(bw.OriginalWriter(), r, err)
@@ -166,7 +170,9 @@ func (a *Adapter) Adapt(pattern string, handler Handler) http.HandlerFunc {
 				}
 			}
 		} else {
-			handler(bw.OriginalWriter(), r, newManager)()
+			if err := handler(bw, r, newManager); err != nil {
+				a.internalErrorFunc(bw.OriginalWriter(), r, err)
+			}
 		}
 	}
 }
