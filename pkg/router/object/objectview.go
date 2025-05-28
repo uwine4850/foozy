@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/uwine4850/foozy/pkg/config"
-	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/debug"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/mapper"
@@ -18,10 +16,11 @@ import (
 type ObjView struct {
 	BaseView
 
-	Name       string      `notdef:"true"`
-	TableName  string      `notdef:"true"`
-	FillStruct interface{} `notdef:"true"`
-	Slug       string      `notdef:"true"`
+	Name       string        `notdef:"true"`
+	TableName  string        `notdef:"true"`
+	Database   IViewDatabase `notdef:"true"`
+	FillStruct interface{}   `notdef:"true"`
+	Slug       string        `notdef:"true"`
 }
 
 func (v *ObjView) ObjectsName() []string {
@@ -34,20 +33,11 @@ func (v *ObjView) Object(w http.ResponseWriter, r *http.Request, manager interfa
 		return nil, typeopr.ErrValueIsPointer{Value: "FillStruct"}
 	}
 
-	dbRead, err := manager.Database().ConnectionPool(config.LoadedConfig().Default.Database.MainConnectionPoolName)
-	if err != nil {
-		return nil, err
-	}
-
 	slugValue, ok := manager.OneTimeData().GetSlugParams(v.Slug)
 	if !ok {
 		return nil, ErrNoSlug{v.Slug}
 	}
-	qRes := qb.NewSyncQB(dbRead.SyncQ()).SelectFrom("*", v.TableName).Where(
-		qb.Compare(v.Slug, qb.EQUAL, slugValue),
-	).Limit(1)
-	qRes.Merge()
-	res, err := qRes.Query()
+	res, err := v.Database.SelectWhereEqual(v.TableName, v.Slug, slugValue)
 	if err != nil {
 		return nil, err
 	}

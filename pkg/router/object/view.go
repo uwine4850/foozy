@@ -11,7 +11,7 @@ import (
 
 type Context map[string]interface{}
 
-// IView The interface implements the basic structure of any IView. ITemplateView is used to display HTML page in a simpler and more convenient way.
+// IView the interface implements the basic structure of any IView. ITemplateView is used to display HTML page in a simpler and more convenient way.
 // For the view to work correctly, you need to create a new structure (for example MyObjView), embed a ready-made implementation of the view
 // (for example ObjView) into it, then you need to initialize this structure in the ITemplateView field in the TemplateView data type.
 type IView interface {
@@ -22,6 +22,14 @@ type IView interface {
 	Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func())
 	OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error)
 	ObjectsName() []string
+}
+
+// IViewDatabase interface that provides object unified access to the database.
+// Since each object queries the database, it is necessary to unify access
+// to the database so as not to be dependent on a particular database.
+type IViewDatabase interface {
+	SelectAll(tableName string) ([]map[string]interface{}, error)
+	SelectWhereEqual(tableName string, colName string, val any) ([]map[string]interface{}, error)
 }
 
 type BaseView struct{}

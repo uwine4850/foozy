@@ -4,8 +4,6 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/uwine4850/foozy/pkg/config"
-	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/debug"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/mapper"
@@ -24,6 +22,7 @@ type MultipleObject struct {
 type MultipleObjectView struct {
 	BaseView
 
+	Database        IViewDatabase    `notdef:"true"`
 	MultipleObjects []MultipleObject `notdef:"true"`
 }
 
@@ -41,10 +40,6 @@ func (v *MultipleObjectView) Object(w http.ResponseWriter, r *http.Request, mana
 		return nil, err
 	}
 	context := make(Context)
-	dbRead, err := manager.Database().ConnectionPool(config.LoadedConfig().Default.Database.MainConnectionPoolName)
-	if err != nil {
-		return nil, err
-	}
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "start fill objects")
 	for i := 0; i < len(v.MultipleObjects); i++ {
 		if typeopr.IsPointer(v.MultipleObjects[i].FillStruct) {
@@ -54,11 +49,7 @@ func (v *MultipleObjectView) Object(w http.ResponseWriter, r *http.Request, mana
 		if !ok {
 			return nil, ErrNoSlug{v.MultipleObjects[i].SlugName}
 		}
-		qRes := qb.NewSyncQB(dbRead.SyncQ()).SelectFrom("*", v.MultipleObjects[i].TaleName).Where(
-			qb.Compare(v.MultipleObjects[i].SlugField, qb.EQUAL, slugValue),
-		).Limit(1)
-		qRes.Merge()
-		res, err := qRes.Query()
+		res, err := v.Database.SelectWhereEqual(v.MultipleObjects[i].TaleName, v.MultipleObjects[i].SlugField, slugValue)
 		if err != nil {
 			return nil, err
 		}

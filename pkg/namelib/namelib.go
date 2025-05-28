@@ -18,7 +18,6 @@ var AUTH = AuthNames{
 type RouterNames struct {
 	URL_PATTERN            string
 	COOKIE_CSRF_TOKEN      string
-	MDDL_ERROR             string
 	SKIP_NEXT_PAGE         string
 	REDIRECT_ERROR         string
 	SERVER_ERROR           string
@@ -28,7 +27,6 @@ type RouterNames struct {
 var ROUTER = RouterNames{
 	URL_PATTERN:            "URL_PATTERN",
 	COOKIE_CSRF_TOKEN:      "CSRF_TOKEN",
-	MDDL_ERROR:             "MDDL_ERROR",
 	SKIP_NEXT_PAGE:         "SKIP_NEXT_PAGE",
 	REDIRECT_ERROR:         "REDIRECT_ERROR",
 	SERVER_ERROR:           "SERVER_ERROR",

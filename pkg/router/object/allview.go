@@ -4,8 +4,6 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/uwine4850/foozy/pkg/config"
-	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/debug"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/mapper"
@@ -17,8 +15,9 @@ import (
 // If the [slug] parameter is not set, all data from the table will be output.
 type AllView struct {
 	BaseView
-	Name       string `notdef:"true"`
-	TableName  string `notdef:"true"`
+	Name       string        `notdef:"true"`
+	TableName  string        `notdef:"true"`
+	Database   IViewDatabase `notdef:"true"`
 	Slug       string
 	FillStruct interface{} `notdef:"true"`
 }
@@ -30,25 +29,24 @@ func (v *AllView) ObjectsName() []string {
 // Object sets a slice of rows from the database.
 func (v *AllView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (Context, error) {
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "run AllView object")
-	dbRead, err := manager.Database().ConnectionPool(config.LoadedConfig().Default.Database.MainConnectionPoolName)
-	if err != nil {
-		return nil, err
-	}
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "get object from database")
-	qObjects := qb.NewSyncQB(dbRead.SyncQ())
+	var objects []map[string]interface{}
 	if v.Slug != "" {
 		slugValue, ok := manager.OneTimeData().GetSlugParams(v.Slug)
 		if !ok {
 			return nil, ErrNoSlug{v.Slug}
 		}
-		qObjects.SelectFrom("*", v.TableName).Where(qb.Compare(v.Slug, qb.EQUAL, slugValue))
+		res, err := v.Database.SelectWhereEqual(v.TableName, v.Slug, slugValue)
+		if err != nil {
+			return nil, err
+		}
+		objects = res
 	} else {
-		qObjects.SelectFrom("*", v.TableName)
-	}
-	qObjects.Merge()
-	objects, err := qObjects.Query()
-	if err != nil {
-		return nil, err
+		res, err := v.Database.SelectAll(v.TableName)
+		if err != nil {
+			return nil, err
+		}
+		objects = res
 	}
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "fill objects")
 	fillObjects, err := v.fillObjects(objects)
