@@ -118,7 +118,7 @@ func NewAdapter(manager interfaces.IManager, middlewares middlewares.IMiddleware
 // In all other cases, [PostMiddlewares] will work as usual.
 func (a *Adapter) Adapt(pattern string, handler Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		isWebsocketConn := isWebsocket(r)
+		isWebsocketConn := IsWebsocket(r)
 		bw := NewBufferedResponseWriter(w)
 		if err := debug.ClearRequestInfoLogging(); err != nil {
 			a.internalErrorFunc(bw.OriginalWriter(), r, err)
@@ -170,7 +170,7 @@ func (a *Adapter) Adapt(pattern string, handler Handler) http.HandlerFunc {
 				}
 			}
 		} else {
-			if err := handler(bw, r, newManager); err != nil {
+			if err := handler(bw.OriginalWriter(), r, newManager); err != nil {
 				a.internalErrorFunc(bw.OriginalWriter(), r, err)
 			}
 		}
@@ -318,7 +318,7 @@ func MatchUrlSegments(routeSegments, pathSegments []string) map[string]string {
 	return params
 }
 
-func isWebsocket(r *http.Request) bool {
+func IsWebsocket(r *http.Request) bool {
 	connHdr := strings.ToLower(r.Header.Get("Connection"))
 	return strings.Contains(connHdr, "upgrade") &&
 		strings.EqualFold(r.Header.Get("Upgrade"), "websocket")

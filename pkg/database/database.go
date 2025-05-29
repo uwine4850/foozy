@@ -99,7 +99,7 @@ func (d *MysqlDatabase) SelectAll(tableName string) ([]map[string]interface{}, e
 }
 
 func (d *MysqlDatabase) SelectWhereEqual(tableName string, colName string, val any) ([]map[string]interface{}, error) {
-	return d.syncQ.Query("SELECT * FROM ? WHERE ? = ?", tableName, colName, val)
+	return d.syncQ.Query(fmt.Sprintf("SELECT * FROM %s WHERE %s = ?", tableName, colName), val)
 }
 
 // MysqlTransaction An object that performs transactions
