@@ -94,14 +94,6 @@ func (d *MysqlDatabase) NewAsyncQ() (interfaces.IAsyncQueries, error) {
 	return aq.(interfaces.IAsyncQueries), nil
 }
 
-func (d *MysqlDatabase) SelectAll(tableName string) ([]map[string]interface{}, error) {
-	return d.syncQ.Query(fmt.Sprintf("SELECT * FROM %s", tableName))
-}
-
-func (d *MysqlDatabase) SelectWhereEqual(tableName string, colName string, val any) ([]map[string]interface{}, error) {
-	return d.syncQ.Query(fmt.Sprintf("SELECT * FROM %s WHERE %s = ?", tableName, colName), val)
-}
-
 // MysqlTransaction An object that performs transactions
 // to the mysql database.
 // This object is used only for one transaction, for each

@@ -41,7 +41,7 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 
-	if err := auth.CreateAuthTable(_db, tconf.DbArgs.DatabaseName); err != nil {
+	if err := auth.CreateMysqlAuthTable(_db, tconf.DbArgs.DatabaseName); err != nil {
 		panic(err)
 	}
 	_, err := _db.SyncQ().Query(fmt.Sprintf("TRUNCATE TABLE %s", namelib.AUTH.AUTH_TABLE))
@@ -89,7 +89,7 @@ func register() func(w http.ResponseWriter, r *http.Request, manager interfaces.
 		if err != nil {
 			return func() { router.ServerError(w, err.Error(), manager) }
 		}
-		if err := auth.CreateAuthTable(dbRead, tconf.DbArgs.DatabaseName); err != nil {
+		if err := auth.CreateMysqlAuthTable(dbRead, tconf.DbArgs.DatabaseName); err != nil {
 			return func() { router.ServerError(w, err.Error(), manager) }
 		}
 		au, err := auth.NewAuth(w, mng)

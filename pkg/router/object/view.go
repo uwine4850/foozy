@@ -32,6 +32,25 @@ type IViewDatabase interface {
 	SelectWhereEqual(tableName string, colName string, val any) ([]map[string]interface{}, error)
 }
 
+// ViewMysqlDatabase implementation of the [IViewDatabase] interface for a MySql database.
+type ViewMysqlDatabase struct {
+	db interfaces.IReadDatabase
+}
+
+func NewViewMysqlDatabase(db interfaces.IReadDatabase) *ViewMysqlDatabase {
+	return &ViewMysqlDatabase{
+		db: db,
+	}
+}
+
+func (d *ViewMysqlDatabase) SelectAll(tableName string) ([]map[string]interface{}, error) {
+	return d.db.SyncQ().Query(fmt.Sprintf("SELECT * FROM %s", tableName))
+}
+
+func (d *ViewMysqlDatabase) SelectWhereEqual(tableName string, colName string, val any) ([]map[string]interface{}, error) {
+	return d.db.SyncQ().Query(fmt.Sprintf("SELECT * FROM %s WHERE %s = ?", tableName, colName), val)
+}
+
 type BaseView struct{}
 
 func (v *BaseView) CloseDb() error {

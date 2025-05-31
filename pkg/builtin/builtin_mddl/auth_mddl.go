@@ -27,7 +27,7 @@ type OnError func(w http.ResponseWriter, r *http.Request, manager interfaces.IMa
 // The onErr element is used for error management only within this middleware. When any error occurs,
 // this function will be called instead of sending it to the router.
 // This is designed for more flexible control.
-func Auth(excludePatterns []string, onErr OnError) middlewares.PreMiddleware {
+func Auth(adb auth.AuthQuery, excludePatterns []string, onErr OnError) middlewares.PreMiddleware {
 	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 		pattern, ok := manager.OneTimeData().GetUserContext(namelib.ROUTER.URL_PATTERN)
 		if !ok {
@@ -46,11 +46,7 @@ func Auth(excludePatterns []string, onErr OnError) middlewares.PreMiddleware {
 		d1 := manager.Key().Get32BytesKey().Date().Format("02.01.2006 15:04:05")
 		d2 := auth_date.Format("02.01.2006 15:04:05")
 		if d1 != d2 {
-			_auth, err := auth.NewAuth(w, manager)
-			if err != nil {
-				onErr(w, r, manager, err)
-				return middlewares.ErrStopMiddlewares{}
-			}
+			_auth := auth.NewAuth(w, adb, manager)
 			if err := _auth.UpdateAuthCookie([]byte(k.OldHashKey()), []byte(k.OldBlockKey()), r); err != nil {
 				onErr(w, r, manager, err)
 				return middlewares.ErrStopMiddlewares{}
