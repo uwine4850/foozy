@@ -2,6 +2,7 @@ package fstring
 
 import (
 	"strings"
+	"unicode"
 )
 
 // SplitUrl separates the url by the "/" character. Skips empty slice values.
@@ -15,4 +16,11 @@ func SplitUrl(url string) []string {
 		res = append(res, sp[i])
 	}
 	return res
+}
+
+func ToLower(value string) string {
+	for i, v := range value {
+		return string(unicode.ToLower(v)) + value[i+1:]
+	}
+	return ""
 }

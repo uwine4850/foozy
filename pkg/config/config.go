@@ -61,6 +61,9 @@ func Cnf() *Config {
 				Database: DatabaseConfig{
 					MainConnectionPoolName: "main",
 				},
+				DTOConfig: DTOConfig{
+					PkgName: "userdto",
+				},
 			},
 		}
 	})
@@ -69,8 +72,9 @@ func Cnf() *Config {
 
 // DefaultConfig a standard set of configurations.
 type DefaultConfig struct {
-	Debug    DebugConfig    `yaml:"Debug"`
-	Database DatabaseConfig `yaml:"Database"`
+	Debug     DebugConfig    `yaml:"Debug"`
+	Database  DatabaseConfig `yaml:"Database"`
+	DTOConfig DTOConfig      `yaml:"DTOConfig"`
 }
 
 type DebugConfig struct {
@@ -86,6 +90,11 @@ type DebugConfig struct {
 
 type DatabaseConfig struct {
 	MainConnectionPoolName string `yaml:"MainConnectionPoolName" i:"The name of the main connection pool"`
+}
+
+type DTOConfig struct {
+	GeneratedFilePath string `yaml:"GeneratedFilePath" i:"A file where DTO objects are stored for use by the server"`
+	PkgName           string `yaml:"PkgName" i:"Package name"`
 }
 
 // Info displays information about each command.
