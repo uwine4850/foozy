@@ -33,6 +33,9 @@ export interface {{.Name}} {
     {{ .Name }}: {{ .Type }};
     {{- end}}
 }
+export function is{{ .Name }}(obj: any): obj is {{ .Name }} {
+    return typeof obj === 'object' && obj !== null && '{{ .TypeId }}' in obj;
+}
 {{- end}}
 `
 
@@ -147,7 +150,7 @@ func (d *DTO) validateMessageIntegrity() error {
 // writeClientMessages writes messages to client files that are passed through the [Messages] method.
 func (d *DTO) writeClientMessages() error {
 	allGeneratedAllowMessages := []AllowMessage{}
-	acceptMessages := map[string][]genMessage{}
+	acceptMessages := map[string][]clientMessage{}
 	for path, messages := range d.messages {
 		generatedMessages, generetedAllowMessages, err := d.generateMessages(messages)
 		if err != nil {
@@ -205,14 +208,14 @@ func (d *DTO) writeServerMessages() error {
 // generateServerFile generates a single file for all server messages.
 // It is important to specify the package name and file path in the settings.
 func (d *DTO) generateServerFile() (*generatedServerFile, error) {
-	newGeneratedServerMessages := []generatedServerMessage{}
+	newServerMessages := []serverMessage{}
 	imports := []string{}
 	for _, messages := range d.messages {
 		for msgID := 0; msgID < len(messages); msgID++ {
 			messageType := reflect.TypeOf(messages[msgID])
-			newGeneratedServerMessage := generatedServerMessage{}
+			newServerMessage := serverMessage{}
 			pkgName := strings.Split(messageType.String(), ".")[0]
-			newGeneratedServerMessage.Name = pkgName + "_" + messageType.Name()
+			newServerMessage.Name = pkgName + "_" + messageType.Name()
 			funcArgs := map[string]string{}
 			for fieldID := 0; fieldID < messageType.NumField(); fieldID++ {
 				field := messageType.Field(fieldID)
@@ -228,7 +231,7 @@ func (d *DTO) generateServerFile() (*generatedServerFile, error) {
 						Name: field.Name,
 						Type: templateFieldType,
 					}
-					newGeneratedServerMessage.Fields = append(newGeneratedServerMessage.Fields, newGeneratedMessageField)
+					newServerMessage.Fields = append(newServerMessage.Fields, newGeneratedMessageField)
 					funcArgs[field.Name] = templateArgFieldType
 				}
 			}
@@ -236,11 +239,11 @@ func (d *DTO) generateServerFile() (*generatedServerFile, error) {
 			dtoMessageIdName := fmt.Sprintf("Type%s", strings.Replace(messageType.String(), ".", "", -1))
 			dtoMessageIdTypeName := fmt.Sprintf("any `%s:\"%s\"`",
 				namelib.TAGS.REST_MAPPER_NAME, dtoMessageIdName)
-			newGeneratedServerMessage.MessageID = fmt.Sprintf("%s %s", dtoMessageIdName, dtoMessageIdTypeName)
+			newServerMessage.MessageID = fmt.Sprintf("%s %s", dtoMessageIdName, dtoMessageIdTypeName)
 			funcName := cases.Title(language.Und).String(pkgAndStructName[0]) + pkgAndStructName[1]
-			newGeneratedServerMessage.FuncName = fmt.Sprintf("New%s", funcName)
-			newGeneratedServerMessage.FuncArgs = funcArgs
-			newGeneratedServerMessages = append(newGeneratedServerMessages, newGeneratedServerMessage)
+			newServerMessage.FuncName = fmt.Sprintf("New%s", funcName)
+			newServerMessage.FuncArgs = funcArgs
+			newServerMessages = append(newServerMessages, newServerMessage)
 		}
 	}
 	pkgName := config.LoadedConfig().Default.DTOConfig.PkgName
@@ -249,7 +252,7 @@ func (d *DTO) generateServerFile() (*generatedServerFile, error) {
 	}
 	return &generatedServerFile{
 		PkgName:  pkgName,
-		Messages: newGeneratedServerMessages,
+		Messages: newServerMessages,
 		Imports:  imports,
 	}, nil
 }
@@ -257,16 +260,16 @@ func (d *DTO) generateServerFile() (*generatedServerFile, error) {
 // generateMessages generates typescript interfaces and stores them
 // in the special structures [genMessage]. Each such structure contains data of one interface.
 // Also returns [AllowMessage]. This structure contains data about one generated DTO message.
-func (d *DTO) generateMessages(messages []irest.IMessage) ([]genMessage, []AllowMessage, error) {
-	generatedMessages := []genMessage{}
+func (d *DTO) generateMessages(messages []irest.IMessage) ([]clientMessage, []AllowMessage, error) {
+	clientMessages := []clientMessage{}
 	generatedAllowMessages := []AllowMessage{}
 	for i := 0; i < len(messages); i++ {
 		_type := reflect.TypeOf((messages)[i])
 		typeInfo := strings.Split(_type.String(), ".")
 
 		allowedMessage := AllowMessage{Package: typeInfo[0], Name: typeInfo[1]}
-		var genMsg genMessage
-		genMsg.Name = _type.Name()
+		var clientMessage clientMessage
+		clientMessage.Name = _type.Name()
 		for i := 0; i < _type.NumField(); i++ {
 			// Skip implemetation object.
 			if _type.Field(i).Type == reflect.TypeOf(ImplementDTOMessage{}) {
@@ -279,26 +282,27 @@ func (d *DTO) generateMessages(messages []irest.IMessage) ([]genMessage, []Allow
 			if tagFieldName := _type.Field(i).Tag.Get(namelib.TAGS.REST_MAPPER_NAME); tagFieldName != "" {
 				// Formation of the [genMessageField] structure.
 				messageField := generatedMessageField{Type: cnvType, Name: tagFieldName}
-				genMsg.Fields = append(genMsg.Fields, messageField)
+				clientMessage.Fields = append(clientMessage.Fields, messageField)
 			} else {
 				// Skip if tag no exists.
 				continue
 			}
 		}
-		if len(genMsg.Fields) == 0 {
+		if len(clientMessage.Fields) == 0 {
 			return nil, nil, ErrNumberOfFields{MessageType: allowedMessage.FullName()}
 		}
 
+		typeId := fmt.Sprintf("Type%s", strings.Replace(allowedMessage.FullName(), ".", "", -1))
 		typeMessageFiels := generatedMessageField{
-			Name: fmt.Sprintf("Type%s?", strings.Replace(allowedMessage.FullName(), ".", "", -1)),
+			Name: typeId + "?",
 			Type: "unknown",
 		}
-		genMsg.Fields = append([]generatedMessageField{typeMessageFiels}, genMsg.Fields...)
-
-		generatedMessages = append(generatedMessages, genMsg)
+		clientMessage.Fields = append([]generatedMessageField{typeMessageFiels}, clientMessage.Fields...)
+		clientMessage.TypeId = typeId
+		clientMessages = append(clientMessages, clientMessage)
 		generatedAllowMessages = append(generatedAllowMessages, allowedMessage)
 	}
-	return generatedMessages, generatedAllowMessages, nil
+	return clientMessages, generatedAllowMessages, nil
 }
 
 func (d *DTO) convertType(goType reflect.Type, messages []irest.IMessage, mainMessage AllowMessage) (string, error) {
@@ -356,18 +360,19 @@ func (d *DTO) validateImplementMessage(generatedMessage []AllowMessage) error {
 	return nil
 }
 
-type genMessage struct {
+type clientMessage struct {
 	Name   string
+	TypeId string
 	Fields []generatedMessageField
 }
 
 type generatedServerFile struct {
 	PkgName  string
 	Imports  []string
-	Messages []generatedServerMessage
+	Messages []serverMessage
 }
 
-type generatedServerMessage struct {
+type serverMessage struct {
 	PkgName   string
 	Name      string
 	MessageID string
