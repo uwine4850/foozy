@@ -39,10 +39,7 @@ func IsSafeMessage(message typeopr.IPtr, allowedMessages []AllowMessage) error {
 	if _type == reflect.TypeOf((*irest.IMessage)(nil)).Elem() {
 		_type = reflect.TypeOf(reflect.ValueOf(message.Ptr()).Elem().Interface())
 	}
-	pkgAndName := strings.Split(_type.Name(), "_")
-	if len(pkgAndName) != 2 {
-		return fmt.Errorf("error reading the %s message prefix", _type.Name())
-	}
+	pkgAndName := strings.Split(_type.String(), ".")
 	msg := AllowMessage{Package: pkgAndName[0], Name: pkgAndName[1]}
 	if !fslice.SliceContains(allowedMessages, msg) {
 		return fmt.Errorf("%s message is unsafe", msg.FullName())

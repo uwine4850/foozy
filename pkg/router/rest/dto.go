@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"reflect"
@@ -11,14 +10,12 @@ import (
 
 	"strings"
 
-	"github.com/uwine4850/foozy/pkg/config"
 	"github.com/uwine4850/foozy/pkg/interfaces/irest"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router/form"
-	"github.com/uwine4850/foozy/pkg/utils/fstring"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 )
+
+type TypeId struct{}
 
 var (
 	instance *DTO
@@ -37,35 +34,6 @@ export function is{{ .Name }}(obj: any): obj is {{ .Name }} {
     return typeof obj === 'object' && obj !== null && '{{ .TypeId }}' in obj;
 }
 {{- end}}
-`
-
-const serverMessageTemplate = `package {{ .PkgName }}
-import "github.com/uwine4850/foozy/pkg/router/rest"
-{{ range $import := .Imports }}
-{{ $import }}
-{{- end }}
-
-{{- range .Messages}}
-
-type {{.Name}} struct {
-    rest.ImplementDTOMessage
-    {{ .MessageID }}
-    {{- range .Fields}}
-    {{ .Name }} {{ .Type }}
-    {{- end}}
-}
-
-func {{ .FuncName }}({{ range $name, $type := .FuncArgs }}
-    {{ $name | ToLower }} {{ $type }},
-{{- end }}
-) *{{.Name}} {
-    return &{{.Name}}{ {{ range $name, $type := .FuncArgs }}
-	    {{$name}}: {{$name | ToLower}},
-{{- end }}
-    }
-}
-{{- end}}
-
 `
 
 // DTO (Data Transfer Object) generates a typescript interface using a message.
@@ -124,9 +92,6 @@ func (d *DTO) Generate() error {
 	if err := d.writeClientMessages(); err != nil {
 		return err
 	}
-	if err := d.writeServerMessages(); err != nil {
-		return err
-	}
 	d.isGenerated = true
 	return nil
 }
@@ -178,89 +143,11 @@ func (d *DTO) writeClientMessages() error {
 	return nil
 }
 
-// writeServerMessages writes generated server message data to a file.
-// To work it is necessary to specify the path to the file in the DTO configuration.
-func (d *DTO) writeServerMessages() error {
-	serverDTOPath := config.LoadedConfig().Default.DTOConfig.GeneratedFilePath
-	if serverDTOPath == "" {
-		return errors.New("the Default.DTOConfig.GeneratedFilePath configuration cannot be empty")
-	}
-	serverDTOFile, err := os.Create(serverDTOPath)
-	if err != nil {
-		return err
-	}
-	defer serverDTOFile.Close()
-
-	serverFile, err := d.generateServerFile()
-	if err != nil {
-		return err
-	}
-	funcMap := template.FuncMap{
-		"ToLower": fstring.ToLower,
-	}
-	st := template.Must(template.New("serverM").Funcs(funcMap).Parse(serverMessageTemplate))
-	if err := st.Execute(serverDTOFile, serverFile); err != nil {
-		return err
-	}
-	return nil
-}
-
-// generateServerFile generates a single file for all server messages.
-// It is important to specify the package name and file path in the settings.
-func (d *DTO) generateServerFile() (*generatedServerFile, error) {
-	newServerMessages := []serverMessage{}
-	imports := []string{}
-	for _, messages := range d.messages {
-		for msgID := 0; msgID < len(messages); msgID++ {
-			messageType := reflect.TypeOf(messages[msgID])
-			newServerMessage := serverMessage{}
-			pkgName := strings.Split(messageType.String(), ".")[0]
-			newServerMessage.Name = pkgName + "_" + messageType.Name()
-			funcArgs := map[string]string{}
-			for fieldID := 0; fieldID < messageType.NumField(); fieldID++ {
-				field := messageType.Field(fieldID)
-				dtoTag := field.Tag.Get(namelib.TAGS.REST_MAPPER_NAME)
-				if field.Type != reflect.TypeOf(ImplementDTOMessage{}) && dtoTag != "" {
-					templateFieldType, templateArgFieldType := getTemplateFieldAndArgFieldType(field)
-					if field.Type == reflect.TypeOf(form.FormFile{}) {
-						imports = append(imports, `import "github.com/uwine4850/foozy/pkg/router/form"`)
-						templateFieldType = fmt.Sprintf("form.%s `%s:\"%s\"`", field.Type.Name(), namelib.TAGS.REST_MAPPER_NAME, dtoTag)
-						templateArgFieldType = "form." + field.Type.Name()
-					}
-					newGeneratedMessageField := generatedMessageField{
-						Name: field.Name,
-						Type: templateFieldType,
-					}
-					newServerMessage.Fields = append(newServerMessage.Fields, newGeneratedMessageField)
-					funcArgs[field.Name] = templateArgFieldType
-				}
-			}
-			pkgAndStructName := strings.Split(messageType.String(), ".")
-			dtoMessageIdName := fmt.Sprintf("Type%s", strings.Replace(messageType.String(), ".", "", -1))
-			dtoMessageIdTypeName := fmt.Sprintf("any `%s:\"%s\"`",
-				namelib.TAGS.REST_MAPPER_NAME, dtoMessageIdName)
-			newServerMessage.MessageID = fmt.Sprintf("%s %s", dtoMessageIdName, dtoMessageIdTypeName)
-			funcName := cases.Title(language.Und).String(pkgAndStructName[0]) + pkgAndStructName[1]
-			newServerMessage.FuncName = fmt.Sprintf("New%s", funcName)
-			newServerMessage.FuncArgs = funcArgs
-			newServerMessages = append(newServerMessages, newServerMessage)
-		}
-	}
-	pkgName := config.LoadedConfig().Default.DTOConfig.PkgName
-	if pkgName == "" {
-		return nil, errors.New("package name cannot be empty")
-	}
-	return &generatedServerFile{
-		PkgName:  pkgName,
-		Messages: newServerMessages,
-		Imports:  imports,
-	}, nil
-}
-
 // generateMessages generates typescript interfaces and stores them
 // in the special structures [genMessage]. Each such structure contains data of one interface.
 // Also returns [AllowMessage]. This structure contains data about one generated DTO message.
 func (d *DTO) generateMessages(messages []irest.IMessage) ([]clientMessage, []AllowMessage, error) {
+	typeIdNames := []string{}
 	clientMessages := []clientMessage{}
 	generatedAllowMessages := []AllowMessage{}
 	for i := 0; i < len(messages); i++ {
@@ -270,35 +157,46 @@ func (d *DTO) generateMessages(messages []irest.IMessage) ([]clientMessage, []Al
 		allowedMessage := AllowMessage{Package: typeInfo[0], Name: typeInfo[1]}
 		var clientMessage clientMessage
 		clientMessage.Name = _type.Name()
+		hasTypeId := false
+		typeIdValue := ""
 		for i := 0; i < _type.NumField(); i++ {
 			// Skip implemetation object.
 			if _type.Field(i).Type == reflect.TypeOf(ImplementDTOMessage{}) {
 				continue
 			}
-			cnvType, err := d.convertType(_type.Field(i).Type, messages, allowedMessage)
-			if err != nil {
-				return nil, nil, err
-			}
-			if tagFieldName := _type.Field(i).Tag.Get(namelib.TAGS.REST_MAPPER_NAME); tagFieldName != "" {
-				// Formation of the [genMessageField] structure.
-				messageField := generatedMessageField{Type: cnvType, Name: tagFieldName}
-				clientMessage.Fields = append(clientMessage.Fields, messageField)
-			} else {
-				// Skip if tag no exists.
+			dtoTag := _type.Field(i).Tag.Get(namelib.TAGS.DTO)
+			if dtoTag == "" {
 				continue
 			}
+			var messageField generatedMessageField
+			if dtoTag == "-typeid" {
+				if _type.Field(i).Type != reflect.TypeOf(TypeId{}) {
+					return nil, nil, ErrInvalidTypeIdDataType{}
+				}
+				if slices.Contains(typeIdNames, _type.Field(i).Name) {
+					return nil, nil, ErrTypeIdAlreadyExists{Name: _type.Field(i).Name}
+				}
+				typeIdNames = append(typeIdNames, _type.Field(i).Name)
+				typeIdValue = _type.Field(i).Name
+				hasTypeId = true
+				messageField = generatedMessageField{Type: "unknown", Name: _type.Field(i).Name + "?"}
+			} else {
+				cnvType, err := d.convertType(_type.Field(i).Type, messages, allowedMessage)
+				if err != nil {
+					return nil, nil, err
+				}
+				messageField = generatedMessageField{Type: cnvType, Name: dtoTag}
+			}
+			// Formation of the [genMessageField] structure.
+			clientMessage.Fields = append(clientMessage.Fields, messageField)
+			clientMessage.TypeId = typeIdValue
+		}
+		if !hasTypeId {
+			return nil, nil, ErrTypeIdNotFound{}
 		}
 		if len(clientMessage.Fields) == 0 {
 			return nil, nil, ErrNumberOfFields{MessageType: allowedMessage.FullName()}
 		}
-
-		typeId := fmt.Sprintf("Type%s", strings.Replace(allowedMessage.FullName(), ".", "", -1))
-		typeMessageFiels := generatedMessageField{
-			Name: typeId + "?",
-			Type: "unknown",
-		}
-		clientMessage.Fields = append([]generatedMessageField{typeMessageFiels}, clientMessage.Fields...)
-		clientMessage.TypeId = typeId
 		clientMessages = append(clientMessages, clientMessage)
 		generatedAllowMessages = append(generatedAllowMessages, allowedMessage)
 	}
@@ -366,41 +264,9 @@ type clientMessage struct {
 	Fields []generatedMessageField
 }
 
-type generatedServerFile struct {
-	PkgName  string
-	Imports  []string
-	Messages []serverMessage
-}
-
-type serverMessage struct {
-	PkgName   string
-	Name      string
-	MessageID string
-	Fields    []generatedMessageField
-	FuncName  string
-	// <name>:<type>
-	FuncArgs map[string]string
-}
-
 type generatedMessageField struct {
 	Name string
 	Type string
-}
-
-func getTemplateFieldAndArgFieldType(field reflect.StructField) (templFieldType string, templArgFieldType string) {
-	dtoTag := field.Tag.Get(namelib.TAGS.REST_MAPPER_NAME)
-	var templateFieldType string
-	var templateArgFieldType string
-	if field.Type.Kind() == reflect.Struct {
-		fieldStructPkg := strings.Split(field.Type.String(), ".")[0]
-		fieldStructTypeName := fieldStructPkg + "_" + field.Type.Name()
-		templateFieldType = fmt.Sprintf("%s `%s:\"%s\"`", fieldStructTypeName, namelib.TAGS.REST_MAPPER_NAME, dtoTag)
-		templateArgFieldType = fieldStructTypeName
-	} else {
-		templateFieldType = fmt.Sprintf("%s `%s:\"%s\"`", field.Type.Name(), namelib.TAGS.REST_MAPPER_NAME, dtoTag)
-		templateArgFieldType = field.Type.Name()
-	}
-	return templateFieldType, templateArgFieldType
 }
 
 type ErrMessageNotAllowed struct {
@@ -440,4 +306,24 @@ type ErrMultipleGenerateCall struct{}
 
 func (e ErrMultipleGenerateCall) Error() string {
 	return "generate can only be called once"
+}
+
+type ErrInvalidTypeIdDataType struct{}
+
+func (e ErrInvalidTypeIdDataType) Error() string {
+	return "invalid TypeId data type"
+}
+
+type ErrTypeIdNotFound struct{}
+
+func (e ErrTypeIdNotFound) Error() string {
+	return "TypeId not found"
+}
+
+type ErrTypeIdAlreadyExists struct {
+	Name string
+}
+
+func (e ErrTypeIdAlreadyExists) Error() string {
+	return fmt.Sprintf("TypeId \"%s\" already exists", e.Name)
 }

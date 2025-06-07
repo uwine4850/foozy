@@ -17,6 +17,7 @@ import (
 
 var messageRawCache sync.Map
 var implementDTOMessageType = reflect.TypeOf(rest.ImplementDTOMessage{})
+var typeIdType = reflect.TypeOf(rest.TypeId{})
 
 // DeepCheckDTOSafeMessage checks whether transmitted messages and internal messages are safe.
 // That is, there will be a check of internal structures, in depth to the limit.
@@ -36,9 +37,9 @@ func DeepCheckDTOSafeMessage(dto *rest.DTO, messagePtr typeopr.IPtr) error {
 	} else {
 		RV = message
 	}
-	rawObject := LoadSomeRawObjectFromCache(RV, &messageRawCache, namelib.TAGS.REST_MAPPER_NAME)
+	rawObject := LoadSomeRawObjectFromCache(RV, &messageRawCache, namelib.TAGS.DTO)
 	for _, f := range *rawObject.Fields() {
-		if f.Type.Kind() == reflect.Struct && f.Type != implementDTOMessageType {
+		if f.Type.Kind() == reflect.Struct && f.Type != implementDTOMessageType && f.Type != typeIdType {
 			v := RV.FieldByName(f.Name)
 			i := v.Interface().(irest.IMessage)
 			if err := DeepCheckDTOSafeMessage(dto, typeopr.Ptr{}.New(&i)); err != nil {
@@ -84,7 +85,7 @@ func FillDTOMessageFromMap[T any](jsonMap map[string]interface{}, out *T) error 
 	if !typeopr.IsImplementInterface(typeopr.Ptr{}.New(out), (*irest.IMessage)(nil)) {
 		return errors.New("output param must implement the irest.IMessage interface")
 	}
-	rawObject := LoadSomeRawObjectFromCache(RV, &messageRawCache, namelib.TAGS.REST_MAPPER_NAME)
+	rawObject := LoadSomeRawObjectFromCache(RV, &messageRawCache, namelib.TAGS.DTO)
 	for name, f := range *rawObject.Fields() {
 		inputValue, ok := (jsonMap)[name]
 		if !ok {
