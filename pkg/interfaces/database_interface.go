@@ -28,7 +28,7 @@ type IReadDatabase interface {
 	// is necessary for data security reasons.
 	// That is, for each new transaction a new instance of [ITransaction]
 	// should be created, which works in its own scope. This behavior prevents any data leaks.
-	NewTransaction() ITransaction
+	NewTransaction() (ITransaction, error)
 }
 
 type ITransaction interface {
@@ -58,6 +58,7 @@ type IDbQuery interface {
 }
 
 type ISyncQueries interface {
+	itypeopr.INewInstance
 	SetDB(db IDbQuery)
 	Query(query string, args ...any) ([]map[string]interface{}, error)
 	Exec(query string, args ...any) (map[string]interface{}, error)

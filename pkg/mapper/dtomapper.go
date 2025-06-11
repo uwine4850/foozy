@@ -63,11 +63,11 @@ func JsonToDTOMessage[T any](jsonData map[string]interface{}, dto *rest.DTO, out
 }
 
 // SendSafeJsonMessage sends only safe messages in JSON format.
-func SendSafeJsonDTOMessage(w http.ResponseWriter, dto *rest.DTO, message typeopr.IPtr) error {
+func SendSafeJsonDTOMessage(w http.ResponseWriter, code int, dto *rest.DTO, message typeopr.IPtr) error {
 	if err := DeepCheckDTOSafeMessage(dto, message); err != nil {
 		return err
 	}
-	if err := router.SendJson(message.Ptr(), w); err != nil {
+	if err := router.SendJson(message.Ptr(), w, code); err != nil {
 		return err
 	}
 	return nil

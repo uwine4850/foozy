@@ -12,6 +12,12 @@ func NewSyncQueries() *SyncQueries {
 	return &SyncQueries{}
 }
 
+func (q *SyncQueries) New() (interface{}, error) {
+	return &SyncQueries{
+		db: q.db,
+	}, nil
+}
+
 // Query wrapper for the IDbQuery.Query method.
 func (q *SyncQueries) Query(query string, args ...any) ([]map[string]interface{}, error) {
 	return q.db.Query(query, args...)

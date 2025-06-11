@@ -56,13 +56,13 @@ func ServerForbidden(w http.ResponseWriter, manager interfaces.IManager) {
 }
 
 // SendJson sends json-formatted data to the page.
-func SendJson(data interface{}, w http.ResponseWriter) error {
+func SendJson(data interface{}, w http.ResponseWriter, code int) error {
 	marshal, err := json.Marshal(data)
 	if err != nil {
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(code)
 	_, err = w.Write(marshal)
 	if err != nil {
 		return err

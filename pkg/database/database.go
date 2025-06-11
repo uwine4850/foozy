@@ -77,7 +77,7 @@ func (d *MysqlDatabase) Close() error {
 }
 
 // NewTransaction creates a new transaction instance.
-func (d *MysqlDatabase) NewTransaction() interfaces.ITransaction {
+func (d *MysqlDatabase) NewTransaction() (interfaces.ITransaction, error) {
 	return NewMysqlTransaction(d.db, d.syncQ, d.asyncQ)
 }
 
@@ -108,12 +108,20 @@ type MysqlTransaction struct {
 // NewMysqlTransaction creates a new [MysqlTransaction] escamp.
 // For correct creation, it is necessary to pass an already open
 // connection to the database.
-func NewMysqlTransaction(db *sql.DB, syncQ interfaces.ISyncQueries, asyncQ interfaces.IAsyncQueries) *MysqlTransaction {
+func NewMysqlTransaction(db *sql.DB, syncQ interfaces.ISyncQueries, asyncQ interfaces.IAsyncQueries) (*MysqlTransaction, error) {
+	newSyncQ, err := syncQ.New()
+	if err != nil {
+		return nil, err
+	}
+	newAsyncQ, err := asyncQ.New()
+	if err != nil {
+		return nil, err
+	}
 	return &MysqlTransaction{
 		db:     db,
-		syncQ:  syncQ,
-		asyncQ: asyncQ,
-	}
+		syncQ:  newSyncQ.(interfaces.ISyncQueries),
+		asyncQ: newAsyncQ.(interfaces.IAsyncQueries),
+	}, nil
 }
 
 // BeginTransaction starts the transaction.
@@ -134,6 +142,9 @@ func (t *MysqlTransaction) BeginTransaction() error {
 
 // CommitTransaction writes the transaction to the database.
 func (t *MysqlTransaction) CommitTransaction() error {
+	if t.tx == nil {
+		return errors.New("transaction not begin")
+	}
 	if err := t.tx.Commit(); err != nil {
 		return err
 	}
@@ -145,6 +156,9 @@ func (t *MysqlTransaction) CommitTransaction() error {
 // during the transaction.
 // That is, after executing the [BeginTransaction] method.
 func (t *MysqlTransaction) RollBackTransaction() error {
+	if t.tx == nil {
+		return errors.New("transaction not begin")
+	}
 	if err := t.tx.Rollback(); err != nil {
 		return err
 	}

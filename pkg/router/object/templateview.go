@@ -170,7 +170,7 @@ func (v *JsonObjectTemplateView) Call(w http.ResponseWriter, r *http.Request, ma
 		filledMessage = viewContext
 	}
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "send json")
-	router.SendJson(filledMessage, w)
+	router.SendJson(filledMessage, w, http.StatusOK)
 	return nil
 }
 
@@ -236,7 +236,7 @@ func (v *JsonMultipleObjectTemplateView) Call(w http.ResponseWriter, r *http.Req
 		returnData = viewContext
 	}
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "send json")
-	router.SendJson(returnData, w)
+	router.SendJson(returnData, w, http.StatusOK)
 	return nil
 }
 
@@ -304,7 +304,7 @@ func (v *JsonAllTemplateView) Call(w http.ResponseWriter, r *http.Request, manag
 			}
 			filledMessages = append(filledMessages, filledMessage)
 		}
-		router.SendJson(filledMessages, w)
+		router.SendJson(filledMessages, w, http.StatusOK)
 		return nil
 	} else {
 		debug.RequestLogginIfEnable(debug.P_OBJECT, "pass context without DTO messages")
@@ -313,7 +313,7 @@ func (v *JsonAllTemplateView) Call(w http.ResponseWriter, r *http.Request, manag
 		contextSliceMap = append(contextSliceMap, viewContext)
 	}
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "send json")
-	router.SendJson(contextSliceMap[0], w)
+	router.SendJson(contextSliceMap[0], w, http.StatusOK)
 	return nil
 }
 

@@ -121,14 +121,14 @@ func (a *Adapter) Adapt(pattern string, handler Handler) http.HandlerFunc {
 		isWebsocketConn := IsWebsocket(r)
 		bw := NewBufferedResponseWriter(w)
 		if err := debug.ClearRequestInfoLogging(); err != nil {
-			a.internalErrorFunc(bw.OriginalWriter(), r, err)
+			a.internalErrorFunc(bw, r, err)
 			return
 		}
 		debug.RequestLogginIfEnable(debug.P_ROUTER, fmt.Sprintf("request url: %s", r.URL))
 		debug.RequestLogginIfEnable(debug.P_ROUTER, "init manager")
 		newManager, err := a.newManager()
 		if err != nil {
-			a.internalErrorFunc(bw.OriginalWriter(), r, err)
+			a.internalErrorFunc(bw, r, err)
 			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
 			return
 		}
@@ -141,7 +141,7 @@ func (a *Adapter) Adapt(pattern string, handler Handler) http.HandlerFunc {
 
 		// Run middlewares
 		if skip, err := a.runPreAndAsyncMddl(w, r, newManager); err != nil {
-			a.internalErrorFunc(bw.OriginalWriter(), r, err)
+			a.internalErrorFunc(bw, r, err)
 			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
 			return
 		} else if skip {
@@ -151,11 +151,11 @@ func (a *Adapter) Adapt(pattern string, handler Handler) http.HandlerFunc {
 		a.printLog(r)
 		if !isWebsocketConn {
 			if err := handler(bw, r, newManager); err != nil {
-				a.internalErrorFunc(bw.OriginalWriter(), r, err)
+				a.internalErrorFunc(bw, r, err)
 			}
 			if err := a.middlewares.RunPostMiddlewares(r, newManager); err != nil {
 				if !errors.Is(err, middlewares.ErrStopMiddlewares{}) {
-					a.internalErrorFunc(bw.OriginalWriter(), r, err)
+					a.internalErrorFunc(bw, r, err)
 					debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
 					return
 				}
@@ -164,14 +164,14 @@ func (a *Adapter) Adapt(pattern string, handler Handler) http.HandlerFunc {
 				return
 			} else {
 				if _, err := bw.Flush(); err != nil {
-					a.internalErrorFunc(bw.OriginalWriter(), r, err)
+					a.internalErrorFunc(bw, r, err)
 					debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
 					return
 				}
 			}
 		} else {
 			if err := handler(bw.OriginalWriter(), r, newManager); err != nil {
-				a.internalErrorFunc(bw.OriginalWriter(), r, err)
+				a.internalErrorFunc(bw, r, err)
 			}
 		}
 	}
