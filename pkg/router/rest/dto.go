@@ -192,7 +192,7 @@ func (d *DTO) generateMessages(messages []irest.IMessage) ([]clientMessage, []Al
 			clientMessage.TypeId = typeIdValue
 		}
 		if !hasTypeId {
-			return nil, nil, ErrTypeIdNotFound{}
+			return nil, nil, ErrTypeIdNotFound{MessageName: allowedMessage.FullName()}
 		}
 		if len(clientMessage.Fields) == 0 {
 			return nil, nil, ErrNumberOfFields{MessageType: allowedMessage.FullName()}
@@ -314,10 +314,12 @@ func (e ErrInvalidTypeIdDataType) Error() string {
 	return "invalid TypeId data type"
 }
 
-type ErrTypeIdNotFound struct{}
+type ErrTypeIdNotFound struct {
+	MessageName string
+}
 
 func (e ErrTypeIdNotFound) Error() string {
-	return "TypeId not found"
+	return fmt.Sprintf("the message %s does not have a TypeId", e.MessageName)
 }
 
 type ErrTypeIdAlreadyExists struct {

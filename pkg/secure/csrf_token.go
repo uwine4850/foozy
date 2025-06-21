@@ -48,7 +48,7 @@ func GenerateCsrfToken() (string, error) {
 	return csrfToken, nil
 }
 
-func SetCSRFToken(maxAge int, w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func SetCSRFToken(maxAge int, httpOnly bool, w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 	csrfCookie, err := r.Cookie(namelib.ROUTER.COOKIE_CSRF_TOKEN)
 	if err != nil || csrfCookie.Value == "" {
 		csrfToken, err := GenerateCsrfToken()
@@ -59,7 +59,7 @@ func SetCSRFToken(maxAge int, w http.ResponseWriter, r *http.Request, manager in
 			Name:     namelib.ROUTER.COOKIE_CSRF_TOKEN,
 			Value:    csrfToken,
 			MaxAge:   maxAge,
-			HttpOnly: true,
+			HttpOnly: httpOnly,
 			Secure:   true,
 			SameSite: http.SameSiteStrictMode,
 			Path:     "/",

@@ -122,6 +122,7 @@ func (a *Adapter) Adapt(pattern string, handler Handler) http.HandlerFunc {
 		bw := NewBufferedResponseWriter(w)
 		if err := debug.ClearRequestInfoLogging(); err != nil {
 			a.internalErrorFunc(bw, r, err)
+			a.wrappedFlush(bw, r)
 			return
 		}
 		debug.RequestLogginIfEnable(debug.P_ROUTER, fmt.Sprintf("request url: %s", r.URL))
@@ -130,6 +131,7 @@ func (a *Adapter) Adapt(pattern string, handler Handler) http.HandlerFunc {
 		if err != nil {
 			a.internalErrorFunc(bw, r, err)
 			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
+			a.wrappedFlush(bw, r)
 			return
 		}
 		debug.RequestLogginIfEnable(debug.P_ROUTER, "manager is initialized")
@@ -140,11 +142,13 @@ func (a *Adapter) Adapt(pattern string, handler Handler) http.HandlerFunc {
 		}
 
 		// Run middlewares
-		if skip, err := a.runPreAndAsyncMddl(w, r, newManager); err != nil {
+		if skip, err := a.runPreAndAsyncMddl(bw, r, newManager); err != nil {
 			a.internalErrorFunc(bw, r, err)
 			debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
+			a.wrappedFlush(bw, r)
 			return
 		} else if skip {
+			a.wrappedFlush(bw, r)
 			return
 		}
 		newManager.OneTimeData().SetUserContext(namelib.ROUTER.URL_PATTERN, pattern)
@@ -157,17 +161,15 @@ func (a *Adapter) Adapt(pattern string, handler Handler) http.HandlerFunc {
 				if !errors.Is(err, middlewares.ErrStopMiddlewares{}) {
 					a.internalErrorFunc(bw, r, err)
 					debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
+					a.wrappedFlush(bw, r)
 					return
 				}
 			}
 			if middlewares.IsSkipNextPage(newManager.OneTimeData()) {
+				a.wrappedFlush(bw, r)
 				return
 			} else {
-				if _, err := bw.Flush(); err != nil {
-					a.internalErrorFunc(bw, r, err)
-					debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
-					return
-				}
+				a.wrappedFlush(bw, r)
 			}
 		} else {
 			if err := handler(bw.OriginalWriter(), r, newManager); err != nil {
@@ -229,6 +231,13 @@ func (a *Adapter) getSlugParams(currentPath string, pattern string) map[string]s
 	segments := strings.Split(strings.Trim(pattern, "/"), "/")
 	urlSegments := strings.Split(strings.Trim(currentPath, "/"), "/")
 	return MatchUrlSegments(segments, urlSegments)
+}
+
+func (a *Adapter) wrappedFlush(bw *BufferedResponseWriter, r *http.Request) {
+	if _, err := bw.Flush(); err != nil {
+		a.internalErrorFunc(bw.OriginalWriter(), r, err)
+		debug.RequestLogginIfEnable(debug.P_ERROR, err.Error())
+	}
 }
 
 type RegisterHandler func(method string, pattern string, handler Handler)
