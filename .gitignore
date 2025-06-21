@@ -18,3 +18,5 @@ reloader
 _reloader
 tee.html
 serverDTO
+tests1/**/*.log
+tests1/router_test/form_test/saved_files

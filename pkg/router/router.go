@@ -315,6 +315,8 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	http.NotFound(w, req)
 }
 
+// MatchUrlSegments compares slug segments to the real url.
+// If there is a match, it returns a map slug - value.
 func MatchUrlSegments(routeSegments, pathSegments []string) map[string]string {
 	if len(routeSegments) != len(pathSegments) {
 		return nil

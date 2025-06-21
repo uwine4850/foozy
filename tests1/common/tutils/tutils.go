@@ -8,6 +8,7 @@ import (
 
 const (
 	PortSimpleHandlers = ":7000"
+	PortForm           = ":7001"
 )
 
 func MakeUrl(port string, addres string) string {
