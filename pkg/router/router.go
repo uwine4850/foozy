@@ -15,6 +15,16 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
 )
 
+const (
+	MethodGET     = "GET"
+	MethodPOST    = "POST"
+	MethodDELETE  = "DELETE"
+	MethodPUT     = "PUT"
+	MethodPATCH   = "PATCH"
+	MethodHEAD    = "HEAD"
+	MethodOPTIONS = "OPTIONS"
+)
+
 type IBufferedResponseWriter interface {
 	Flush() (int, error)
 	OriginalWriter() http.ResponseWriter
@@ -261,10 +271,10 @@ func NewRouter(adapter IAdapter) *Router {
 	}
 }
 
-func (r *Router) HandlerSet(handlers []map[string]map[string]Handler) {
-	for i := 0; i < len(handlers); i++ {
-		for method, h := range handlers[i] {
-			for pattern, handler := range h {
+func (r *Router) HandlerSet(handlerSet map[string][]map[string]Handler) {
+	for method, handlers := range handlerSet {
+		for i := 0; i < len(handlers); i++ {
+			for pattern, handler := range handlers[i] {
 				r.Register(method, pattern, handler)
 			}
 		}
