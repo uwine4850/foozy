@@ -2,6 +2,7 @@ package object
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"reflect"
 
@@ -55,6 +56,8 @@ func (v *TemplateView) Call(w http.ResponseWriter, r *http.Request, manager inte
 	if v.isSkipRender {
 		debug.RequestLogginIfEnable(debug.P_OBJECT, "skip render")
 		return nil
+	} else if manager.Render() == nil {
+		return errors.New("IRender is used, but it is not set")
 	}
 
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "handle permissions")

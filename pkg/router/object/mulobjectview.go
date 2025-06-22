@@ -13,7 +13,7 @@ import (
 
 type MultipleObject struct {
 	Name       string      `notdef:"true"`
-	TaleName   string      `notdef:"true"`
+	TableName  string      `notdef:"true"`
 	SlugName   string      `notdef:"true"`
 	SlugField  string      `notdef:"true"`
 	FillStruct interface{} `notdef:"true"`
@@ -49,7 +49,7 @@ func (v *MultipleObjectView) Object(w http.ResponseWriter, r *http.Request, mana
 		if !ok {
 			return nil, ErrNoSlug{v.MultipleObjects[i].SlugName}
 		}
-		res, err := v.Database.SelectWhereEqual(v.MultipleObjects[i].TaleName, v.MultipleObjects[i].SlugField, slugValue)
+		res, err := v.Database.SelectWhereEqual(v.MultipleObjects[i].TableName, v.MultipleObjects[i].SlugField, slugValue)
 		if err != nil {
 			return nil, err
 		}

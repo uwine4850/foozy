@@ -106,6 +106,9 @@ func (dc DatabaseConverter) convertTimeF(val *[]byte, dateFormat string) (time.T
 func (dc DatabaseConverter) convertBoolean(dataPtr *any) (bool, error) {
 	data := *dataPtr
 	var zero int64
+	if reflect.TypeOf(data).Kind() == reflect.Bool {
+		return data.(bool), nil
+	}
 	if reflect.ValueOf(data).CanConvert(reflect.TypeOf(zero)) {
 		int64Value := data.(int64)
 		boolValue := int64Value != 0
