@@ -10,6 +10,7 @@ const (
 	PortSimpleHandlers = ":7000"
 	PortForm           = ":7001"
 	PortObject         = ":7002"
+	PortCookies        = ":7003"
 )
 
 func MakeUrl(port string, addres string) string {
