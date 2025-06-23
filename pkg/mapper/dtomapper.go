@@ -140,9 +140,14 @@ func fillField(fieldValue *reflect.Value, fieldData interface{}) error {
 		}
 		fieldValue.Set(newSlice)
 	case reflect.Int:
-		// It needs to be converted to float64 because json.Unmarshal represents any numbers only in this format.
-		fl := fieldDataValue.Interface().(float64)
-		fieldValue.Set(reflect.ValueOf(int(fl)))
+		_int, ok := fieldDataValue.Interface().(int)
+		if !ok {
+			// It needs to be converted to float64 because json.Unmarshal represents any numbers only in this format.
+			fl := fieldDataValue.Interface().(float64)
+			fieldValue.Set(reflect.ValueOf(int(fl)))
+		} else {
+			fieldValue.Set(reflect.ValueOf(_int))
+		}
 	case reflect.String:
 		fieldValue.Set(reflect.ValueOf(template.HTMLEscapeString(fieldData.(string))))
 	case reflect.Float32, reflect.Float64:
