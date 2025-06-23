@@ -36,11 +36,11 @@ var FC FormConverter
 // It has several arguments:
 //   - `empty:"<some_text>"` - the value that will be passed to the structure field. You can pass, for example,
 //     a number, it will be formatted if the field type is int.
-//   - `empty:“-err”` - will print the corresponding error if the field is empty.
+//   - `empty:"-err"` - will print the corresponding error if the field is empty.
 //
 // __nil__ - is executed when it is impossible to find data in the form by the current key, which means that there
 // is no data. You can pass the arguments:
-//   - `nil:“-skip”` - skips the given field.
+//   - `nil:"-skip"` - skips the given field.
 //
 // If the tag "nil" is not set, there will be an error because of an undiscovered key.
 func FillStructFromForm[T any](frm *form.Form, out *T) error {
