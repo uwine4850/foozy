@@ -11,6 +11,7 @@ const (
 	PortForm           = ":7001"
 	PortObject         = ":7002"
 	PortCookies        = ":7003"
+	PortSocket         = ":7004"
 )
 
 func MakeUrl(port string, addres string) string {
