@@ -7,22 +7,21 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/interfaces/irest"
 	"github.com/uwine4850/foozy/pkg/router/object"
 	"github.com/uwine4850/foozy/tests1/common/tutils"
 )
 
-// OBJECT VIEW TEST -------------------------------------
-
-type ObjectView struct {
+type DTOObjectView struct {
 	object.ObjView
 }
 
-func (v *ObjectView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+func (v *DTOObjectView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
 	w.WriteHeader(http.StatusInternalServerError)
 	w.Write([]byte(err.Error()))
 }
 
-func objectView() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func jsonObjectView() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 	sqlDB, mock, err := sqlmock.New()
 	if err != nil {
 		panic(err)
@@ -31,9 +30,8 @@ func objectView() func(w http.ResponseWriter, r *http.Request, manager interface
 		{1, "TEST_NAME", true},
 	})
 	db := NewMockDatabase(sqlDB)
-	view := object.TemplateView{
-		TemplatePath: "object_template.html",
-		View: &ObjectView{
+	view := object.JsonObjectTemplateView{
+		View: &DTOObjectView{
 			object.ObjView{
 				Name:       "object",
 				TableName:  "table",
@@ -42,12 +40,14 @@ func objectView() func(w http.ResponseWriter, r *http.Request, manager interface
 				Slug:       "id",
 			},
 		},
+		DTO:     newDTO,
+		Message: DTOMessage{},
 	}
 	return view.Call
 }
 
-func TestObjectView(t *testing.T) {
-	resp, err := http.Get(tutils.MakeUrl(tutils.PortObject, "test-object-view/1"))
+func TestJsonObjectView(t *testing.T) {
+	resp, err := http.Get(tutils.MakeUrl(tutils.PortObject, "test-json-object-view/1"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -55,32 +55,29 @@ func TestObjectView(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if res != "1" {
-		t.Error("object view error: ", res)
+	if res != `{"TypDTOMessage":{},"Id":1,"Name":"TEST_NAME","Ok":true}` {
+		t.Error("json object view error: ", res)
 	}
 }
 
-// ALL VIEW TEST ---------------------
-
-type AllView struct {
+type JsonAllView struct {
 	object.AllView
 }
 
-func (v *AllView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+func (v *JsonAllView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
 	w.WriteHeader(http.StatusInternalServerError)
 	w.Write([]byte(err.Error()))
 }
 
-func objectAllView() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func objectJsonAllView() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 	sqlDB, mock, err := sqlmock.New()
 	if err != nil {
 		panic(err)
 	}
 	initSelectAllMock(mock)
 	db := NewMockDatabase(sqlDB)
-	view := object.TemplateView{
-		TemplatePath: "all_template.html",
-		View: &AllView{
+	view := object.JsonAllTemplateView{
+		View: &JsonAllView{
 			object.AllView{
 				Name:       "objects",
 				TableName:  "table",
@@ -88,12 +85,14 @@ func objectAllView() func(w http.ResponseWriter, r *http.Request, manager interf
 				FillStruct: DatabaseTable{},
 			},
 		},
+		DTO:     newDTO,
+		Message: DTOMessage{},
 	}
 	return view.Call
 }
 
-func TestAllView(t *testing.T) {
-	resp, err := http.Get(tutils.MakeUrl(tutils.PortObject, "test-all-view"))
+func TestJsonAllView(t *testing.T) {
+	resp, err := http.Get(tutils.MakeUrl(tutils.PortObject, "test-json-all-view"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -101,23 +100,21 @@ func TestAllView(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if res != "1|2|" {
+	if res != `[{"TypDTOMessage":{},"Id":1,"Name":"TEST_NAME","Ok":true},{"TypDTOMessage":{},"Id":2,"Name":"TEST_NAME_1","Ok":true}]` {
 		t.Error("object view error: ", res)
 	}
 }
 
-// ALL VIEW WITH SLUG TEST ----------------------
-
-type AllSlugView struct {
+type JsonSlugAllView struct {
 	object.AllView
 }
 
-func (v *AllSlugView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+func (v *JsonSlugAllView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
 	w.WriteHeader(http.StatusInternalServerError)
 	w.Write([]byte(err.Error()))
 }
 
-func objectAllSlugView() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func objectSlugJsonAllView() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 	sqlDB, mock, err := sqlmock.New()
 	if err != nil {
 		panic(err)
@@ -126,23 +123,24 @@ func objectAllSlugView() func(w http.ResponseWriter, r *http.Request, manager in
 		{1, "TEST_NAME", true},
 	})
 	db := NewMockDatabase(sqlDB)
-	view := object.TemplateView{
-		TemplatePath: "all_template.html",
-		View: &AllSlugView{
+	view := object.JsonAllTemplateView{
+		View: &JsonAllView{
 			object.AllView{
 				Name:       "objects",
 				TableName:  "table",
 				Database:   db,
-				FillStruct: DatabaseTable{},
 				Slug:       "id",
+				FillStruct: DatabaseTable{},
 			},
 		},
+		DTO:     newDTO,
+		Message: DTOMessage{},
 	}
 	return view.Call
 }
 
-func TestAllSlugView(t *testing.T) {
-	resp, err := http.Get(tutils.MakeUrl(tutils.PortObject, "test-all-view/1"))
+func TestSlugJsonAllView(t *testing.T) {
+	resp, err := http.Get(tutils.MakeUrl(tutils.PortObject, "test-slug-json-all-view/1"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -150,23 +148,21 @@ func TestAllSlugView(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if res != "1|" {
+	if res != `[{"TypDTOMessage":{},"Id":1,"Name":"TEST_NAME","Ok":true}]` {
 		t.Error("object view error: ", res)
 	}
 }
 
-// MULTIPLE VIEW TEST ----------------------
-
-type MultipleView struct {
+type JsonMultipleView struct {
 	object.MultipleObjectView
 }
 
-func (v *MultipleView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+func (v *JsonMultipleView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
 	w.WriteHeader(http.StatusInternalServerError)
 	w.Write([]byte(err.Error()))
 }
 
-func objectMultipleView() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func objectJsonMultipleView() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 	sqlDB, mock, err := sqlmock.New()
 	if err != nil {
 		panic(err)
@@ -178,9 +174,8 @@ func objectMultipleView() func(w http.ResponseWriter, r *http.Request, manager i
 		{2, "TEST_NAME", true},
 	})
 	db := NewMockDatabase(sqlDB)
-	view := object.TemplateView{
-		TemplatePath: "multiple_template.html",
-		View: &MultipleView{
+	view := object.JsonMultipleObjectTemplateView{
+		View: &JsonMultipleView{
 			object.MultipleObjectView{
 				Database: db,
 				MultipleObjects: []object.MultipleObject{
@@ -201,12 +196,17 @@ func objectMultipleView() func(w http.ResponseWriter, r *http.Request, manager i
 				},
 			},
 		},
+		DTO: newDTO,
+		Messages: map[string]irest.IMessage{
+			"object1": DTOMessage{},
+			"object2": DTOMessage{},
+		},
 	}
 	return view.Call
 }
 
-func TestMultipleView(t *testing.T) {
-	resp, err := http.Get(tutils.MakeUrl(tutils.PortObject, "test-multiple-view/obj1/obj2"))
+func TestJsomMultipleView(t *testing.T) {
+	resp, err := http.Get(tutils.MakeUrl(tutils.PortObject, "test-json-multiple-view/obj1/obj2"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -214,7 +214,7 @@ func TestMultipleView(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if res != "1|2" {
+	if res != `{"object1":{"TypDTOMessage":{},"Id":1,"Name":"TEST_NAME","Ok":true},"object2":{"TypDTOMessage":{},"Id":2,"Name":"TEST_NAME","Ok":true}}` {
 		t.Error("object view error: ", res)
 	}
 }
