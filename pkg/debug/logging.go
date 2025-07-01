@@ -36,7 +36,11 @@ const (
 // constants “P_...” from this package.
 //
 // message - the message that will be recorded.
-func WriteLog(skipLevel int, filePath string, flag int, prefix string, message string) {
+func WriteLog(skipLevel int, filePath string, flag int, prefix string, message string, logFlags int) {
+	var _logFlags int
+	if logFlags == -1 {
+		_logFlags = log.LstdFlags
+	}
 	f, err := os.OpenFile(filePath, flag, 0644)
 	if err != nil {
 		fmt.Println("LogError: ", err.Error())
@@ -49,8 +53,8 @@ func WriteLog(skipLevel int, filePath string, flag int, prefix string, message s
 			return
 		}
 	}(f)
-	ilog := log.New(f, fmt.Sprintf("[%s] ", prefix), log.LstdFlags)
-	ilog.SetFlags(log.LstdFlags)
+	ilog := log.New(f, fmt.Sprintf("[%s] ", prefix), _logFlags)
+	ilog.SetFlags(_logFlags)
 
 	if skipLevel < 0 {
 		skipLevel = 3
@@ -75,7 +79,6 @@ func WriteLog(skipLevel int, filePath string, flag int, prefix string, message s
 		}
 		loggingFilePath = relPath
 	}
-
 	ilog.Printf("%s:%d %s\n", loggingFilePath, line, message)
 }
 
@@ -84,7 +87,13 @@ func LogError(message string) {
 	if config.LoadedConfig().Default.Debug.ErrorLoggingPath == "" {
 		panic("unable to create log file. File path not set")
 	}
-	WriteLog(config.LoadedConfig().Default.Debug.SkipLoggingLevel+1, config.LoadedConfig().Default.Debug.ErrorLoggingPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, "", message)
+	WriteLog(
+		config.LoadedConfig().Default.Debug.SkipLoggingLevel+1,
+		config.LoadedConfig().Default.Debug.ErrorLoggingPath,
+		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
+		"",
+		message, -1,
+	)
 }
 
 // ErrorLoggingIfEnableAndWrite writes a message to the log if error logging is enabled.
@@ -129,7 +138,14 @@ func LogRequestInfo(prefix string, message string) {
 	if config.LoadedConfig().Default.Debug.RequestInfoLogPath == "" {
 		panic("unable to create request info log file. File path not set")
 	}
-	WriteLog(config.LoadedConfig().Default.Debug.SkipLoggingLevel, config.LoadedConfig().Default.Debug.RequestInfoLogPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, prefix, message)
+	WriteLog(
+		config.LoadedConfig().Default.Debug.SkipLoggingLevel,
+		config.LoadedConfig().Default.Debug.RequestInfoLogPath,
+		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
+		prefix,
+		message,
+		-1,
+	)
 }
 
 // RequestLogginIfEnable logs request information if request logging is enabled.

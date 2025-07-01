@@ -8,6 +8,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/mapper"
 	"github.com/uwine4850/foozy/pkg/router/rest"
 	"github.com/uwine4850/foozy/pkg/typeopr"
+	"github.com/uwine4850/foozy/tests1/common/tutils"
 )
 
 type TestMessage struct {
@@ -74,7 +75,7 @@ func TestGenerate(t *testing.T) {
 	if err := newDTO.Generate(); err != nil {
 		t.Error(err)
 	}
-	ok, err := filesAreEqual("test.ts", "expected_file.ts")
+	ok, err := tutils.FilesAreEqual("test.ts", "expected_file.ts")
 	if err != nil {
 		t.Error(err)
 	}
