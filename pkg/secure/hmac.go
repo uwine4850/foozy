@@ -24,6 +24,7 @@ func GenerateHMAC(hashKey []byte, data []byte) ([]byte, error) {
 }
 
 // VerifyHMAC compares the received signature with the correct one.
+// data - expected content.
 func VerifyHMAC(hashKey []byte, data []byte, hmacCode []byte) (bool, error) {
 	// A valid signature has been generated and is expected.
 	expectedHMAC, err := GenerateHMAC(hashKey, data)
@@ -78,6 +79,7 @@ func Decrypt(blockKey []byte, enc string) ([]byte, error) {
 	return gcm.Open(nil, nonce, ciphertext, nil)
 }
 
+// CreateSecureData creates encrypted data using hmac and the [Encrypt] function.
 func CreateSecureData(hashKey []byte, blockKey []byte, writeData interface{}) (string, error) {
 	if reflect.TypeOf(writeData).Kind() != reflect.Pointer {
 		return "", errors.New("the writeData argument must be a pointer")
