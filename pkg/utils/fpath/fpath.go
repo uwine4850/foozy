@@ -13,8 +13,5 @@ func CurrentFileDir() string {
 
 func PathExist(path string) bool {
 	_, err := os.Stat(path)
-	if os.IsNotExist(err) {
-		return false
-	}
-	return true
+	return !os.IsNotExist(err)
 }

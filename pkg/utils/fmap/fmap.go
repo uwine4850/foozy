@@ -7,7 +7,6 @@ import (
 	"sync"
 
 	"github.com/uwine4850/foozy/pkg/typeopr"
-	"github.com/uwine4850/foozy/pkg/utils/fslice"
 )
 
 // MergeMap merges two maps into one.
@@ -28,22 +27,22 @@ func MergeMapSync[T1 comparable, T2 any](mu *sync.Mutex, map1 *map[T1]T2, map2 m
 
 // Compare map values. It is important that the keys and values ​​match.
 // exclude - keys that do not need to be taken into account.
-func Compare[T1 comparable, T2 comparable](map1 *map[T1]T2, map2 *map[T1]T2, exclude []T1) bool {
-	for key, value := range *map1 {
-		if exclude != nil && fslice.SliceContains(exclude, key) {
-			continue
-		}
-		value2, ok := (*map2)[key]
-		if !ok {
-			return false
-		} else {
-			if value != value2 {
-				return false
-			}
-		}
-	}
-	return true
-}
+// func Compare[T1 comparable, T2 comparable](map1 *map[T1]T2, map2 *map[T1]T2, exclude []T1) bool {
+// 	for key, value := range *map1 {
+// 		if exclude != nil && fslice.SliceContains(exclude, key) {
+// 			continue
+// 		}
+// 		value2, ok := (*map2)[key]
+// 		if !ok {
+// 			return false
+// 		} else {
+// 			if value != value2 {
+// 				return false
+// 			}
+// 		}
+// 	}
+// 	return true
+// }
 
 // YamlMapToStruct writes a yaml map to the structure.
 // IMPOrTANT: the field of the structure to be written must have the

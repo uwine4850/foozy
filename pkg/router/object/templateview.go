@@ -139,6 +139,10 @@ func (v *JsonObjectTemplateView) Call(w http.ResponseWriter, r *http.Request, ma
 		v.View.OnError(w, r, manager, err)
 		return nil
 	}
+	if viewObject == nil || viewContext == nil {
+		return nil
+	}
+
 	var filledMessage any
 	if v.Message != nil {
 		debug.RequestLogginIfEnable(debug.P_OBJECT, "fill DTO message...")
@@ -195,6 +199,9 @@ func (v *JsonMultipleObjectTemplateView) Call(w http.ResponseWriter, r *http.Req
 	viewObject, viewContext, err := baseParseView(v.View, w, r, manager)
 	if err != nil {
 		v.View.OnError(w, r, manager, err)
+		return nil
+	}
+	if viewObject == nil || viewContext == nil {
 		return nil
 	}
 
@@ -263,6 +270,10 @@ func (v *JsonAllTemplateView) Call(w http.ResponseWriter, r *http.Request, manag
 		v.View.OnError(w, r, manager, err)
 		return nil
 	}
+	if viewObject == nil || viewContext == nil {
+		return nil
+	}
+
 	contextSliceMap := []Context{}
 	var filledMessages []any
 	if v.Message != nil {
@@ -354,9 +365,9 @@ func baseParseView(view IView, w http.ResponseWriter, r *http.Request, manager i
 	if !permissions {
 		debug.RequestLogginIfEnable(debug.P_OBJECT, "permissions are not granted")
 		f()
-		return nil, nil, err
+		return nil, nil, nil
 	}
-	return
+	return viewObject, viewContext, nil
 }
 
 func getRealView(wrapperView IView) IView {
