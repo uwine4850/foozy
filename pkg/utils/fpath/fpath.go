@@ -11,6 +11,7 @@ func CurrentFileDir() string {
 	return filepath.Dir(file)
 }
 
+// PathExist checks to see if a path exists in the file directory.
 func PathExist(path string) bool {
 	_, err := os.Stat(path)
 	return !os.IsNotExist(err)

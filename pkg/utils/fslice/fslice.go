@@ -10,6 +10,7 @@ func SliceContains[T comparable](slice []T, item T) bool {
 	return false
 }
 
+// AllStringItemsEmpty checks if all items in the slice are empty strings.
 func AllStringItemsEmpty(slice []string) bool {
 	for i := 0; i < len(slice); i++ {
 		if slice[i] != "" {

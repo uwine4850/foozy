@@ -6,14 +6,17 @@ import (
 	"reflect"
 )
 
+// IsPointer checks if the value is a pointer.
 func IsPointer(a any) bool {
 	return reflect.TypeOf(a).Kind() == reflect.Pointer
 }
 
+// PtrIsStruct checks if the value is a pointer to a structure.
 func PtrIsStruct(a any) bool {
 	return reflect.TypeOf(a).Elem().Kind() == reflect.Struct
 }
 
+// IsEmpty checks if the value is empty.
 func IsEmpty(value interface{}) bool {
 	v := reflect.ValueOf(value)
 	switch v.Kind() {
@@ -31,6 +34,7 @@ func IsEmpty(value interface{}) bool {
 	return reflect.DeepEqual(value, reflect.Zero(v.Type()).Interface())
 }
 
+// AnyToBytes converts input data into bytes.
 func AnyToBytes(value interface{}) ([]byte, error) {
 	var buf bytes.Buffer
 
@@ -58,10 +62,13 @@ type IPtr interface {
 	Ptr() interface{}
 }
 
+// Ptr structure that is designed to pass any value as a pointer.
 type Ptr struct {
 	value interface{}
 }
 
+// New creating a new object [Ptr].
+// It is also guaranteed that a pointer will be stored inside this object.
 func (p Ptr) New(value interface{}) IPtr {
 	if !IsPointer(value) {
 		panic(ErrValueNotPointer{Value: fmt.Sprintf("Ptr<%s>", reflect.TypeOf(value))})
@@ -70,6 +77,7 @@ func (p Ptr) New(value interface{}) IPtr {
 	return p
 }
 
+// Ptr returns a pointer that is stored in the object.
 func (p Ptr) Ptr() interface{} {
 	return p.value
 }
@@ -98,6 +106,7 @@ func IsImplementInterface(objectPtr IPtr, interfaceType interface{}) bool {
 
 var typeReflectValue = reflect.TypeOf(&reflect.Value{}).Elem()
 
+// GetReflectValue get [reflect.Value] from the passed value.
 func GetReflectValue[T any](target *T) reflect.Value {
 	var v reflect.Value
 	if reflect.TypeOf(*target) == typeReflectValue {
