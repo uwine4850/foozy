@@ -17,6 +17,7 @@ const (
 	PortMiddlewares    = ":7005"
 	PortPageRender     = ":7006"
 	PortCSRFToken      = ":7007"
+	PortBuiltinCSRF    = ":7008"
 )
 
 func MakeUrl(port string, addres string) string {
