@@ -94,7 +94,7 @@ func onError(w http.ResponseWriter, r *http.Request, err error) {
 }
 
 func TestSecureData(t *testing.T) {
-	writeCoolieResponse, err := http.Get(tutils.MakeUrl(tutils.PortCookies, "test-write-secure-cookie"))
+	writeCookieResponse, err := http.Get(tutils.MakeUrl(tutils.PortCookies, "test-write-secure-cookie"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -102,7 +102,7 @@ func TestSecureData(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	readReq.AddCookie(writeCoolieResponse.Cookies()[0])
+	readReq.AddCookie(writeCookieResponse.Cookies()[0])
 	readCookieResponse, err := http.DefaultClient.Do(readReq)
 	if err != nil {
 		t.Error(err)

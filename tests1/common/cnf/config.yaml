@@ -1,0 +1,15 @@
+GeneratedDefault: true
+GeneratedAdditionally: true
+Config:
+    Debug:
+        PrintInfo: true
+        Debug: true
+        DebugRelativeFilepath: false
+        ErrorLogging: false
+        ErrorLoggingPath: errors.log
+        RequestInfoLog: false
+        RequestInfoLogPath: request.log
+        SkipLoggingLevel: 3
+    Database:
+        MainConnectionPoolName: main
+Additionally: {}

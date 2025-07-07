@@ -146,6 +146,8 @@ func (a *Adapter) Adapt(pattern string, handler Handler) http.HandlerFunc {
 		}
 		debug.RequestLogginIfEnable(debug.P_ROUTER, "manager is initialized")
 
+		newManager.OneTimeData().SetUserContext(namelib.ROUTER.URL_PATTERN, pattern)
+
 		// Slug params
 		if params := a.getSlugParams(r.URL.Path, pattern); params != nil {
 			newManager.OneTimeData().SetSlugParams(params)
@@ -161,7 +163,7 @@ func (a *Adapter) Adapt(pattern string, handler Handler) http.HandlerFunc {
 			a.wrappedFlush(bw, r)
 			return
 		}
-		newManager.OneTimeData().SetUserContext(namelib.ROUTER.URL_PATTERN, pattern)
+
 		a.printLog(r)
 		if !isWebsocketConn {
 			if err := handler(bw, r, newManager); err != nil {
