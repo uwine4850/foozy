@@ -26,6 +26,7 @@ type AuthQuery interface {
 
 // MysqlAuthDatabase implementation of the [AuthQuery] interface.
 // Executes database queries with specific methods only. Used only for the needs of the auth package.
+//
 // IMPORTANT: this structure uses the [UnsafeUser] object. Use this structure outside the auth package with caution.
 type MysqlAuthDatabase struct {
 	db        interfaces.IReadDatabase

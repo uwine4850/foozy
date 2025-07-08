@@ -4,12 +4,16 @@ import (
 	"errors"
 	"net/http"
 	"os"
+	"reflect"
+	"regexp"
 	"testing"
 	"time"
 
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/uwine4850/foozy/pkg/builtin/auth"
 	"github.com/uwine4850/foozy/pkg/builtin/bglobalflow"
 	"github.com/uwine4850/foozy/pkg/builtin/builtin_mddl"
+	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router"
@@ -21,6 +25,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/server/globalflow"
 	initcnf_t "github.com/uwine4850/foozy/tests1/common/init_cnf"
 	"github.com/uwine4850/foozy/tests1/common/tutils"
+	databasemock "github.com/uwine4850/foozy/tests1/database_mock"
 )
 
 type FakeAuthQuery struct{}
@@ -62,14 +67,20 @@ var newManager = manager.NewManager(
 	nil,
 	manager.NewDatabasePool(),
 )
-
 var newMiddlewares = middlewares.NewMiddlewares()
+var mockDatabase *databasemock.MysqlDatabase
 
 func TestMain(m *testing.M) {
 	initcnf_t.InitCnf()
 	newManager.Key().Generate32BytesKeys()
 
 	fakeAuthQuery := FakeAuthQuery{}
+	syncQ := database.NewSyncQueries()
+	asyncQ := database.NewAsyncQueries(syncQ)
+	mockDatabase = databasemock.NewMysqlDatabase(syncQ, asyncQ)
+	if err := mockDatabase.Open(); err != nil {
+		panic(err)
+	}
 
 	excludePatterns := []string{"/test-register-user-exists", "/test-register", "/test-login", "/test-login-wrong-password",
 		"/test-login-wrong-username", "/test-auth-jwt"}
@@ -358,5 +369,93 @@ func TestAuthJWT(t *testing.T) {
 
 	if !updateCalled {
 		t.Error("[updatedToken] method is not called")
+	}
+}
+
+func TestAuthQCreateNewUser(t *testing.T) {
+	authQ := auth.NewMysqlAuthQuery(mockDatabase, "auth")
+	hashPassword, err := auth.HashPassword("111111")
+	if err != nil {
+		t.Error(err)
+	}
+
+	mockDatabase.Mock().
+		ExpectExec(regexp.QuoteMeta("INSERT INTO auth ( username, password ) VALUES ( ?, ? )")).
+		WithArgs("USER", sqlmock.AnyArg()).
+		WillReturnResult(sqlmock.NewResult(10, 1))
+
+	res, err := authQ.CreateNewUser("USER", hashPassword)
+	if err != nil {
+		t.Error(err)
+	}
+	if res["insertID"] != int64(10) && res["rowsAffected"] != int64(1) {
+		t.Error("the result of the query does not match the expectation")
+	}
+}
+
+func TestAuthQUserByUsername(t *testing.T) {
+	authQ := auth.NewMysqlAuthQuery(mockDatabase, "auth")
+
+	rows := sqlmock.NewRows([]string{"id", "username", "password"})
+	rows.AddRow(1, "USER", "password")
+
+	mockDatabase.Mock().
+		ExpectQuery(regexp.QuoteMeta("SELECT * FROM auth WHERE username = ?")).
+		WithArgs("USER").
+		WillReturnRows(rows)
+
+	unsafeUser, err := authQ.UserByUsername("USER")
+	if err != nil {
+		t.Error(err)
+	}
+	expectUser := &auth.UnsafeUser{
+		Id:       1,
+		Username: "USER",
+		Password: "password",
+	}
+	if !reflect.DeepEqual(unsafeUser, expectUser) {
+		t.Error("object does not match expectations")
+	}
+}
+
+func TestAuthQUserById(t *testing.T) {
+	authQ := auth.NewMysqlAuthQuery(mockDatabase, "auth")
+
+	rows := sqlmock.NewRows([]string{"id", "username", "password"})
+	rows.AddRow(1, "USER", "password")
+
+	mockDatabase.Mock().
+		ExpectQuery(regexp.QuoteMeta("SELECT * FROM auth WHERE id = ?")).
+		WithArgs(1).
+		WillReturnRows(rows)
+
+	unsafeUser, err := authQ.UserById(1)
+	if err != nil {
+		t.Error(err)
+	}
+	expectUser := &auth.UnsafeUser{
+		Id:       1,
+		Username: "USER",
+		Password: "password",
+	}
+	if !reflect.DeepEqual(unsafeUser, expectUser) {
+		t.Error("object does not match expectations")
+	}
+}
+
+func TestAuthQChangePassword(t *testing.T) {
+	authQ := auth.NewMysqlAuthQuery(mockDatabase, "auth")
+
+	mockDatabase.Mock().
+		ExpectExec(regexp.QuoteMeta("UPDATE auth SET password = ? WHERE id = ?")).
+		WithArgs("new_password", "1").
+		WillReturnResult(sqlmock.NewResult(0, 1))
+
+	res, err := authQ.ChangePassword("1", "new_password")
+	if err != nil {
+		t.Error(err)
+	}
+	if res["insertID"] != int64(0) && res["rowsAffected"] != int64(1) {
+		t.Error("the result of the query does not match the expectation")
 	}
 }
