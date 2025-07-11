@@ -25,7 +25,7 @@ func (v *FormView) ObjectsName() []string {
 	return []string{namelib.OBJECT.OBJECT_CONTEXT_FORM}
 }
 
-func (v *FormView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (Context, error) {
+func (v *FormView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) (Context, error) {
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "run FormView object")
 	frm := form.NewForm(r)
 	if err := frm.Parse(); err != nil {
@@ -78,7 +78,7 @@ func (v *FormView) Object(w http.ResponseWriter, r *http.Request, manager interf
 // }
 
 // FormInterface retrieves the form interface itself from the interface pointer.
-func (v *FormView) FormInterface(manager interfaces.IManagerOneTimeData) (interface{}, error) {
+func (v *FormView) FormInterface(manager interfaces.ManagerOneTimeData) (interface{}, error) {
 	context, ok := manager.GetUserContext(namelib.OBJECT.OBJECT_CONTEXT)
 	if !ok {
 		return nil, errors.New("the ObjectContext not found")

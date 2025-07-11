@@ -17,10 +17,10 @@ type Context map[string]interface{}
 type IView interface {
 	// Object receives data from the selected table and writes it to a variable structure.
 	// IMPORTANT: connects to the database in this method (or others), but closes the connection only in the TemplateView.
-	Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (Context, error)
-	Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (Context, error)
-	Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func())
-	OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error)
+	Object(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) (Context, error)
+	Context(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) (Context, error)
+	Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) (bool, func())
+	OnError(w http.ResponseWriter, r *http.Request, manager interfaces.Manager, err error)
 	ObjectsName() []string
 }
 
@@ -34,10 +34,10 @@ type IViewDatabase interface {
 
 // ViewMysqlDatabase implementation of the [IViewDatabase] interface for a MySql database.
 type ViewMysqlDatabase struct {
-	db interfaces.IReadDatabase
+	db interfaces.DatabaseInteraction
 }
 
-func NewViewMysqlDatabase(db interfaces.IReadDatabase) *ViewMysqlDatabase {
+func NewViewMysqlDatabase(db interfaces.DatabaseInteraction) *ViewMysqlDatabase {
 	return &ViewMysqlDatabase{
 		db: db,
 	}
@@ -57,26 +57,26 @@ func (v *BaseView) CloseDb() error {
 	panic("CloseDb is not implement. Please implement this method in your structure.")
 }
 
-func (v *BaseView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (Context, error) {
+func (v *BaseView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) (Context, error) {
 	return Context{}, nil
 }
 
-func (v *BaseView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (Context, error) {
+func (v *BaseView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) (Context, error) {
 	return Context{}, nil
 }
 
-func (v *BaseView) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
+func (v *BaseView) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) (bool, func()) {
 	return true, func() {}
 }
 
-func (v *BaseView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+func (v *BaseView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.Manager, err error) {
 	panic("OnError is not implement. Please implement this method in your structure.")
 }
 
 // GetContext retrieves the Context from the manager.
 // It is important to understand that this method can only be used when the IView.Object method has completed running,
 // for example in IView.Context.
-func GetContext(manager interfaces.IManager) (Context, error) {
+func GetContext(manager interfaces.Manager) (Context, error) {
 	objectInterface, ok := manager.OneTimeData().GetUserContext(namelib.OBJECT.OBJECT_CONTEXT)
 	if !ok {
 		return nil, errors.New("unable to get object context")

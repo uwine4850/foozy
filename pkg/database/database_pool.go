@@ -1,4 +1,4 @@
-package manager
+package database
 
 import (
 	"fmt"
@@ -27,26 +27,26 @@ func NewDatabasePool() *DatabasePool {
 }
 
 // ConnectionPool get a named connection pool.
-func (dp *DatabasePool) ConnectionPool(name string) (interfaces.IReadDatabase, error) {
+func (dp *DatabasePool) ConnectionPool(name string) (interfaces.DatabaseInteraction, error) {
 	if !dp.locked.Load() {
 		return nil, &ErrDatabasePoolNotLocked{}
 	}
 	if val, ok := dp.connnectionPool.Load(name); ok {
-		return val.(interfaces.IReadDatabase), nil
+		return val.(interfaces.DatabaseInteraction), nil
 	} else {
 		return nil, &ErrConnectionNotExists{Name: name}
 	}
 }
 
 // AddConnection adding a new open named database connection pool.
-func (dp *DatabasePool) AddConnection(name string, rd interfaces.IReadDatabase) error {
+func (dp *DatabasePool) AddConnection(name string, dbInteraction interfaces.DatabaseInteraction) error {
 	if dp.locked.Load() {
 		return &ErrDatabasePoolIsLocked{}
 	}
 	if _, ok := dp.connnectionPool.Load(name); ok {
 		return &ErrConnectionAlreadyExists{Name: name}
 	} else {
-		dp.connnectionPool.Store(name, rd)
+		dp.connnectionPool.Store(name, dbInteraction)
 		return nil
 	}
 }

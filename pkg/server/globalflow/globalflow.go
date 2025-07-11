@@ -8,7 +8,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
-type Task func(manager interfaces.IManager)
+type Task func(manager interfaces.Manager)
 
 // GlobalFlow creates a flow that runs separately from the server.
 // It is used for constant calculations, because it constantly runs tasks.
@@ -48,7 +48,7 @@ func (gf *GlobalFlow) AddNotWaitTask(task Task) {
 }
 
 // Run starts the execution of two types of tasks in two separate goroutines.
-func (gf *GlobalFlow) Run(manager interfaces.IManager) {
+func (gf *GlobalFlow) Run(manager interfaces.Manager) {
 	if !typeopr.IsPointer(manager) {
 		panic("The managerConfig must be passed by pointer.")
 	}

@@ -29,11 +29,11 @@ type AuthQuery interface {
 //
 // IMPORTANT: this structure uses the [UnsafeUser] object. Use this structure outside the auth package with caution.
 type MysqlAuthDatabase struct {
-	db        interfaces.IReadDatabase
+	db        interfaces.DatabaseInteraction
 	tableName string
 }
 
-func NewMysqlAuthQuery(db interfaces.IReadDatabase, tableName string) *MysqlAuthDatabase {
+func NewMysqlAuthQuery(db interfaces.DatabaseInteraction, tableName string) *MysqlAuthDatabase {
 	return &MysqlAuthDatabase{
 		db:        db,
 		tableName: tableName,
@@ -128,10 +128,10 @@ type Auth struct {
 	db        AuthQuery
 	tableName string
 	w         http.ResponseWriter
-	manager   interfaces.IManager
+	manager   interfaces.Manager
 }
 
-func NewAuth(w http.ResponseWriter, db AuthQuery, manager interfaces.IManager) *Auth {
+func NewAuth(w http.ResponseWriter, db AuthQuery, manager interfaces.Manager) *Auth {
 	return &Auth{db, namelib.AUTH.AUTH_TABLE, w, manager}
 }
 
@@ -276,12 +276,12 @@ func UserByID(db AuthQuery, id any) (*User, error) {
 }
 
 // CreateMysqlAuthTable creates a user authentication table.
-func CreateMysqlAuthTable(dbRead interfaces.IReadDatabase, databaseName string) error {
+func CreateMysqlAuthTable(dbInteraction interfaces.DatabaseInteraction, databaseName string) error {
 	sql := fmt.Sprintf("CREATE TABLE IF NOT EXISTS `%s`.`%s` "+
 		"(`id` INT NOT NULL AUTO_INCREMENT , "+
 		"`username` VARCHAR(200) NOT NULL , "+
 		"`password` TEXT NOT NULL , PRIMARY KEY (`id`))", databaseName, namelib.AUTH.AUTH_TABLE)
-	_, err := dbRead.SyncQ().Query(sql)
+	_, err := dbInteraction.SyncQ().Query(sql)
 	if err != nil {
 		return err
 	}

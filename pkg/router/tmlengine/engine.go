@@ -22,7 +22,7 @@ type TemplateEngine struct {
 	mu           sync.Mutex
 }
 
-func NewTemplateEngine() interfaces.ITemplateEngine {
+func NewTemplateEngine() interfaces.TemplateEngine {
 	RegisterMultipleGlobalFilter(BuiltinFilters)
 	return &TemplateEngine{context: make(map[string]interface{})}
 }

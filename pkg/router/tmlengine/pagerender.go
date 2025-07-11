@@ -9,27 +9,27 @@ import (
 )
 
 type Render struct {
-	TemplateEngine interfaces.ITemplateEngine
+	TemplateEngine interfaces.TemplateEngine
 	templatePath   string
 }
 
-func NewRender() (interfaces.IRender, error) {
+func NewRender() (interfaces.Render, error) {
 	render := Render{}
 	newRender, err := render.New()
 	if err != nil {
 		return nil, err
 	}
-	return newRender.(interfaces.IRender), nil
+	return newRender.(interfaces.Render), nil
 }
 
 func (rn *Render) New() (interface{}, error) {
-	var engine interfaces.ITemplateEngine
+	var engine interfaces.TemplateEngine
 	if rn.TemplateEngine != nil {
 		_engine, err := rn.TemplateEngine.New()
 		if err != nil {
 			return nil, err
 		}
-		engine = _engine.(interfaces.ITemplateEngine)
+		engine = _engine.(interfaces.TemplateEngine)
 	} else {
 		engine = NewTemplateEngine()
 	}
@@ -47,11 +47,11 @@ func (rn *Render) GetContext() map[string]interface{} {
 
 // SetTemplateEngine set the template engine interface.
 // Optional method if the template engine is already installed.
-func (rn *Render) SetTemplateEngine(engine interfaces.ITemplateEngine) {
+func (rn *Render) SetTemplateEngine(engine interfaces.TemplateEngine) {
 	rn.TemplateEngine = engine
 }
 
-func (rn *Render) GetTemplateEngine() interfaces.ITemplateEngine {
+func (rn *Render) GetTemplateEngine() interfaces.TemplateEngine {
 	return rn.TemplateEngine
 }
 

@@ -1,0 +1,778 @@
+[] 2025/01/11 11:38:35 pkg/builtin/builtin_admin/admin.go:15 The path to the "admin.html" template was not found.
+[] 2025/01/11 11:38:37 pkg/builtin/builtin_admin/admin.go:15 The path to the "admin.html" template was not found.
+[] 2025/01/11 11:38:37 pkg/builtin/builtin_admin/admin.go:15 The path to the "admin.html" template was not found.
+[] 2025/01/11 11:38:38 pkg/builtin/builtin_admin/admin.go:15 The path to the "admin.html" template was not found.
+[] 2025/01/11 11:38:38 pkg/builtin/builtin_admin/admin.go:15 The path to the "admin.html" template was not found.
+[] 2025/01/11 11:38:38 pkg/builtin/builtin_admin/admin.go:15 The path to the "admin.html" template was not found.
+[] 2025/01/11 11:38:38 pkg/builtin/builtin_admin/admin.go:15 The path to the "admin.html" template was not found.
+[] 2025/01/11 11:38:39 pkg/builtin/builtin_admin/admin.go:15 The path to the "admin.html" template was not found.
+[] 2025/01/11 11:38:39 pkg/builtin/builtin_admin/admin.go:15 The path to the "admin.html" template was not found.
+[] 2025/01/11 11:38:39 pkg/builtin/builtin_admin/admin.go:15 The path to the "admin.html" template was not found.
+[] 2025/01/11 11:38:39 pkg/builtin/builtin_admin/admin.go:15 The path to the "admin.html" template was not found.
+[] 2025/01/11 11:38:48 pkg/builtin/builtin_admin/admin.go:15 The path to the "admin.html" template was not found.
+[] 2025/01/11 11:38:50 pkg/builtin/builtin_admin/admin.go:15 The path to the "admin.html" template was not found.
+[] 2025/01/11 11:38:52 pkg/builtin/builtin_admin/admin.go:15 The path to the "admin.html" template was not found.
+[] 2025/01/11 11:39:04 pkg/builtin/builtin_admin/admin.go:15 The path to the "./admin.html" template was not found.
+[] 2025/01/11 11:39:06 pkg/builtin/builtin_admin/admin.go:15 The path to the "./admin.html" template was not found.
+[] 2025/01/11 11:39:29 pkg/builtin/builtin_admin/admin.go:15 The path to the "admin.html" template was not found.
+[] 2025/01/11 11:39:30 pkg/builtin/builtin_admin/admin.go:15 The path to the "admin.html" template was not found.
+[] 2025/01/11 11:39:38 pkg/builtin/builtin_admin/admin.go:15 The path to the "../admin.html" template was not found.
+[] 2025/01/11 11:39:39 pkg/builtin/builtin_admin/admin.go:15 The path to the "../admin.html" template was not found.
+[] 2025/01/11 11:39:39 pkg/builtin/builtin_admin/admin.go:15 The path to the "../admin.html" template was not found.
+[] 2025/01/11 11:39:39 pkg/builtin/builtin_admin/admin.go:15 The path to the "../admin.html" template was not found.
+[] 2025/01/11 11:42:26 pkg/builtin/builtin_admin/admin.go:21 The path to the "../admin.html" template was not found.
+[] 2025/01/12 15:02:47 pkg/builtin/builtin_admin/admin.go:86 field Output must be a slice
+[] 2025/01/12 15:04:05 pkg/builtin/builtin_admin/admin.go:86 field Output must be a slice
+[] 2025/01/12 15:06:18 pkg/builtin/builtin_admin/admin.go:86 field Output must be a slice
+[] 2025/01/12 15:06:31 pkg/builtin/builtin_admin/admin.go:86 field Output must be a slice
+[] 2025/01/12 15:27:08 pkg/builtin/builtin_admin/admin.go:91 [Error (where: parser) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/users.html | Line 22 Col 8 near 'endfor'] Tag 'endfor' not found (or beginning tag not provided)
+[] 2025/01/12 17:20:23 pkg/builtin/builtin_admin/admin.go:120 Error 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '%te%COUNT 10' at line 1
+[] 2025/01/12 17:20:40 pkg/builtin/builtin_admin/admin.go:120 Error 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '%te% COUNT 10' at line 1
+[] 2025/01/12 17:21:09 pkg/builtin/builtin_admin/admin.go:120 Error 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '%te% COUNT 10' at line 1
+[] 2025/01/12 17:21:10 pkg/builtin/builtin_admin/admin.go:120 Error 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '%te% COUNT 10' at line 1
+[] 2025/01/12 17:21:11 pkg/builtin/builtin_admin/admin.go:120 Error 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '%te% COUNT 10' at line 1
+[] 2025/01/12 17:21:11 pkg/builtin/builtin_admin/admin.go:120 Error 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '%te% COUNT 10' at line 1
+[] 2025/01/12 17:21:11 pkg/builtin/builtin_admin/admin.go:120 Error 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '%te% COUNT 10' at line 1
+[] 2025/01/12 17:21:12 pkg/builtin/builtin_admin/admin.go:120 Error 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '%te% COUNT 10' at line 1
+[] 2025/01/12 17:21:12 pkg/builtin/builtin_admin/admin.go:120 Error 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '%te% COUNT 10' at line 1
+[] 2025/01/12 17:22:26 pkg/builtin/builtin_admin/admin.go:120 Error 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '%te%LIMIT 10' at line 1
+[] 2025/01/12 17:22:34 pkg/builtin/builtin_admin/admin.go:120 Error 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '%te% LIMIT 10' at line 1
+[] 2025/01/12 18:08:35 internal/builtin/admin.go:73 The path to the "/home/fhx/Documents/golang/foozy/internal/builtin/templates/users.html" template was not found.
+[] 2025/01/12 18:08:42 internal/builtin/admin.go:73 The path to the "/home/fhx/Documents/golang/foozy/internal/builtin/templates/users.html" template was not found.
+[] 2025/01/12 18:08:43 internal/builtin/admin.go:73 The path to the "/home/fhx/Documents/golang/foozy/internal/builtin/templates/users.html" template was not found.
+[] 2025/01/13 00:29:01 internal/builtin/admin.go:116 [Error (where: fromfile) in /home/fhx/Documents/golang/foozy/internal/builtin/templates/base.html] unable to resolve template
+[] 2025/01/13 00:30:05 internal/builtin/admin.go:116 [Error (where: fromfile) in /home/fhx/Documents/golang/foozy/internal/pkg/builtin/builtin_admin/templates/base.html] unable to resolve template
+[] 2025/01/13 00:30:06 internal/builtin/admin.go:116 [Error (where: fromfile) in /home/fhx/Documents/golang/foozy/internal/pkg/builtin/builtin_admin/templates/base.html] unable to resolve template
+[] 2025/01/13 00:30:07 internal/builtin/admin.go:116 [Error (where: fromfile) in /home/fhx/Documents/golang/foozy/internal/pkg/builtin/builtin_admin/templates/base.html] unable to resolve template
+[] 2025/01/13 00:30:09 internal/builtin/admin.go:116 [Error (where: fromfile) in /home/fhx/Documents/golang/foozy/internal/pkg/builtin/builtin_admin/templates/base.html] unable to resolve template
+[] 2025/01/13 00:30:10 internal/builtin/admin.go:116 [Error (where: fromfile) in /home/fhx/Documents/golang/foozy/internal/pkg/builtin/builtin_admin/templates/base.html] unable to resolve template
+[] 2025/01/13 00:30:10 internal/builtin/admin.go:116 [Error (where: fromfile) in /home/fhx/Documents/golang/foozy/internal/pkg/builtin/builtin_admin/templates/base.html] unable to resolve template
+[] 2025/01/13 00:30:11 internal/builtin/admin.go:116 [Error (where: fromfile) in /home/fhx/Documents/golang/foozy/internal/pkg/builtin/builtin_admin/templates/base.html] unable to resolve template
+[] 2025/01/13 00:30:11 internal/builtin/admin.go:116 [Error (where: fromfile) in /home/fhx/Documents/golang/foozy/internal/pkg/builtin/builtin_admin/templates/base.html] unable to resolve template
+[] 2025/01/13 00:30:12 internal/builtin/admin.go:116 [Error (where: fromfile) in /home/fhx/Documents/golang/foozy/internal/pkg/builtin/builtin_admin/templates/base.html] unable to resolve template
+[] 2025/01/13 00:30:12 internal/builtin/admin.go:116 [Error (where: fromfile) in /home/fhx/Documents/golang/foozy/internal/pkg/builtin/builtin_admin/templates/base.html] unable to resolve template
+[] 2025/01/13 15:57:10 pkg/builtin/builtin_admin/admin.go:69 Error 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '
+		PRIMARY KEY ('id')' at line 3
+[] 2025/01/13 15:57:31 pkg/builtin/builtin_admin/admin.go:69 Error 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '
+		PRIMARY KEY (id)' at line 3
+[] 2025/01/13 19:24:52 internal/builtin/users_page.go:37 Error 1146 (42S02): Table 'foozy_test.roles' doesn't exist
+[] 2025/01/13 19:24:54 internal/builtin/users_page.go:37 Error 1146 (42S02): Table 'foozy_test.roles' doesn't exist
+[] 2025/01/13 19:25:02 internal/builtin/users_page.go:37 Error 1146 (42S02): Table 'foozy_test.roles' doesn't exist
+[] 2025/01/13 19:25:02 internal/builtin/users_page.go:37 Error 1146 (42S02): Table 'foozy_test.roles' doesn't exist
+[] 2025/01/13 19:25:03 internal/builtin/users_page.go:37 Error 1146 (42S02): Table 'foozy_test.roles' doesn't exist
+[] 2025/01/13 19:25:03 internal/builtin/users_page.go:37 Error 1146 (42S02): Table 'foozy_test.roles' doesn't exist
+[] 2025/01/13 19:27:14 pkg/builtin/builtin_admin/admin.go:109 Error 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'FOREIGN KEY (user_id) REFERENCES auth(id) ON DELETE CASCADE,
+			FOREIGN KEY (rol' at line 6
+[] 2025/01/13 19:30:09 pkg/builtin/builtin_admin/admin.go:111 Error 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'FOREIGN KEY (user_id) REFERENCES auth(id) ON DELETE CASCADE,
+			FOREIGN KEY (rol' at line 6
+[] 2025/01/13 20:08:57 internal/builtin/edit_role.go:22 sql: converting argument $1 type: unsupported type []string, a slice of string
+[] 2025/01/14 15:20:04 internal/builtin/delete_roles.go:23 delete role is Admin
+[] 2025/01/14 15:26:54 internal/builtin/delete_roles.go:23 delete role is Admin
+[] 2025/01/14 16:16:37 internal/builtin/delete_roles.go:23 delete role is Admin
+[] 2025/01/14 16:16:48 internal/builtin/delete_roles.go:23 delete role is Admin
+[] 2025/01/14 16:40:41 internal/builtin/create_role.go:22 sql: expected 0 arguments, got 1
+[] 2025/01/14 16:46:42 internal/builtin/create_role.go:22 the admin12 role already exists
+[] 2025/01/14 16:50:49 internal/builtin/create_role.go:26 the admin12 role already exists
+[] 2025/01/14 16:50:57 internal/builtin/create_role.go:26 the admin12 role already exists
+[] 2025/01/14 16:51:48 internal/builtin/create_role.go:26 the admin12 role already exists
+[] 2025/01/14 16:52:00 internal/builtin/create_role.go:26 the admin12 role already exists
+[] 2025/01/14 16:52:20 internal/builtin/create_role.go:27 the admin12 role already exists
+[] 2025/01/14 16:52:36 internal/builtin/create_role.go:27 the Admin12 role already exists
+[] 2025/01/14 16:53:41 internal/builtin/create_role.go:24 the role already exists
+[] 2025/01/14 16:56:15 internal/builtin/delete_roles.go:23 delete role is Admin
+[] 2025/01/14 16:56:22 internal/builtin/delete_roles.go:23 delete role is Admin
+[] 2025/01/14 16:57:06 internal/builtin/delete_roles.go:23 delete role is Admin
+[] 2025/01/14 16:57:29 internal/builtin/delete_roles.go:23 delete role is Admin
+[] 2025/01/14 16:58:26 internal/builtin/delete_roles.go:23 delete role is Admin
+[] 2025/01/14 16:58:30 internal/builtin/delete_roles.go:23 delete role is Admin
+[] 2025/01/14 16:58:43 internal/builtin/delete_roles.go:23 delete role is Admin
+[] 2025/01/14 16:59:27 internal/builtin/delete_roles.go:24 delete role is Admin
+[] 2025/01/14 16:59:55 internal/builtin/delete_roles.go:24 delete role is Admin
+[] 2025/01/14 17:18:06 internal/builtin/delete_roles.go:24 delete role is Admin
+[] 2025/01/14 17:20:36 internal/builtin/delete_roles.go:25 delete role is Admin
+[] 2025/01/14 17:20:39 internal/builtin/delete_roles.go:25 delete role is Admin
+[] 2025/01/14 17:30:52 internal/builtin/edit_role.go:24 you can't delete the admin role
+[] 2025/01/15 11:39:01 internal/builtin/create_role.go:26 Csrf token not found.
+[] 2025/01/15 11:41:10 internal/builtin/create_role.go:25 Csrf token not found.
+[] 2025/01/15 11:48:52 internal/builtin/create_role.go:25 Csrf token not found.
+[] 2025/01/15 11:48:55 internal/builtin/create_role.go:25 Csrf token not found.
+[] 2025/01/15 11:48:57 internal/builtin/create_role.go:25 Csrf token not found.
+[] 2025/01/15 12:24:22 internal/builtin/edit_role.go:24 you can't edit the admin role
+[] 2025/01/15 14:56:56 internal/builtin/users_page.go:29 403 forbidden
+[] 2025/01/15 14:56:58 internal/builtin/users_page.go:29 403 forbidden
+[] 2025/01/15 14:56:58 internal/builtin/users_page.go:29 403 forbidden
+[] 2025/01/15 14:56:58 internal/builtin/users_page.go:29 403 forbidden
+[] 2025/01/15 14:56:58 internal/builtin/users_page.go:29 403 forbidden
+[] 2025/01/15 15:00:12 pkg/builtin/builtin_admin/admin.go:53 403 forbidden
+[] 2025/01/15 15:00:13 pkg/builtin/builtin_admin/admin.go:53 403 forbidden
+[] 2025/01/15 15:00:13 pkg/builtin/builtin_admin/admin.go:53 403 forbidden
+[] 2025/01/15 15:00:13 pkg/builtin/builtin_admin/admin.go:53 403 forbidden
+[] 2025/01/15 15:07:24 pkg/builtin/builtin_admin/admin.go:53 403 forbidden
+[] 2025/01/15 15:07:31 internal/builtin/create_role.go:29 403 forbidden
+[] 2025/01/16 13:21:50 pkg/builtin/builtin_admin/admin.go:74 Error 1054 (42S22): Unknown column 'Admin' in 'field list'
+[] 2025/01/16 13:29:20 pkg/builtin/builtin_admin/admin.go:81 field Output must be a slice
+[] 2025/01/16 13:45:32 internal/builtin/admin_access.go:31 Csrf token not found.
+[] 2025/01/16 13:45:38 internal/builtin/admin_access.go:31 Csrf token not found.
+[] 2025/01/16 13:45:59 internal/builtin/admin_access.go:31 Csrf token not found.
+[] 2025/01/16 13:47:03 pkg/builtin/builtin_admin/admin.go:90 [Error (where: parser) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/admin.html | Line 9 Col 16 near 'SCRF_TOKEN'] Tag 'SCRF_TOKEN' not found (or beginning tag not provided)
+[] 2025/01/16 13:47:03 pkg/builtin/builtin_admin/admin.go:90 [Error (where: parser) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/admin.html | Line 9 Col 16 near 'SCRF_TOKEN'] Tag 'SCRF_TOKEN' not found (or beginning tag not provided)
+[] 2025/01/16 13:47:04 pkg/builtin/builtin_admin/admin.go:90 [Error (where: parser) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/admin.html | Line 9 Col 16 near 'SCRF_TOKEN'] Tag 'SCRF_TOKEN' not found (or beginning tag not provided)
+[] 2025/01/16 13:47:04 pkg/builtin/builtin_admin/admin.go:90 [Error (where: parser) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/admin.html | Line 9 Col 16 near 'SCRF_TOKEN'] Tag 'SCRF_TOKEN' not found (or beginning tag not provided)
+[] 2025/01/16 13:47:12 pkg/builtin/builtin_admin/admin.go:90 [Error (where: parser) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/admin.html | Line 9 Col 16 near 'CSRF_TOKEN'] Tag 'CSRF_TOKEN' not found (or beginning tag not provided)
+[] 2025/01/16 13:47:13 pkg/builtin/builtin_admin/admin.go:90 [Error (where: parser) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/admin.html | Line 9 Col 16 near 'CSRF_TOKEN'] Tag 'CSRF_TOKEN' not found (or beginning tag not provided)
+[] 2025/01/16 13:47:13 pkg/builtin/builtin_admin/admin.go:90 [Error (where: parser) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/admin.html | Line 9 Col 16 near 'CSRF_TOKEN'] Tag 'CSRF_TOKEN' not found (or beginning tag not provided)
+[] 2025/01/16 13:47:13 pkg/builtin/builtin_admin/admin.go:90 [Error (where: parser) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/admin.html | Line 9 Col 16 near 'CSRF_TOKEN'] Tag 'CSRF_TOKEN' not found (or beginning tag not provided)
+[] 2025/01/16 13:47:14 pkg/builtin/builtin_admin/admin.go:90 [Error (where: parser) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/admin.html | Line 9 Col 16 near 'CSRF_TOKEN'] Tag 'CSRF_TOKEN' not found (or beginning tag not provided)
+[] 2025/01/16 13:47:14 pkg/builtin/builtin_admin/admin.go:90 [Error (where: parser) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/admin.html | Line 9 Col 16 near 'CSRF_TOKEN'] Tag 'CSRF_TOKEN' not found (or beginning tag not provided)
+[] 2025/01/16 13:47:14 pkg/builtin/builtin_admin/admin.go:90 [Error (where: parser) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/admin.html | Line 9 Col 16 near 'CSRF_TOKEN'] Tag 'CSRF_TOKEN' not found (or beginning tag not provided)
+[] 2025/01/16 13:47:14 pkg/builtin/builtin_admin/admin.go:90 [Error (where: parser) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/admin.html | Line 9 Col 16 near 'CSRF_TOKEN'] Tag 'CSRF_TOKEN' not found (or beginning tag not provided)
+[] 2025/01/16 13:47:14 pkg/builtin/builtin_admin/admin.go:90 [Error (where: parser) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/admin.html | Line 9 Col 16 near 'CSRF_TOKEN'] Tag 'CSRF_TOKEN' not found (or beginning tag not provided)
+[] 2025/01/16 13:47:14 pkg/builtin/builtin_admin/admin.go:90 [Error (where: parser) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/admin.html | Line 9 Col 16 near 'CSRF_TOKEN'] Tag 'CSRF_TOKEN' not found (or beginning tag not provided)
+[] 2025/01/16 13:47:14 pkg/builtin/builtin_admin/admin.go:90 [Error (where: parser) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/admin.html | Line 9 Col 16 near 'CSRF_TOKEN'] Tag 'CSRF_TOKEN' not found (or beginning tag not provided)
+[] 2025/01/16 13:47:15 pkg/builtin/builtin_admin/admin.go:90 [Error (where: parser) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/admin.html | Line 9 Col 16 near 'CSRF_TOKEN'] Tag 'CSRF_TOKEN' not found (or beginning tag not provided)
+[] 2025/01/16 13:47:15 pkg/builtin/builtin_admin/admin.go:90 [Error (where: parser) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/admin.html | Line 9 Col 16 near 'CSRF_TOKEN'] Tag 'CSRF_TOKEN' not found (or beginning tag not provided)
+[] 2025/01/16 13:47:15 pkg/builtin/builtin_admin/admin.go:90 [Error (where: parser) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/admin.html | Line 9 Col 16 near 'CSRF_TOKEN'] Tag 'CSRF_TOKEN' not found (or beginning tag not provided)
+[] 2025/01/16 13:47:15 pkg/builtin/builtin_admin/admin.go:90 [Error (where: parser) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/admin.html | Line 9 Col 16 near 'CSRF_TOKEN'] Tag 'CSRF_TOKEN' not found (or beginning tag not provided)
+[] 2025/01/16 13:47:15 pkg/builtin/builtin_admin/admin.go:90 [Error (where: parser) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/admin.html | Line 9 Col 16 near 'CSRF_TOKEN'] Tag 'CSRF_TOKEN' not found (or beginning tag not provided)
+[] 2025/01/16 13:47:17 pkg/builtin/builtin_admin/admin.go:90 [Error (where: parser) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/admin.html | Line 9 Col 16 near 'CSRF_TOKEN'] Tag 'CSRF_TOKEN' not found (or beginning tag not provided)
+[] 2025/01/16 13:47:18 pkg/builtin/builtin_admin/admin.go:90 [Error (where: parser) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/admin.html | Line 9 Col 16 near 'CSRF_TOKEN'] Tag 'CSRF_TOKEN' not found (or beginning tag not provided)
+[] 2025/01/16 13:47:18 pkg/builtin/builtin_admin/admin.go:90 [Error (where: parser) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/admin.html | Line 9 Col 16 near 'CSRF_TOKEN'] Tag 'CSRF_TOKEN' not found (or beginning tag not provided)
+[] 2025/01/16 13:47:18 pkg/builtin/builtin_admin/admin.go:90 [Error (where: parser) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/admin.html | Line 9 Col 16 near 'CSRF_TOKEN'] Tag 'CSRF_TOKEN' not found (or beginning tag not provided)
+[] 2025/01/16 13:47:18 pkg/builtin/builtin_admin/admin.go:90 [Error (where: parser) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/admin.html | Line 9 Col 16 near 'CSRF_TOKEN'] Tag 'CSRF_TOKEN' not found (or beginning tag not provided)
+[] 2025/01/16 13:47:18 pkg/builtin/builtin_admin/admin.go:90 [Error (where: parser) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/admin.html | Line 9 Col 16 near 'CSRF_TOKEN'] Tag 'CSRF_TOKEN' not found (or beginning tag not provided)
+[] 2025/01/16 13:47:32 pkg/builtin/builtin_admin/admin.go:90 [Error (where: parser) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/admin.html | Line 20 Col 20 near 'CSRF_TOKEN'] Tag 'CSRF_TOKEN' not found (or beginning tag not provided)
+[] 2025/01/16 13:47:32 pkg/builtin/builtin_admin/admin.go:90 [Error (where: parser) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/admin.html | Line 20 Col 20 near 'CSRF_TOKEN'] Tag 'CSRF_TOKEN' not found (or beginning tag not provided)
+[] 2025/01/17 12:16:57 internal/builtin/create_roles_table.go:43 Error 1215 (HY000): Cannot add foreign key constraint
+[] 2025/01/17 12:17:31 internal/builtin/users_page.go:47 The database output result does not contain the id field.
+[] 2025/01/17 12:17:34 internal/builtin/users_page.go:47 The database output result does not contain the id field.
+[] 2025/01/17 12:17:34 internal/builtin/users_page.go:47 The database output result does not contain the id field.
+[] 2025/01/17 12:17:35 internal/builtin/users_page.go:47 The database output result does not contain the id field.
+[] 2025/01/17 12:17:36 internal/builtin/users_page.go:47 The database output result does not contain the id field.
+[] 2025/01/17 12:17:36 internal/builtin/users_page.go:47 The database output result does not contain the id field.
+[] 2025/01/17 12:17:36 internal/builtin/users_page.go:47 The database output result does not contain the id field.
+[] 2025/01/17 12:17:37 internal/builtin/users_page.go:47 The database output result does not contain the id field.
+[] 2025/01/17 12:17:37 internal/builtin/users_page.go:47 The database output result does not contain the id field.
+[] 2025/01/17 12:17:37 internal/builtin/users_page.go:47 The database output result does not contain the id field.
+[] 2025/01/17 12:17:37 internal/builtin/users_page.go:47 The database output result does not contain the id field.
+[] 2025/01/17 12:20:59 internal/builtin/create_role.go:35 the role already exists
+[] 2025/01/17 12:27:22 internal/builtin/delete_roles.go:39 field Name is empty
+[] 2025/01/17 12:29:55 internal/builtin/delete_roles.go:37 you can't delete the admin role
+[] 2025/01/17 13:03:12 internal/builtin/admin_access.go:32 no user with the admin role
+[] 2025/01/17 13:03:44 internal/builtin/admin_access.go:32 no user with the admin role
+[] 2025/01/17 13:03:57 internal/builtin/admin_access.go:32 no user with the admin role
+[] 2025/01/17 13:03:59 internal/builtin/admin_access.go:32 no user with the admin role
+[] 2025/01/17 13:03:59 internal/builtin/admin_access.go:32 no user with the admin role
+[] 2025/01/17 13:04:00 internal/builtin/admin_access.go:32 no user with the admin role
+[] 2025/01/17 13:04:33 internal/builtin/admin_access.go:32 no user with the admin role
+[] 2025/01/17 13:19:29 internal/builtin/admin_access.go:32 no user with the admin role
+[] 2025/01/17 13:20:33 internal/builtin/edit_role.go:36 you can't edit the admin role
+[] 2025/01/17 13:21:18 internal/builtin/admin_access.go:32 no user with the admin role
+[] 2025/01/18 12:22:32 pkg/builtin/builtin_admin/admin.go:79 403 forbidden
+[] 2025/01/18 12:22:33 pkg/builtin/builtin_admin/admin.go:79 403 forbidden
+[] 2025/01/18 12:22:33 pkg/builtin/builtin_admin/admin.go:79 403 forbidden
+[] 2025/01/18 12:22:33 pkg/builtin/builtin_admin/admin.go:79 403 forbidden
+[] 2025/01/18 12:22:40 pkg/builtin/builtin_admin/admin.go:79 403 forbidden
+[] 2025/01/18 12:22:40 pkg/builtin/builtin_admin/admin.go:79 403 forbidden
+[] 2025/01/18 12:22:40 pkg/builtin/builtin_admin/admin.go:79 403 forbidden
+[] 2025/01/18 12:22:40 pkg/builtin/builtin_admin/admin.go:79 403 forbidden
+[] 2025/01/18 12:22:41 pkg/builtin/builtin_admin/admin.go:79 403 forbidden
+[] 2025/01/18 12:22:41 pkg/builtin/builtin_admin/admin.go:79 403 forbidden
+[] 2025/01/18 12:22:41 pkg/builtin/builtin_admin/admin.go:79 403 forbidden
+[] 2025/01/18 12:22:41 pkg/builtin/builtin_admin/admin.go:79 403 forbidden
+[] 2025/01/18 12:45:19 pkg/builtin/builtin_admin/admin.go:79 403 forbidden
+[] 2025/01/18 12:45:28 pkg/builtin/builtin_admin/admin.go:79 403 forbidden
+[] 2025/01/18 12:45:40 pkg/builtin/builtin_admin/admin.go:79 403 forbidden
+[] 2025/01/18 12:47:18 pkg/builtin/builtin_admin/admin.go:76 Error 1054 (42S22): Unknown column 'admin_acces' in 'field list'
+[] 2025/01/18 12:47:37 pkg/builtin/builtin_admin/admin.go:79 403 forbidden
+[] 2025/01/18 12:49:23 pkg/builtin/builtin_admin/admin.go:79 403 forbidden
+[] 2025/01/18 12:50:25 pkg/builtin/builtin_admin/admin.go:79 403 forbidden
+[] 2025/01/18 12:52:48 internal/builtin/admin_access.go:38 no user with the admin role
+[] 2025/01/18 12:53:01 internal/builtin/admin_access.go:38 no user with the admin role
+[] 2025/01/19 13:21:00 internal/builtin/admin_access.go:38 no user with the admin role
+[] 2025/01/19 13:21:04 internal/builtin/users_page.go:30 sql: database is closed
+[] 2025/01/19 13:21:06 internal/builtin/users_page.go:30 sql: database is closed
+[] 2025/01/19 13:21:12 internal/builtin/users_page.go:30 sql: database is closed
+[] 2025/01/19 13:21:13 internal/builtin/users_page.go:30 sql: database is closed
+[] 2025/01/19 13:21:13 internal/builtin/users_page.go:30 sql: database is closed
+[] 2025/01/19 13:21:13 internal/builtin/users_page.go:30 sql: database is closed
+[] 2025/01/19 13:21:22 internal/builtin/admin_access.go:38 no user with the admin role
+[] 2025/01/19 13:21:24 internal/builtin/users_page.go:30 sql: database is closed
+[] 2025/01/19 15:20:35 internal/builtin/user_view.go:22 The path to the template is not set.
+[] 2025/01/19 15:21:06 internal/builtin/user_view.go:22 The path to the template is not set.
+[] 2025/01/19 15:21:07 internal/builtin/user_view.go:22 The path to the template is not set.
+[] 2025/01/19 15:21:07 internal/builtin/user_view.go:22 The path to the template is not set.
+[] 2025/01/19 15:21:07 internal/builtin/user_view.go:22 The path to the template is not set.
+[] 2025/01/19 15:21:08 internal/builtin/user_view.go:22 The path to the template is not set.
+[] 2025/01/19 15:21:12 internal/builtin/user_view.go:22 The path to the template is not set.
+[] 2025/01/19 15:21:12 internal/builtin/user_view.go:22 The path to the template is not set.
+[] 2025/01/19 15:21:13 internal/builtin/user_view.go:22 The path to the template is not set.
+[] 2025/01/19 15:21:54 internal/builtin/user_view.go:22 The path to the template is not set.
+[] 2025/01/19 15:21:55 internal/builtin/user_view.go:22 The path to the template is not set.
+[] 2025/01/19 15:21:56 internal/builtin/user_view.go:22 The path to the template is not set.
+[] 2025/01/19 15:22:01 internal/builtin/user_view.go:22 The path to the template is not set.
+[] 2025/01/19 15:22:02 internal/builtin/user_view.go:22 The path to the template is not set.
+[] 2025/01/19 15:22:02 internal/builtin/user_view.go:22 The path to the template is not set.
+[] 2025/01/19 15:22:11 internal/builtin/user_view.go:22 The path to the template is not set.
+[] 2025/01/19 15:22:11 internal/builtin/user_view.go:22 The path to the template is not set.
+[] 2025/01/19 15:22:11 internal/builtin/user_view.go:22 The path to the template is not set.
+[] 2025/01/19 15:22:12 internal/builtin/user_view.go:22 The path to the template is not set.
+[] 2025/01/19 15:22:12 internal/builtin/user_view.go:22 The path to the template is not set.
+[] 2025/01/19 15:22:12 internal/builtin/user_view.go:22 The path to the template is not set.
+[] 2025/01/19 15:22:12 internal/builtin/user_view.go:22 The path to the template is not set.
+[] 2025/01/19 15:22:12 internal/builtin/user_view.go:22 The path to the template is not set.
+[] 2025/01/19 15:22:23 internal/builtin/user_view.go:22 The path to the template is not set.
+[] 2025/01/19 15:23:02 internal/builtin/user_view.go:22 The path to the template is not set.
+[] 2025/01/19 15:25:57 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:00 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:00 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:00 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:00 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:01 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:01 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:01 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:01 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:01 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:01 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:02 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:02 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:02 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:02 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:02 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:03 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:03 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:03 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:03 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:03 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:04 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:43 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:44 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:45 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:45 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:45 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:45 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:45 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:45 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:46 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:46 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:46 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:26:46 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:34:28 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:49:20 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:49:21 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:49:22 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:49:22 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:49:23 internal/builtin/user_view.go:24 no data to display was found
+[] 2025/01/19 15:51:35 internal/builtin/user_view.go:38 404 not found
+[] 2025/01/19 15:51:37 internal/builtin/user_view.go:38 404 not found
+[] 2025/01/19 15:51:51 internal/builtin/user_view.go:38 404 not found
+[] 2025/01/19 15:51:52 internal/builtin/user_view.go:38 404 not found
+[] 2025/01/19 15:51:52 internal/builtin/user_view.go:38 404 not found
+[] 2025/01/19 15:51:52 internal/builtin/user_view.go:38 404 not found
+[] 2025/01/19 15:52:08 internal/builtin/user_view.go:36 no data to display was found
+[] 2025/01/19 15:52:09 internal/builtin/user_view.go:36 no data to display was found
+[] 2025/01/19 15:52:09 internal/builtin/user_view.go:36 no data to display was found
+[] 2025/01/19 15:52:09 internal/builtin/user_view.go:36 no data to display was found
+[] 2025/01/19 15:52:10 internal/builtin/user_view.go:36 no data to display was found
+[] 2025/01/19 15:53:36 internal/builtin/user_view.go:36 no data to display was found
+[] 2025/01/19 15:53:37 internal/builtin/user_view.go:36 no data to display was found
+[] 2025/01/19 15:53:37 internal/builtin/user_view.go:36 no data to display was found
+[] 2025/01/19 15:53:37 internal/builtin/user_view.go:36 no data to display was found
+[] 2025/01/19 15:54:00 internal/builtin/user_view.go:36 no data to display was found
+[] 2025/01/19 15:54:00 internal/builtin/user_view.go:36 no data to display was found
+[] 2025/01/19 15:54:01 internal/builtin/user_view.go:36 no data to display was found
+[] 2025/01/19 15:54:01 internal/builtin/user_view.go:36 no data to display was found
+[] 2025/01/19 15:54:01 internal/builtin/user_view.go:36 no data to display was found
+[] 2025/01/19 15:54:03 internal/builtin/user_view.go:36 no data to display was found
+[] 2025/01/27 13:17:31 internal/builtin/user_view.go:38 no data to display was found
+[] 2025/01/28 12:46:19 internal/builtin/admin_access.go:38 no user with the admin role
+[] 2025/01/28 12:46:22 internal/builtin/admin_access.go:38 no user with the admin role
+[] 2025/01/29 11:50:27 internal/builtin/admin_access.go:38 no user with the admin role
+[] 2025/01/29 11:57:22 internal/builtin/adminpanel/users_page.go:49 [Error (where: fromfile) in /home/fhx/Documents/golang/foozy/internal/pkg/builtin/builtin_admin/templates/base.html] unable to resolve template
+[] 2025/01/29 11:57:25 internal/builtin/adminpanel/users_page.go:49 [Error (where: fromfile) in /home/fhx/Documents/golang/foozy/internal/pkg/builtin/builtin_admin/templates/base.html] unable to resolve template
+[] 2025/01/29 13:07:53 pkg/builtin/builtin_admin/admin.go:99 The path to the "/home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/admin.html" template was not found.
+[] 2025/01/29 13:08:17 pkg/builtin/builtin_admin/admin.go:99 The path to the "../../../internal/adminpanel/templates/admin.html" template was not found.
+[] 2025/01/29 13:08:18 pkg/builtin/builtin_admin/admin.go:99 The path to the "../../../internal/adminpanel/templates/admin.html" template was not found.
+[] 2025/01/29 13:08:18 pkg/builtin/builtin_admin/admin.go:99 The path to the "../../../internal/adminpanel/templates/admin.html" template was not found.
+[] 2025/01/29 13:08:18 pkg/builtin/builtin_admin/admin.go:99 The path to the "../../../internal/adminpanel/templates/admin.html" template was not found.
+[] 2025/01/29 13:08:19 pkg/builtin/builtin_admin/admin.go:99 The path to the "../../../internal/adminpanel/templates/admin.html" template was not found.
+[] 2025/01/29 13:08:19 pkg/builtin/builtin_admin/admin.go:99 The path to the "../../../internal/adminpanel/templates/admin.html" template was not found.
+[] 2025/01/29 13:08:20 pkg/builtin/builtin_admin/admin.go:99 The path to the "../../../internal/adminpanel/templates/admin.html" template was not found.
+[] 2025/01/29 13:08:20 pkg/builtin/builtin_admin/admin.go:99 The path to the "../../../internal/adminpanel/templates/admin.html" template was not found.
+[] 2025/02/03 12:47:26 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:47:29 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:47:29 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:47:29 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:47:30 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:47:31 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:47:31 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:47:31 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:47:58 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:47:59 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:47:59 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:47:59 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:48:00 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:48:00 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:48:00 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:48:00 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:48:01 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:48:01 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:48:01 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:48:01 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:48:02 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:48:02 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:48:32 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:48:36 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:48:37 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:48:37 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:48:38 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:48:38 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:49:01 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:49:01 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:49:01 pprof/main.go:57 The connection is not open.
+[] 2025/02/03 12:55:00 pprof/main.go:65 User tee already exist.
+[] 2025/02/03 12:55:01 pprof/main.go:65 User tee already exist.
+[] 2025/02/03 12:55:01 pprof/main.go:65 User tee already exist.
+[] 2025/02/03 12:55:04 pprof/main.go:80 crypto/aes: invalid key size 0
+[] 2025/02/03 12:55:06 pprof/main.go:80 crypto/aes: invalid key size 0
+[] 2025/02/03 12:55:07 pprof/main.go:80 crypto/aes: invalid key size 0
+[] 2025/02/03 12:55:07 pprof/main.go:80 crypto/aes: invalid key size 0
+[] 2025/02/03 12:55:07 pprof/main.go:80 crypto/aes: invalid key size 0
+[] 2025/02/03 12:55:08 pprof/main.go:80 crypto/aes: invalid key size 0
+[] 2025/02/03 12:55:08 pprof/main.go:80 crypto/aes: invalid key size 0
+[] 2025/02/03 12:55:12 pprof/main.go:80 crypto/aes: invalid key size 0
+[] 2025/02/03 12:55:12 pprof/main.go:80 crypto/aes: invalid key size 0
+[] 2025/02/03 12:55:13 pprof/main.go:80 crypto/aes: invalid key size 0
+[] 2025/02/03 12:55:13 pprof/main.go:80 crypto/aes: invalid key size 0
+[] 2025/02/03 12:58:50 pkg/router/router.go:220 Middleware with id 0 already exists.
+[] 2025/02/03 13:01:15 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:01:19 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:01:19 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:01:20 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:01:20 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:01:22 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:01:22 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:01:22 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:01:22 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:01:23 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:01:24 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:01:24 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:01:24 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:02:36 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:02:38 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:02:39 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:02:39 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:02:39 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:02:40 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:02:40 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:02:48 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:02:48 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:02:48 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:02:48 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:02:48 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:02:49 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:02:49 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:02:49 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:02:49 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:02:49 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:03:01 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:03:01 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:03:01 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:03:01 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:03:01 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:03:01 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:03:11 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:03:12 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:03:14 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:03:14 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:03:14 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:03:23 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:03:23 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:03:23 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:03:40 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:03:56 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:03:57 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:03:57 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:03:57 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:03:57 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:06:12 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:06:13 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:06:13 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:06:13 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:06:14 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:06:14 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:06:14 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:06:15 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:06:16 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:06:21 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:06:22 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:06:22 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:06:22 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:06:28 pkg/router/router.go:220 http: named cookie not present
+[] 2025/02/03 13:06:32 pkg/router/router.go:220 http: named cookie not present
+[] 2025/02/03 13:06:33 pkg/router/router.go:220 http: named cookie not present
+[] 2025/02/03 13:06:33 pkg/router/router.go:220 http: named cookie not present
+[] 2025/02/03 13:06:34 pkg/router/router.go:220 http: named cookie not present
+[] 2025/02/03 13:06:35 pkg/router/router.go:220 http: named cookie not present
+[] 2025/02/03 13:06:35 pkg/router/router.go:220 http: named cookie not present
+[] 2025/02/03 13:06:37 pkg/router/router.go:220 http: named cookie not present
+[] 2025/02/03 13:07:21 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:07:24 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:07:25 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:07:25 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:07:26 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:07:27 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:08:14 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:08:31 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:08:38 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:08:50 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:10:45 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:11:13 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:11:14 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:11:28 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:11:31 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:11:37 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:11:49 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:11:51 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:12:00 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:12:16 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:12:29 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:13:10 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:13:26 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:13:46 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:14:03 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:14:18 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:26:03 pkg/builtin/builtin_admin/admin.go:92 Error 1146 (42S02): Table 'foozy_main.admin_settings' doesn't exist
+[] 2025/02/03 13:26:06 pkg/builtin/builtin_admin/admin.go:92 Error 1146 (42S02): Table 'foozy_main.admin_settings' doesn't exist
+[] 2025/02/03 13:29:41 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:29:42 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:29:42 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:29:43 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:29:49 pkg/builtin/builtin_admin/admin.go:92 Error 1146 (42S02): Table 'foozy_main.admin_settings' doesn't exist
+[] 2025/02/03 13:29:50 pkg/builtin/builtin_admin/admin.go:92 Error 1146 (42S02): Table 'foozy_main.admin_settings' doesn't exist
+[] 2025/02/03 13:29:50 pkg/builtin/builtin_admin/admin.go:92 Error 1146 (42S02): Table 'foozy_main.admin_settings' doesn't exist
+[] 2025/02/03 13:31:49 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:31:51 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:31:51 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:31:51 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:31:54 pkg/builtin/builtin_admin/admin.go:92 Error 1146 (42S02): Table 'foozy_main.admin_settings' doesn't exist
+[] 2025/02/03 13:31:55 pkg/builtin/builtin_admin/admin.go:92 Error 1146 (42S02): Table 'foozy_main.admin_settings' doesn't exist
+[] 2025/02/03 13:31:55 pkg/builtin/builtin_admin/admin.go:92 Error 1146 (42S02): Table 'foozy_main.admin_settings' doesn't exist
+[] 2025/02/03 13:31:55 pkg/builtin/builtin_admin/admin.go:92 Error 1146 (42S02): Table 'foozy_main.admin_settings' doesn't exist
+[] 2025/02/03 13:31:55 pkg/builtin/builtin_admin/admin.go:92 Error 1146 (42S02): Table 'foozy_main.admin_settings' doesn't exist
+[] 2025/02/03 13:31:56 pkg/builtin/builtin_admin/admin.go:92 Error 1146 (42S02): Table 'foozy_main.admin_settings' doesn't exist
+[] 2025/02/03 13:31:56 pkg/builtin/builtin_admin/admin.go:92 Error 1146 (42S02): Table 'foozy_main.admin_settings' doesn't exist
+[] 2025/02/03 13:31:56 pkg/builtin/builtin_admin/admin.go:92 Error 1146 (42S02): Table 'foozy_main.admin_settings' doesn't exist
+[] 2025/02/03 13:31:56 pkg/builtin/builtin_admin/admin.go:92 Error 1146 (42S02): Table 'foozy_main.admin_settings' doesn't exist
+[] 2025/02/03 13:31:56 pkg/builtin/builtin_admin/admin.go:92 Error 1146 (42S02): Table 'foozy_main.admin_settings' doesn't exist
+[] 2025/02/03 13:33:38 pkg/builtin/builtin_admin/admin.go:94 Error 1146 (42S02): Table 'foozy_main.admin_settings' doesn't exist
+[] 2025/02/03 13:34:25 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:34:44 internal/adminpanel/change_admin_access.go:44 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/03 13:34:59 internal/adminpanel/users_page.go:50 [Error (where: fromfile) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/base.html] unable to resolve template
+[] 2025/02/03 13:35:04 internal/adminpanel/users_page.go:50 [Error (where: fromfile) in /home/fhx/Documents/golang/foozy/pkg/builtin/builtin_admin/templates/base.html] unable to resolve template
+[] 2025/02/03 13:37:02 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:38:02 internal/adminpanel/change_admin_access.go:44 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/03 13:41:13 internal/adminpanel/change_admin_access.go:44 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/03 13:41:20 internal/adminpanel/create_role.go:43 Error 1146 (42S02): Table 'foozy_main.roles' doesn't exist
+[] 2025/02/03 13:41:23 internal/adminpanel/create_role.go:43 Error 1146 (42S02): Table 'foozy_main.roles' doesn't exist
+[] 2025/02/03 13:42:01 internal/adminpanel/user_view.go:40 Error 1146 (42S02): Table 'foozy_main.roles' doesn't exist
+[] 2025/02/03 13:42:04 internal/adminpanel/user_view.go:40 Error 1146 (42S02): Table 'foozy_main.roles' doesn't exist
+[] 2025/02/03 13:45:23 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:45:38 internal/adminpanel/change_admin_access.go:44 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/03 13:47:47 internal/adminpanel/change_admin_access.go:44 roles table not created
+[] 2025/02/03 13:48:55 internal/adminpanel/change_admin_access.go:44 roles table not created
+[] 2025/02/03 13:49:25 internal/adminpanel/change_admin_access.go:46 roles table not created
+[] 2025/02/03 13:49:56 internal/adminpanel/change_admin_access.go:43 roles table not created
+[] 2025/02/03 13:50:04 internal/adminpanel/change_admin_access.go:43 roles table not created
+[] 2025/02/03 13:50:09 internal/adminpanel/create_role.go:43 Error 1146 (42S02): Table 'foozy_main.roles' doesn't exist
+[] 2025/02/03 13:51:21 internal/adminpanel/create_role.go:41 roles table not created
+[] 2025/02/03 13:53:46 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:46 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:46 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:46 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:46 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:46 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:46 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:46 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:46 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:46 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:46 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:46 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:46 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:46 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:46 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:46 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:46 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:46 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:46 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:46 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:47 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:47 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:47 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:47 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:47 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:47 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:48 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:48 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:48 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:48 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:48 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:48 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:48 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:48 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:48 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:48 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:48 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:48 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:48 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:48 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:51 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:51 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:51 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:51 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:51 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:51 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:51 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:51 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:51 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:51 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:51 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:51 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:51 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:51 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:51 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:51 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:51 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:51 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:51 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:51 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:54 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:54 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:54 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:54 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:54 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:54 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:54 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:54 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:54 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:54 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:54 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:54 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:54 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:54 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:54 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:54 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:54 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:54 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:54 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:54 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:59 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:59 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:59 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:59 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:59 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:59 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:59 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:59 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:59 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:59 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:59 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:59 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:53:59 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:00 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:00 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:00 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:00 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:00 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:00 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:00 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:05 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:05 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:05 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:05 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:05 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:05 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:05 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:06 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:06 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:06 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:06 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:06 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:06 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:06 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:06 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:06 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:06 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:06 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:06 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:06 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:36 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:36 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:36 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:36 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:36 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:36 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:36 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:36 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:36 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:36 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:36 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:36 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:36 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:36 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:36 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:36 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:36 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:36 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:37 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:37 internal/adminpanel/user_view.go:41 roles table not created
+[] 2025/02/03 13:54:53 internal/adminpanel/user_view.go:40 roles table not created
+[] 2025/02/03 13:55:16 internal/adminpanel/change_admin_access.go:41 no user with the admin role
+[] 2025/02/03 13:55:43 internal/adminpanel/change_admin_access.go:41 no user with the admin role
+[] 2025/02/03 13:57:00 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:57:02 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:57:02 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:57:09 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:57:09 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:57:29 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:57:29 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:57:30 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:57:30 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:57:30 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:57:30 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:57:31 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:57:31 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:57:31 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:57:31 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:57:31 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 13:57:31 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 14:00:49 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 14:00:49 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 14:00:50 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 14:00:51 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 14:00:51 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 14:00:52 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 14:00:52 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 14:00:57 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 14:00:57 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 14:00:57 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 14:01:31 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 14:01:58 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 14:01:58 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 14:01:58 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 14:02:12 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 14:02:22 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 14:02:28 pkg/router/router.go:220 http: named cookie not present
+[] 2025/02/03 14:02:29 pkg/router/router.go:220 http: named cookie not present
+[] 2025/02/03 14:02:29 pkg/router/router.go:220 http: named cookie not present
+[] 2025/02/03 14:02:29 pkg/router/router.go:220 http: named cookie not present
+[] 2025/02/03 14:02:30 pkg/router/router.go:220 http: named cookie not present
+[] 2025/02/03 14:02:30 pkg/router/router.go:220 http: named cookie not present
+[] 2025/02/03 14:02:30 pkg/router/router.go:220 http: named cookie not present
+[] 2025/02/03 14:02:31 pkg/router/router.go:220 http: named cookie not present
+[] 2025/02/03 14:02:31 pkg/router/router.go:220 http: named cookie not present
+[] 2025/02/03 14:02:33 pkg/router/router.go:220 http: named cookie not present
+[] 2025/02/03 14:02:34 pkg/router/router.go:220 http: named cookie not present
+[] 2025/02/03 14:08:36 pprof/main.go:72 User tee1 already exist.
+[] 2025/02/03 14:08:39 pprof/main.go:72 User tee1 already exist.
+[] 2025/02/03 14:08:39 pprof/main.go:72 User tee1 already exist.
+[] 2025/02/03 14:08:40 pprof/main.go:72 User tee1 already exist.
+[] 2025/02/03 14:08:41 pprof/main.go:72 User tee1 already exist.
+[] 2025/02/03 14:08:41 pprof/main.go:72 User tee1 already exist.
+[] 2025/02/03 14:08:44 pprof/main.go:72 User tee1 already exist.
+[] 2025/02/03 14:08:55 pprof/main.go:72 User tee1 already exist.
+[] 2025/02/03 14:46:00 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 14:47:21 pkg/router/router.go:220 cipher: message authentication failed
+[] 2025/02/03 14:52:07 pkg/builtin/builtin_admin/admin.go:84 403 forbidden
+[] 2025/02/03 14:52:08 pkg/builtin/builtin_admin/admin.go:84 403 forbidden
+[] 2025/02/03 14:52:08 pkg/builtin/builtin_admin/admin.go:84 403 forbidden
+[] 2025/02/03 14:52:09 pkg/builtin/builtin_admin/admin.go:84 403 forbidden
+[] 2025/02/03 14:52:09 pkg/builtin/builtin_admin/admin.go:84 403 forbidden
+[] 2025/02/03 14:52:09 pkg/builtin/builtin_admin/admin.go:84 403 forbidden
+[] 2025/02/03 14:52:09 pkg/builtin/builtin_admin/admin.go:84 403 forbidden
+[] 2025/02/03 14:52:09 pkg/builtin/builtin_admin/admin.go:84 403 forbidden
+[] 2025/02/03 14:52:10 pkg/builtin/builtin_admin/admin.go:84 403 forbidden
+[] 2025/02/03 14:52:10 pkg/builtin/builtin_admin/admin.go:84 403 forbidden
+[] 2025/02/03 14:52:10 pkg/builtin/builtin_admin/admin.go:84 403 forbidden
+[] 2025/02/03 14:52:10 pkg/builtin/builtin_admin/admin.go:84 403 forbidden
+[] 2025/02/03 14:52:10 pkg/builtin/builtin_admin/admin.go:84 403 forbidden
+[] 2025/02/03 14:52:11 pkg/builtin/builtin_admin/admin.go:84 403 forbidden
+[] 2025/02/03 14:52:11 pkg/builtin/builtin_admin/admin.go:84 403 forbidden
+[] 2025/02/03 14:52:11 pkg/builtin/builtin_admin/admin.go:84 403 forbidden
+[] 2025/02/03 14:52:11 pkg/builtin/builtin_admin/admin.go:84 403 forbidden
+[] 2025/02/04 11:56:15 pkg/router/router.go:220 http: named cookie not present
+[] 2025/02/04 11:56:29 pkg/router/router.go:220 http: named cookie not present
+[] 2025/02/04 11:56:30 pkg/router/router.go:220 http: named cookie not present
+[] 2025/02/04 11:56:30 pkg/router/router.go:220 http: named cookie not present
+[] 2025/02/04 11:57:47 pprof/main.go:75 User tee1 already exist.
+[] 2025/02/04 11:57:53 pprof/main.go:75 User tee1 already exist.
+[] 2025/02/04 13:15:35 internal/adminpanel/users_page.go:29 cipher: message authentication failed
+[] 2025/02/04 13:15:36 internal/adminpanel/users_page.go:29 cipher: message authentication failed
+[] 2025/02/04 13:15:36 internal/adminpanel/users_page.go:29 cipher: message authentication failed
+[] 2025/02/04 13:15:37 internal/adminpanel/users_page.go:29 cipher: message authentication failed
+[] 2025/02/04 13:15:37 internal/adminpanel/users_page.go:29 cipher: message authentication failed
+[] 2025/02/04 13:15:37 internal/adminpanel/users_page.go:29 cipher: message authentication failed
+[] 2025/02/04 13:15:37 internal/adminpanel/users_page.go:29 cipher: message authentication failed
+[] 2025/02/04 13:15:38 internal/adminpanel/users_page.go:29 cipher: message authentication failed
+[] 2025/02/04 13:15:38 internal/adminpanel/users_page.go:29 cipher: message authentication failed
+[] 2025/02/04 13:15:38 internal/adminpanel/users_page.go:29 cipher: message authentication failed
+[] 2025/02/04 13:15:38 internal/adminpanel/users_page.go:29 cipher: message authentication failed
+[] 2025/02/04 13:15:39 internal/adminpanel/users_page.go:29 cipher: message authentication failed
+[] 2025/02/04 13:15:39 internal/adminpanel/users_page.go:29 cipher: message authentication failed
+[] 2025/02/04 13:15:40 internal/adminpanel/users_page.go:29 cipher: message authentication failed
+[] 2025/02/04 13:15:41 internal/adminpanel/users_page.go:29 cipher: message authentication failed
+[] 2025/02/04 13:15:41 internal/adminpanel/users_page.go:29 cipher: message authentication failed
+[] 2025/02/04 13:24:39 pkg/builtin/builtin_admin/admin.go:81 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/04 13:24:43 pkg/builtin/builtin_admin/admin.go:81 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/04 13:24:43 pkg/builtin/builtin_admin/admin.go:81 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/04 13:24:44 pkg/builtin/builtin_admin/admin.go:81 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/04 13:24:44 pkg/builtin/builtin_admin/admin.go:81 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/04 13:24:44 pkg/builtin/builtin_admin/admin.go:81 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/04 13:24:44 pkg/builtin/builtin_admin/admin.go:81 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/04 13:24:45 pkg/builtin/builtin_admin/admin.go:81 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/04 13:24:45 pkg/builtin/builtin_admin/admin.go:81 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/04 13:24:45 pkg/builtin/builtin_admin/admin.go:81 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/04 13:24:47 pkg/builtin/builtin_admin/admin.go:81 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/04 13:24:47 pkg/builtin/builtin_admin/admin.go:81 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/04 13:24:47 pkg/builtin/builtin_admin/admin.go:81 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/04 13:24:47 pkg/builtin/builtin_admin/admin.go:81 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/04 13:24:48 pkg/builtin/builtin_admin/admin.go:81 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/04 13:24:48 pkg/builtin/builtin_admin/admin.go:81 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/04 13:24:49 pkg/builtin/builtin_admin/admin.go:81 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/04 13:24:49 pkg/builtin/builtin_admin/admin.go:81 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/04 13:24:49 pkg/builtin/builtin_admin/admin.go:81 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/04 13:24:50 pkg/builtin/builtin_admin/admin.go:81 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/04 13:24:51 pkg/builtin/builtin_admin/admin.go:81 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/04 13:25:37 pkg/builtin/builtin_admin/admin.go:81 cipher: message authentication failed
+[] 2025/02/04 13:25:37 pkg/builtin/builtin_admin/admin.go:81 cipher: message authentication failed
+[] 2025/02/04 13:25:38 pkg/builtin/builtin_admin/admin.go:81 cipher: message authentication failed
+[] 2025/02/04 13:25:38 pkg/builtin/builtin_admin/admin.go:81 cipher: message authentication failed
+[] 2025/02/04 13:25:39 pkg/builtin/builtin_admin/admin.go:81 cipher: message authentication failed
+[] 2025/02/04 13:25:39 pkg/builtin/builtin_admin/admin.go:81 cipher: message authentication failed
+[] 2025/02/04 13:25:39 pkg/builtin/builtin_admin/admin.go:81 cipher: message authentication failed
+[] 2025/02/04 13:25:40 pkg/builtin/builtin_admin/admin.go:81 cipher: message authentication failed
+[] 2025/02/04 13:25:40 pkg/builtin/builtin_admin/admin.go:81 cipher: message authentication failed
+[] 2025/02/04 13:25:40 pkg/builtin/builtin_admin/admin.go:81 cipher: message authentication failed
+[] 2025/02/04 13:25:40 pkg/builtin/builtin_admin/admin.go:81 cipher: message authentication failed
+[] 2025/02/04 13:25:40 pkg/builtin/builtin_admin/admin.go:81 cipher: message authentication failed
+[] 2025/02/04 13:25:45 pkg/builtin/builtin_admin/admin.go:81 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/04 13:25:46 pkg/builtin/builtin_admin/admin.go:81 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/04 13:25:46 pkg/builtin/builtin_admin/admin.go:81 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/04 13:25:46 pkg/builtin/builtin_admin/admin.go:81 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/04 13:25:46 pkg/builtin/builtin_admin/admin.go:81 Error 1146 (42S02): Table 'foozy_main.user_roles' doesn't exist
+[] 2025/02/04 13:28:47 internal/adminpanel/create_roles_table.go:23 Csrf token not found.
+[] 2025/02/27 12:05:49 internal/adminpanel/change_admin_access.go:42 no user with the admin role
+[] 2025/02/27 12:08:12 internal/adminpanel/change_admin_access.go:28 403 forbidden
+[] 2025/02/27 12:08:24 internal/adminpanel/change_admin_access.go:28 403 forbidden
+[] 2025/02/27 12:08:27 pkg/builtin/builtin_admin/admin.go:83 http: named cookie not present
+[] 2025/02/27 12:08:31 pkg/builtin/builtin_admin/admin.go:83 http: named cookie not present
+[] 2025/02/27 12:08:34 pkg/builtin/builtin_admin/admin.go:83 http: named cookie not present
+[] 2025/02/27 12:08:37 pkg/builtin/builtin_admin/admin.go:83 http: named cookie not present
+[] 2025/02/27 12:10:06 pkg/builtin/builtin_admin/admin.go:86 403 forbidden
+[] 2025/02/27 12:10:07 pkg/builtin/builtin_admin/admin.go:86 403 forbidden
+[] 2025/02/27 12:10:08 pkg/builtin/builtin_admin/admin.go:86 403 forbidden
+[] 2025/02/27 12:10:08 pkg/builtin/builtin_admin/admin.go:86 403 forbidden
+[] 2025/02/27 12:10:09 pkg/builtin/builtin_admin/admin.go:86 403 forbidden
+[] 2025/02/27 12:10:09 pkg/builtin/builtin_admin/admin.go:86 403 forbidden
+[] 2025/02/27 12:10:09 pkg/builtin/builtin_admin/admin.go:86 403 forbidden
+[] 2025/02/27 12:10:09 pkg/builtin/builtin_admin/admin.go:86 403 forbidden
+[] 2025/02/27 12:11:56 internal/adminpanel/delete_roles.go:42 you can't delete the admin role

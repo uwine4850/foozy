@@ -34,7 +34,7 @@ func (v *MultipleObjectView) ObjectsName() []string {
 	return names
 }
 
-func (v *MultipleObjectView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (Context, error) {
+func (v *MultipleObjectView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) (Context, error) {
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "run MultipleObjectView object")
 	if err := v.checkMultipleObject(); err != nil {
 		return nil, err

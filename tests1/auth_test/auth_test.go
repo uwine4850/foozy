@@ -65,7 +65,7 @@ func (q *FakeAuthQuery) ChangePassword(userId string, newHashPassword string) (r
 var newManager = manager.NewManager(
 	manager.NewOneTimeData(),
 	nil,
-	manager.NewDatabasePool(),
+	database.NewDatabasePool(),
 )
 var newMiddlewares = middlewares.NewMiddlewares()
 var mockDatabase *databasemock.MysqlDatabase
@@ -86,7 +86,7 @@ func TestMain(m *testing.M) {
 		"/test-login-wrong-username", "/test-auth-jwt"}
 	newMiddlewares.PreMiddleware(1,
 		builtin_mddl.Auth(&fakeAuthQuery, excludePatterns,
-			func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+			func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager, err error) {
 				w.WriteHeader(http.StatusInternalServerError)
 				w.Write([]byte(err.Error()))
 			},
@@ -96,7 +96,7 @@ func TestMain(m *testing.M) {
 	newAdapter := router.NewAdapter(newManager, newMiddlewares)
 	newAdapter.SetOnErrorFunc(onError)
 	newRouter := router.NewRouter(newAdapter)
-	newRouter.Register(router.MethodGET, "/test-register-user-exists", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodGET, "/test-register-user-exists", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		myauth := auth.NewAuth(w, &fakeAuthQuery, manager)
 		_, err := myauth.RegisterUser("USER", "111111")
 		if err != nil {
@@ -104,7 +104,7 @@ func TestMain(m *testing.M) {
 		}
 		return nil
 	})
-	newRouter.Register(router.MethodGET, "/test-register", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodGET, "/test-register", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		myauth := auth.NewAuth(w, &fakeAuthQuery, manager)
 		uid, err := myauth.RegisterUser("USER_1", "111111")
 		if err != nil {
@@ -117,7 +117,7 @@ func TestMain(m *testing.M) {
 		}
 		return nil
 	})
-	newRouter.Register(router.MethodGET, "/test-login", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodGET, "/test-login", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		myauth := auth.NewAuth(w, &fakeAuthQuery, manager)
 		user, err := myauth.LoginUser("USER", "111111")
 		if err != nil {
@@ -133,7 +133,7 @@ func TestMain(m *testing.M) {
 		}
 		return nil
 	})
-	newRouter.Register(router.MethodGET, "/test-login-wrong-password", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodGET, "/test-login-wrong-password", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		myauth := auth.NewAuth(w, &fakeAuthQuery, manager)
 		_, err := myauth.LoginUser("USER", "WRONG PASSWORD")
 		if err != nil {
@@ -141,7 +141,7 @@ func TestMain(m *testing.M) {
 		}
 		return nil
 	})
-	newRouter.Register(router.MethodGET, "/test-login-wrong-username", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodGET, "/test-login-wrong-username", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		myauth := auth.NewAuth(w, &fakeAuthQuery, manager)
 		_, err := myauth.LoginUser("WRONG USERNAME", "111111")
 		if err != nil {
@@ -149,7 +149,7 @@ func TestMain(m *testing.M) {
 		}
 		return nil
 	})
-	newRouter.Register(router.MethodGET, "/test-auth-cookie", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodGET, "/test-auth-cookie", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		k := manager.Key().Get32BytesKey()
 		var a auth.Cookie
 		if err := cookies.ReadSecureCookieData([]byte(k.HashKey()), []byte(k.BlockKey()), r, namelib.AUTH.COOKIE_AUTH, &a); err != nil {
@@ -161,7 +161,7 @@ func TestMain(m *testing.M) {
 		w.Write([]byte("OK"))
 		return nil
 	})
-	newRouter.Register(router.MethodGET, "/test-auth-jwt", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodGET, "/test-auth-jwt", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		return nil
 	})
 
@@ -319,21 +319,21 @@ func TestAuthJWT(t *testing.T) {
 	}
 
 	newMiddlewares.PreMiddleware(2, builtin_mddl.AuthJWT(
-		func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (string, error) {
+		func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) (string, error) {
 			return token, nil
 		},
-		func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, token string, AID int) error {
+		func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager, token string, AID int) error {
 			updateCalled = true
 			return nil
 		},
-		func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, AID int) error {
+		func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager, AID int) error {
 			uidCalled = true
 			if AID != 1 {
 				return errors.New("[currentID] error: uid does not match expectation")
 			}
 			return nil
 		},
-		func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+		func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager, err error) {
 			onError(w, r, err)
 		},
 	))

@@ -5,7 +5,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces"
 )
 
-func NewHmacJwtWithClaims(claims jwt.Claims, manager interfaces.IManager) (string, error) {
+func NewHmacJwtWithClaims(claims jwt.Claims, manager interfaces.Manager) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(manager.Key().Get32BytesKey().HashKey()))
 	if err != nil {

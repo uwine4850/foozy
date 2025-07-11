@@ -11,12 +11,12 @@ import (
 type MysqlDatabase struct {
 	db     *sql.DB
 	tx     *sql.Tx
-	syncQ  interfaces.ISyncQueries
-	asyncQ interfaces.IAsyncQueries
+	syncQ  interfaces.SyncQ
+	asyncQ interfaces.AsyncQ
 	mock   sqlmock.Sqlmock
 }
 
-func NewMysqlDatabase(syncQ interfaces.ISyncQueries, asyncQ interfaces.IAsyncQueries) *MysqlDatabase {
+func NewMysqlDatabase(syncQ interfaces.SyncQ, asyncQ interfaces.AsyncQ) *MysqlDatabase {
 	return &MysqlDatabase{
 		syncQ:  syncQ,
 		asyncQ: asyncQ,
@@ -48,20 +48,20 @@ func (d *MysqlDatabase) Close() error {
 	return nil
 }
 
-func (d *MysqlDatabase) NewTransaction() (interfaces.ITransaction, error) {
+func (d *MysqlDatabase) NewTransaction() (interfaces.DatabaseTransaction, error) {
 	return database.NewMysqlTransaction(d.db, d.syncQ, d.asyncQ)
 }
 
-func (d *MysqlDatabase) SyncQ() interfaces.ISyncQueries {
+func (d *MysqlDatabase) SyncQ() interfaces.SyncQ {
 	return d.syncQ
 }
 
-func (d *MysqlDatabase) NewAsyncQ() (interfaces.IAsyncQueries, error) {
+func (d *MysqlDatabase) NewAsyncQ() (interfaces.AsyncQ, error) {
 	aq, err := d.asyncQ.New()
 	if err != nil {
 		return nil, err
 	}
-	return aq.(interfaces.IAsyncQueries), nil
+	return aq.(interfaces.AsyncQ), nil
 }
 
 func (d *MysqlDatabase) Mock() sqlmock.Sqlmock {

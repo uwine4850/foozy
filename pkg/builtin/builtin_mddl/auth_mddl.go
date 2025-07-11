@@ -16,7 +16,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/secure"
 )
 
-type OnError func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error)
+type OnError func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager, err error)
 
 // Auth is used to determine when to change the AUTH cookie encoding.
 // When keys are changed, a change date is set. If the date does not match, then you need to change the encoding.
@@ -28,7 +28,7 @@ type OnError func(w http.ResponseWriter, r *http.Request, manager interfaces.IMa
 // this function will be called instead of sending it to the router.
 // This is designed for more flexible control.
 func Auth(adb auth.AuthQuery, excludePatterns []string, onErr OnError) middlewares.PreMiddleware {
-	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	return func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		pattern, ok := manager.OneTimeData().GetUserContext(namelib.ROUTER.URL_PATTERN)
 		if !ok {
 			onErr(w, r, manager, ErrUrlPatternNotExist{})
@@ -58,13 +58,13 @@ func Auth(adb auth.AuthQuery, excludePatterns []string, onErr OnError) middlewar
 }
 
 // SetToken sets the JWT token for further work with it.
-type SetToken func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (string, error)
+type SetToken func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) (string, error)
 
 // UpdatedToken function, which is called only if the token has been updated.
 // Passes a single updated token.
-type UpdatedToken func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, token string, AID int) error
+type UpdatedToken func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager, token string, AID int) error
 
-type CurrentUID func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, AID int) error
+type CurrentUID func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager, AID int) error
 
 // AuthJWT updates the JWT authentication encoding accordingly with key updates.
 // That is, the update depends directly on the frequency of key updates in GloablFlow.
@@ -73,7 +73,7 @@ type CurrentUID func(w http.ResponseWriter, r *http.Request, manager interfaces.
 // this function will be called instead of sending it to the router.
 // This is designed for more flexible control.
 func AuthJWT(setToken SetToken, updatedToken UpdatedToken, currentUID CurrentUID, onErr OnError) middlewares.PreMiddleware {
-	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	return func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		tokenString, err := setToken(w, r, manager)
 		if err != nil {
 			onErr(w, r, manager, err)

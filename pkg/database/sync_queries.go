@@ -5,7 +5,7 @@ import (
 )
 
 type SyncQueries struct {
-	db interfaces.IDbQuery
+	qe interfaces.QueryExec
 }
 
 func NewSyncQueries() *SyncQueries {
@@ -14,20 +14,20 @@ func NewSyncQueries() *SyncQueries {
 
 func (q *SyncQueries) New() (interface{}, error) {
 	return &SyncQueries{
-		db: q.db,
+		qe: q.qe,
 	}, nil
 }
 
 // Query wrapper for the IDbQuery.Query method.
 func (q *SyncQueries) Query(query string, args ...any) ([]map[string]interface{}, error) {
-	return q.db.Query(query, args...)
+	return q.qe.Query(query, args...)
 }
 
 // Exec wrapper for the IDbQuery.Exec method.
 func (q *SyncQueries) Exec(query string, args ...any) (map[string]interface{}, error) {
-	return q.db.Exec(query, args...)
+	return q.qe.Exec(query, args...)
 }
 
-func (q *SyncQueries) SetDB(db interfaces.IDbQuery) {
-	q.db = db
+func (q *SyncQueries) SetDB(qe interfaces.QueryExec) {
+	q.qe = qe
 }

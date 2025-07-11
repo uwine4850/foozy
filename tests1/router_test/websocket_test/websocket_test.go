@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/gorilla/websocket"
+	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/manager"
@@ -24,12 +25,12 @@ func TestMain(m *testing.M) {
 	newManager := manager.NewManager(
 		manager.NewOneTimeData(),
 		nil,
-		manager.NewDatabasePool(),
+		database.NewDatabasePool(),
 	)
 	newMiddlewares := middlewares.NewMiddlewares()
 	newAdapter := router.NewAdapter(newManager, newMiddlewares)
 	newRouter := router.NewRouter(newAdapter)
-	newRouter.Register(router.MethodGET, "/socket", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodGET, "/socket", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		socket := router.NewWebsocket(router.Upgrader)
 		socket.OnConnect(func(w http.ResponseWriter, r *http.Request, conn *websocket.Conn) {})
 		socket.OnClientClose(func(w http.ResponseWriter, r *http.Request, conn *websocket.Conn) {})

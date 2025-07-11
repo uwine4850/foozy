@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/interfaces/irest"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/manager"
@@ -33,7 +34,7 @@ type DTOMessage struct {
 }
 
 var newDTO = rest.NewDTO()
-var messages = map[string][]irest.IMessage{
+var messages = map[string][]irest.Message{
 	"tee.ts": {
 		DTOMessage{},
 	},
@@ -59,7 +60,7 @@ func TestMain(m *testing.M) {
 	newManager := manager.NewManager(
 		manager.NewOneTimeData(),
 		newRender,
-		manager.NewDatabasePool(),
+		database.NewDatabasePool(),
 	)
 	newMiddlewares := middlewares.NewMiddlewares()
 	newAdapter := router.NewAdapter(newManager, newMiddlewares)

@@ -52,7 +52,7 @@ export function is{{ .Name }}(obj: any): obj is {{ .Name }} {
 // If the tag is not added, the field will simply be skipped during generation.
 type DTO struct {
 	allowedMessages []AllowMessage
-	messages        map[string][]irest.IMessage
+	messages        map[string][]irest.Message
 	isGenerated     bool
 }
 
@@ -76,7 +76,7 @@ func (d *DTO) GetAllowedMessages() []AllowMessage {
 
 // Messages a list of messages that will be used for generation.
 // So will check the generation allowances for each message.
-func (d *DTO) Messages(messages map[string][]irest.IMessage) {
+func (d *DTO) Messages(messages map[string][]irest.Message) {
 	d.messages = messages
 }
 
@@ -146,7 +146,7 @@ func (d *DTO) writeClientMessages() error {
 // generateMessages generates typescript interfaces and stores them
 // in the special structures [genMessage]. Each such structure contains data of one interface.
 // Also returns [AllowMessage]. This structure contains data about one generated DTO message.
-func (d *DTO) generateMessages(messages []irest.IMessage) ([]clientMessage, []AllowMessage, error) {
+func (d *DTO) generateMessages(messages []irest.Message) ([]clientMessage, []AllowMessage, error) {
 	typeIdNames := []string{}
 	clientMessages := []clientMessage{}
 	generatedAllowMessages := []AllowMessage{}
@@ -203,7 +203,7 @@ func (d *DTO) generateMessages(messages []irest.IMessage) ([]clientMessage, []Al
 	return clientMessages, generatedAllowMessages, nil
 }
 
-func (d *DTO) convertType(goType reflect.Type, messages []irest.IMessage, mainMessage AllowMessage) (string, error) {
+func (d *DTO) convertType(goType reflect.Type, messages []irest.Message, mainMessage AllowMessage) (string, error) {
 	switch goType.Kind() {
 	case reflect.Int, reflect.Float64, reflect.Float32:
 		return "number", nil

@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/cookies"
@@ -30,13 +31,13 @@ func TestMain(m *testing.M) {
 	newManager := manager.NewManager(
 		manager.NewOneTimeData(),
 		nil,
-		manager.NewDatabasePool(),
+		database.NewDatabasePool(),
 	)
 	newMiddlewares := middlewares.NewMiddlewares()
 	newAdapter := router.NewAdapter(newManager, newMiddlewares)
 	newAdapter.SetOnErrorFunc(onError)
 	newRouter := router.NewRouter(newAdapter)
-	newRouter.Register(router.MethodGET, "/test-write-secure-cookie", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodGET, "/test-write-secure-cookie", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		if err := cookies.CreateSecureCookieData(hashKey, blockKey, w, &http.Cookie{
 			Name:     "session",
 			Path:     "/",
@@ -47,7 +48,7 @@ func TestMain(m *testing.M) {
 		}
 		return nil
 	})
-	newRouter.Register(router.MethodGET, "/test-read-secure-cookie", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodGET, "/test-read-secure-cookie", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		var data SessionData
 		if err := cookies.ReadSecureCookieData(hashKey, blockKey, r, "session", &data); err != nil {
 			return err
@@ -55,7 +56,7 @@ func TestMain(m *testing.M) {
 		w.Write([]byte(data.UserID))
 		return nil
 	})
-	newRouter.Register(router.MethodGET, "/test-nohmac-write-secure-cookie", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodGET, "/test-nohmac-write-secure-cookie", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		err := cookies.CreateSecureNoHMACCookieData(blockKey, w, &http.Cookie{
 			Name:     "session",
 			Path:     "/",
@@ -67,7 +68,7 @@ func TestMain(m *testing.M) {
 		}
 		return nil
 	})
-	newRouter.Register(router.MethodGET, "/test-nohmac-read-secure-cookie", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodGET, "/test-nohmac-read-secure-cookie", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		var data SessionData
 		if err := cookies.ReadSecureNoHMACCookieData(blockKey, r, "session", &data); err != nil {
 			return err

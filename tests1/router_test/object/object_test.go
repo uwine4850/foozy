@@ -17,12 +17,12 @@ type ObjectView struct {
 	object.ObjView
 }
 
-func (v *ObjectView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+func (v *ObjectView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.Manager, err error) {
 	w.WriteHeader(http.StatusInternalServerError)
 	w.Write([]byte(err.Error()))
 }
 
-func objectView() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func objectView() func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	sqlDB, mock, err := sqlmock.New()
 	if err != nil {
 		panic(err)
@@ -66,12 +66,12 @@ type AllView struct {
 	object.AllView
 }
 
-func (v *AllView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+func (v *AllView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.Manager, err error) {
 	w.WriteHeader(http.StatusInternalServerError)
 	w.Write([]byte(err.Error()))
 }
 
-func objectAllView() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func objectAllView() func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	sqlDB, mock, err := sqlmock.New()
 	if err != nil {
 		panic(err)
@@ -112,12 +112,12 @@ type AllSlugView struct {
 	object.AllView
 }
 
-func (v *AllSlugView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+func (v *AllSlugView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.Manager, err error) {
 	w.WriteHeader(http.StatusInternalServerError)
 	w.Write([]byte(err.Error()))
 }
 
-func objectAllSlugView() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func objectAllSlugView() func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	sqlDB, mock, err := sqlmock.New()
 	if err != nil {
 		panic(err)
@@ -161,12 +161,12 @@ type MultipleView struct {
 	object.MultipleObjectView
 }
 
-func (v *MultipleView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+func (v *MultipleView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.Manager, err error) {
 	w.WriteHeader(http.StatusInternalServerError)
 	w.Write([]byte(err.Error()))
 }
 
-func objectMultipleView() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func objectMultipleView() func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	sqlDB, mock, err := sqlmock.New()
 	if err != nil {
 		panic(err)

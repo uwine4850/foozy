@@ -4,6 +4,7 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router/manager"
 	"github.com/uwine4850/foozy/pkg/server/globalflow"
@@ -18,17 +19,17 @@ func TestGlobalflow(t *testing.T) {
 	wg.Add(1)
 	wg.Add(1)
 
-	mngr := manager.NewManager(manager.NewOneTimeData(), nil, manager.NewDatabasePool())
+	mngr := manager.NewManager(manager.NewOneTimeData(), nil, database.NewDatabasePool())
 	gf := globalflow.NewGlobalFlow(1000)
 
-	gf.AddTask(func(manager interfaces.IManager) {
+	gf.AddTask(func(manager interfaces.Manager) {
 		defer wg.Done()
 		if !noWaitTask {
 			t.Error("no wait task has not yet been completed")
 		}
 		waitTask = true
 	})
-	gf.AddNotWaitTask(func(manager interfaces.IManager) {
+	gf.AddNotWaitTask(func(manager interfaces.Manager) {
 		defer wg.Done()
 		noWaitTask = true
 	})

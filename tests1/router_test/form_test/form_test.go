@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/mapper"
 	"github.com/uwine4850/foozy/pkg/router"
@@ -44,13 +45,13 @@ func TestMain(m *testing.M) {
 	newManager := manager.NewManager(
 		manager.NewOneTimeData(),
 		nil,
-		manager.NewDatabasePool(),
+		database.NewDatabasePool(),
 	)
 	newMiddlewares := middlewares.NewMiddlewares()
 	newAdapter := router.NewAdapter(newManager, newMiddlewares)
 	newAdapter.SetOnErrorFunc(onError)
 	newRouter := router.NewRouter(newAdapter)
-	newRouter.Register(router.MethodPOST, "/test-application-form", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodPOST, "/test-application-form", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		frm := form.NewForm(r)
 		if err := frm.Parse(); err != nil {
 			return err
@@ -63,7 +64,7 @@ func TestMain(m *testing.M) {
 		w.Write([]byte("OK"))
 		return nil
 	})
-	newRouter.Register(router.MethodPOST, "/test-multipart-form", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodPOST, "/test-multipart-form", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		frm := form.NewForm(r)
 		if err := frm.Parse(); err != nil {
 			return err
@@ -81,7 +82,7 @@ func TestMain(m *testing.M) {
 		w.Write([]byte("OK"))
 		return nil
 	})
-	newRouter.Register(router.MethodPOST, "/test-savefile", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodPOST, "/test-savefile", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		newForm := form.NewForm(r)
 		err := newForm.Parse()
 		if err != nil {
@@ -99,10 +100,13 @@ func TestMain(m *testing.M) {
 		if !fpath.PathExist(path) {
 			return errors.New("file not found")
 		}
+		if err := os.Remove(path); err != nil {
+			return err
+		}
 		w.Write([]byte("OK"))
 		return nil
 	})
-	newRouter.Register(router.MethodPOST, "/test-fill-struct", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodPOST, "/test-fill-struct", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		frm := form.NewForm(r)
 		if err := frm.Parse(); err != nil {
 			return err
@@ -114,7 +118,7 @@ func TestMain(m *testing.M) {
 		w.Write([]byte(strconv.Itoa(f.Id)))
 		return nil
 	})
-	newRouter.Register(router.MethodPOST, "/test-fill-struct-empty-value", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodPOST, "/test-fill-struct-empty-value", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		frm := form.NewForm(r)
 		if err := frm.Parse(); err != nil {
 			return err
@@ -126,7 +130,7 @@ func TestMain(m *testing.M) {
 		w.Write([]byte(strconv.Itoa(f.Id)))
 		return nil
 	})
-	newRouter.Register(router.MethodPOST, "/test-fill-struct-empty-error", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodPOST, "/test-fill-struct-empty-error", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		frm := form.NewForm(r)
 		if err := frm.Parse(); err != nil {
 			return err
@@ -137,7 +141,7 @@ func TestMain(m *testing.M) {
 		}
 		return nil
 	})
-	newRouter.Register(router.MethodPOST, "/test-fill-struct-nil-skip", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodPOST, "/test-fill-struct-nil-skip", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		frm := form.NewForm(r)
 		if err := frm.Parse(); err != nil {
 			return err
@@ -149,7 +153,7 @@ func TestMain(m *testing.M) {
 		w.Write([]byte("OK"))
 		return nil
 	})
-	newRouter.Register(router.MethodPOST, "/test-fill-struct-nil-error", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodPOST, "/test-fill-struct-nil-error", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		frm := form.NewForm(r)
 		if err := frm.Parse(); err != nil {
 			return err

@@ -2,10 +2,12 @@ package middlewares_test
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"testing"
 
+	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/manager"
@@ -25,38 +27,38 @@ func TestMain(m *testing.M) {
 	newManager := manager.NewManager(
 		manager.NewOneTimeData(),
 		nil,
-		manager.NewDatabasePool(),
+		database.NewDatabasePool(),
 	)
-	newMiddlewares.PreMiddleware(0, func(w http.ResponseWriter, r *http.Request, m interfaces.IManager) error {
+	newMiddlewares.PreMiddleware(0, func(w http.ResponseWriter, r *http.Request, m interfaces.Manager) error {
 		preMddl = true
 		return nil
 	})
-	newMiddlewares.AsyncMiddleware(func(w http.ResponseWriter, r *http.Request, m interfaces.IManager) error {
+	newMiddlewares.AsyncMiddleware(func(w http.ResponseWriter, r *http.Request, m interfaces.Manager) error {
 		asyncMddl = true
 		return nil
 	})
-	newMiddlewares.PostMiddleware(0, func(r *http.Request, m interfaces.IManager) error {
+	newMiddlewares.PostMiddleware(0, func(r *http.Request, m interfaces.Manager) error {
 		postMddl = true
 		return nil
 	})
 	newAdapter := router.NewAdapter(newManager, newMiddlewares)
 	newAdapter.SetOnErrorFunc(onError)
 	newRouter := router.NewRouter(newAdapter)
-	newRouter.Register(router.MethodGET, "/test-run", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodGET, "/test-run", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		if preMddl && asyncMddl {
 			w.Write([]byte("OK"))
 		}
 		return nil
 	})
-	newRouter.Register(router.MethodGET, "/test-skip-next-page", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodGET, "/test-skip-next-page", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		w.Write([]byte("PAGE"))
 		return nil
 	})
-	newRouter.Register(router.MethodGET, "/test-skip-next-page-redirect", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodGET, "/test-skip-next-page-redirect", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		w.Write([]byte("NOT DISPLAY PAGE"))
 		return nil
 	})
-	newRouter.Register(router.MethodGET, "/redirect", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodGET, "/redirect", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		w.Write([]byte("REDIRECT PAGE"))
 		return nil
 	})
@@ -93,8 +95,10 @@ func TestRunMiddlewares(t *testing.T) {
 }
 
 func TestSkipNextPage(t *testing.T) {
-	newMiddlewares.AsyncMiddleware(func(w http.ResponseWriter, r *http.Request, m interfaces.IManager) error {
-		middlewares.SkipNextPage(m.OneTimeData())
+	newMiddlewares.AsyncMiddleware(func(w http.ResponseWriter, r *http.Request, m interfaces.Manager) error {
+		if r.URL.Path == "/test-skip-next-page" {
+			middlewares.SkipNextPage(m.OneTimeData())
+		}
 		return nil
 	})
 	resp, err := http.Get(tutils.MakeUrl(tutils.PortMiddlewares, "test-skip-next-page"))
@@ -111,7 +115,7 @@ func TestSkipNextPage(t *testing.T) {
 }
 
 func TestSkipNextPageAndRedirect(t *testing.T) {
-	newMiddlewares.AsyncMiddleware(func(w http.ResponseWriter, r *http.Request, m interfaces.IManager) error {
+	newMiddlewares.AsyncMiddleware(func(w http.ResponseWriter, r *http.Request, m interfaces.Manager) error {
 		if r.URL.Path == "/test-skip-next-page-redirect" {
 			middlewares.SkipNextPageAndRedirect(m.OneTimeData(), w, r, "/redirect")
 		}
@@ -125,6 +129,7 @@ func TestSkipNextPageAndRedirect(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+	fmt.Println(middlewares.IsSkipNextPage(manager.NewOneTimeData()))
 	if res != "REDIRECT PAGE" {
 		t.Error("page is not redirected")
 	}

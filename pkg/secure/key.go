@@ -68,7 +68,7 @@ func (k *Key) Generate32BytesKeys() {
 	k.GenerateBytesKeys(32)
 }
 
-func (k *Key) Get32BytesKey() interfaces.IKey {
+func (k *Key) Get32BytesKey() interfaces.Key {
 	return k
 }
 

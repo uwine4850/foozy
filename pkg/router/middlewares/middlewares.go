@@ -13,17 +13,17 @@ import (
 	"github.com/uwine4850/foozy/pkg/namelib"
 )
 
-type PreMiddleware func(w http.ResponseWriter, r *http.Request, m interfaces.IManager) error
-type PostMiddleware func(r *http.Request, m interfaces.IManager) error
-type AsyncMiddleware func(w http.ResponseWriter, r *http.Request, m interfaces.IManager) error
+type PreMiddleware func(w http.ResponseWriter, r *http.Request, m interfaces.Manager) error
+type PostMiddleware func(r *http.Request, m interfaces.Manager) error
+type AsyncMiddleware func(w http.ResponseWriter, r *http.Request, m interfaces.Manager) error
 
 type IMiddleware interface {
 	PreMiddleware(order int, handler PreMiddleware)
 	PostMiddleware(order int, handler PostMiddleware)
 	AsyncMiddleware(handler AsyncMiddleware)
-	RunPreMiddlewares(w http.ResponseWriter, r *http.Request, m interfaces.IManager) error
-	RunAndWaitAsyncMiddlewares(w http.ResponseWriter, r *http.Request, m interfaces.IManager) error
-	RunPostMiddlewares(r *http.Request, m interfaces.IManager) error
+	RunPreMiddlewares(w http.ResponseWriter, r *http.Request, m interfaces.Manager) error
+	RunAndWaitAsyncMiddlewares(w http.ResponseWriter, r *http.Request, m interfaces.Manager) error
+	RunPostMiddlewares(r *http.Request, m interfaces.Manager) error
 }
 
 // Middlewares implementation of the middleware concept for the framework.
@@ -84,7 +84,7 @@ func (mddl *Middlewares) AsyncMiddleware(handler AsyncMiddleware) {
 	mddl.asyncMiddlewares = append(mddl.asyncMiddlewares, handler)
 }
 
-func (mddl *Middlewares) RunPreMiddlewares(w http.ResponseWriter, r *http.Request, m interfaces.IManager) error {
+func (mddl *Middlewares) RunPreMiddlewares(w http.ResponseWriter, r *http.Request, m interfaces.Manager) error {
 	mddl.preMiddlewaresOrder.Sort()
 	for i := 0; i < mddl.preMiddlewaresOrder.Len(); i++ {
 		order := mddl.preMiddlewaresOrder[i]
@@ -97,7 +97,7 @@ func (mddl *Middlewares) RunPreMiddlewares(w http.ResponseWriter, r *http.Reques
 
 // RunAndWaitAsyncMiddlewares runs asynchronous middlewares.
 // It also waits for them to complete, no additional actions are needed.
-func (mddl *Middlewares) RunAndWaitAsyncMiddlewares(w http.ResponseWriter, r *http.Request, m interfaces.IManager) error {
+func (mddl *Middlewares) RunAndWaitAsyncMiddlewares(w http.ResponseWriter, r *http.Request, m interfaces.Manager) error {
 	var wg sync.WaitGroup
 	var asyncError error
 	var mu sync.Mutex
@@ -127,7 +127,7 @@ func (mddl *Middlewares) RunAndWaitAsyncMiddlewares(w http.ResponseWriter, r *ht
 	return asyncError
 }
 
-func (mddl *Middlewares) RunPostMiddlewares(r *http.Request, m interfaces.IManager) error {
+func (mddl *Middlewares) RunPostMiddlewares(r *http.Request, m interfaces.Manager) error {
 	mddl.postMiddlewaresOrder.Sort()
 	for i := 0; i < mddl.postMiddlewaresOrder.Len(); i++ {
 		order := mddl.postMiddlewaresOrder[i]
@@ -139,7 +139,7 @@ func (mddl *Middlewares) RunPostMiddlewares(r *http.Request, m interfaces.IManag
 }
 
 // SkipNextPage sends a command to the router to skip rendering the next page.
-func SkipNextPage(manager interfaces.IManagerOneTimeData) {
+func SkipNextPage(manager interfaces.ManagerOneTimeData) {
 	manager.SetUserContext(namelib.ROUTER.SKIP_NEXT_PAGE, true)
 	urlPattern, _ := manager.GetUserContext(namelib.ROUTER.URL_PATTERN)
 	debug.RequestLogginIfEnable(debug.P_MIDDLEWARE, fmt.Sprintf("skip page at %s", urlPattern))
@@ -147,13 +147,13 @@ func SkipNextPage(manager interfaces.IManagerOneTimeData) {
 
 // IsSkipNextPage checks if the page rendering should be skipped.
 // The function is built into the router.
-func IsSkipNextPage(manager interfaces.IManagerOneTimeData) bool {
+func IsSkipNextPage(manager interfaces.ManagerOneTimeData) bool {
 	_, ok := manager.GetUserContext(namelib.ROUTER.SKIP_NEXT_PAGE)
 	return ok
 }
 
 // SkipNextPageAndRedirect skips the page render and redirects to another page.
-func SkipNextPageAndRedirect(manager interfaces.IManagerOneTimeData, w http.ResponseWriter, r *http.Request, path string) {
+func SkipNextPageAndRedirect(manager interfaces.ManagerOneTimeData, w http.ResponseWriter, r *http.Request, path string) {
 	http.Redirect(w, r, path, http.StatusFound)
 	SkipNextPage(manager)
 	debug.RequestLogginIfEnable(debug.P_MIDDLEWARE, fmt.Sprintf("redirect to %s", path))

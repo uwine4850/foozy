@@ -6,8 +6,8 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces/itypeopr"
 )
 
-type ITemplateEngine interface {
-	itypeopr.INewInstance
+type TemplateEngine interface {
+	itypeopr.NewInstance
 	SetPath(files string)
 	Exec() error
 	SetContext(data map[string]interface{})
@@ -16,12 +16,12 @@ type ITemplateEngine interface {
 	SetRequest(r *http.Request)
 }
 
-type IRender interface {
-	itypeopr.INewInstance
+type Render interface {
+	itypeopr.NewInstance
 	SetContext(data map[string]interface{})
 	GetContext() map[string]interface{}
-	SetTemplateEngine(engine ITemplateEngine)
-	GetTemplateEngine() ITemplateEngine
+	SetTemplateEngine(engine TemplateEngine)
+	GetTemplateEngine() TemplateEngine
 	RenderTemplate(w http.ResponseWriter, r *http.Request) error
 	SetTemplatePath(templatePath string)
 	RenderJson(data interface{}, w http.ResponseWriter) error

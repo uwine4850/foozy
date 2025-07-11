@@ -16,12 +16,12 @@ type DTOObjectView struct {
 	object.ObjView
 }
 
-func (v *DTOObjectView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+func (v *DTOObjectView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.Manager, err error) {
 	w.WriteHeader(http.StatusInternalServerError)
 	w.Write([]byte(err.Error()))
 }
 
-func jsonObjectView() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func jsonObjectView() func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	sqlDB, mock, err := sqlmock.New()
 	if err != nil {
 		panic(err)
@@ -64,12 +64,12 @@ type JsonAllView struct {
 	object.AllView
 }
 
-func (v *JsonAllView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+func (v *JsonAllView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.Manager, err error) {
 	w.WriteHeader(http.StatusInternalServerError)
 	w.Write([]byte(err.Error()))
 }
 
-func objectJsonAllView() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func objectJsonAllView() func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	sqlDB, mock, err := sqlmock.New()
 	if err != nil {
 		panic(err)
@@ -109,12 +109,12 @@ type JsonSlugAllView struct {
 	object.AllView
 }
 
-func (v *JsonSlugAllView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+func (v *JsonSlugAllView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.Manager, err error) {
 	w.WriteHeader(http.StatusInternalServerError)
 	w.Write([]byte(err.Error()))
 }
 
-func objectSlugJsonAllView() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func objectSlugJsonAllView() func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	sqlDB, mock, err := sqlmock.New()
 	if err != nil {
 		panic(err)
@@ -157,12 +157,12 @@ type JsonMultipleView struct {
 	object.MultipleObjectView
 }
 
-func (v *JsonMultipleView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+func (v *JsonMultipleView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.Manager, err error) {
 	w.WriteHeader(http.StatusInternalServerError)
 	w.Write([]byte(err.Error()))
 }
 
-func objectJsonMultipleView() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func objectJsonMultipleView() func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	sqlDB, mock, err := sqlmock.New()
 	if err != nil {
 		panic(err)
@@ -197,7 +197,7 @@ func objectJsonMultipleView() func(w http.ResponseWriter, r *http.Request, manag
 			},
 		},
 		DTO: newDTO,
-		Messages: map[string]irest.IMessage{
+		Messages: map[string]irest.Message{
 			"object1": DTOMessage{},
 			"object2": DTOMessage{},
 		},

@@ -13,7 +13,7 @@ import (
 // maxAge - cookie lifetime.
 // onError - a function that will be executed during an error.
 func GenerateAndSetCsrf(maxAge int, httpOnly bool) middlewares.PreMiddleware {
-	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	return func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		if err := secure.SetCSRFToken(maxAge, httpOnly, w, r, manager); err != nil {
 			return err
 		}

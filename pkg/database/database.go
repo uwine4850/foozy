@@ -22,7 +22,7 @@ type DbArgs struct {
 // MysqlDatabase structure for accessing the database.
 // It can send both synchronous and asynchronous queries.
 // IMPORTANT: after the end of work it is necessary to close the connection using Close method.
-// For each transaction a new instance of the [interfaces.ITransaction] object is created,
+// For each transaction a new instance of the [Transaction] object is created,
 // so each transaction is executed in its own scope and is completely safe.
 type MysqlDatabase struct {
 	username string
@@ -32,11 +32,11 @@ type MysqlDatabase struct {
 	database string
 	db       *sql.DB
 	tx       *sql.Tx
-	syncQ    interfaces.ISyncQueries
-	asyncQ   interfaces.IAsyncQueries
+	syncQ    interfaces.SyncQ
+	asyncQ   interfaces.AsyncQ
 }
 
-func NewMysqlDatabase(args DbArgs, syncQ interfaces.ISyncQueries, asyncQ interfaces.IAsyncQueries) *MysqlDatabase {
+func NewMysqlDatabase(args DbArgs, syncQ interfaces.SyncQ, asyncQ interfaces.AsyncQ) *MysqlDatabase {
 	d := MysqlDatabase{username: args.Username, password: args.Password, host: args.Host, port: args.Port, database: args.DatabaseName}
 	d.syncQ = syncQ
 	d.asyncQ = asyncQ
@@ -77,21 +77,21 @@ func (d *MysqlDatabase) Close() error {
 }
 
 // NewTransaction creates a new transaction instance.
-func (d *MysqlDatabase) NewTransaction() (interfaces.ITransaction, error) {
+func (d *MysqlDatabase) NewTransaction() (interfaces.DatabaseTransaction, error) {
 	return NewMysqlTransaction(d.db, d.syncQ, d.asyncQ)
 }
 
 // SyncQ getting access to synchronous requests.
-func (d *MysqlDatabase) SyncQ() interfaces.ISyncQueries {
+func (d *MysqlDatabase) SyncQ() interfaces.SyncQ {
 	return d.syncQ
 }
 
-func (d *MysqlDatabase) NewAsyncQ() (interfaces.IAsyncQueries, error) {
+func (d *MysqlDatabase) NewAsyncQ() (interfaces.AsyncQ, error) {
 	aq, err := d.asyncQ.New()
 	if err != nil {
 		return nil, err
 	}
-	return aq.(interfaces.IAsyncQueries), nil
+	return aq.(interfaces.AsyncQ), nil
 }
 
 // MysqlTransaction An object that performs transactions
@@ -101,14 +101,14 @@ func (d *MysqlDatabase) NewAsyncQ() (interfaces.IAsyncQueries, error) {
 type MysqlTransaction struct {
 	db     *sql.DB
 	tx     *sql.Tx
-	syncQ  interfaces.ISyncQueries
-	asyncQ interfaces.IAsyncQueries
+	syncQ  interfaces.SyncQ
+	asyncQ interfaces.AsyncQ
 }
 
 // NewMysqlTransaction creates a new [MysqlTransaction] escamp.
 // For correct creation, it is necessary to pass an already open
 // connection to the database.
-func NewMysqlTransaction(db *sql.DB, syncQ interfaces.ISyncQueries, asyncQ interfaces.IAsyncQueries) (*MysqlTransaction, error) {
+func NewMysqlTransaction(db *sql.DB, syncQ interfaces.SyncQ, asyncQ interfaces.AsyncQ) (*MysqlTransaction, error) {
 	newSyncQ, err := syncQ.New()
 	if err != nil {
 		return nil, err
@@ -119,8 +119,8 @@ func NewMysqlTransaction(db *sql.DB, syncQ interfaces.ISyncQueries, asyncQ inter
 	}
 	return &MysqlTransaction{
 		db:     db,
-		syncQ:  newSyncQ.(interfaces.ISyncQueries),
-		asyncQ: newAsyncQ.(interfaces.IAsyncQueries),
+		syncQ:  newSyncQ.(interfaces.SyncQ),
+		asyncQ: newAsyncQ.(interfaces.AsyncQ),
 	}, nil
 }
 
@@ -167,17 +167,17 @@ func (t *MysqlTransaction) RollBackTransaction() error {
 }
 
 // SyncQ getting access to synchronous requests.
-func (t *MysqlTransaction) SyncQ() interfaces.ISyncQueries {
+func (t *MysqlTransaction) SyncQ() interfaces.SyncQ {
 	return t.syncQ
 }
 
 // AsyncQ getting access to asynchronous requests.
-func (t *MysqlTransaction) NewAsyncQ() (interfaces.IAsyncQueries, error) {
+func (t *MysqlTransaction) NewAsyncQ() (interfaces.AsyncQ, error) {
 	aq, err := t.asyncQ.New()
 	if err != nil {
 		return nil, err
 	}
-	return aq.(interfaces.IAsyncQueries), nil
+	return aq.(interfaces.AsyncQ), nil
 }
 
 // DbQuery standard database queries. They are used *sql.DB.
@@ -267,7 +267,7 @@ func (d *DbTxQuery) Exec(query string, args ...any) (map[string]interface{}, err
 // [Default.Database.MainConnectionPoolName] settings.
 // Once created, the pool is locked. Therefore, you need to
 // initialize it manually if you need more connections.
-func InitDatabasePool(manager interfaces.IManager, db interfaces.IDatabase) error {
+func InitDatabasePool(manager interfaces.Manager, db interfaces.Database) error {
 	name := config.LoadedConfig().Default.Database.MainConnectionPoolName
 	if err := manager.Database().AddConnection(name, db); err != nil {
 		return err

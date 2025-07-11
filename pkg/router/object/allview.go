@@ -27,7 +27,7 @@ func (v *AllView) ObjectsName() []string {
 }
 
 // Object sets a slice of rows from the database.
-func (v *AllView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (Context, error) {
+func (v *AllView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) (Context, error) {
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "run AllView object")
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "get object from database")
 	var objects []map[string]interface{}

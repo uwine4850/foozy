@@ -10,12 +10,9 @@ main.go
 docker-compose.yml
 Dockerfile.*
 mycmd
-tests/**/*.log
 myapp
 reloader
-*.log
 _reloader
 tee.html
 serverDTO
-tests1/**/*.log
 tests1/router_test/form_test/saved_files

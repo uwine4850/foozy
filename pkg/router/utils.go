@@ -24,7 +24,7 @@ func RedirectError(w http.ResponseWriter, r *http.Request, path string, _err str
 
 // CatchRedirectError handling by the template engine of an error sent by the CatchRedirectError function.
 // In the template you can get an error using the error variable.
-func CatchRedirectError(r *http.Request, manager interfaces.IManager) {
+func CatchRedirectError(r *http.Request, manager interfaces.Manager) {
 	q := r.URL.Query()
 	redirectError := q.Get(namelib.ROUTER.REDIRECT_ERROR)
 	if redirectError != "" {
@@ -36,7 +36,7 @@ func CatchRedirectError(r *http.Request, manager interfaces.IManager) {
 }
 
 // ServerError displaying a 500 error to the user.
-func ServerError(w http.ResponseWriter, error string, manager interfaces.IManager) {
+func ServerError(w http.ResponseWriter, error string, manager interfaces.Manager) {
 	manager.OneTimeData().SetUserContext(namelib.ROUTER.SERVER_ERROR, error)
 	w.WriteHeader(http.StatusInternalServerError)
 	if config.LoadedConfig().Default.Debug.Debug {
@@ -48,7 +48,7 @@ func ServerError(w http.ResponseWriter, error string, manager interfaces.IManage
 }
 
 // ServerForbidden displaying a 403 error to the user.
-func ServerForbidden(w http.ResponseWriter, manager interfaces.IManager) {
+func ServerForbidden(w http.ResponseWriter, manager interfaces.Manager) {
 	manager.OneTimeData().SetUserContext(namelib.ROUTER.SERVER_FORBIDDEN_ERROR, "403 forbidden")
 	w.WriteHeader(http.StatusForbidden)
 	debug.ErrorLoggingIfEnableAndWrite(w, "403 forbidden", "403 forbidden")

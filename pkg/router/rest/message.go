@@ -32,11 +32,11 @@ func (a *AllowMessage) FullName() string {
 // A message is safe if it is in allowed messages.
 func IsSafeMessage(message typeopr.IPtr, allowedMessages []AllowMessage) error {
 	_type := reflect.TypeOf(message.Ptr()).Elem()
-	if !typeopr.IsImplementInterface(message, (*irest.IMessage)(nil)) {
+	if !typeopr.IsImplementInterface(message, (*irest.Message)(nil)) {
 		return fmt.Errorf("%s message does not implement irest.IMessage interface", _type)
 	}
 	// If the message type is passed through the irest.IMessage interface.
-	if _type == reflect.TypeOf((*irest.IMessage)(nil)).Elem() {
+	if _type == reflect.TypeOf((*irest.Message)(nil)).Elem() {
 		_type = reflect.TypeOf(reflect.ValueOf(message.Ptr()).Elem().Interface())
 	}
 	pkgAndName := strings.Split(_type.String(), ".")

@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/uwine4850/foozy/pkg/builtin/builtin_mddl"
+	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router"
@@ -22,14 +23,14 @@ func TestMain(m *testing.M) {
 	newManager := manager.NewManager(
 		manager.NewOneTimeData(),
 		nil,
-		manager.NewDatabasePool(),
+		database.NewDatabasePool(),
 	)
 	newMiddlewares := middlewares.NewMiddlewares()
 	newMiddlewares.PreMiddleware(1, builtin_mddl.GenerateAndSetCsrf(1000, true))
 	newAdapter := router.NewAdapter(newManager, newMiddlewares)
 	newAdapter.SetOnErrorFunc(onError)
 	newRouter := router.NewRouter(newAdapter)
-	newRouter.Register(router.MethodGET, "/test-get-csrf", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodGET, "/test-get-csrf", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		csrfCookie, err := r.Cookie(namelib.ROUTER.COOKIE_CSRF_TOKEN)
 		if err != nil {
 			return err

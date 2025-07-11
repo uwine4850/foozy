@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router"
@@ -24,13 +25,13 @@ func TestMain(m *testing.M) {
 	newManager := manager.NewManager(
 		manager.NewOneTimeData(),
 		nil,
-		manager.NewDatabasePool(),
+		database.NewDatabasePool(),
 	)
 	newMiddlewares := middlewares.NewMiddlewares()
 	newAdapter := router.NewAdapter(newManager, newMiddlewares)
 	newAdapter.SetOnErrorFunc(onError)
 	newRouter := router.NewRouter(newAdapter)
-	newRouter.Register(router.MethodGET, "/set-cookie-token", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodGET, "/set-cookie-token", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		token, err := secure.GenerateCsrfToken()
 		if err != nil {
 			return err
@@ -48,20 +49,20 @@ func TestMain(m *testing.M) {
 		http.SetCookie(w, cookie)
 		return nil
 	})
-	newRouter.Register(router.MethodGET, "/test-validate-cookie-token", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodGET, "/test-validate-cookie-token", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		if err := secure.ValidateCookieCsrfToken(r, cookieToken); err != nil {
 			return err
 		}
 		w.Write([]byte("OK"))
 		return nil
 	})
-	newRouter.Register(router.MethodGET, "/test-set-csrf-token", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodGET, "/test-set-csrf-token", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		if err := secure.SetCSRFToken(1000, true, w, r, manager); err != nil {
 			return err
 		}
 		return nil
 	})
-	newRouter.Register(router.MethodGET, "/read-token", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodGET, "/read-token", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		_, err := r.Cookie(namelib.ROUTER.COOKIE_CSRF_TOKEN)
 		if err != nil {
 			return err

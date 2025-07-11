@@ -18,7 +18,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/utils/fstruct"
 )
 
-type OnMessageFilled func(message any, manager interfaces.IManager) error
+type OnMessageFilled func(message any, manager interfaces.Manager) error
 
 type TemplateView struct {
 	TemplatePath string
@@ -30,7 +30,7 @@ func (v *TemplateView) SkipRender() {
 	v.isSkipRender = true
 }
 
-func (v *TemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func (v *TemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "run template view")
 	if v.View == nil {
 		panic("the ITemplateView field must not be nil")
@@ -85,7 +85,7 @@ type TemplateRedirectView struct {
 	RedirectUrl string
 }
 
-func (v *TemplateRedirectView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func (v *TemplateRedirectView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "run template view")
 	if v.View == nil {
 		panic("the ITemplateView field must not be nil")
@@ -128,11 +128,11 @@ func (v *TemplateRedirectView) Call(w http.ResponseWriter, r *http.Request, mana
 type JsonObjectTemplateView struct {
 	View            IView
 	DTO             *rest.DTO
-	Message         irest.IMessage
+	Message         irest.Message
 	onMessageFilled OnMessageFilled
 }
 
-func (v *JsonObjectTemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func (v *JsonObjectTemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "run JsonObjectTemplateView")
 	viewObject, viewContext, err := baseParseView(v.View, w, r, manager)
 	if err != nil {
@@ -181,7 +181,7 @@ func (v *JsonObjectTemplateView) Call(w http.ResponseWriter, r *http.Request, ma
 	return nil
 }
 
-func (v *JsonObjectTemplateView) OnMessageFilled(fn func(message any, manager interfaces.IManager) error) {
+func (v *JsonObjectTemplateView) OnMessageFilled(fn func(message any, manager interfaces.Manager) error) {
 	v.onMessageFilled = fn
 }
 
@@ -190,11 +190,11 @@ func (v *JsonObjectTemplateView) OnMessageFilled(fn func(message any, manager in
 type JsonMultipleObjectTemplateView struct {
 	View            IView
 	DTO             *rest.DTO
-	Messages        map[string]irest.IMessage
+	Messages        map[string]irest.Message
 	onMessageFilled OnMessageFilled
 }
 
-func (v *JsonMultipleObjectTemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func (v *JsonMultipleObjectTemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "run JsonMultipleObjectTemplateView")
 	viewObject, viewContext, err := baseParseView(v.View, w, r, manager)
 	if err != nil {
@@ -250,7 +250,7 @@ func (v *JsonMultipleObjectTemplateView) Call(w http.ResponseWriter, r *http.Req
 	return nil
 }
 
-func (v *JsonMultipleObjectTemplateView) OnMessageFilled(fn func(message any, manager interfaces.IManager) error) {
+func (v *JsonMultipleObjectTemplateView) OnMessageFilled(fn func(message any, manager interfaces.Manager) error) {
 	v.onMessageFilled = fn
 }
 
@@ -259,11 +259,11 @@ func (v *JsonMultipleObjectTemplateView) OnMessageFilled(fn func(message any, ma
 type JsonAllTemplateView struct {
 	View            IView
 	DTO             *rest.DTO
-	Message         irest.IMessage
+	Message         irest.Message
 	onMessageFilled OnMessageFilled
 }
 
-func (v *JsonAllTemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func (v *JsonAllTemplateView) Call(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	debug.RequestLogginIfEnable(debug.P_OBJECT, "run JsonAllTemplateView")
 	viewObject, viewContext, err := baseParseView(v.View, w, r, manager)
 	if err != nil {
@@ -331,11 +331,11 @@ func (v *JsonAllTemplateView) Call(w http.ResponseWriter, r *http.Request, manag
 	return nil
 }
 
-func (v *JsonAllTemplateView) OnMessageFilled(fn func(message any, manager interfaces.IManager) error) {
+func (v *JsonAllTemplateView) OnMessageFilled(fn func(message any, manager interfaces.Manager) error) {
 	v.onMessageFilled = fn
 }
 
-func baseParseView(view IView, w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (viewObject Context, viewContext Context, outErr error) {
+func baseParseView(view IView, w http.ResponseWriter, r *http.Request, manager interfaces.Manager) (viewObject Context, viewContext Context, outErr error) {
 	if view == nil {
 		panic("the ITemplateView field must not be nil")
 	}
@@ -397,7 +397,7 @@ func contextByNameToObjectContext(contextData interface{}) (Context, error) {
 
 // fillMessage fills the DTO Message with the data passed to the objectContext.
 // It is important to highlight that the messageType argument is used only to obtain the message type; an instance of this type is returned.
-func fillMessage(dto *rest.DTO, objectContext *Context, messageType irest.IMessage) (irest.IMessage, error) {
+func fillMessage(dto *rest.DTO, objectContext *Context, messageType irest.Message) (irest.Message, error) {
 	if err := mapper.DeepCheckDTOSafeMessage(dto, typeopr.Ptr{}.New(&messageType)); err != nil {
 		return nil, err
 	}
@@ -405,18 +405,18 @@ func fillMessage(dto *rest.DTO, objectContext *Context, messageType irest.IMessa
 	if err := mapper.FillDTOMessageFromMap(*(*map[string]interface{})(objectContext), &newMessage); err != nil {
 		return nil, err
 	}
-	newMessageInface := newMessage.Interface().(irest.IMessage)
+	newMessageInface := newMessage.Interface().(irest.Message)
 	return newMessageInface, nil
 }
 
-func makePointerToFilledMessage(messageInstance irest.IMessage, filledMessage reflect.Value) interface{} {
+func makePointerToFilledMessage(messageInstance irest.Message, filledMessage reflect.Value) interface{} {
 	messageType := reflect.TypeOf(messageInstance)
 	tempMessage := reflect.New(messageType)
 	tempMessage.Elem().Set(filledMessage)
 	return tempMessage.Interface()
 }
 
-func runOnMessageFilledFunction(onMessageFilledFn OnMessageFilled, sourceFilledMessage any, filledMessagePointer any, manager interfaces.IManager) error {
+func runOnMessageFilledFunction(onMessageFilledFn OnMessageFilled, sourceFilledMessage any, filledMessagePointer any, manager interfaces.Manager) error {
 	if !typeopr.IsPointer(sourceFilledMessage) {
 		return typeopr.ErrValueNotPointer{Value: "sourceFilledMessage"}
 	}

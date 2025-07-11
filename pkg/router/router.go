@@ -84,7 +84,7 @@ func (rw *BufferedResponseWriter) Flush() (int, error) {
 
 // Handler handles the http method.
 // Returns an error that is handled by the proper method from [Adapter].
-type Handler func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error
+type Handler func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error
 
 type IAdapter interface {
 	Adapt(pattern string, handler Handler) http.HandlerFunc
@@ -107,12 +107,12 @@ func internalServerError(w http.ResponseWriter, r *http.Request, err error) {
 // [internalErrorFunc] is responsible for handling internal errors.
 // This function can be overridden using the [SetOnErrorFunc] method.
 type Adapter struct {
-	manager           interfaces.IManager
+	manager           interfaces.Manager
 	middlewares       middlewares.IMiddleware
 	internalErrorFunc func(w http.ResponseWriter, r *http.Request, err error)
 }
 
-func NewAdapter(manager interfaces.IManager, middlewares middlewares.IMiddleware) *Adapter {
+func NewAdapter(manager interfaces.Manager, middlewares middlewares.IMiddleware) *Adapter {
 	return &Adapter{
 		manager:           manager,
 		middlewares:       middlewares,
@@ -195,12 +195,12 @@ func (a *Adapter) SetOnErrorFunc(fn func(w http.ResponseWriter, r *http.Request,
 	a.internalErrorFunc = fn
 }
 
-func (a *Adapter) newManager() (interfaces.IManager, error) {
+func (a *Adapter) newManager() (interfaces.Manager, error) {
 	_newManager, err := a.manager.New()
 	if err != nil {
 		return nil, err
 	}
-	newManager := _newManager.(interfaces.IManager)
+	newManager := _newManager.(interfaces.Manager)
 	return newManager, nil
 }
 
@@ -209,7 +209,7 @@ func (a *Adapter) newManager() (interfaces.IManager, error) {
 // perform important logic, which, for example, should be run first.
 // After execution of synchronous middleware, asynchronous ones are executed.
 // Middleware errors and the page rendering skip algorithm are also handled here.
-func (a *Adapter) runPreAndAsyncMddl(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, error) {
+func (a *Adapter) runPreAndAsyncMddl(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) (bool, error) {
 	if a.middlewares != nil {
 		debug.RequestLogginIfEnable(debug.P_ROUTER, "run middlewares...")
 		if err := a.middlewares.RunPreMiddlewares(w, r, manager); err != nil {

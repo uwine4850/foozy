@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router"
@@ -22,7 +23,7 @@ func TestMain(m *testing.M) {
 	newManager := manager.NewManager(
 		manager.NewOneTimeData(),
 		nil,
-		manager.NewDatabasePool(),
+		database.NewDatabasePool(),
 	)
 	newMiddlewares := middlewares.NewMiddlewares()
 	newAdapter := router.NewAdapter(newManager, newMiddlewares)
@@ -30,73 +31,73 @@ func TestMain(m *testing.M) {
 	newRouter := router.NewRouter(newAdapter)
 	newRouter.HandlerSet(map[string][]map[string]router.Handler{
 		router.MethodGET: {
-			{"/handler-set-get-1": func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+			{"/handler-set-get-1": func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 				w.Write([]byte("OK1"))
 				return nil
 			}},
-			{"/handler-set-get-2": func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+			{"/handler-set-get-2": func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 				w.Write([]byte("OK2"))
 				return nil
 			}},
 		},
 		router.MethodDELETE: {
-			{"/handler-set-delete-1": func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+			{"/handler-set-delete-1": func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 				w.Write([]byte("OK1"))
 				return nil
 			}},
-			{"/handler-set-delete-2": func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+			{"/handler-set-delete-2": func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 				w.Write([]byte("OK2"))
 				return nil
 			}},
 		},
 	})
-	newRouter.Register(router.MethodGET, "/test-get", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodGET, "/test-get", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		w.Write([]byte("OK"))
 		return nil
 	})
-	newRouter.Register(router.MethodPOST, "/test-post", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodPOST, "/test-post", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		w.Write([]byte("OK"))
 		return nil
 	})
-	newRouter.Register(router.MethodDELETE, "/test-delete", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodDELETE, "/test-delete", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		w.Write([]byte("OK"))
 		return nil
 	})
-	newRouter.Register(router.MethodPUT, "/test-put", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodPUT, "/test-put", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		w.Write([]byte("OK"))
 		return nil
 	})
-	newRouter.Register(router.MethodPATCH, "/test-patch", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodPATCH, "/test-patch", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		w.Write([]byte("OK"))
 		return nil
 	})
-	newRouter.Register(router.MethodOPTIONS, "/test-options", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodOPTIONS, "/test-options", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		w.Write([]byte("OK"))
 		return nil
 	})
-	newRouter.Register(router.MethodHEAD, "/test-head", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodHEAD, "/test-head", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		w.Write([]byte("OK"))
 		return nil
 	})
-	newRouter.Register(router.MethodGET, "/test-error", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodGET, "/test-error", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		return errors.New("ERROR")
 	})
-	newRouter.Register(router.MethodGET, "/test-slug/:slug", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodGET, "/test-slug/:slug", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		slug, _ := manager.OneTimeData().GetSlugParams("slug")
 		w.Write([]byte(slug))
 		return nil
 	})
-	newRouter.Register(router.MethodGET, "/test-multiple-slug/:slug/:slug1", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodGET, "/test-multiple-slug/:slug/:slug1", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		slug, _ := manager.OneTimeData().GetSlugParams("slug")
 		slug1, _ := manager.OneTimeData().GetSlugParams("slug1")
 		w.Write([]byte(slug + " " + slug1))
 		return nil
 	})
-	newRouter.Register(router.MethodGET, "/test-redirect-error", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodGET, "/test-redirect-error", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		router.RedirectError(w, r, "/catch-redirect-error", "test error")
 		return nil
 	})
-	newRouter.Register(router.MethodGET, "/catch-redirect-error", func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	newRouter.Register(router.MethodGET, "/catch-redirect-error", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 		router.CatchRedirectError(r, manager)
 		errorText, _ := manager.OneTimeData().GetUserContext(namelib.ROUTER.REDIRECT_ERROR)
 		w.Write([]byte(errorText.(string)))

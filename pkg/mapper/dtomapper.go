@@ -41,7 +41,7 @@ func DeepCheckDTOSafeMessage(dto *rest.DTO, messagePtr typeopr.IPtr) error {
 	for _, f := range *rawObject.Fields() {
 		if f.Type.Kind() == reflect.Struct && f.Type != implementDTOMessageType && f.Type != typeIdType {
 			v := RV.FieldByName(f.Name)
-			i := v.Interface().(irest.IMessage)
+			i := v.Interface().(irest.Message)
 			if err := DeepCheckDTOSafeMessage(dto, typeopr.Ptr{}.New(&i)); err != nil {
 				return err
 			}
@@ -82,7 +82,7 @@ func FillDTOMessageFromMap[T any](jsonMap map[string]interface{}, out *T) error 
 		return errors.New("nil input to FillMessageFromMap")
 	}
 	RV := typeopr.GetReflectValue(out)
-	if !typeopr.IsImplementInterface(typeopr.Ptr{}.New(out), (*irest.IMessage)(nil)) {
+	if !typeopr.IsImplementInterface(typeopr.Ptr{}.New(out), (*irest.Message)(nil)) {
 		return errors.New("output param must implement the irest.IMessage interface")
 	}
 	rawObject := LoadSomeRawObjectFromCache(RV, &messageRawCache, namelib.TAGS.DTO)

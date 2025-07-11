@@ -46,7 +46,7 @@ type TestInnerNotSafeMessage struct {
 }
 
 var newDTO = rest.NewDTO()
-var messages = map[string][]irest.IMessage{
+var messages = map[string][]irest.Message{
 	"test.ts": {
 		TestMessage{},
 		Test1Message{},
@@ -101,7 +101,7 @@ func TestIsSafeMessageError(t *testing.T) {
 }
 
 func TestDeepCheckSafeMessage(t *testing.T) {
-	newDTO.Messages(map[string][]irest.IMessage{
+	newDTO.Messages(map[string][]irest.Message{
 		"test.ts": {
 			TestDeepNotSafeMessage{},
 		},
@@ -118,7 +118,7 @@ func TestDeepCheckSafeMessage(t *testing.T) {
 			t.Errorf("the error doesn't match the expected error. Unexpected error: %s", err.Error())
 		}
 	}
-	newDTO.Messages(map[string][]irest.IMessage{
+	newDTO.Messages(map[string][]irest.Message{
 		"test.ts": {
 			TestDeepNotSafeMessage{},
 			TestInnerNotSafeMessage{},

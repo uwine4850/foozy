@@ -1,5 +1,5 @@
 package irest
 
-type IMessage interface {
+type Message interface {
 	IsImplementDTOMessage()
 }

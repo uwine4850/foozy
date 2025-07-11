@@ -114,8 +114,8 @@ type QB struct {
 	queryParts  []string
 	queryString string
 	queryArgs   []any
-	syncQ       interfaces.ISyncQueries
-	asyncQ      interfaces.IAsyncQueries
+	syncQ       interfaces.SyncQ
+	asyncQ      interfaces.AsyncQ
 	asyncKey    string
 }
 
@@ -128,7 +128,7 @@ func NewNoDbQB() *QB {
 	return qb
 }
 
-func NewSyncQB(syncQ interfaces.ISyncQueries) *QB {
+func NewSyncQB(syncQ interfaces.SyncQ) *QB {
 	qb := &QB{
 		syncQ: syncQ,
 	}
@@ -139,7 +139,7 @@ func NewSyncQB(syncQ interfaces.ISyncQueries) *QB {
 	return qb
 }
 
-func NewAsyncQB(asyncQ interfaces.IAsyncQueries, key string) *QB {
+func NewAsyncQB(asyncQ interfaces.AsyncQ, key string) *QB {
 	qb := &QB{
 		asyncQ:   asyncQ,
 		asyncKey: key,

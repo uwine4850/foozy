@@ -16,12 +16,12 @@ import (
 // This is done to protect the user from data leakage, because the object saves user request data
 // and should not be shared.
 type AsyncQueries struct {
-	syncQ    interfaces.ISyncQueries
+	syncQ    interfaces.SyncQ
 	wg       sync.WaitGroup
 	asyncRes sync.Map
 }
 
-func NewAsyncQueries(syncQ interfaces.ISyncQueries) *AsyncQueries {
+func NewAsyncQueries(syncQ interfaces.SyncQ) *AsyncQueries {
 	return &AsyncQueries{
 		syncQ: syncQ,
 	}
@@ -33,7 +33,7 @@ func (q *AsyncQueries) New() (interface{}, error) {
 	}, nil
 }
 
-func (q *AsyncQueries) SetSyncQueries(queries interfaces.ISyncQueries) {
+func (q *AsyncQueries) SetSyncQueries(queries interfaces.SyncQ) {
 	q.syncQ = queries
 }
 
@@ -83,7 +83,7 @@ func (q *AsyncQueries) Clear() {
 }
 
 // AsyncResError loads the result of several asynchronous key queries and checks for errors.
-func AsyncResError(keys []string, asyncQ interfaces.IAsyncQueries) error {
+func AsyncResError(keys []string, asyncQ interfaces.AsyncQ) error {
 	for i := 0; i < len(keys); i++ {
 		res, ok := asyncQ.LoadAsyncRes(keys[i])
 		if !ok {
