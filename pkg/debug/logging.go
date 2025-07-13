@@ -41,7 +41,7 @@ func WriteLog(skipLevel int, filePath string, flag int, prefix string, message s
 	if logFlags == -1 {
 		_logFlags = log.LstdFlags
 	}
-	f, err := os.OpenFile(filePath, flag, 0644)
+	f, err := os.OpenFile(filePath, flag, 0666)
 	if err != nil {
 		fmt.Println("LogError: ", err.Error())
 		return
