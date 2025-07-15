@@ -16,6 +16,8 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces"
 )
 
+// FormFile representation of the form file as an object.
+// All data of the file is stored here.
 type FormFile struct {
 	Header *multipart.FileHeader
 }

@@ -64,6 +64,9 @@ type SetToken func(w http.ResponseWriter, r *http.Request, manager interfaces.Ma
 // Passes a single updated token.
 type UpdatedToken func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager, token string, AID int) error
 
+// CurrentUID function to which the user id is passed.
+// This function is called each time the [AuthJWT] middleware is triggered.
+// The function works both after token update and without update.
 type CurrentUID func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager, AID int) error
 
 // AuthJWT updates the JWT authentication encoding accordingly with key updates.

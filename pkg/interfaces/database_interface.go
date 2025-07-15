@@ -7,7 +7,8 @@ import (
 
 type Database interface {
 	DatabaseInteraction
-	OpenClose
+	Open() error
+	Close() error
 }
 
 type SyncAsyncQuery interface {
@@ -37,11 +38,6 @@ type DatabaseTransaction interface {
 	BeginTransaction() error
 	CommitTransaction() error
 	RollBackTransaction() error
-}
-
-type OpenClose interface {
-	Open() error
-	Close() error
 }
 
 // QueryExec an interface represents any object that can query a database.

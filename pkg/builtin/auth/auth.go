@@ -18,9 +18,15 @@ import (
 // The AuthQuery interface is designed to abstract from the database during authentication.
 // Any database can implement this interface and use it in the auth package.
 type AuthQuery interface {
+	// UserByUsername with username returns an [UnsafeUser] object that stores user data from the database.
 	UserByUsername(username string) (*UnsafeUser, error)
+	// UserById with id returns an [UnsafeUser] object that stores user data from the database.
 	UserById(id any) (*UnsafeUser, error)
+	// CreateNewUser creates a new user in the database.
+	// The password must be encrypted in advance before passing it to this method.
 	CreateNewUser(username string, hashPassword string) (result map[string]interface{}, err error)
+	// ChangePassword changes the user's password.
+	// The password must be encrypted in advance before passing it to this method.
 	ChangePassword(userId string, newHashPassword string) (result map[string]interface{}, err error)
 }
 
@@ -110,12 +116,15 @@ type Cookie struct {
 	KeyDate time.Time
 }
 
+// UnsafeUser full user data.
+// Not safe, should be used with caution.
 type UnsafeUser struct {
 	Id       int    `db:"id"`
 	Username string `db:"username"`
 	Password string `db:"password"`
 }
 
+// User public user data that can be accessed by everyone.
 type User struct {
 	Id       int    `db:"id"`
 	Username string `db:"username"`
