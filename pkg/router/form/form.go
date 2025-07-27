@@ -119,7 +119,7 @@ func SaveFile(fileHeader *multipart.FileHeader, pathToDir string, buildPath *str
 	return nil
 }
 
-// ReplaceFile Changes the specified file to a new file.
+// ReplaceFile changes the specified file to a new file.
 func ReplaceFile(pathToFile string, fileHeader *multipart.FileHeader, pathToDir string, buildPath *string, manager interfaces.Manager) error {
 	err := os.Remove(pathToFile)
 	if err != nil {

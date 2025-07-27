@@ -1,0 +1,17 @@
+site_name: foozy
+theme:
+  name: cluster
+
+nav:
+  - General: index.md
+  - Getting started: getting_started.md
+  - Cmd and config:
+    - Cmd: cmd_and_config/cmd.md
+    - Config: cmd_and_config/config.md
+  - Router:
+    - Router: router/router.md
+    - Websocket: router/websocket.md
+    - Cookies: router/cookies/cookies.md
+    - Manager: router/manager/manager.md
+    - Form: router/form/form.md
+    - Middlewares: router/middlewares/middlewares.md

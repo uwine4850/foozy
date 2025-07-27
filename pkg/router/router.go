@@ -25,11 +25,6 @@ const (
 	MethodOPTIONS = "OPTIONS"
 )
 
-type IBufferedResponseWriter interface {
-	Flush() (int, error)
-	OriginalWriter() http.ResponseWriter
-}
-
 // BufferedResponseWriter wrapper around [http.ResponseWriter].
 // Used to buffer the write into an http response. Now the [Write]
 // method doesn't send the response, it just writes it to the buffer.
