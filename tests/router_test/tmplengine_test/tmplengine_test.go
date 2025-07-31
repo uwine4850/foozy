@@ -14,8 +14,8 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
 	"github.com/uwine4850/foozy/pkg/router/tmlengine"
 	"github.com/uwine4850/foozy/pkg/server"
-	initcnf_t "github.com/uwine4850/foozy/tests1/common/init_cnf"
-	"github.com/uwine4850/foozy/tests1/common/tutils"
+	initcnf_t "github.com/uwine4850/foozy/tests/common/init_cnf"
+	"github.com/uwine4850/foozy/tests/common/tutils"
 )
 
 func TestMain(m *testing.M) {
@@ -74,12 +74,6 @@ func TestMain(m *testing.M) {
 		manager.Render().SetTemplatePath("test_context.html")
 		manager.Render().SetContext(map[string]interface{}{"KEY": "VAL"})
 		if err := manager.Render().RenderTemplate(w, r); err != nil {
-			return err
-		}
-		return nil
-	})
-	newRouter.Register(router.MethodGET, "/test-render-json", func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
-		if err := manager.Render().RenderJson(map[string]any{"OK": true}, w); err != nil {
 			return err
 		}
 		return nil
@@ -160,24 +154,6 @@ func TestTemplateContext(t *testing.T) {
 			t.Error("context is not displayed")
 		} else {
 			t.Errorf("when the page displays an error: %s", res)
-		}
-	}
-}
-
-func TestRenderJson(t *testing.T) {
-	resp, err := http.Get(tutils.MakeUrl(tutils.PortPageRender, "test-render-json"))
-	if err != nil {
-		t.Error(err)
-	}
-	res, err := tutils.ReadBody(resp.Body)
-	if err != nil {
-		t.Error(err)
-	}
-	if res != `{"OK":true}` {
-		if res == "" {
-			t.Error("json is not displayed")
-		} else {
-			t.Errorf("when the json displays an error: %s", res)
 		}
 	}
 }

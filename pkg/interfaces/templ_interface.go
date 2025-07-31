@@ -24,5 +24,4 @@ type Render interface {
 	GetTemplateEngine() TemplateEngine
 	RenderTemplate(w http.ResponseWriter, r *http.Request) error
 	SetTemplatePath(templatePath string)
-	RenderJson(data interface{}, w http.ResponseWriter) error
 }

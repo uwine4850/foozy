@@ -116,7 +116,7 @@ initcnf.InitCnf()
 ```
 ___
 
-[Manager](/router/manager/manager/) initialization. This object is used in many places in the framework, but you need to initialize it here. It is mandatory to pass [manager.NewOneTimeData()](/router/manager/manager/#onetimedata). __TODO: add link__ [Render]() and __TODO: add link__ [DatabasePool]() are optional if you don't plan to use a templating engine or database.
+[Manager](/router/manager/manager/) initialization. This object is used in many places in the framework, but you need to initialize it here. It is mandatory to pass [manager.NewOneTimeData()](/router/manager/manager/#onetimedata). [Render](/router/tmlengine/tmlengine) and __TODO: add link__ [DatabasePool]() are optional if you don't plan to use a templating engine or database.
 ```golang
 newManager := manager.NewManager(
     manager.NewOneTimeData(),
@@ -162,7 +162,7 @@ newRouter.Register(router.MethodGET, "/page",
 	})
 ```
 This shows the simplest possible output of data to a page using `w.Write([]byte(“My first page!”))`.
-For more advanced output, you need to use a __TODO: add link__ [templating engine](). But before that you need to create HTML file and make __full__ initialization of the [manager](/router/manager/manager/), which is shown above.
+For more advanced output, you need to use a [templating engine](/router/tmlengine/tmlengine). But before that you need to create HTML file and make __full__ initialization of the [manager](/router/manager/manager/), which is shown above.
 ```golang
 newRouter.Register(router.MethodGET, "/page",
 	func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {

@@ -2,14 +2,14 @@
 The `Manager` object is used to manage router modules. The object's responsibilities include the following tasks:
 
 * Transferring data within a single HTTP request. That is, data cannot be transferred between two HTTP requests
-* Storing the __TODO: link__ [Render]() object
+* Storing the [Render](/router/tmlengine/tmlengine) object
 * More convenient access to the __TODO: link__ [Key]() module
 * Access to __TODO: link__ [DatabasePool]()
 
 #### Manager.New
 Creates a new instance of `Manager` with some of the old settings. This is a very important method because it creates 
 a new instance of `Manager`, but retains the static data. If a new instance is created without this method, the [router](/router/router) 
-may not work properly or may cause serious problems. Also creates a new instance of __TODO: link__ [Render]() if it has been set previously.
+may not work properly or may cause serious problems. Also creates a new instance of [Render](/router/tmlengine/tmlengine) if it has been set previously.
 ```golang
 func (m *Manager) New() (interface{}, error) {
 	newOTD, err := m.oneTimeData.New()

@@ -103,7 +103,7 @@ func RedirectError(w http.ResponseWriter, r *http.Request, path string, _err str
 ```
 
 #### CatchRedirectError
-Catches an error from url parameters that is passed through the [RedirectError](#redirecterror) function. Sets the error to the [manager](/router/manager/manager/) context. If there is a __TODO: link__ [Render]() instance in [Manager](/router/manager/manager/), sets the error to its context. Both contexts are handled by the `namelib.ROUTER.REDIRECT_ERROR` key.
+Catches an error from url parameters that is passed through the [RedirectError](#redirecterror) function. Sets the error to the [manager](/router/manager/manager/) context. If there is a [Render](/router/tmlengine/tmlengine) instance in [Manager](/router/manager/manager/), sets the error to its context. Both contexts are handled by the `namelib.ROUTER.REDIRECT_ERROR` key.
 ```golang
 func CatchRedirectError(r *http.Request, manager interfaces.Manager) {
 	q := r.URL.Query()

@@ -13,8 +13,6 @@ type Filter struct {
 	Fn   pongo2.FilterFunction
 }
 
-var userFilters = []Filter{}
-
 var BuiltinFilters = []Filter{
 	{
 		// Converts a string with escaped characters to just a string.

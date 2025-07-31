@@ -1,7 +1,6 @@
 package tmlengine
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/uwine4850/foozy/pkg/interfaces"
@@ -36,7 +35,7 @@ func (rn *Render) New() (interface{}, error) {
 	return &Render{TemplateEngine: engine}, nil
 }
 
-// SetContext Setting variables for html template.
+// SetContext setting variables for html template.
 func (rn *Render) SetContext(data map[string]interface{}) {
 	rn.TemplateEngine.SetContext(data)
 }
@@ -73,21 +72,7 @@ func (rn *Render) RenderTemplate(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-// SetTemplatePath Setting the path to the template that the templating engine renders.
+// SetTemplatePath setting the path to the template that the templating engine renders.
 func (rn *Render) SetTemplatePath(templatePath string) {
 	rn.templatePath = templatePath
-}
-
-// RenderJson displays data in json format on the page.
-func (rn *Render) RenderJson(data interface{}, w http.ResponseWriter) error {
-	marshal, err := json.Marshal(data)
-	if err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	_, err = w.Write(marshal)
-	if err != nil {
-		return err
-	}
-	return nil
 }

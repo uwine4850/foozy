@@ -1,17 +1,10 @@
-package secure
+## CSRF token
+The package specializes in working with CSRF tokens.
 
-import (
-	"crypto/rand"
-	"encoding/base64"
-	"fmt"
-	"net/http"
-
-	"github.com/uwine4850/foozy/pkg/interfaces"
-	"github.com/uwine4850/foozy/pkg/namelib"
-)
-
-// ValidateFormCsrfToken checks the validity of the csrf token. If no errors are detected, the token is valid.
-// It is desirable to use this method only after form.Parse() method.
+#### ValidateCookieCsrfToken
+Checks the validity of the csrf token. If no errors are detected, the token is valid.
+It is desirable to use this method only after [form.Parse](/router/form/form/#formparse) method.
+```golang
 func ValidateCookieCsrfToken(r *http.Request, token string) error {
 	if token == "" {
 		return ErrCsrfTokenNotFound{}
@@ -25,9 +18,12 @@ func ValidateCookieCsrfToken(r *http.Request, token string) error {
 	}
 	return nil
 }
+```
 
-// ValidateHeaderCSRFToken validates the CSRF token based on its value in the header.
-// For proper operation, the token must be set in cookies before verification.
+#### ValidateHeaderCSRFToken
+Validates the CSRF token based on its value in the header.
+For proper operation, the token must be set in cookies before verification.
+```golang
 func ValidateHeaderCSRFToken(r *http.Request, tokenName string) error {
 	csrfToken := r.Header.Get(tokenName)
 	if csrfToken == "" {
@@ -35,8 +31,11 @@ func ValidateHeaderCSRFToken(r *http.Request, tokenName string) error {
 	}
 	return ValidateCookieCsrfToken(r, csrfToken)
 }
+```
 
-// GenerateCsrfToken generates a CSRF token.
+#### GenerateCsrfToken
+Generates a CSRF token.
+```golang
 func GenerateCsrfToken() (string, error) {
 	tokenBytes := make([]byte, 32)
 	_, err := rand.Read(tokenBytes)
@@ -47,10 +46,11 @@ func GenerateCsrfToken() (string, error) {
 	csrfToken := base64.StdEncoding.EncodeToString(tokenBytes)
 	return csrfToken, nil
 }
+```
 
-// SetCSRFToken sets the CSRF token in the cookie.
-// Also, if [Render] is previously installed in the manager, sets the template context [input]
-// with the token by the key [namelib.ROUTER.COOKIE_CSRF_TOKEN].
+#### SetCSRFToken
+Sets the CSRF token in the cookie. Also, if [Render](/router/tmlengine/pagerender/) is previously installed in the [manager](/router/manager/manager), sets the template context `input` with the token by the key `namelib.ROUTER.COOKIE_CSRF_TOKEN`.
+```golang
 func SetCSRFToken(maxAge int, httpOnly bool, w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	csrfCookie, err := r.Cookie(namelib.ROUTER.COOKIE_CSRF_TOKEN)
 	if err != nil || csrfCookie.Value == "" {
@@ -76,17 +76,4 @@ func SetCSRFToken(maxAge int, httpOnly bool, w http.ResponseWriter, r *http.Requ
 	}
 	return nil
 }
-
-type ErrCsrfTokenNotFound struct {
-}
-
-func (receiver ErrCsrfTokenNotFound) Error() string {
-	return "Csrf token not found."
-}
-
-type ErrCsrfTokenDoesNotMatch struct {
-}
-
-func (receiver ErrCsrfTokenDoesNotMatch) Error() string {
-	return "Csrf token does not match. The validity time may have expired."
-}
+```
