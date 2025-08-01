@@ -64,6 +64,7 @@ func (k *Key) GenerateBytesKeys(length int) {
 	k.date = time.Now()
 }
 
+// Generate32BytesKeys generates keys with a length of 32 bytes.
 func (k *Key) Generate32BytesKeys() {
 	k.GenerateBytesKeys(32)
 }

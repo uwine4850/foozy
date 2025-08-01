@@ -16,7 +16,9 @@ nav:
     - Form: router/form/form.md
     - Middlewares: router/middlewares/middlewares.md
     - Tmlengine: router/tmlengine/tmlengine.md
-  - Serure:
+  - Secure:
     - CSRF token: secure/csrf_token.md
     - HMAC: secure/hmac.md
     - JWT: secure/jwt.md
+    - Key: secure/key.md
+    - Header: secure/header.md

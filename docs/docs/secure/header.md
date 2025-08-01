@@ -1,14 +1,10 @@
-package secure
+## Header
+Ready-made modules for protection via Header.
 
-import (
-	"bytes"
-	"net/http"
-)
-
-// Setting CSP.
-// CSP (Content Security Policy) is a security mechanism implemented through HTTP headers
-// or meta tags that helps prevent XSS (Cross-Site Scripting) attacks, injection,
-// and other vulnerabilities associated with the introduction of malicious content.
+#### SetCSP
+Setting CSP.<br>
+CSP (Content Security Policy) is a security mechanism implemented through HTTP headers or meta tags that helps prevent XSS (Cross-Site Scripting) attacks, injection, and other vulnerabilities associated with the introduction of malicious content.
+```golang
 func SetCSP(w http.ResponseWriter, directives map[string][]string) error {
 	var directivesString bytes.Buffer
 	for name, value := range directives {
@@ -33,15 +29,14 @@ func SetCSP(w http.ResponseWriter, directives map[string][]string) error {
 	w.Header().Set("Content-Security-Policy", directivesString.String())
 	return nil
 }
+```
 
-const (
-	ACSameorigin = "SAMEORIGIN"
-	ACDeny       = "DENY"
-)
-
-// Setting AntiClickjacking.
-// Anti-clickjacking refers to protective measures that prevent your website from
-// being embedded in an <iframe> so that attackers cannot use clickjacking attacks.
+#### SetAntiClickjacking
+Setting AntiClickjacking.<br>
+Anti-clickjacking refers to protective measures that prevent your website from
+being embedded in an `<iframe>` so that attackers cannot use clickjacking attacks.
+```golang
 func SetAntiClickjacking(w http.ResponseWriter, acOption string) {
 	w.Header().Set("X-Frame-Options", acOption)
 }
+```
