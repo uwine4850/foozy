@@ -22,3 +22,6 @@ nav:
     - JWT: secure/jwt.md
     - Key: secure/key.md
     - Header: secure/header.md
+  - Codegen: codegen/gen.md
+  - Debug: debug/logging.md
+  - Builtin: builtin/builtin.md

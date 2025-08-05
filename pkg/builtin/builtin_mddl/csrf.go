@@ -8,7 +8,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/secure"
 )
 
-// GenerateAndSetCsrf A middleware designed to generate a CSRF token. The token is set as a cookie value.
+// GenerateAndSetCsrf a middleware designed to generate a CSRF token. The token is set as a cookie value.
 // To use it you need to run the method in a synchronous or asynchronous handler.
 // maxAge - cookie lifetime.
 // onError - a function that will be executed during an error.
