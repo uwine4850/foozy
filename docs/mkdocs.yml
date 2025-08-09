@@ -25,3 +25,4 @@ nav:
   - Codegen: codegen/gen.md
   - Debug: debug/logging.md
   - Builtin: builtin/builtin.md
+  - Typeopr: typeopr/typeopr.md
