@@ -4,3 +4,5 @@ This section contains ready-made implementations that can be used in the project
 #### middlewares
 * [auth](/builtin/mddl/auth) — tools for auth.
 * [csrf](/builtin/mddl/csrf) — working with CSRF tokens.
+
+[globalflow](/builtin/globalflow/globalflow) — working with the globalflow package.

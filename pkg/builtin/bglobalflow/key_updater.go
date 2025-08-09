@@ -7,7 +7,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/server/globalflow"
 )
 
-// KeyUpdater function for use in GlobalFlow.AddNot WaitTask.
+// KeyUpdater function for use in GlobalFlow.AddNotWaitTask.
 // Updates the hashKey and blockKey keys after a selected period of time.
 func KeyUpdater(delaySec int) globalflow.Task {
 	return func(manager interfaces.Manager) {
