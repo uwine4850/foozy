@@ -26,3 +26,7 @@ nav:
   - Debug: debug/logging.md
   - Builtin: builtin/builtin.md
   - Typeopr: typeopr/typeopr.md
+  - Server:
+    - Server: server/server.md
+    - Globalflow: server/globalflow/globalflow.md
+    - Livereload: server/livereload/livereload.md

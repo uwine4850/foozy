@@ -1,26 +1,14 @@
-package server
+## package server
+The package is responsible for the operation of the framework server.
 
-import (
-	"fmt"
-	"log"
-	"net"
-	"net/http"
-	"sync"
-	"time"
+### Server
+An object that stores server data and launches the server.
 
-	"github.com/rs/cors"
-	"github.com/uwine4850/foozy/pkg/router"
-	"google.golang.org/grpc"
-)
-
-type Server struct {
-	router *router.Router
-	addr   string
-	serv   *http.Server
-}
-
-// rcors - CORS data, which is set using the cors.Options library at github.com/rs/cors.
-// These settings will be applied to all requests.
+#### NewServer
+Creating a new server instance.<br>
+The `rcors` argument is responsible for launching `CORS` together with the `server`. The argument can be nil.<br>
+`CORS` is implemented using [https://github.com/rs/cors](https://github.com/rs/cors).
+```golang
 func NewServer(addr string, router *router.Router, rcors *cors.Options) *Server {
 	s := &Server{router: router, addr: addr}
 	var handler http.Handler = router
@@ -35,8 +23,11 @@ func NewServer(addr string, router *router.Router, rcors *cors.Options) *Server 
 	}
 	return s
 }
+```
 
-// Start starts the server.
+#### Server.Start
+Starts listening for connections on the selected address.
+```golang
 func (s *Server) Start() error {
 	fmt.Printf("Server start on %s", s.addr)
 	err := s.serv.ListenAndServe()
@@ -45,12 +36,19 @@ func (s *Server) Start() error {
 	}
 	return nil
 }
+```
 
+#### Server.GetServ
+Returns an `*http.Server` object.
+```golang
 func (s *Server) GetServ() *http.Server {
 	return s.serv
 }
+```
 
-// Stop stops the server.
+#### Server.Stop
+Stopping server listening.
+```golang
 func (s *Server) Stop() error {
 	if err := s.serv.Close(); err != nil {
 		return err
@@ -58,17 +56,14 @@ func (s *Server) Stop() error {
 	println("Server stopped.")
 	return nil
 }
+```
 
-type MicServer struct {
-	Network    string
-	Address    string
-	GrpcServer *grpc.Server
-}
+#### MicServer
+Server implementation object for microservices.
 
-func NewMicServer(network string, address string, grpcServer *grpc.Server) *MicServer {
-	return &MicServer{Network: network, Address: address, GrpcServer: grpcServer}
-}
-
+#### MicServer.Start
+Starts listening for connections on the selected address.
+```golang
 func (mc *MicServer) Start() error {
 	lis, err := net.Listen(mc.Network, mc.Address)
 	if err != nil {
@@ -80,7 +75,15 @@ func (mc *MicServer) Start() error {
 	}
 	return nil
 }
+```
 
+#### FoozyAndMic
+Launching two servers simultaneously:
+
+* Server
+* MicServer
+
+```golang
 func FoozyAndMic(fserver *Server, micServer *MicServer, onError func(err error)) {
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -99,18 +102,13 @@ func FoozyAndMic(fserver *Server, micServer *MicServer, onError func(err error))
 	}()
 	wg.Wait()
 }
+```
 
-type ErrResponseTimedOut struct {
-	Address string
-}
-
-func (e ErrResponseTimedOut) Error() string {
-	return fmt.Sprintf("the response timed out, address: %s", e.Address)
-}
-
-// WaitStartServer waits for the server to start at the selected address for the specified amount of time.
-// If the connection did not appear during this time, it returns an error.
-// IMPORTANT: Either the server or this function must be run in a goroutine, otherwise it may not work.
+#### WaitStartServer
+Waits for the server to start at the selected address for the specified amount of time.<br>
+If the connection did not appear during this time, it returns an error.<br>
+__IMPORTANT:__ Either the server or this function must be run in a goroutine, otherwise it may not work.
+```golang
 func WaitStartServer(addr string, waitTimeSec int) error {
 	var outErr error
 	for i := 0; i < waitTimeSec; i++ {
@@ -128,3 +126,4 @@ func WaitStartServer(addr string, waitTimeSec int) error {
 	}
 	return outErr
 }
+```
