@@ -6,6 +6,7 @@ import (
 	"runtime"
 )
 
+// CurrentFileDir returns the path to the directory in which this function is called.
 func CurrentFileDir() string {
 	_, file, _, _ := runtime.Caller(1)
 	return filepath.Dir(file)

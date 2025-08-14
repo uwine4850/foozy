@@ -30,3 +30,9 @@ nav:
     - Server: server/server.md
     - Globalflow: server/globalflow/globalflow.md
     - Livereload: server/livereload/livereload.md
+  - Utils:
+    - fmap: utils/fmap/fmap.md
+    - fpath: utils/fpath/fpath.md
+    - fslice: utils/fslice/fslice.md
+    - fstring: utils/fstring/fstring.md
+    - fstruct: utils/fstruct/fstruct.md

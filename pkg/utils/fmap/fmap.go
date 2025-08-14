@@ -26,7 +26,7 @@ func MergeMapSync[T1 comparable, T2 any](mu *sync.Mutex, map1 *map[T1]T2, map2 m
 }
 
 // YamlMapToStruct writes a yaml map to the structure.
-// IMPOrTANT: the field of the structure to be written must have the
+// IMPORTANT: the field of the structure to be written must have the
 // yaml tag:"<field_name>". This name must correspond to the name of the
 // field in the targetMap structure.
 // Works in depth, you can make as many attachments as you want.
