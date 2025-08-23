@@ -106,11 +106,13 @@ func (d *MysqlAuthDatabase) ChangePassword(userId string, newHashPassword string
 	return result, nil
 }
 
+// JWTClaims claims for JWT authentication.
 type JWTClaims struct {
 	jwt.RegisteredClaims
 	Id int `json:"id"`
 }
 
+// Cookie presentation of authentication cookies.
 type Cookie struct {
 	UID     int
 	KeyDate time.Time
@@ -196,7 +198,7 @@ func (a *Auth) LoginUser(username string, password string) (*User, error) {
 	}, nil
 }
 
-// Update Auth Cookie updates the cookie encoding.
+// UpdateAuthCookie updates the cookie encoding.
 // IMPORTANT: to work, you need to decode the data; accordingly, in the hashKey and blockKey fields you need to use the keys
 // with which they were encoded. Next, the function itself will take new keys from ManagerConf.
 func (a *Auth) UpdateAuthCookie(hashKey []byte, blockKey []byte, r *http.Request) error {

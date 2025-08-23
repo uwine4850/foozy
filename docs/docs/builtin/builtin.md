@@ -6,3 +6,5 @@ This section contains ready-made implementations that can be used in the project
 * [csrf](/builtin/mddl/csrf) — working with CSRF tokens.
 
 [globalflow](/builtin/globalflow/globalflow) — working with the globalflow package.
+
+[auth](/builtin/auth/auth) — built-in user account management.
