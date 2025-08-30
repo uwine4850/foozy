@@ -30,7 +30,7 @@ type IView interface {
 type IViewDatabase interface {
 	// SelectAll selects all data from the table.
 	SelectAll(tableName string) ([]map[string]interface{}, error)
-	// SelectAll selects all data from the table according to the specified condition.
+	// SelectWhereEqual selects all data from the table according to the specified condition.
 	SelectWhereEqual(tableName string, colName string, val any) ([]map[string]interface{}, error)
 }
 

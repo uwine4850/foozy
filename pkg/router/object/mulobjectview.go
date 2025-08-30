@@ -19,6 +19,8 @@ type MultipleObject struct {
 	FillStruct interface{} `notdef:"true"`
 }
 
+// MultipleObjectView used to display data from multiple sources at once.
+// You also need to use [MultipleObject] to transfer data about a specific object.
 type MultipleObjectView struct {
 	BaseView
 

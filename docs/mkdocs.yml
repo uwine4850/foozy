@@ -15,6 +15,7 @@ nav:
     - Manager: router/manager/manager.md
     - Form: router/form/form.md
     - Middlewares: router/middlewares/middlewares.md
+    - Object: router/object/object.md
     - Tmlengine: router/tmlengine/tmlengine.md
   - Secure:
     - CSRF token: secure/csrf_token.md
