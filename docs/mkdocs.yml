@@ -24,6 +24,7 @@ nav:
     - Header: secure/header.md
   - Codegen: codegen/gen.md
   - Debug: debug/logging.md
+  - Mapper: mapper/mapper.md
   - Builtin: builtin/builtin.md
   - Typeopr: typeopr/typeopr.md
   - Server:

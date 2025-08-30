@@ -1,32 +1,19 @@
-package mapper
+## orderedform
 
-import (
-	"mime/multipart"
-	"net/url"
-
-	"github.com/uwine4850/foozy/pkg/router/form"
-)
-
-type IFormGetEnctypeData interface {
-	GetMultipartForm() *multipart.Form
-	GetApplicationForm() url.Values
-}
-
-// OrderedForm values can be displayed either by field name or all fields at once.
+### OrderedForm
+This structure is used to store the ordered data of the form.<br>
+This is necessary to ensure that the data is in the same order each time the form is used.
+```golang
 type OrderedForm struct {
 	itemCount int
 	names     map[string][]int
 	values    []OrderedFormValue
 }
+```
 
-func NewOrderedForm() *OrderedForm {
-	o := &OrderedForm{}
-	o.itemCount = 0
-	o.names = make(map[string][]int)
-	return o
-}
-
-// Add a new form field.
+#### OrderedForm.Add
+Add a new form field.
+```golang
 func (f *OrderedForm) Add(name string, value interface{}) {
 	f.values = append(f.values, OrderedFormValue{
 		Name:  name,
@@ -35,8 +22,11 @@ func (f *OrderedForm) Add(name string, value interface{}) {
 	f.itemCount++
 	f.names[name] = append(f.names[name], f.itemCount)
 }
+```
 
-// GetByName getting a field by name.
+#### OrderedForm.GetByName
+Getting a field by name.
+```golang
 func (f *OrderedForm) GetByName(name string) ([]OrderedFormValue, bool) {
 	getIndex, ok := f.names[name]
 	if !ok {
@@ -48,18 +38,28 @@ func (f *OrderedForm) GetByName(name string) ([]OrderedFormValue, bool) {
 	}
 	return res, true
 }
+```
 
-// GetAll getting all fields.
+#### OrderedForm.GetAll
+Getting all fields.
+```golang
 func (f *OrderedForm) GetAll() []OrderedFormValue {
 	return f.values
 }
+```
 
+### OrderedFormValue
+Single value of a form field.
+```golang
 type OrderedFormValue struct {
 	Name  string
 	Value interface{}
 }
+```
 
-// FrmValueToOrderedForm converts the form to a OrderedForm.
+#### FrmValueToOrderedForm
+Converts the form to a `OrderedForm`.
+```golang
 func FrmValueToOrderedForm(frm IFormGetEnctypeData) *OrderedForm {
 	orderedForm := NewOrderedForm()
 	multipartForm := frm.GetMultipartForm()
@@ -83,3 +83,4 @@ func FrmValueToOrderedForm(frm IFormGetEnctypeData) *OrderedForm {
 	}
 	return orderedForm
 }
+```

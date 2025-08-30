@@ -70,7 +70,7 @@ func FillStructFromForm[T any](frm *form.Form, out *T) error {
 	return nil
 }
 
-// CheckExtension Check if the file resolution matches the expected one. Can only be used with a structure already
+// CheckExtension check if the file resolution matches the expected one. Can only be used with a structure already
 // filled out in the form.
 // To work, you need to add an ext tag with the necessary extensions (if there are many, separated by commas).
 // For example, ext:".jpg .jpeg .png".
