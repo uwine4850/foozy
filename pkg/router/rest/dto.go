@@ -41,7 +41,7 @@ export function is{{ .Name }}(obj: any): obj is {{ .Name }} {
 // transferred messages.
 //
 // IMPORTANT: Allowed messages [AllowedMessages] must be exactly the same as the
-// messages to generate [Messages].  This is only needed during genarration.
+// messages to generate [Messages].  This is only needed during genaration.
 // If no generation is taking place, you can use the allowed [AllowedMessages] alone.
 //
 // Any dependencies must also be included in the allowed messages, and they must be

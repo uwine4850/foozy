@@ -16,6 +16,7 @@ nav:
     - Form: router/form/form.md
     - Middlewares: router/middlewares/middlewares.md
     - Object: router/object/object.md
+    - Rest: router/rest/rest.md
     - Tmlengine: router/tmlengine/tmlengine.md
   - Secure:
     - CSRF token: secure/csrf_token.md
