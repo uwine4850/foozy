@@ -1,29 +1,16 @@
-package database
+## database
+Implementation of Mysql database interfaces.
 
-import (
-	"database/sql"
-	"errors"
-	"fmt"
+### MysqlDatabase
+Implementation of `Database`, `SyncAsyncQuery` and `DatabaseInteraction` interfaces.<br>
+Object for accessing the database.<br>
+It can send both synchronous and asynchronous queries.
 
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/uwine4850/foozy/pkg/config"
-	"github.com/uwine4850/foozy/pkg/database/dbutils"
-	"github.com/uwine4850/foozy/pkg/interfaces"
-)
+__IMPORTANT__: after the end of work it is necessary to close the connection using Close method.
 
-type DbArgs struct {
-	Username     string
-	Password     string
-	Host         string
-	Port         string
-	DatabaseName string
-}
-
-// MysqlDatabase structure for accessing the database.
-// It can send both synchronous and asynchronous queries.
-// IMPORTANT: after the end of work it is necessary to close the connection using Close method.
-// For each transaction a new instance of the [Transaction] object is created,
-// so each transaction is executed in its own scope and is completely safe.
+For each transaction a new instance of the `Transaction` object is created,
+so each transaction is executed in its own scope and is completely safe.
+```golang
 type MysqlDatabase struct {
 	username string
 	password string
@@ -35,16 +22,12 @@ type MysqlDatabase struct {
 	syncQ    interfaces.SyncQ
 	asyncQ   interfaces.AsyncQ
 }
+```
 
-func NewMysqlDatabase(args DbArgs, syncQ interfaces.SyncQ, asyncQ interfaces.AsyncQ) *MysqlDatabase {
-	d := MysqlDatabase{username: args.Username, password: args.Password, host: args.Host, port: args.Port, database: args.DatabaseName}
-	d.syncQ = syncQ
-	d.asyncQ = asyncQ
-	return &d
-}
-
-// Open connecting to a mysql database.
-// Also, initialization of synchronous and asynchronous queries.
+#### MysqlDatabase.Open
+Connecting to a mysql database.<br>
+Also, initialization of synchronous and asynchronous queries.
+```golang
 func (d *MysqlDatabase) Open() error {
 	connStr := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", d.username, d.password, d.host, d.port, d.database)
 	db, err := sql.Open("mysql", connStr)
@@ -60,8 +43,11 @@ func (d *MysqlDatabase) Open() error {
 	d.syncQ.SetDB(&DbQuery{DB: db})
 	return nil
 }
+```
 
-// Close closes the connection to the database.
+#### MysqlDatabase.Close
+Closes the connection to the database.
+```golang
 func (d *MysqlDatabase) Close() error {
 	err := d.db.Close()
 	if err != nil {
@@ -75,17 +61,28 @@ func (d *MysqlDatabase) Close() error {
 	}
 	return nil
 }
+```
 
-// NewTransaction creates a new transaction instance.
+#### MysqlDatabase.NewTransaction
+```golang
 func (d *MysqlDatabase) NewTransaction() (interfaces.DatabaseTransaction, error) {
 	return NewMysqlTransaction(d.db, d.syncQ, d.asyncQ)
 }
+```
 
-// SyncQ getting access to synchronous requests.
+#### MysqlDatabase.SyncQ
+Getting access to synchronous requests.
+```golang
 func (d *MysqlDatabase) SyncQ() interfaces.SyncQ {
 	return d.syncQ
 }
+```
 
+#### MysqlDatabase.NewAsyncQ
+Creates and returns a new instance of `interfaces.AsyncQ`.<br>
+This is necessary for data security, since `interfaces.AsyncQ` stores SQL query data, so a separate instance must be 
+created for each HTTP handler.
+```golang
 func (d *MysqlDatabase) NewAsyncQ() (interfaces.AsyncQ, error) {
 	aq, err := d.asyncQ.New()
 	if err != nil {
@@ -93,39 +90,24 @@ func (d *MysqlDatabase) NewAsyncQ() (interfaces.AsyncQ, error) {
 	}
 	return aq.(interfaces.AsyncQ), nil
 }
+```
 
-// MysqlTransaction an object that performs transactions
-// to the mysql database.
-// This object is used only for one transaction, for each
-// next transaction a new instance of the object must be created.
+### MysqlTransaction
+An object that performs transactions to the mysql database.<br>
+This object is used only for one transaction, for each next transaction a new instance of the object must be created.
+```golang
 type MysqlTransaction struct {
 	db     *sql.DB
 	tx     *sql.Tx
 	syncQ  interfaces.SyncQ
 	asyncQ interfaces.AsyncQ
 }
+```
 
-// NewMysqlTransaction creates a new [MysqlTransaction] escamp.
-// For correct creation, it is necessary to pass an already open
-// connection to the database.
-func NewMysqlTransaction(db *sql.DB, syncQ interfaces.SyncQ, asyncQ interfaces.AsyncQ) (*MysqlTransaction, error) {
-	newSyncQ, err := syncQ.New()
-	if err != nil {
-		return nil, err
-	}
-	newAsyncQ, err := asyncQ.New()
-	if err != nil {
-		return nil, err
-	}
-	return &MysqlTransaction{
-		db:     db,
-		syncQ:  newSyncQ.(interfaces.SyncQ),
-		asyncQ: newAsyncQ.(interfaces.AsyncQ),
-	}, nil
-}
-
-// BeginTransaction starts the transaction.
-// Only one transaction can be started per object instance.
+#### MysqlTransaction.BeginTransaction
+Starts the transaction.<br>
+Only one transaction can be started per object instance.
+```golang
 func (t *MysqlTransaction) BeginTransaction() error {
 	if t.tx != nil {
 		return errors.New("transaction already started")
@@ -139,8 +121,11 @@ func (t *MysqlTransaction) BeginTransaction() error {
 	t.tx = tx
 	return nil
 }
+```
 
-// CommitTransaction writes the transaction to the database.
+#### MysqlTransaction.CommitTransaction
+Writes the transaction to the database.
+```golang
 func (t *MysqlTransaction) CommitTransaction() error {
 	if t.tx == nil {
 		return errors.New("transaction not begin")
@@ -151,10 +136,12 @@ func (t *MysqlTransaction) CommitTransaction() error {
 	t.tx = nil
 	return nil
 }
+```
 
-// RollBackTransaction undoes any changes that were made
-// during the transaction.
-// That is, after executing the [BeginTransaction] method.
+#### MysqlTransaction.RollBackTransaction
+Undoes any changes that were made during the transaction.<br>
+That is, after executing the `BeginTransaction` method.
+```golang
 func (t *MysqlTransaction) RollBackTransaction() error {
 	if t.tx == nil {
 		return errors.New("transaction not begin")
@@ -165,13 +152,21 @@ func (t *MysqlTransaction) RollBackTransaction() error {
 	t.tx = nil
 	return nil
 }
+```
 
-// SyncQ getting access to synchronous requests.
+#### MysqlTransaction.SyncQ
+Getting access to synchronous requests.
+```golang
 func (t *MysqlTransaction) SyncQ() interfaces.SyncQ {
 	return t.syncQ
 }
+```
 
-// AsyncQ getting access to asynchronous requests.
+#### MysqlTransaction.NewAsyncQ
+Creates and returns a new instance of `interfaces.AsyncQ`.<br>
+This is necessary for data security, since `interfaces.AsyncQ` stores SQL query data, so a separate instance must be 
+created for each HTTP handler.
+```golang
 func (t *MysqlTransaction) NewAsyncQ() (interfaces.AsyncQ, error) {
 	aq, err := t.asyncQ.New()
 	if err != nil {
@@ -179,13 +174,21 @@ func (t *MysqlTransaction) NewAsyncQ() (interfaces.AsyncQ, error) {
 	}
 	return aq.(interfaces.AsyncQ), nil
 }
+```
 
-// DbQuery standard database queries. They are used *sql.DB.
-// Requests are executed as usual.
+### DbQuery
+Standard database queries. They are used *sql.DB.
+Requests are executed as usual.
+```golang
 type DbQuery struct {
 	DB *sql.DB
 }
+```
 
+#### DbQuery.Query
+Used to execute queries that return data.
+For example, the SELECT command.
+```golang
 func (d *DbQuery) Query(query string, args ...any) ([]map[string]interface{}, error) {
 	sqlRows, err := d.DB.Query(query, args...)
 	if err != nil {
@@ -202,7 +205,17 @@ func (d *DbQuery) Query(query string, args ...any) ([]map[string]interface{}, er
 	}
 	return rows, nil
 }
+```
 
+#### DbQuery.Exec
+Used to execute queries that do not return data.
+For example, the INSERT command.
+
+Returns the following data:
+
+* Key "insertID" is the identifier of the inserted row using INSERT.
+* Key "rowsAffected" - Returns the number of rows affected by INSERT, UPDATE, DELETE.
+```golang
 func (d *DbQuery) Exec(query string, args ...any) (map[string]interface{}, error) {
 	result, err := d.DB.Exec(query, args...)
 	if err != nil {
@@ -219,14 +232,21 @@ func (d *DbQuery) Exec(query string, args ...any) (map[string]interface{}, error
 	}
 	return map[string]interface{}{"insertID": id, "rowsAffected": rowsId}, nil
 }
+```
 
-// DbTxQuery queries that can be rolled back. Used *sql.Tx.
-// This object will perform queries with the [*sql.Tx]
-// object that is used for transactions.
+### DbTxQuery
+Queries that can be rolled back. Used *sql.Tx.<br>
+This object will perform queries with the `*sql.Tx` object that is used for transactions.
+```golang
 type DbTxQuery struct {
 	Tx *sql.Tx
 }
+```
 
+#### DbTxQuery.Query
+Used to execute queries that return data.
+For example, the SELECT command.
+```golang
 func (d *DbTxQuery) Query(query string, args ...any) ([]map[string]interface{}, error) {
 	sqlRows, err := d.Tx.Query(query, args...)
 	if err != nil {
@@ -244,7 +264,17 @@ func (d *DbTxQuery) Query(query string, args ...any) ([]map[string]interface{}, 
 	}
 	return rows, nil
 }
+```
 
+#### DbTxQuery.Exec
+Used to execute queries that do not return data.
+For example, the INSERT command.
+
+Returns the following data:
+
+* Key "insertID" is the identifier of the inserted row using INSERT.
+* Key "rowsAffected" - Returns the number of rows affected by INSERT, UPDATE, DELETE.
+```golang
 func (d *DbTxQuery) Exec(query string, args ...any) (map[string]interface{}, error) {
 	result, err := d.Tx.Exec(query, args...)
 	if err != nil {
@@ -261,12 +291,15 @@ func (d *DbTxQuery) Exec(query string, args ...any) (map[string]interface{}, err
 	}
 	return map[string]interface{}{"id": id, "rows": rowsId}, nil
 }
+```
 
-// InitDatabasePool initializes a database pool.
-// Only one pool is created, which is specified in the
-// [Default.Database.MainConnectionPoolName] settings.
-// Once created, the pool is locked. Therefore, you need to
-// initialize it manually if you need more connections.
+___
+
+#### InitDatabasePool
+Initializes a database pool.<br>
+Only one pool is created, which is specified in the `Default.Database.MainConnectionPoolName` settings.
+Once created, the pool is locked. Therefore, you need to initialize it manually if you need more connections.
+```golang
 func InitDatabasePool(manager interfaces.Manager, db interfaces.Database) error {
 	name := config.LoadedConfig().Default.Database.MainConnectionPoolName
 	if err := manager.Database().AddConnection(name, db); err != nil {
@@ -275,20 +308,4 @@ func InitDatabasePool(manager interfaces.Manager, db interfaces.Database) error 
 	manager.Database().Lock()
 	return nil
 }
-
-func scanRows(sqlRows *sql.Rows) ([]map[string]interface{}, error) {
-	var rows []map[string]interface{}
-	if err := dbutils.ScanRows(sqlRows, func(row map[string]interface{}) {
-		rows = append(rows, row)
-	}); err != nil {
-		return nil, err
-	}
-	return rows, nil
-}
-
-type ErrConnectionNotOpen struct {
-}
-
-func (receiver ErrConnectionNotOpen) Error() string {
-	return "The connection is not open."
-}
+```

@@ -1,6 +1,6 @@
 site_name: foozy
 theme:
-  name: cluster
+  name: readthedocs
 
 nav:
   - General: index.md
@@ -24,11 +24,21 @@ nav:
     - JWT: secure/jwt.md
     - Key: secure/key.md
     - Header: secure/header.md
-  - Codegen: codegen/gen.md
-  - Debug: debug/logging.md
-  - Mapper: mapper/mapper.md
-  - Builtin: builtin/builtin.md
-  - Typeopr: typeopr/typeopr.md
+  - Database:
+    - Database: database/database.md
+    - AsyncQueries: database/async_queries.md
+    - SyncQueries: database/sync_queries.md
+    - DatabasePool: database/database_pool.md
+  - Codegen:
+    - codegen/gen.md
+  - Debug:
+    - debug/logging.md
+  - Mapper:
+    - mapper/mapper.md
+  - Builtin:
+    - builtin/builtin.md
+  - Typeopr:
+    - typeopr/typeopr.md
   - Server:
     - Server: server/server.md
     - Globalflow: server/globalflow/globalflow.md
@@ -39,3 +49,6 @@ nav:
     - fslice: utils/fslice/fslice.md
     - fstring: utils/fstring/fstring.md
     - fstruct: utils/fstruct/fstruct.md
+
+extra:
+  prev_next_enabled: True

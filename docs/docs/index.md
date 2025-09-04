@@ -4,4 +4,6 @@ foozy is a framework focused on flexibility and extensibility. Most of the frame
 
 You can read more about the other packages in the rest of the documentation.
 
+An [example of a project](https://github.com/uwine4850/alllogs) written using the framework.
+
 For example, you can look at the [getting started section](getting_started.md).
