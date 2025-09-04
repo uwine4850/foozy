@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Middlewares - foozy</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Middlewares";
+        var mkdocs_page_input_path = "router/middlewares/middlewares.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> foozy
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../..">General</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../getting_started/">Getting started</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Cmd and config</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../cmd_and_config/cmd/">Cmd</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../cmd_and_config/config/">Config</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Router</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/">Router</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../websocket/">Websocket</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../cookies/cookies/">Cookies</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../manager/manager/">Manager</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../form/form/">Form</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Middlewares</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../object/object/">Object</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../rest/rest/">Rest</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../tmlengine/tmlengine/">Tmlengine</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Secure</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../secure/csrf_token/">CSRF token</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../secure/hmac/">HMAC</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../secure/jwt/">JWT</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../secure/key/">Key</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../secure/header/">Header</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Database</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../database/database/">Database</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../database/async_queries/">AsyncQueries</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../database/sync_queries/">SyncQueries</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../database/database_pool/">DatabasePool</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Codegen</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../codegen/gen/">Gen</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Debug</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../debug/logging/">Logging</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Mapper</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../mapper/mapper/">Mapper</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Builtin</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../builtin/builtin/">Builtin</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Typeopr</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../typeopr/typeopr/">Typeopr</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Server</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../server/server/">Server</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../server/globalflow/globalflow/">Globalflow</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../server/livereload/livereload/">Livereload</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Utils</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../utils/fmap/fmap/">fmap</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../utils/fpath/fpath/">fpath</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../utils/fslice/fslice/">fslice</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../utils/fstring/fstring/">fstring</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../utils/fstruct/fstruct/">fstruct</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">foozy</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Router</li>
+      <li class="breadcrumb-item active">Middlewares</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h2 id="package-middlewares">package middlewares</h2>
+<p>This package implements middleware.<br>
+Middleware is software that acts as a bridge between applications, operating systems, and other software components, providing common services and capabilities.</p>
+<p>Example of use:</p>
+<pre><code class="language-golang">mdd := middlewares.NewMiddlewares()
+mdd.PreMiddleware(0, func(w http.ResponseWriter, r *http.Request, m interfaces.Manager) error {
+    fmt.Println(&quot;PRE&quot;)
+    return nil
+})
+mdd.AsyncMiddleware(func(w http.ResponseWriter, r *http.Request, m interfaces.Manager) error {
+    fmt.Println(&quot;ASYNC&quot;)
+    return nil
+})
+mdd.AsyncMiddleware(func(w http.ResponseWriter, r *http.Request, m interfaces.Manager) error {
+    fmt.Println(&quot;ASYNC 2&quot;)
+    return nil
+})
+mdd.PostMiddleware(0, func(r *http.Request, m interfaces.Manager) error {
+    fmt.Println(&quot;POST&quot;)
+    return nil
+})
+adapter := router.NewAdapter(newManager, mdd)
+</code></pre>
+<p><strong>NOTE:</strong> you must install middlewares in the <a href="/router/router/#adapter">adapter</a>.</p>
+<pre><code class="language-golang">adapter := router.NewAdapter(newManager, mdd)
+</code></pre>
+<h2 id="middlewares">Middlewares</h2>
+<p>Middlewares implementation of the middleware concept for the framework.
+Three types of middleware are possible:</p>
+<ol>
+<li><a href="#middlewarespremiddleware">PreMiddleware</a> — executed synchronously before the request. 
+These middlewares are executed exactly according to their established order.</li>
+<li><a href="#middlewarespostmiddleware">PostMiddleware</a> — executed synchronously after the request. These middlewares 
+will be called in the specified order.</li>
+<li><a href="#middlewaresasyncmiddleware">AsyncMiddleware</a> — asynchronous middleware. They are executed asynchronously, 
+but after <a href="#middlewarespremiddleware">PreMiddleware</a> and before the request handler. Cannot be ordered, so are not used in a chain.
+Also each middleware returns an error, it is handled in the router. But if you need more specific processing, 
+you can not return an error, but process it directly in the middleware.</li>
+</ol>
+<p>Also very important point: there are also functions that can control the router from middleware, 
+they are in the same package. These functions should be called only in middleware.
+These functions include:</p>
+<ol>
+<li><a href="#skipnextpage">SkipNextPage</a> — skips the page turner. That is, not just its display, but the whole logic.</li>
+<li><a href="#skipnextpageandredirect">SkipNextPageAndRedirect</a> — does the same thing as <a href="#skipnextpage">SkipNextPage</a>, but does redirect after skipping the page.</li>
+</ol>
+<h4 id="middlewarespremiddleware">Middlewares.PreMiddleware</h4>
+<p>Middleware that are executed in an ordered fashion before the url handler.<br>
+The order must not be repeated.</p>
+<pre><code class="language-golang">func (mddl *Middlewares) PreMiddleware(order int, handler PreMiddleware) {
+    if slices.Contains(mddl.preMiddlewaresOrder, order) {
+        panic(fmt.Sprintf(&quot;middleware with order %s already exists&quot;, strconv.Itoa(order)))
+    }
+    mddl.preMiddlewaresOrder = append(mddl.preMiddlewaresOrder, order)
+    mddl.preMiddlewares[order] = handler
+}
+</code></pre>
+<h4 id="middlewarespostmiddleware">Middlewares.PostMiddleware</h4>
+<p>Middleware that runs after the HTTP request handler has been confirmed.</p>
+<pre><code class="language-golang">func (mddl *Middlewares) PostMiddleware(order int, handler PostMiddleware) {
+    if slices.Contains(mddl.postMiddlewaresOrder, order) {
+        panic(fmt.Sprintf(&quot;middleware with order %s already exists&quot;, strconv.Itoa(order)))
+    }
+    mddl.postMiddlewaresOrder = append(mddl.postMiddlewaresOrder, order)
+    mddl.postMiddlewares[order] = handler
+}
+</code></pre>
+<h4 id="middlewaresasyncmiddleware">Middlewares.AsyncMiddleware</h4>
+<p>Middleware that is executed asynchronously before the request handler, 
+but after <code>PreMiddleware</code> processing.<br>
+Can't create chains, not called in an orderly fashion.</p>
+<pre><code class="language-golang">func (mddl *Middlewares) AsyncMiddleware(handler AsyncMiddleware) {
+    mddl.asyncMiddlewares = append(mddl.asyncMiddlewares, handler)
+}
+</code></pre>
+<h4 id="middlewaresrunpremiddlewares">Middlewares.RunPreMiddlewares</h4>
+<p>Runs all <code>PreMiddleware</code>. Starts them in sorted order, i.e. 1...n.</p>
+<pre><code class="language-golang">func (mddl *Middlewares) RunPreMiddlewares(w http.ResponseWriter, r *http.Request, m interfaces.Manager) error {
+    mddl.preMiddlewaresOrder.Sort()
+    for i := 0; i &lt; mddl.preMiddlewaresOrder.Len(); i++ {
+        order := mddl.preMiddlewaresOrder[i]
+        if err := mddl.preMiddlewares[order](w, r, m); err != nil {
+            return err
+        }
+    }
+    return nil
+}
+</code></pre>
+<h4 id="middlewares-runandwaitasyncmiddlewares">Middlewares. RunAndWaitAsyncMiddlewares</h4>
+<p>Runs asynchronous middlewares.<br>
+It also waits for them to complete, no additional actions are needed.<br>
+If at least one middleware causes an error, all handlers stop.</p>
+<pre><code class="language-golang">func (mddl *Middlewares) RunAndWaitAsyncMiddlewares(w http.ResponseWriter, r *http.Request, m interfaces.Manager) error {
+    var wg sync.WaitGroup
+    var asyncError error
+    var mu sync.Mutex
+    stop := make(chan struct{})
+    for i := 0; i &lt; len(mddl.asyncMiddlewares); i++ {
+        handler := mddl.asyncMiddlewares[i]
+        wg.Add(1)
+        go func(h AsyncMiddleware) {
+            defer wg.Done()
+
+            // If at least one handler causes an error, all other handlers will fail to run.
+            select {
+            case &lt;-stop:
+                return
+            default:
+            }
+
+            if err := h(w, r, m); err != nil {
+                mu.Lock()
+                asyncError = err
+                close(stop)
+                mu.Unlock()
+            }
+        }(handler)
+    }
+    wg.Wait()
+    return asyncError
+}
+</code></pre>
+<h4 id="middlewaresrunpostmiddlewares">Middlewares.RunPostMiddlewares</h4>
+<p>Runs all <code>PostMiddleware</code>. Starts them in sorted order, i.e. 1...n.</p>
+<pre><code class="language-golang">func (mddl *Middlewares) RunPostMiddlewares(r *http.Request, m interfaces.Manager) error {
+    mddl.postMiddlewaresOrder.Sort()
+    for i := 0; i &lt; mddl.postMiddlewaresOrder.Len(); i++ {
+        order := mddl.postMiddlewaresOrder[i]
+        if err := mddl.postMiddlewares[order](r, m); err != nil {
+            return err
+        }
+    }
+    return nil
+}
+</code></pre>
+<h4 id="skipnextpage">SkipNextPage</h4>
+<p>Sends a command to the <a href="/router/router">router</a> to skip rendering the next page.</p>
+<pre><code class="language-golang">func SkipNextPage(manager interfaces.ManagerOneTimeData) {
+    manager.SetUserContext(namelib.ROUTER.SKIP_NEXT_PAGE, true)
+    urlPattern, _ := manager.GetUserContext(namelib.ROUTER.URL_PATTERN)
+    debug.RequestLogginIfEnable(debug.P_MIDDLEWARE, fmt.Sprintf(&quot;skip page at %s&quot;, urlPattern))
+}
+</code></pre>
+<h4 id="isskipnextpage">IsSkipNextPage</h4>
+<p>Checks if the page rendering should be skipped.
+The function is built into the <a href="/router/router">router</a>.</p>
+<pre><code class="language-golang">func IsSkipNextPage(manager interfaces.ManagerOneTimeData) bool {
+    _, ok := manager.GetUserContext(namelib.ROUTER.SKIP_NEXT_PAGE)
+    return ok
+}
+</code></pre>
+<h4 id="skipnextpageandredirect">SkipNextPageAndRedirect</h4>
+<p>Skips the page render and redirects to another page.</p>
+<pre><code class="language-golang">func SkipNextPageAndRedirect(manager interfaces.ManagerOneTimeData, w http.ResponseWriter, r *http.Request, path string) {
+    http.Redirect(w, r, path, http.StatusFound)
+    SkipNextPage(manager)
+    debug.RequestLogginIfEnable(debug.P_MIDDLEWARE, fmt.Sprintf(&quot;redirect to %s&quot;, path))
+}
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../form/form/" class="btn btn-neutral float-left" title="Form"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../object/object/" class="btn btn-neutral float-right" title="Object">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../../form/form/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../object/object/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

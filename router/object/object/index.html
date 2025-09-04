@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Object - foozy</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Object";
+        var mkdocs_page_input_path = "router/object/object.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> foozy
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../..">General</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../getting_started/">Getting started</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Cmd and config</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../cmd_and_config/cmd/">Cmd</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../cmd_and_config/config/">Config</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Router</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/">Router</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../websocket/">Websocket</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../cookies/cookies/">Cookies</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../manager/manager/">Manager</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../form/form/">Form</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../middlewares/middlewares/">Middlewares</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Object</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#iview">IView</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#iviewdatabase">IViewDatabase</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#getcontext">GetContext</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#allview">AllView</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#formview">FormView</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#forminterface">FormInterface</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#multipleobjectview">MultipleObjectView</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#objview">ObjView</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#templateview">TemplateView</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#templateredirectview">TemplateRedirectView</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#jsonobjecttemplateview">JsonObjectTemplateView</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#jsonmultipleobjecttemplateview">JsonMultipleObjectTemplateView</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#jsonalltemplateview">JsonAllTemplateView</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../rest/rest/">Rest</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../tmlengine/tmlengine/">Tmlengine</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Secure</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../secure/csrf_token/">CSRF token</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../secure/hmac/">HMAC</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../secure/jwt/">JWT</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../secure/key/">Key</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../secure/header/">Header</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Database</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../database/database/">Database</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../database/async_queries/">AsyncQueries</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../database/sync_queries/">SyncQueries</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../database/database_pool/">DatabasePool</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Codegen</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../codegen/gen/">Gen</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Debug</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../debug/logging/">Logging</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Mapper</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../mapper/mapper/">Mapper</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Builtin</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../builtin/builtin/">Builtin</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Typeopr</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../typeopr/typeopr/">Typeopr</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Server</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../server/server/">Server</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../server/globalflow/globalflow/">Globalflow</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../server/livereload/livereload/">Livereload</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Utils</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../utils/fmap/fmap/">fmap</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../utils/fpath/fpath/">fpath</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../utils/fslice/fslice/">fslice</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../utils/fstring/fstring/">fstring</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../utils/fstruct/fstruct/">fstruct</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">foozy</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Router</li>
+      <li class="breadcrumb-item active">Object</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h2 id="object">object</h2>
+<p>This package is designed to display data more conveniently on the page using view.<br>
+More detailed use of this package is shown in the <a href="https://github.com/uwine4850/foozy/tree/master/tests/router_test/object">tests</a>.</p>
+<h3 id="iview">IView</h3>
+<p>The interface implements the basic structure of any IView. <code>ITemplateView</code> is used to display HTML page in a simpler and more convenient way.<br>
+For the view to work correctly, you need to create a new structure (for example MyObjView), embed a ready-made implementation of the view 
+(for example ObjView) into it, then you need to initialize this structure in the ITemplateView field in the TemplateView data type.</p>
+<pre><code class="language-golang">type IView interface {
+    // Object receives data from the selected table and writes it to a variable structure.
+    // IMPORTANT: connects to the database in this method (or others), but closes the connection only in the TemplateView.
+    Object(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) (Context, error)
+    Context(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) (Context, error)
+    Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) (bool, func())
+    OnError(w http.ResponseWriter, r *http.Request, manager interfaces.Manager, err error)
+    ObjectsName() []string
+}
+</code></pre>
+<h3 id="iviewdatabase">IViewDatabase</h3>
+<p>Interface that provides object unified access to the database.
+Since each object queries the database, it is necessary to unify access 
+to the database so as not to be dependent on a particular database.</p>
+<pre><code class="language-golang">type IViewDatabase interface {
+    // SelectAll selects all data from the table.
+    SelectAll(tableName string) ([]map[string]interface{}, error)
+    // SelectWhereEqual selects all data from the table according to the specified condition.
+    SelectWhereEqual(tableName string, colName string, val any) ([]map[string]interface{}, error)
+}
+</code></pre>
+<h4 id="getcontext">GetContext</h4>
+<p>Retrieves the <code>Context</code> from the manager.
+It is important to understand that this method can only be used when the IView.Object method has completed running, 
+for example in <code>IView.Context</code>.</p>
+<pre><code class="language-golang">func GetContext(manager interfaces.Manager) (Context, error) {
+    objectInterface, ok := manager.OneTimeData().GetUserContext(namelib.OBJECT.OBJECT_CONTEXT)
+    if !ok {
+        return nil, errors.New(&quot;unable to get object context&quot;)
+    }
+    object := objectInterface.(Context)
+    return object, nil
+}
+</code></pre>
+<h3 id="allview">AllView</h3>
+<p>Displays HTML page by passing all data from the selected table to it.
+If the <code>slug</code> parameter is set, all data from the table that match the condition will be output.<br>
+If the <code>slug</code> parameter is not set, all data from the table will be output.</p>
+<pre><code class="language-golang">type AllView struct {
+    BaseView
+    Name       string        `notdef:&quot;true&quot;`
+    TableName  string        `notdef:&quot;true&quot;`
+    Database   IViewDatabase `notdef:&quot;true&quot;`
+    Slug       string
+    FillStruct interface{} `notdef:&quot;true&quot;`
+}
+</code></pre>
+<h3 id="formview">FormView</h3>
+<p>This object is designed to process forms sent via HTML forms.</p>
+<pre><code class="language-golang">type FormView struct {
+    BaseView
+
+    FormStruct   interface{} `notdef:&quot;true&quot;`
+    ValidateCSRF bool
+}
+</code></pre>
+<h4 id="forminterface">FormInterface</h4>
+<p>Retrieves the form interface itself from the interface pointer.</p>
+<pre><code class="language-golang">func (v *FormView) FormInterface(manager interfaces.ManagerOneTimeData) (interface{}, error) {
+    context, ok := manager.GetUserContext(namelib.OBJECT.OBJECT_CONTEXT)
+    if !ok {
+        return nil, errors.New(&quot;the ObjectContext not found&quot;)
+    }
+    objectContext, ok := context.(Context)
+    if !ok {
+        return nil, errors.New(&quot;the ObjectContext type assertion error&quot;)
+    }
+    return reflect.Indirect(reflect.ValueOf(objectContext[namelib.OBJECT.OBJECT_CONTEXT_FORM])).Interface(), nil
+}
+</code></pre>
+<h3 id="multipleobjectview">MultipleObjectView</h3>
+<p>Used to display data from multiple sources at once. You also need to use <code>MultipleObject</code> to transfer data about a specific object.</p>
+<pre><code class="language-golang">type MultipleObjectView struct {
+    BaseView
+
+    Database        IViewDatabase    `notdef:&quot;true&quot;`
+    MultipleObjects []MultipleObject `notdef:&quot;true&quot;`
+}
+</code></pre>
+<h3 id="objview">ObjView</h3>
+<p>Displays only the HTML page only with a specific row from the database.<br>
+Needs to be used with slug parameter URL path, specify the name of the parameter in the Slug parameter.</p>
+<pre><code class="language-golang">type ObjView struct {
+    BaseView
+
+    Name       string        `notdef:&quot;true&quot;`
+    TableName  string        `notdef:&quot;true&quot;`
+    Database   IViewDatabase `notdef:&quot;true&quot;`
+    FillStruct interface{}   `notdef:&quot;true&quot;`
+    Slug       string        `notdef:&quot;true&quot;`
+}
+</code></pre>
+<h3 id="templateview">TemplateView</h3>
+<p>Renders an HTML page using a template engine and <code>View</code>.</p>
+<pre><code class="language-golang">type TemplateView struct {
+    TemplatePath string
+    View         IView
+    isSkipRender bool
+}
+</code></pre>
+<h3 id="templateredirectview">TemplateRedirectView</h3>
+<p>Renders an HTML page using a template engine and <code>View</code>.<br>
+Redirects the page to the selected address.</p>
+<pre><code class="language-golang">type TemplateRedirectView struct {
+    View        IView
+    RedirectUrl string
+}
+</code></pre>
+<h3 id="jsonobjecttemplateview">JsonObjectTemplateView</h3>
+<p>Function used to display ObjectView as JSON data.<br>
+If the Messages field is empty, it renders JSON as a regular <code>TemplateView</code>.</p>
+<pre><code class="language-golang">type JsonObjectTemplateView struct {
+    View            IView
+    DTO             *rest.DTO
+    Message         irest.Message
+    onMessageFilled OnMessageFilled
+}
+</code></pre>
+<h3 id="jsonmultipleobjecttemplateview">JsonMultipleObjectTemplateView</h3>
+<p>Function used to display MultipleObjectView as JSON data.<br>
+If the Messages field is empty, it renders JSON as a regular <code>TemplateView</code>.</p>
+<pre><code class="language-golang">type JsonMultipleObjectTemplateView struct {
+    View            IView
+    DTO             *rest.DTO
+    Messages        map[string]irest.Message
+    onMessageFilled OnMessageFilled
+}
+</code></pre>
+<h3 id="jsonalltemplateview">JsonAllTemplateView</h3>
+<p>Function used to display AllView as JSON data.<br>
+If the Messages field is empty, it renders JSON as a regular <code>TemplateView</code>.</p>
+<pre><code class="language-golang">type JsonAllTemplateView struct {
+    View            IView
+    DTO             *rest.DTO
+    Message         irest.Message
+    onMessageFilled OnMessageFilled
+}
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../middlewares/middlewares/" class="btn btn-neutral float-left" title="Middlewares"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../rest/rest/" class="btn btn-neutral float-right" title="Rest">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../../middlewares/middlewares/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../rest/rest/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Manager - foozy</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Manager";
+        var mkdocs_page_input_path = "router/manager/manager.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> foozy
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../..">General</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../getting_started/">Getting started</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Cmd and config</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../cmd_and_config/cmd/">Cmd</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../cmd_and_config/config/">Config</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Router</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/">Router</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../websocket/">Websocket</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../cookies/cookies/">Cookies</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Manager</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#managernew">Manager.New</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../form/form/">Form</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../middlewares/middlewares/">Middlewares</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../object/object/">Object</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../rest/rest/">Rest</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../tmlengine/tmlengine/">Tmlengine</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Secure</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../secure/csrf_token/">CSRF token</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../secure/hmac/">HMAC</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../secure/jwt/">JWT</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../secure/key/">Key</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../secure/header/">Header</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Database</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../database/database/">Database</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../database/async_queries/">AsyncQueries</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../database/sync_queries/">SyncQueries</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../database/database_pool/">DatabasePool</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Codegen</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../codegen/gen/">Gen</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Debug</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../debug/logging/">Logging</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Mapper</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../mapper/mapper/">Mapper</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Builtin</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../builtin/builtin/">Builtin</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Typeopr</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../typeopr/typeopr/">Typeopr</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Server</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../server/server/">Server</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../server/globalflow/globalflow/">Globalflow</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../server/livereload/livereload/">Livereload</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Utils</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../utils/fmap/fmap/">fmap</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../utils/fpath/fpath/">fpath</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../utils/fslice/fslice/">fslice</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../utils/fstring/fstring/">fstring</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../utils/fstruct/fstruct/">fstruct</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">foozy</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Router</li>
+      <li class="breadcrumb-item active">Manager</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h2 id="manager">Manager</h2>
+<p>The <code>Manager</code> object is used to manage router modules. The object's responsibilities include the following tasks:</p>
+<ul>
+<li>Transferring data within a single HTTP request. That is, data cannot be transferred between two HTTP requests</li>
+<li>Storing the <a href="/router/tmlengine/tmlengine">Render</a> object</li>
+<li>More convenient access to the <strong>TODO: link</strong> <a href="">Key</a> module</li>
+<li>Access to <strong>TODO: link</strong> <a href="">DatabasePool</a></li>
+</ul>
+<h4 id="managernew">Manager.New</h4>
+<p>Creates a new instance of <code>Manager</code> with some of the old settings. This is a very important method because it creates 
+a new instance of <code>Manager</code>, but retains the static data. If a new instance is created without this method, the <a href="/router/router">router</a> 
+may not work properly or may cause serious problems. Also creates a new instance of <a href="/router/tmlengine/tmlengine">Render</a> if it has been set previously.</p>
+<pre><code class="language-golang">func (m *Manager) New() (interface{}, error) {
+    newOTD, err := m.oneTimeData.New()
+    if err != nil {
+        return nil, err
+    }
+    var newRender interfaces.Render
+    if m.render != nil {
+        _newRender, err := m.render.New()
+        if err != nil {
+            return nil, err
+        }
+        newRender = _newRender.(interfaces.Render)
+    }
+
+    return &amp;Manager{
+        oneTimeData:  newOTD.(interfaces.ManagerOneTimeData),
+        render:       newRender,
+        key:          m.key,
+        databasePool: m.databasePool,
+    }, nil
+}
+</code></pre>
+<h2 id="onetimedata">OneTimeData</h2>
+<p>An object that transfers data between router modules. Data can only be transferred within the boundaries of a single HTTP request. For example, data cannot be transferred to another handler. For correct operation, a new instance of this object must be created in <a href="/router/router/#adapter">Adapter</a> for each handler call.</p>
+<h4 id="onetimedatasetslugparams">OneTimeData.SetSlugParams</h4>
+<p>Sets slug parameters for further retrieval by the user. The setting is made inside <a href="/router/router/#adapter">adapter</a>.</p>
+<pre><code class="language-golang">func (m *OneTimeData) SetSlugParams(params map[string]string) {
+    m.slugParams = params
+}
+</code></pre>
+<h4 id="onetimedatagetslugparams">OneTimeData.GetSlugParams</h4>
+<p>Returns the slug parameter.</p>
+<pre><code class="language-golang">func (m *OneTimeData) GetSlugParams(key string) (string, bool) {
+    res, ok := m.slugParams[key]
+    return res, ok
+}
+</code></pre>
+<h4 id="onetimedatasetusercontext">OneTimeData.SetUserContext</h4>
+<p>Sets the user context. The user can then use this data. The framework automatically sets some data here, here is a list of it:</p>
+<ul>
+<li><code>namelib.ROUTER.URL_PATTERN</code> — the current URL pattern.</li>
+<li><code>namelib.ROUTER.REDIRECT_ERROR</code> — redirect error. Set only if the <a href="/router/router/#catchredirecterror">router.CatchRedirectError</a> function is called.</li>
+<li><code>namelib.ROUTER.SERVER_ERROR</code> — server error. Set only if the <a href="/router/router/#servererror">router.ServerError</a> function is called.</li>
+<li><code>namelib.ROUTER.SERVER_FORBIDDEN_ERROR</code> — access error. Set only if the <a href="/router/router/#serverforbidden">router.ServerForbidden</a> function is called.</li>
+<li><code>namelib.ROUTER.SKIP_NEXT_PAGE</code> — tells the router to skip the page handler. Set only if the <strong>TODO: link</strong> <a href="">middlewares.SkipNextPage</a> function is called.</li>
+<li><code>namelib.OBJECT.OBJECT_CONTEXT</code> — object that is filled in <strong>TODO: link</strong> <a href="">view</a>.</li>
+<li><code>namelib.ROUTER.COOKIE_CSRF_TOKEN</code> — html string with CSRF token. Set only if the <strong>TODO: link</strong> <a href="">secure.SetCSRFToken</a> function is called.</li>
+</ul>
+<pre><code class="language-golang">func (m *OneTimeData) SetUserContext(key string, value interface{}) {
+    m.userContext.Store(key, value)
+}
+</code></pre>
+<h4 id="onetimedatagetusercontext">OneTimeData.GetUserContext</h4>
+<p>Returns the user context.</p>
+<pre><code class="language-golang">func (m *OneTimeData) GetUserContext(key string) (any, bool) {
+    m.userContext.Range(func(key, value any) bool {
+        return true
+    })
+    value, ok := m.userContext.Load(key)
+    return value, ok
+}
+</code></pre>
+<h4 id="onetimedatadelusercontext">OneTimeData.DelUserContext</h4>
+<p>Removes user context.</p>
+<pre><code class="language-golang">func (m *OneTimeData) DelUserContext(key string) {
+    m.userContext.Delete(key)
+}
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../cookies/cookies/" class="btn btn-neutral float-left" title="Cookies"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../form/form/" class="btn btn-neutral float-right" title="Form">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../../cookies/cookies/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../form/form/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

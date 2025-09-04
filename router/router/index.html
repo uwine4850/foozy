@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Router - foozy</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Router";
+        var mkdocs_page_input_path = "router/router.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> foozy
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">General</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../getting_started/">Getting started</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Cmd and config</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../cmd_and_config/cmd/">Cmd</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../cmd_and_config/config/">Config</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Router</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Router</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#adapter">Adapter</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#adapteradapt">Adapter.Adapt</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#bufferedresponsewriter">BufferedResponseWriter</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#bufferedresponsewriterflush">BufferedResponseWriter.Flush</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#router">Router</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#routerhandlerset">Router.HandlerSet</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#routerregister">Router.Register</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#routerservehttp">Router.ServeHTTP</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#redirecterror">RedirectError</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#catchredirecterror">CatchRedirectError</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#servererror">ServerError</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#serverforbidden">ServerForbidden</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#sendjson">SendJson</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../websocket/">Websocket</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../cookies/cookies/">Cookies</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../manager/manager/">Manager</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../form/form/">Form</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../middlewares/middlewares/">Middlewares</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../object/object/">Object</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../rest/rest/">Rest</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../tmlengine/tmlengine/">Tmlengine</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Secure</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../secure/csrf_token/">CSRF token</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../secure/hmac/">HMAC</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../secure/jwt/">JWT</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../secure/key/">Key</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../secure/header/">Header</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Database</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../database/database/">Database</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../database/async_queries/">AsyncQueries</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../database/sync_queries/">SyncQueries</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../database/database_pool/">DatabasePool</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Codegen</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../codegen/gen/">Gen</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Debug</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../debug/logging/">Logging</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Mapper</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../mapper/mapper/">Mapper</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Builtin</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../builtin/builtin/">Builtin</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Typeopr</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../typeopr/typeopr/">Typeopr</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Server</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../server/server/">Server</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../server/globalflow/globalflow/">Globalflow</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../server/livereload/livereload/">Livereload</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Utils</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../utils/fmap/fmap/">fmap</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../utils/fpath/fpath/">fpath</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../utils/fslice/fslice/">fslice</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../utils/fstring/fstring/">fstring</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../utils/fstruct/fstruct/">fstruct</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">foozy</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Router</li>
+      <li class="breadcrumb-item active">Router</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h2 id="package-router">package router</h2>
+<p>Globally, the router package is responsible for two functions:</p>
+<ol>
+<li>Preparing and running handlers via <a href="#adapter">Adapter</a>.</li>
+<li>Registering and running http methods. This is the responsibility of <a href="#router">Router</a>.</li>
+</ol>
+<p>In general, the algorithm of route processing is as follows:</p>
+<ol>
+<li>Register the handler on the route using the <a href="#routerregister">Register</a> method.</li>
+<li>Passing the handler to <a href="#adapter">Adapter</a> and receiving the same handler, but in a special wrapper.</li>
+<li>Adding the http method, path pattern and adapted handler to the route processing list.</li>
+<li>When url and path pattern match, the adapted handler will start.</li>
+</ol>
+<h3 id="adapter">Adapter</h3>
+<p>The <code>Adapter</code> object is needed to adapt the handler to work with the rest of the framework modules. The object is also needed to control the handler in a more flexible way. In general, <code>Adapter</code> should wrap the passed handler to work with other modules, and then this wrapper will be launched in <a href="#router">Router</a>.</p>
+<p>The adapter's responsibilities include the following items:</p>
+<ul>
+<li>Clearing logs before running the handler</li>
+<li>Creating a new instance of the <a href="/router/manager/manager/">Manager</a> object.</li>
+<li>Setting some <a href="/router/manager/manager/#onetimedata">Manager.OneTimeData</a> variables</li>
+<li>Running all types of middleware</li>
+<li>Running the original handler</li>
+<li>Outputting request logs to the console</li>
+</ul>
+<h4 id="adapteradapt">Adapter.Adapt</h4>
+<p>This is the main method that wraps the source handler and thus runs all the necessary modules. In general, its implementation is quite simple, but there are a few nuances:</p>
+<ul>
+<li>Instead of <code>http.ResponseWriter</code>, <a href="#bufferedresponsewriter">BufferedResponseWriter</a> is used.</li>
+<li>If the connection is a websocket, <a href="/router/middlewares/middlewares/#middlewarespostmiddleware">PostMiddlewares</a> are not run</li>
+</ul>
+<h3 id="bufferedresponsewriter">BufferedResponseWriter</h3>
+<p>BufferedResponseWriter is a wrapper over <code>http.ResponseWriter</code>. The wrapper is needed to give more flexible control over how data is written to the page. This object fully implements the <code>http.ResponseWriter</code> interface, but the difference is that the <code>Write</code> method does not send the request immediately, but buffers it. To actually write the data you need to use the <a href="#bufferedresponsewriterflush">Flush</a> method.</p>
+<h4 id="bufferedresponsewriterflush">BufferedResponseWriter.Flush</h4>
+<p>A simple method that writes data to the original <code>http.ResponseWriter</code>. Accordingly, the data is sent immediately.</p>
+<pre><code class="language-golang">func (rw *BufferedResponseWriter) Flush() (int, error) {
+    for k, vv := range rw.header {
+        for _, v := range vv {
+            rw.original.Header().Add(k, v)
+        }
+    }
+    rw.original.WriteHeader(rw.statusCode)
+    return rw.original.Write(rw.buffer.Bytes())
+}
+</code></pre>
+<h3 id="router">Router</h3>
+<p>The <code>Router</code> object is used to route http requests. The algorithm of its work looks like this:</p>
+<ol>
+<li>Obtaining the url address</li>
+<li>Searching for url address match in stored url templates</li>
+<li>Running a handler that is bound to the url template</li>
+</ol>
+<h4 id="routerhandlerset">Router.HandlerSet</h4>
+<p>Gegisters multiple handlers at once. Does everything the same as <a href="#routerregister">Router.Register</a>, but only with multiple handlers. The method is just for convenience.</p>
+<p>Example Usage:</p>
+<pre><code class="language-golang">newRouter.HandlerSet(
+    map[string][]map[string]router.Handler{
+        router.MethodGET: {
+            {&quot;/home&quot;: homeHandler},
+            {&quot;/about&quot;: aboutHandler},
+        },
+        router.MethodPOST: {
+            {&quot;/register&quot;: registerHandler},
+        },
+    }
+)
+</code></pre>
+<h4 id="routerregister">Router.Register</h4>
+<p>It simply registers a handler on the selected path. Uses <a href="./#adapter">Adapter</a> to wrap the handler.</p>
+<pre><code class="language-golang">newRouter.Register(router.MethodGET, &quot;/page&quot;,
+    func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
+        manager.Render().SetTemplatePath(&quot;index.html&quot;)
+        if err := manager.Render().RenderTemplate(w, r); err != nil {
+            return err
+        }
+        return nil
+    })
+</code></pre>
+<h4 id="routerservehttp">Router.ServeHTTP</h4>
+<p>Implements the <code>http.Handler</code> interface. It is used to call handlers.</p>
+<h4 id="redirecterror">RedirectError</h4>
+<p>The function redirects to the selected url. Also, the url parameters are redirected with an error from the function arguments.</p>
+<pre><code class="language-golang">func RedirectError(w http.ResponseWriter, r *http.Request, path string, _err string) {
+    uval := url.Values{}
+    uval.Add(namelib.ROUTER.REDIRECT_ERROR, _err)
+    newUrl := fmt.Sprintf(&quot;%s?%s&quot;, path, uval.Encode())
+    http.Redirect(w, r, newUrl, http.StatusFound)
+    debug.ErrorLogginIfEnable(_err)
+    debug.RequestLogginIfEnable(debug.P_ERROR, _err)
+}
+</code></pre>
+<h4 id="catchredirecterror">CatchRedirectError</h4>
+<p>Catches an error from url parameters that is passed through the <a href="#redirecterror">RedirectError</a> function. Sets the error to the <a href="/router/manager/manager/">manager</a> context. If there is a <a href="/router/tmlengine/tmlengine">Render</a> instance in <a href="/router/manager/manager/">Manager</a>, sets the error to its context. Both contexts are handled by the <code>namelib.ROUTER.REDIRECT_ERROR</code> key.</p>
+<pre><code class="language-golang">func CatchRedirectError(r *http.Request, manager interfaces.Manager) {
+    q := r.URL.Query()
+    redirectError := q.Get(namelib.ROUTER.REDIRECT_ERROR)
+    if redirectError != &quot;&quot; {
+        if manager.Render() != nil {
+            manager.Render().SetContext(map[string]interface{}{namelib.ROUTER.REDIRECT_ERROR: redirectError})
+        }
+        manager.OneTimeData().SetUserContext(namelib.ROUTER.REDIRECT_ERROR, redirectError)
+    }
+}
+</code></pre>
+<h4 id="servererror">ServerError</h4>
+<p>Sends an error with code 500 and the text "500 Internal server error" to the page. The text is sent using the special function <strong>TODO: link</strong> <a href="">debug.ErrorLoggingIfEnableAndWrite</a>.</p>
+<pre><code class="language-golang">func ServerError(w http.ResponseWriter, error string, manager interfaces.Manager) {
+    manager.OneTimeData().SetUserContext(namelib.ROUTER.SERVER_ERROR, error)
+    w.WriteHeader(http.StatusInternalServerError)
+    if config.LoadedConfig().Default.Debug.Debug {
+        debug.ErrorLoggingIfEnableAndWrite(w, error, error)
+    } else {
+        debug.ErrorLoggingIfEnableAndWrite(w, error, &quot;500 Internal server error&quot;)
+    }
+    debug.RequestLogginIfEnable(debug.P_ERROR, error)
+}
+</code></pre>
+<h4 id="serverforbidden">ServerForbidden</h4>
+<p>Sends an error with code 403 and text "500 Internal server error" to the page. The text is sent using the special function <strong>TODO: link</strong> <a href="">debug.ErrorLoggingIfEnableAndWrite</a>.</p>
+<pre><code class="language-golang">func ServerForbidden(w http.ResponseWriter, manager interfaces.Manager) {
+    manager.OneTimeData().SetUserContext(namelib.ROUTER.SERVER_FORBIDDEN_ERROR, &quot;403 forbidden&quot;)
+    w.WriteHeader(http.StatusForbidden)
+    debug.ErrorLoggingIfEnableAndWrite(w, &quot;403 forbidden&quot;, &quot;403 forbidden&quot;)
+    debug.RequestLogginIfEnable(debug.P_ERROR, &quot;403 forbidden&quot;)
+}
+</code></pre>
+<h4 id="sendjson">SendJson</h4>
+<p>Sends Json as a response to an http request.</p>
+<pre><code class="language-golang">func SendJson(data interface{}, w http.ResponseWriter, code int) error {
+    marshal, err := json.Marshal(data)
+    if err != nil {
+        return err
+    }
+    w.Header().Set(&quot;Content-Type&quot;, &quot;application/json&quot;)
+    w.WriteHeader(code)
+    _, err = w.Write(marshal)
+    if err != nil {
+        return err
+    }
+    return nil
+}
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../cmd_and_config/config/" class="btn btn-neutral float-left" title="Config"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../websocket/" class="btn btn-neutral float-right" title="Websocket">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../../cmd_and_config/config/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../websocket/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

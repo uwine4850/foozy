@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Rest - foozy</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Rest";
+        var mkdocs_page_input_path = "router/rest/rest.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> foozy
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../..">General</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../getting_started/">Getting started</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Cmd and config</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../cmd_and_config/cmd/">Cmd</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../cmd_and_config/config/">Config</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Router</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/">Router</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../websocket/">Websocket</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../cookies/cookies/">Cookies</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../manager/manager/">Manager</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../form/form/">Form</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../middlewares/middlewares/">Middlewares</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../object/object/">Object</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Rest</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#dto_1">DTO</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#dtoallowedmessages">DTO.AllowedMessages</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#dtogetallowedmessages">DTO.GetAllowedMessages</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#dtomessages">DTO.Messages</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#dtogenerate">DTO.Generate</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#implementdtomessage">ImplementDTOMessage</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#allowmessage">AllowMessage</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#allowmessagefullname">AllowMessage.FullName</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#issafemessage">IsSafeMessage</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../tmlengine/tmlengine/">Tmlengine</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Secure</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../secure/csrf_token/">CSRF token</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../secure/hmac/">HMAC</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../secure/jwt/">JWT</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../secure/key/">Key</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../secure/header/">Header</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Database</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../database/database/">Database</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../database/async_queries/">AsyncQueries</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../database/sync_queries/">SyncQueries</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../database/database_pool/">DatabasePool</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Codegen</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../codegen/gen/">Gen</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Debug</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../debug/logging/">Logging</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Mapper</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../mapper/mapper/">Mapper</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Builtin</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../builtin/builtin/">Builtin</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Typeopr</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../typeopr/typeopr/">Typeopr</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Server</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../server/server/">Server</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../server/globalflow/globalflow/">Globalflow</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../server/livereload/livereload/">Livereload</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Utils</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../utils/fmap/fmap/">fmap</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../utils/fpath/fpath/">fpath</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../utils/fslice/fslice/">fslice</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../utils/fstring/fstring/">fstring</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../utils/fstruct/fstruct/">fstruct</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">foozy</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Router</li>
+      <li class="breadcrumb-item active">Rest</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h2 id="dto">dto</h2>
+<p>The DTO system is an implementation of REST API with some special features. The purpose of DTO is to control and type the messages being sent.<br>
+To make interaction with the client more convenient, you can use TypeScript interface generation.<br>
+It works as follows:</p>
+<ol>
+<li>A message (structure) is created that controls the type of data being received and sent.</li>
+<li>All messages are registered.</li>
+<li><strong>Optional</strong>. TypeScript interfaces are generated that correspond to the server message (structure).</li>
+<li>Messages are sent or received using special functions and methods.</li>
+</ol>
+<p>Example of use in these <a href="https://github.com/uwine4850/foozy/tree/master/tests/router_test/dto_test">tests</a>.</p>
+<h3 id="dto_1">DTO</h3>
+<p>DTO (Data Transfer Object) generates a typescript interface using a message.
+For proper operation, you must make sure that the allowed messages match the transferred messages.</p>
+<p><strong>IMPORTANT</strong>: Allowed messages [AllowedMessages] must be exactly the same as the messages to generate [Messages]. This is only needed 
+during genaration. If no generation is taking place, you can use the allowed [AllowedMessages] alone.</p>
+<p>Any dependencies must also be included in the allowed messages, and they must be 
+in the same file as the parent object. Importing from other files is not allowed.</p>
+<p>Structure fields must have the <code>dto:“&lt;field_name&gt;”</code> tag for successful generation. Where <code>&lt;field_name&gt;</code> is the name of the field in 
+the typescript interface. If the tag is not added, the field will simply be skipped during generation.</p>
+<pre><code class="language-golang">type DTO struct {
+    allowedMessages []AllowMessage
+    messages        map[string][]irest.Message
+    isGenerated     bool
+}
+</code></pre>
+<h4 id="dtoallowedmessages">DTO.AllowedMessages</h4>
+<p>List of allowed messages for generation.<br>
+These messages will be checked before using the message, if it is not in this list, an error will be raised.</p>
+<pre><code class="language-golang">func (d *DTO) AllowedMessages(messages []AllowMessage) {
+    d.allowedMessages = messages
+}
+</code></pre>
+<h4 id="dtogetallowedmessages">DTO.GetAllowedMessages</h4>
+<p>Return <code>[]AllowMessage</code>.</p>
+<pre><code class="language-golang">func (d *DTO) GetAllowedMessages() []AllowMessage {
+    return d.allowedMessages
+}
+</code></pre>
+<h4 id="dtomessages">DTO.Messages</h4>
+<p>A list of messages that will be used for generation.<br>
+So will check the generation allowances for each message.</p>
+<pre><code class="language-golang">func (d *DTO) Messages(messages map[string][]irest.Message) {
+    d.messages = messages
+}
+</code></pre>
+<h4 id="dtogenerate">DTO.Generate</h4>
+<p>Start of generation.<br>
+Uses a template to generate typescript interfaces.</p>
+<pre><code class="language-golang">func (d *DTO) Generate() error {
+    if d.isGenerated {
+        return ErrMultipleGenerateCall{}
+    }
+    if err := d.validateMessageIntegrity(); err != nil {
+        return err
+    }
+    if err := d.writeClientMessages(); err != nil {
+        return err
+    }
+    d.isGenerated = true
+    return nil
+}
+</code></pre>
+<h3 id="implementdtomessage">ImplementDTOMessage</h3>
+<p>Structure to be embedded in a message.<br>
+Once inlined, the framework will implement the irest.IMessage interface.</p>
+<pre><code class="language-golang">type ImplementDTOMessage struct{}
+</code></pre>
+<h3 id="allowmessage">AllowMessage</h3>
+<p>Used to transmit packet data and message name in string type.</p>
+<pre><code class="language-golang">type AllowMessage struct {
+    Package string
+    Name    string
+}
+</code></pre>
+<h4 id="allowmessagefullname">AllowMessage.FullName</h4>
+<p>Outputs the full name of the message.<br>
+For example: main.Message.</p>
+<pre><code class="language-golang">func (a *AllowMessage) FullName() string {
+    return fmt.Sprintf(&quot;%s.%s&quot;, a.Package, a.Name)
+}
+</code></pre>
+<h4 id="issafemessage">IsSafeMessage</h4>
+<p>Checks whether the message is safe.<br>
+A message is safe if it is in allowed messages.</p>
+<pre><code class="language-golang">func IsSafeMessage(message typeopr.IPtr, allowedMessages []AllowMessage) error {
+    _type := reflect.TypeOf(message.Ptr()).Elem()
+    if !typeopr.IsImplementInterface(message, (*irest.Message)(nil)) {
+        return fmt.Errorf(&quot;%s message does not implement irest.IMessage interface&quot;, _type)
+    }
+    // If the message type is passed through the irest.IMessage interface.
+    if _type == reflect.TypeOf((*irest.Message)(nil)).Elem() {
+        _type = reflect.TypeOf(reflect.ValueOf(message.Ptr()).Elem().Interface())
+    }
+    pkgAndName := strings.Split(_type.String(), &quot;.&quot;)
+    msg := AllowMessage{Package: pkgAndName[0], Name: pkgAndName[1]}
+    if !fslice.SliceContains(allowedMessages, msg) {
+        return fmt.Errorf(&quot;%s message is unsafe&quot;, msg.FullName())
+    }
+    return nil
+}
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../object/object/" class="btn btn-neutral float-left" title="Object"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../tmlengine/tmlengine/" class="btn btn-neutral float-right" title="Tmlengine">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../../object/object/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../tmlengine/tmlengine/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Config - foozy</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Config";
+        var mkdocs_page_input_path = "cmd_and_config/config.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> foozy
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">General</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../getting_started/">Getting started</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Cmd and config</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../cmd/">Cmd</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Config</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#representing-the-configuration-as-a-golang-object">Representing the configuration as a golang object</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#configuration-templates">Configuration templates</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#info">Info</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#generating-a-configuration-file">Generating a configuration file</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#configgen">Config.Gen</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#initcnf">InitCnf</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#loading-the-configuration-file">Loading the configuration file</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#load">Load</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#loadedconfig">LoadedConfig</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Router</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/router/">Router</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/websocket/">Websocket</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/cookies/cookies/">Cookies</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/manager/manager/">Manager</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/form/form/">Form</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/middlewares/middlewares/">Middlewares</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/object/object/">Object</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/rest/rest/">Rest</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/tmlengine/tmlengine/">Tmlengine</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Secure</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../secure/csrf_token/">CSRF token</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../secure/hmac/">HMAC</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../secure/jwt/">JWT</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../secure/key/">Key</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../secure/header/">Header</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Database</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../database/database/">Database</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../database/async_queries/">AsyncQueries</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../database/sync_queries/">SyncQueries</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../database/database_pool/">DatabasePool</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Codegen</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../codegen/gen/">Gen</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Debug</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../debug/logging/">Logging</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Mapper</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../mapper/mapper/">Mapper</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Builtin</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../builtin/builtin/">Builtin</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Typeopr</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../typeopr/typeopr/">Typeopr</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Server</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../server/server/">Server</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../server/globalflow/globalflow/">Globalflow</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../server/livereload/livereload/">Livereload</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Utils</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../utils/fmap/fmap/">fmap</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../utils/fpath/fpath/">fpath</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../utils/fslice/fslice/">fslice</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../utils/fstring/fstring/">fstring</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../utils/fstruct/fstruct/">fstruct</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">foozy</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Cmd and config</li>
+      <li class="breadcrumb-item active">Config</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h2 id="config">Config</h2>
+<p>This package is designed to create, customize and use a configuration file. The configuration uses the <em>singleton</em> pattern. Also the configuration must be preloaded using the generated <code>InitCnf()</code> function. This function does not need to be called more than once per session.</p>
+<p><strong>NOTE:</strong> after changing the configuration, you must reboot the server.</p>
+<p>This package is divided into three sections:</p>
+<ul>
+<li><a href="#representing-the-configuration-as-a-golang-object">Representing the configuration as a golang object</a></li>
+<li><a href="#generating-a-configuration-file">Generating a configuration file</a></li>
+<li><a href="#loading-the-configuration-file">Loading the configuration file</a></li>
+</ul>
+<p>You can read more about each section below.</p>
+<h3 id="representing-the-configuration-as-a-golang-object">Representing the configuration as a golang object</h3>
+<p>The <code>Config</code> object is used for the global representation of the configuration. The object stores configuration data, is used for generation and stores loaded data from <code>config.yaml</code>.</p>
+<pre><code class="language-golang">type Config struct {
+    GeneratedDefault      bool                   `yaml:&quot;GeneratedDefault&quot;`
+    GeneratedAdditionally bool                   `yaml:&quot;GeneratedAdditionally&quot;`
+    Default               DefaultConfig          `yaml:&quot;Config&quot;`
+    Additionally          map[string]interface{} `yaml:&quot;Additionally&quot;`
+    path                  string
+    loadPath              string
+}
+</code></pre>
+<ul>
+<li>The <code>GeneratedDefault</code> and <code>GeneratedAdditionally</code> fields are intended to avoid re-generating the config 
+and thus resetting the settings. If you still need to reset the settings, these fields should be set to false in the config.yaml file.</li>
+<li>The <code>Default</code> field is responsible for the standard configuration of the framework.</li>
+<li>The <code>Additionally</code> field is for custom settings. That is, the user can put his own configs in this field and change them in the 
+common config.yaml file. This should be done right here using the <code>AppendAdditionally</code> method:</li>
+</ul>
+<pre><code class="language-golang">func InitCnf() {
+    cnf := config.Cnf()
+    // Use this to add your configurations.
+    // cnf.AppendAdditionally(&quot;my_cnf&quot;, typeopr.Ptr{}.New(&amp;MyCnfCtruct{}))
+    cnf.SetPath(&quot;cnf/config.yaml&quot;)
+    cnf.SetLoadPath(&quot;cnf/config.yaml&quot;)
+}
+</code></pre>
+<ul>
+<li>
+<p>The <code>path</code> and <code>loadPath</code> fields should contain the path to the generated configuration file. </p>
+<p>More precisely: <code>path</code> - the place of configuration generation, <code>loadPath</code> - the place of configuration
+loading. Two fields are made because the paths may differ syntactically, e.g. "config.yaml" and "../config.yaml".</p>
+</li>
+</ul>
+<hr />
+<p>The <code>Cnf</code> function is a singleton for accessing configuration settings.
+This function has nothing to do with outputting the configuration from the config.yaml file, it only provides access to the configuration generation settings. To just get the default configuration template you need to call this function.</p>
+<p><strong>NOTE:</strong> this function should not be confused with <code>LoadedConfig</code> as it gives the same object but it does not store the actual project settings.</p>
+<pre><code class="language-golang">func Cnf() *Config
+</code></pre>
+<hr />
+<h4 id="configuration-templates">Configuration templates</h4>
+<p>All configuration templates are shown below. They will be used to generate the standard <code>config.yaml</code>. This is also an example of how the configuration passed to the <code>AppendAdditionally</code> method should look like.</p>
+<p>Two structural tags will also be used here:</p>
+<ul>
+<li>yaml - field name.</li>
+<li>i - brief information about the field.</li>
+</ul>
+<p>The <code>DefaultConfig</code> object is a master template that contains all additional configuration templates.</p>
+<pre><code class="language-golang">type DefaultConfig struct {
+    Debug    DebugConfig    `yaml:&quot;Debug&quot;`
+    Database DatabaseConfig `yaml:&quot;Database&quot;`
+}
+</code></pre>
+<p>The <code>DebugConfig</code> object is the debug settings.</p>
+<pre><code class="language-golang">type DebugConfig struct {
+    PrintInfo             bool   `yaml:&quot;PrintInfo&quot; i:&quot;Displays basic information about each request.&quot;`
+    Debug                 bool   `yaml:&quot;Debug&quot; i:&quot;Enables debugging&quot;`
+    DebugRelativeFilepath bool   `yaml:&quot;DebugRelativeFilepath&quot; i:&quot;In logs, file paths are displayed relatively&quot;`
+    ErrorLogging          bool   `yaml:&quot;ErrorLogging&quot; i:&quot;Enables error logging&quot;`
+    ErrorLoggingPath      string `yaml:&quot;ErrorLoggingPath&quot; i:&quot;Path to error log file&quot;`
+    RequestInfoLog        bool   `yaml:&quot;RequestInfoLog&quot; i:&quot;Enables request logging&quot;`
+    RequestInfoLogPath    string `yaml:&quot;RequestInfoLogPath&quot; i:&quot;Path to request log file&quot;`
+    SkipLoggingLevel      int    `yaml:&quot;SkipLoggingLevel&quot; i:&quot;Skips logging levels. May need to be configured per project&quot;`
+}
+</code></pre>
+<p>The <code>DatabaseConfig</code> object is a part of the database configuration. The rest of the settings can be found directly in the <strong>TODO: add link</strong> <a href="">corresponding package</a>.</p>
+<pre><code class="language-golang">type DatabaseConfig struct {
+    MainConnectionPoolName string `yaml:&quot;MainConnectionPoolName&quot; i:&quot;The name of the main connection pool&quot;`
+}
+</code></pre>
+<hr />
+<h4 id="info">Info</h4>
+<p>The <code>Info</code> function displays all information about the configuration fields that have the <code>i</code> tag.</p>
+<pre><code class="language-golang">func Info()
+</code></pre>
+<h3 id="generating-a-configuration-file">Generating a configuration file</h3>
+<p>There is only one <code>Generate</code> object in this section. It is used only for generating the <code>config.yaml</code> configuration file.
+For correct operation it is necessary to use the <code>Config</code> object. A <code>config.yaml</code> file will be generated based on it. In the standard implementation, the <code>config.Cnf()</code> method must be used to get the <code>Config</code> object. It can be configured in advance.</p>
+<hr />
+<h4 id="configgen">Config.Gen</h4>
+<p>Method <code>Gen</code> generates a configuration file. The previously installed <code>Config</code> object is used for generation.
+Before generation, the previous config file is loaded, if it exists. When the configuration file exists, the following actions are performed:</p>
+<ul>
+<li>If the GeneratedDefault field is true, the default config will not be overwritten in the Config file</li>
+<li>If GeneratedAdditionally is true, the optional configuration is not overwritten, but if there are new or deleted fields, such changes will take effect.</li>
+</ul>
+<pre><code class="language-golang">func (g *Generate) Gen() error
+</code></pre>
+<hr />
+<h4 id="initcnf">InitCnf</h4>
+<p><a id="init-cnf"></a>
+The <code>InitCnf</code> function is designed to initialize the nonfiguration. It currently does two things:</p>
+<ul>
+<li>Setting paths to configuration files.</li>
+<li>Adding a custom configuration via the <code>AppendAdditionally</code> method.</li>
+</ul>
+<p>Therefore, this function must be called at least once per session in order to know where to load the configuration and also to load the user data.</p>
+<pre><code class="language-golang">func InitCnf() {
+    cnf := config.Cnf()
+    // Use this to add your configurations.
+    // cnf.AppendAdditionally(&quot;my_cnf&quot;, typeopr.Ptr{}.New(&amp;MyCnfCtruct{}))
+    cnf.SetPath(&quot;cnf/config.yaml&quot;)
+    cnf.SetLoadPath(&quot;cnf/config.yaml&quot;)
+}
+</code></pre>
+<h3 id="loading-the-configuration-file">Loading the configuration file</h3>
+<p>This part of the package is designed to load a sonfiguration from the <code>config.yaml</code> file and retrieve the loaded configuration.</p>
+<h4 id="load">Load</h4>
+<p>Function <code>Load</code> loads the settings from the <code>config.yaml</code> file. The file is loaded by the <code>path(loadPath)</code>, which is configured with the <code>Config</code> object. In addition, the configurations are loaded into a new instance of the <code>Config</code> structure.
+Due to the fact that the field <code>Additionally</code> has type map[string]interface{} type interface{}
+needs to be converted into a structure.</p>
+<pre><code class="language-golang">func Load() (*Config, error)
+</code></pre>
+<hr />
+<h4 id="loadedconfig">LoadedConfig</h4>
+<p>Function <code>LoadedConfig</code> singleton that loads the settings. It is preferable to use this function rather than <code>Load</code> to avoid loading the config every time.
+It is important to specify that changes in <code>config.yaml</code> settings are not taken into account after the framework is started, so it is necessary to restart the server after changing the configuration.</p>
+<pre><code class="language-golang">func LoadedConfig() *Config
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../cmd/" class="btn btn-neutral float-left" title="Cmd"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../router/router/" class="btn btn-neutral float-right" title="Router">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../cmd/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../router/router/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

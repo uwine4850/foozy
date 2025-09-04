@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Mapper - foozy</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Mapper";
+        var mkdocs_page_input_path = "mapper/mapper.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> foozy
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">General</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../getting_started/">Getting started</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Cmd and config</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../cmd_and_config/cmd/">Cmd</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../cmd_and_config/config/">Config</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Router</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/router/">Router</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/websocket/">Websocket</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/cookies/cookies/">Cookies</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/manager/manager/">Manager</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/form/form/">Form</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/middlewares/middlewares/">Middlewares</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/object/object/">Object</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/rest/rest/">Rest</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/tmlengine/tmlengine/">Tmlengine</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Secure</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../secure/csrf_token/">CSRF token</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../secure/hmac/">HMAC</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../secure/jwt/">JWT</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../secure/key/">Key</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../secure/header/">Header</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Database</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../database/database/">Database</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../database/async_queries/">AsyncQueries</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../database/sync_queries/">SyncQueries</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../database/database_pool/">DatabasePool</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Codegen</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../codegen/gen/">Gen</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Debug</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../debug/logging/">Logging</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Mapper</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Mapper</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#rawobject">RawObject</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#somerawobject">SomeRawObject</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#newsomerawobjectwithtag">NewSomeRawObjectWithTag</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#loadsomerawobjectfromcache">LoadSomeRawObjectFromCache</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Builtin</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../builtin/builtin/">Builtin</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Typeopr</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../typeopr/typeopr/">Typeopr</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Server</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../server/server/">Server</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../server/globalflow/globalflow/">Globalflow</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../server/livereload/livereload/">Livereload</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Utils</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../utils/fmap/fmap/">fmap</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../utils/fpath/fpath/">fpath</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../utils/fslice/fslice/">fslice</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../utils/fstring/fstring/">fstring</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../utils/fstruct/fstruct/">fstruct</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">foozy</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Mapper</li>
+      <li class="breadcrumb-item active">Mapper</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h2 id="mapper">mapper</h2>
+<p>This package is used for mapping data to a data structure.<br>
+The reflect package is actively used for the mapper's operation. Therefore, the key feature of the package is the use of caching.</p>
+<p>The <code>LoadSomeRawObjectFromCache</code> function is used to create and subsequently load the cache. Example of use:</p>
+<pre><code class="language-golang">var rawCache sync.Map
+...
+v := typeopr.GetReflectValue(out)
+raw := LoadSomeRawObjectFromCache(v, &amp;rawCache, namelib.TAGS.FORM_MAPPER_NAME)
+...
+</code></pre>
+<p>There are several types of mappers:</p>
+<p><a href="/mapper/dbmapper">dbmapper</a><br>
+<a href="/mapper/formmapper">formmapper</a><br>
+<a href="/mapper/dtomapper">dtomapper</a><br></p>
+<h3 id="rawobject">RawObject</h3>
+<p>RawObject is used to store data of type undefined structure.</p>
+<p>This structure is intended to optimize the work of the reflect package with the structure.<br>
+The type of the structure itself and its field types are stored here. This object reduces
+the load on the structure parser, now it is not necessary to loop through all fields.
+Also this object is convenient because it can store only selected fields of the structure,
+which makes it more convenient to use.</p>
+<p>Fields are passed by the map so that it is possible to give them a custom tag name. If the tag
+is not needed, the key can be the field name.</p>
+<p><strong>IMPORTANT</strong>: to get better performance you should store an instance of this object in a separate immutable variable.</p>
+<pre><code class="language-golang">type RawObject interface {
+    // Type returns the type of the stored object.
+    Type() reflect.Type
+    // Fields returns the selected fields of the stored object.
+    // It can store not all fields, but only those added by the implementation.
+    Fields() *map[string]reflect.StructField
+}
+</code></pre>
+<h3 id="somerawobject">SomeRawObject</h3>
+<p>Object stores structure data to be filled with data from the data base.
+It implements the RawStruct interface.</p>
+<pre><code class="language-golang">type SomeRawObject struct {
+    typ    reflect.Type
+    fields *map[string]reflect.StructField
+}
+</code></pre>
+<h4 id="newsomerawobjectwithtag">NewSomeRawObjectWithTag</h4>
+<p>Creates and fills a new instance of <code>SomeRawObject</code> from a given object.
+Accepts an object as a direct instance or reflect.Value object.</p>
+<p>Only fields that have the <code>&lt;tag_name&gt;:&lt;field_name&gt;</code> tag will be stored.
+This tag must contain the names of the column in the table, for which
+the structure field is intended. The names must exactly match.
+If there is no tag, the field will be simply skipped.</p>
+<pre><code class="language-golang">func NewSomeRawObjectWithTag[T any](target *T, tagName string) RawObject {
+    t := typeopr.GetReflectValue(target).Type()
+    fields := make(map[string]reflect.StructField)
+    for i := 0; i &lt; t.NumField(); i++ {
+        field := t.Field(i)
+        fieldDbTagName := field.Tag.Get(tagName)
+        // Skip field if tag empty.
+        if fieldDbTagName == &quot;&quot; {
+            continue
+        }
+        fields[fieldDbTagName] = field
+    }
+    return &amp;SomeRawObject{
+        typ:    t,
+        fields: &amp;fields,
+    }
+}
+</code></pre>
+<h4 id="loadsomerawobjectfromcache">LoadSomeRawObjectFromCache</h4>
+<p>Loads an object from the selected cache.
+If the object is not in the cache, creates a RawObject for it and sets it.</p>
+<pre><code class="language-golang">func LoadSomeRawObjectFromCache(objectValue reflect.Value, rawCache *sync.Map, tagName string) RawObject {
+    var raw RawObject
+    objectType := objectValue.Type()
+    if storedRaw, ok := rawCache.Load(objectType); ok {
+        raw = storedRaw.(RawObject)
+    } else {
+        raw = NewSomeRawObjectWithTag(&amp;objectValue, tagName)
+        rawCache.Store(objectType, raw)
+    }
+    return raw
+}
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../debug/logging/" class="btn btn-neutral float-left" title="Logging"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../builtin/builtin/" class="btn btn-neutral float-right" title="Builtin">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../../debug/logging/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../builtin/builtin/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

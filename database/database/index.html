@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Database - foozy</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Database";
+        var mkdocs_page_input_path = "database/database.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> foozy
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">General</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../getting_started/">Getting started</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Cmd and config</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../cmd_and_config/cmd/">Cmd</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../cmd_and_config/config/">Config</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Router</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/router/">Router</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/websocket/">Websocket</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/cookies/cookies/">Cookies</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/manager/manager/">Manager</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/form/form/">Form</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/middlewares/middlewares/">Middlewares</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/object/object/">Object</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/rest/rest/">Rest</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../router/tmlengine/tmlengine/">Tmlengine</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Secure</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../secure/csrf_token/">CSRF token</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../secure/hmac/">HMAC</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../secure/jwt/">JWT</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../secure/key/">Key</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../secure/header/">Header</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Database</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Database</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#mysqldatabase">MysqlDatabase</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#mysqldatabaseopen">MysqlDatabase.Open</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#mysqldatabaseclose">MysqlDatabase.Close</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#mysqldatabasenewtransaction">MysqlDatabase.NewTransaction</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#mysqldatabasesyncq">MysqlDatabase.SyncQ</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#mysqldatabasenewasyncq">MysqlDatabase.NewAsyncQ</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#mysqltransaction">MysqlTransaction</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#mysqltransactionbegintransaction">MysqlTransaction.BeginTransaction</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#mysqltransactioncommittransaction">MysqlTransaction.CommitTransaction</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#mysqltransactionrollbacktransaction">MysqlTransaction.RollBackTransaction</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#mysqltransactionsyncq">MysqlTransaction.SyncQ</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#mysqltransactionnewasyncq">MysqlTransaction.NewAsyncQ</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dbquery">DbQuery</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#dbqueryquery">DbQuery.Query</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#dbqueryexec">DbQuery.Exec</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dbtxquery">DbTxQuery</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#dbtxqueryquery">DbTxQuery.Query</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#dbtxqueryexec">DbTxQuery.Exec</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#initdatabasepool">InitDatabasePool</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../async_queries/">AsyncQueries</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../sync_queries/">SyncQueries</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../database_pool/">DatabasePool</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Codegen</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../codegen/gen/">Gen</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Debug</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../debug/logging/">Logging</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Mapper</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../mapper/mapper/">Mapper</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Builtin</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../builtin/builtin/">Builtin</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Typeopr</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../typeopr/typeopr/">Typeopr</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Server</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../server/server/">Server</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../server/globalflow/globalflow/">Globalflow</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../server/livereload/livereload/">Livereload</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Utils</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../utils/fmap/fmap/">fmap</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../utils/fpath/fpath/">fpath</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../utils/fslice/fslice/">fslice</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../utils/fstring/fstring/">fstring</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../utils/fstruct/fstruct/">fstruct</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">foozy</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Database</li>
+      <li class="breadcrumb-item active">Database</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h2 id="database">database</h2>
+<p>Implementation of Mysql database interfaces.</p>
+<h3 id="mysqldatabase">MysqlDatabase</h3>
+<p>Implementation of <code>Database</code>, <code>SyncAsyncQuery</code> and <code>DatabaseInteraction</code> interfaces.<br>
+Object for accessing the database.<br>
+It can send both synchronous and asynchronous queries.</p>
+<p><strong>IMPORTANT</strong>: after the end of work it is necessary to close the connection using Close method.</p>
+<p>For each transaction a new instance of the <code>Transaction</code> object is created,
+so each transaction is executed in its own scope and is completely safe.</p>
+<pre><code class="language-golang">type MysqlDatabase struct {
+    username string
+    password string
+    host     string
+    port     string
+    database string
+    db       *sql.DB
+    tx       *sql.Tx
+    syncQ    interfaces.SyncQ
+    asyncQ   interfaces.AsyncQ
+}
+</code></pre>
+<h4 id="mysqldatabaseopen">MysqlDatabase.Open</h4>
+<p>Connecting to a mysql database.<br>
+Also, initialization of synchronous and asynchronous queries.</p>
+<pre><code class="language-golang">func (d *MysqlDatabase) Open() error {
+    connStr := fmt.Sprintf(&quot;%s:%s@tcp(%s:%s)/%s&quot;, d.username, d.password, d.host, d.port, d.database)
+    db, err := sql.Open(&quot;mysql&quot;, connStr)
+    if err != nil {
+        return err
+    }
+
+    err = db.Ping()
+    if err != nil {
+        return err
+    }
+    d.db = db
+    d.syncQ.SetDB(&amp;DbQuery{DB: db})
+    return nil
+}
+</code></pre>
+<h4 id="mysqldatabaseclose">MysqlDatabase.Close</h4>
+<p>Closes the connection to the database.</p>
+<pre><code class="language-golang">func (d *MysqlDatabase) Close() error {
+    err := d.db.Close()
+    if err != nil {
+        return err
+    }
+    if d.tx != nil {
+        if err := d.tx.Rollback(); err != nil {
+            return err
+        }
+        d.tx = nil
+    }
+    return nil
+}
+</code></pre>
+<h4 id="mysqldatabasenewtransaction">MysqlDatabase.NewTransaction</h4>
+<pre><code class="language-golang">func (d *MysqlDatabase) NewTransaction() (interfaces.DatabaseTransaction, error) {
+    return NewMysqlTransaction(d.db, d.syncQ, d.asyncQ)
+}
+</code></pre>
+<h4 id="mysqldatabasesyncq">MysqlDatabase.SyncQ</h4>
+<p>Getting access to synchronous requests.</p>
+<pre><code class="language-golang">func (d *MysqlDatabase) SyncQ() interfaces.SyncQ {
+    return d.syncQ
+}
+</code></pre>
+<h4 id="mysqldatabasenewasyncq">MysqlDatabase.NewAsyncQ</h4>
+<p>Creates and returns a new instance of <code>interfaces.AsyncQ</code>.<br>
+This is necessary for data security, since <code>interfaces.AsyncQ</code> stores SQL query data, so a separate instance must be 
+created for each HTTP handler.</p>
+<pre><code class="language-golang">func (d *MysqlDatabase) NewAsyncQ() (interfaces.AsyncQ, error) {
+    aq, err := d.asyncQ.New()
+    if err != nil {
+        return nil, err
+    }
+    return aq.(interfaces.AsyncQ), nil
+}
+</code></pre>
+<h3 id="mysqltransaction">MysqlTransaction</h3>
+<p>An object that performs transactions to the mysql database.<br>
+This object is used only for one transaction, for each next transaction a new instance of the object must be created.</p>
+<pre><code class="language-golang">type MysqlTransaction struct {
+    db     *sql.DB
+    tx     *sql.Tx
+    syncQ  interfaces.SyncQ
+    asyncQ interfaces.AsyncQ
+}
+</code></pre>
+<h4 id="mysqltransactionbegintransaction">MysqlTransaction.BeginTransaction</h4>
+<p>Starts the transaction.<br>
+Only one transaction can be started per object instance.</p>
+<pre><code class="language-golang">func (t *MysqlTransaction) BeginTransaction() error {
+    if t.tx != nil {
+        return errors.New(&quot;transaction already started&quot;)
+    }
+    tx, err := t.db.Begin()
+    if err != nil {
+        return err
+    }
+    t.syncQ.SetDB(&amp;DbTxQuery{Tx: tx})
+    t.asyncQ.SetSyncQueries(t.syncQ)
+    t.tx = tx
+    return nil
+}
+</code></pre>
+<h4 id="mysqltransactioncommittransaction">MysqlTransaction.CommitTransaction</h4>
+<p>Writes the transaction to the database.</p>
+<pre><code class="language-golang">func (t *MysqlTransaction) CommitTransaction() error {
+    if t.tx == nil {
+        return errors.New(&quot;transaction not begin&quot;)
+    }
+    if err := t.tx.Commit(); err != nil {
+        return err
+    }
+    t.tx = nil
+    return nil
+}
+</code></pre>
+<h4 id="mysqltransactionrollbacktransaction">MysqlTransaction.RollBackTransaction</h4>
+<p>Undoes any changes that were made during the transaction.<br>
+That is, after executing the <code>BeginTransaction</code> method.</p>
+<pre><code class="language-golang">func (t *MysqlTransaction) RollBackTransaction() error {
+    if t.tx == nil {
+        return errors.New(&quot;transaction not begin&quot;)
+    }
+    if err := t.tx.Rollback(); err != nil {
+        return err
+    }
+    t.tx = nil
+    return nil
+}
+</code></pre>
+<h4 id="mysqltransactionsyncq">MysqlTransaction.SyncQ</h4>
+<p>Getting access to synchronous requests.</p>
+<pre><code class="language-golang">func (t *MysqlTransaction) SyncQ() interfaces.SyncQ {
+    return t.syncQ
+}
+</code></pre>
+<h4 id="mysqltransactionnewasyncq">MysqlTransaction.NewAsyncQ</h4>
+<p>Creates and returns a new instance of <code>interfaces.AsyncQ</code>.<br>
+This is necessary for data security, since <code>interfaces.AsyncQ</code> stores SQL query data, so a separate instance must be 
+created for each HTTP handler.</p>
+<pre><code class="language-golang">func (t *MysqlTransaction) NewAsyncQ() (interfaces.AsyncQ, error) {
+    aq, err := t.asyncQ.New()
+    if err != nil {
+        return nil, err
+    }
+    return aq.(interfaces.AsyncQ), nil
+}
+</code></pre>
+<h3 id="dbquery">DbQuery</h3>
+<p>Standard database queries. They are used *sql.DB.
+Requests are executed as usual.</p>
+<pre><code class="language-golang">type DbQuery struct {
+    DB *sql.DB
+}
+</code></pre>
+<h4 id="dbqueryquery">DbQuery.Query</h4>
+<p>Used to execute queries that return data.
+For example, the SELECT command.</p>
+<pre><code class="language-golang">func (d *DbQuery) Query(query string, args ...any) ([]map[string]interface{}, error) {
+    sqlRows, err := d.DB.Query(query, args...)
+    if err != nil {
+        return nil, err
+    }
+    rows, err := scanRows(sqlRows)
+    if err != nil {
+        return nil, err
+    }
+
+    err = sqlRows.Close()
+    if err != nil {
+        return nil, err
+    }
+    return rows, nil
+}
+</code></pre>
+<h4 id="dbqueryexec">DbQuery.Exec</h4>
+<p>Used to execute queries that do not return data.
+For example, the INSERT command.</p>
+<p>Returns the following data:</p>
+<ul>
+<li>Key "insertID" is the identifier of the inserted row using INSERT.</li>
+<li>Key "rowsAffected" - Returns the number of rows affected by INSERT, UPDATE, DELETE.</li>
+</ul>
+<pre><code class="language-golang">func (d *DbQuery) Exec(query string, args ...any) (map[string]interface{}, error) {
+    result, err := d.DB.Exec(query, args...)
+    if err != nil {
+        return nil, err
+    }
+
+    id, err := result.LastInsertId()
+    if err != nil {
+        return nil, err
+    }
+    rowsId, err := result.RowsAffected()
+    if err != nil {
+        return nil, err
+    }
+    return map[string]interface{}{&quot;insertID&quot;: id, &quot;rowsAffected&quot;: rowsId}, nil
+}
+</code></pre>
+<h3 id="dbtxquery">DbTxQuery</h3>
+<p>Queries that can be rolled back. Used *sql.Tx.<br>
+This object will perform queries with the <code>*sql.Tx</code> object that is used for transactions.</p>
+<pre><code class="language-golang">type DbTxQuery struct {
+    Tx *sql.Tx
+}
+</code></pre>
+<h4 id="dbtxqueryquery">DbTxQuery.Query</h4>
+<p>Used to execute queries that return data.
+For example, the SELECT command.</p>
+<pre><code class="language-golang">func (d *DbTxQuery) Query(query string, args ...any) ([]map[string]interface{}, error) {
+    sqlRows, err := d.Tx.Query(query, args...)
+    if err != nil {
+        return nil, err
+    }
+
+    rows, err := scanRows(sqlRows)
+    if err != nil {
+        return nil, err
+    }
+
+    err = sqlRows.Close()
+    if err != nil {
+        return nil, err
+    }
+    return rows, nil
+}
+</code></pre>
+<h4 id="dbtxqueryexec">DbTxQuery.Exec</h4>
+<p>Used to execute queries that do not return data.
+For example, the INSERT command.</p>
+<p>Returns the following data:</p>
+<ul>
+<li>Key "insertID" is the identifier of the inserted row using INSERT.</li>
+<li>Key "rowsAffected" - Returns the number of rows affected by INSERT, UPDATE, DELETE.</li>
+</ul>
+<pre><code class="language-golang">func (d *DbTxQuery) Exec(query string, args ...any) (map[string]interface{}, error) {
+    result, err := d.Tx.Exec(query, args...)
+    if err != nil {
+        return nil, err
+    }
+
+    id, err := result.LastInsertId()
+    if err != nil {
+        return nil, err
+    }
+    rowsId, err := result.RowsAffected()
+    if err != nil {
+        return nil, err
+    }
+    return map[string]interface{}{&quot;id&quot;: id, &quot;rows&quot;: rowsId}, nil
+}
+</code></pre>
+<hr />
+<h4 id="initdatabasepool">InitDatabasePool</h4>
+<p>Initializes a database pool.<br>
+Only one pool is created, which is specified in the <code>Default.Database.MainConnectionPoolName</code> settings.
+Once created, the pool is locked. Therefore, you need to initialize it manually if you need more connections.</p>
+<pre><code class="language-golang">func InitDatabasePool(manager interfaces.Manager, db interfaces.Database) error {
+    name := config.LoadedConfig().Default.Database.MainConnectionPoolName
+    if err := manager.Database().AddConnection(name, db); err != nil {
+        return err
+    }
+    manager.Database().Lock()
+    return nil
+}
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../secure/header/" class="btn btn-neutral float-left" title="Header"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../async_queries/" class="btn btn-neutral float-right" title="AsyncQueries">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../../secure/header/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../async_queries/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
